@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Espacio de Ejercicios | Secundaria</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height:100vh;
+      overflow:hidden;
+      background: linear-gradient(135deg, #111827, #1e3a8a, #0f172a);
+      color:white;
+      position:relative;
+    }
+
+    /* Fondo animado */
+    .bg-circle{
+      position:absolute;
+      border-radius:50%;
+      filter: blur(60px);
+      opacity:0.4;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .circle1{
+      width:300px;
+      height:300px;
+      background:#3b82f6;
+      top:-100px;
+      left:-100px;
+    }
+
+    .circle2{
+      width:350px;
+      height:350px;
+      background:#22c55e;
+      bottom:-120px;
+      right:-120px;
+      animation-delay:2s;
+    }
+
+    @keyframes float{
+      0%,100%{
+        transform:translateY(0px);
+      }
+      50%{
+        transform:translateY(25px);
+      }
+    }
+
+    /* Emojis */
+    .emoji{
+      position:absolute;
+      top:-50px;
+      animation: fall linear forwards;
+      user-select:none;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    @keyframes fall{
+      to{
+        transform: translateY(110vh) rotate(360deg);
+        opacity:0;
+      }
+    }
+
+    /* Contenido */
+    .container{
+      position:relative;
+      z-index:2;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+    }
+
+    .card{
+      width:100%;
+      max-width:900px;
+      background: rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(15px);
+      border-radius:30px;
+      padding:55px;
+      text-align:center;
+      box-shadow:0 15px 40px rgba(0,0,0,0.35);
+      animation: show 1.2s ease;
+    }
+
+    @keyframes show{
+      from{
+        opacity:0;
+        transform: translateY(40px);
+      }
+      to{
+        opacity:1;
+        transform: translateY(0);
+      }
+    }
+
+    .icon{
+      font-size:3rem;
+      margin-bottom:20px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce{
+      0%,100%{
+        transform:translateY(0);
+      }
+      50%{
+        transform:translateY(-10px);
+      }
+    }
+
+    h1{
+      font-size:3.4rem;
+      margin-bottom:18px;
+      background: linear-gradient(to right, #60a5fa, #4ade80);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+
+    h2{
+      font-size:1.4rem;
+      color:#cbd5e1;
+      margin-bottom:30px;
+      font-weight:400;
+    }
+
+    p{
+      font-size:1.15rem;
+      line-height:1.8;
+      color:#e5e7eb;
+      margin-bottom:35px;
+    }
+
+    .btn{
+      display:inline-block;
+      padding:15px 35px;
+      border-radius:999px;
+      background: linear-gradient(135deg, #2563eb, #22c55e);
+      color:white;
+      text-decoration:none;
+      font-weight:bold;
+      font-size:1rem;
+      transition:0.3s;
+      box-shadow:0 10px 20px rgba(0,0,0,0.25);
+    }
+
+    .btn:hover{
+      transform:scale(1.05);
+    }
+
+    .footer{
+      margin-top:35px;
+      color:#94a3b8;
+      font-size:0.95rem;
+    }
+
+    @media(max-width:768px){
+
+      .card{
+        padding:35px 25px;
+      }
+
+      h1{
+        font-size:2.4rem;
+      }
+
+      h2{
+        font-size:1.1rem;
+      }
+
+      p{
+        font-size:1rem;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="bg-circle circle1"></div>
+  <div class="bg-circle circle2"></div>
+
+  <div class="container">
+
+    <div class="card">
+
+      <div class="icon">🚀📚✨</div>
+
+      <h1>Espacio de Ejercicios</h1>
+
+      <h2>Secundaria • Aprende • Practica • Mejora</h2>
+
+      <p>
+        ¡Bienvenido/a! 🎉
+        <br><br>
+        Este es tu espacio para practicar, resolver ejercicios y fortalecer tus habilidades.
+        Aquí cada reto es una oportunidad para aprender algo nuevo 💡
+        <br><br>
+        No importa si algo parece difícil al inicio… incluso el WiFi se cae a veces 😅
+        Lo importante es seguir intentando 🚀
+      </p>
+
+      <a href="#" class="btn">
+        ✨ Comenzar
+      </a>
+
+      <div class="footer">
+        Desarrollado por <strong>Prof. Eliseo</strong> 👨‍🏫
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    const emojis = [
+      "📚","✨","🚀","🧠","💡","🎯",
+      "⭐","📝","🔥","🎓","🌟","💻"
+    ];
+
+    function createEmoji(){
+
+      const emoji = document.createElement("div");
+      emoji.classList.add("emoji");
+
+      emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+
+      emoji.style.left = Math.random() * window.innerWidth + "px";
+      emoji.style.fontSize = (Math.random() * 20 + 20) + "px";
+      emoji.style.animationDuration = (Math.random() * 3 + 3) + "s";
+
+      document.body.appendChild(emoji);
+
+      setTimeout(()=>{
+        emoji.remove();
+      },6000);
+    }
+
+    setInterval(createEmoji, 160);
+
+    for(let i=0;i<30;i++){
+      setTimeout(createEmoji, i * 120);
+    }
+
+  </script>
+
+</body>
+</html>
