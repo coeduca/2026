@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Los paisajes culturales - Octavo</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="civica-exercises.js"></script>
+  <script src="civica-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    CIVICA.init({
+      id: 'cv_1778499445872',
+      container: '#app',
+      topic: 'Los paisajes culturales',
+      level: 'Octavo',
+      unit: '',
+      subjectLabel: 'Ciudadanía y Valores',
+      book: { url: 'https://drive.google.com/file/d/1Cggz0OedoPDyOSGYGtoTSLjTc0nyogin/view?usp=drivesdk', label: 'Libro de Octavo' },
+      pdfDesign: 'PopArt', 
+      colors: { primary: '#006575', accent: '#59B6AE', bg: '#4FCCFF' },
+      
+      sections: {
+        explore: [
+          {
+            type: 'cv_textanswer',
+            title: 'Actividad 1: Cambios en el tiempo',
+            instruction: 'Lee y analiza la fotografía comparativa del Palacio Nacional de San Salvador. Luego, reflexiona y responde las interrogantes.',
+            image: 'files/palacio_nacional_1911_2014.png',
+            dataA: [
+              { q: '¿De qué manera es posible apreciar los cambios en el paisaje cultural a través del tiempo observando las imágenes?', minLength: 30, rows: 3, placeholder: 'Describe los cambios arquitectónicos, urbanos o sociales...' },
+              { q: 'Según tu opinión, además de los cambios visuales, ¿qué otras transformaciones (sociales, económicas) se producen en el paisaje cultural?', minLength: 30, rows: 3, placeholder: 'Menciona cambios en la forma de vivir, costumbres...' }
+            ],
+            dataB: [
+              { q: '¿Cómo crees que el turismo masivo puede afectar la autenticidad y conservación de los paisajes culturales a lo largo del tiempo?', minLength: 30, rows: 3, placeholder: 'Explica tu punto de vista sobre el impacto del turismo...' },
+              { q: '¿Has notado cambios drásticos en el paisaje natural o cultural en tu propia localidad? Describe un ejemplo.', minLength: 30, rows: 3, placeholder: 'Piensa en parques, calles o edificios de tu zona...' }
+            ]
+          }
+        ],
+        deepen: [
+          {
+            type: 'categorize',
+            title: 'Impactos de la Industria Turística',
+            instruction: 'Clasifica los siguientes elementos según correspondan a beneficios o impactos negativos (desafíos) generados por el turismo, basándote en la lectura.',
+            dataA: {
+              categories: ['Beneficios Económicos y Sociales', 'Impactos Negativos / Desafíos'],
+              items: [
+                { text: 'Generación de empleos', cat: 0 },
+                { text: 'Gentrificación urbana', cat: 1 },
+                { text: 'Incremento de ingresos fiscales', cat: 0 },
+                { text: 'Escasez de agua por consumo excesivo', cat: 1 },
+                { text: 'Desarrollo de pequeños negocios', cat: 0 },
+                { text: 'Sobreturismo y hacinamiento', cat: 1 }
+              ]
+            },
+            dataB: {
+              categories: ['Beneficios Económicos y Sociales', 'Impactos Negativos / Desafíos'],
+              items: [
+                { text: 'Aporte significativo al PIB mundial', cat: 0 },
+                { text: 'Pérdida de hábitats naturales', cat: 1 },
+                { text: 'Difusión y puesta en valor del patrimonio', cat: 0 },
+                { text: 'Alteración de prácticas tradicionales', cat: 1 },
+                { text: 'Oportunidades de desarrollo local', cat: 0 },
+                { text: 'Erosión del suelo y contaminación', cat: 1 }
+              ]
+            }
+          },
+          {
+            type: 'cv_textanswer',
+            title: 'Actividad 3: Análisis de Gobernanza y Centros Históricos',
+            instruction: 'Desarrolla tu habilidad para establecer conexiones e interrelaciones respondiendo a estas interrogantes sobre el desarrollo urbano.',
+            dataA: [
+              { q: '¿Qué relación existe entre la preservación del paisaje cultural y el desarrollo económico de un país?', minLength: 40, rows: 3, placeholder: 'Relaciona la cultura, el turismo y la economía...' },
+              { q: '¿Cuáles son los principales desafíos medioambientales a los que se enfrenta un lugar como el Centro Histórico de San Salvador?', minLength: 40, rows: 3, placeholder: 'Piensa en el tráfico, los desechos, la infraestructura...' }
+            ],
+            dataB: [
+              { q: '¿Cómo puede equilibrarse el desarrollo comercial, la conservación del patrimonio histórico y el impacto ambiental?', minLength: 40, rows: 3, placeholder: 'Propón ideas para mantener este equilibrio...' },
+              { q: '¿Qué rol debería asumir la comunidad local en la planificación turística de los centros históricos?', minLength: 40, rows: 3, placeholder: 'Describe la participación ciudadana ideal...' }
+            ]
+          }
+        ],
+        consolidate: [
+          {
+            type: 'truefalse',
+            title: 'Estudio de Caso: Ecoturismo de Ballenas',
+            instruction: 'Analiza el caso del proyecto "Viva Ballena" y determina si las siguientes afirmaciones son verdaderas o falsas.',
+            image: 'files/avistamiento_ballenas.jpg',
+            dataA: [
+              { statement: 'Las actividades de avistamiento, si no son responsables, pueden perturbar los hábitos de descanso y alimentación de los cetáceos.', answer: true },
+              { statement: 'El proyecto "Viva Ballena" promueve el sobreturismo sin establecer límites a las embarcaciones.', answer: false },
+              { statement: 'El ecoturismo busca mejorar la calidad de vida de las comunidades a través de la conservación responsable.', answer: true }
+            ],
+            dataB: [
+              { statement: 'La cacería histórica es una de las principales causas por las que declinaron las poblaciones de ballenas jorobadas.', answer: true },
+              { statement: 'Los turistas que participan en estos avistamientos no tienen ningún rol en la conservación ni como ciudadanos científicos.', answer: false },
+              { statement: 'Es vital capacitar a los turoperadores locales en biología y buenas prácticas de navegación cerca de la fauna.', answer: true }
+            ]
+          },
+          {
+            type: 'cv_textanswer',
+            title: 'Actividad 5: Propuesta de Desarrollo Turístico Sostenible',
+            instruction: 'A partir de lo investigado en clase, plantea una alternativa viable para promover el turismo responsable en tu localidad.',
+            dataA: [
+              { q: 'Diseña una propuesta de proyecto turístico sostenible para tu localidad. ¿Cuáles serían los beneficios económicos esperados?', minLength: 50, rows: 4, placeholder: 'Describe tu idea de proyecto y cómo generará ingresos...' },
+              { q: 'Identifica al menos dos posibles efectos socioambientales negativos que tu proyecto podría causar y cómo los prevendrías.', minLength: 40, rows: 4, placeholder: 'Habla sobre posibles riesgos y tus soluciones...' }
+            ],
+            dataB: [
+              { q: 'Describe una propuesta de ecoturismo para tu departamento que respete el paisaje cultural y evite la gentrificación.', minLength: 50, rows: 4, placeholder: 'Detalla las actividades y atractivos de tu propuesta...' },
+              { q: '¿Qué instituciones, organizaciones comunitarias o actores clave deberían involucrarse en tu propuesta para garantizar su éxito?', minLength: 40, rows: 4, placeholder: 'Menciona Ministerios, alcaldías, ONG, líderes locales...' }
+            ]
+          }
+        ]
+      },
+      
+      game: { 
+        type: 'trivia',
+        questions: [
+          { q: 'Es el proceso donde un destino recibe una cantidad excesiva de turistas, provocando hacinamiento y presión sobre los recursos:', options: ['Sobreturismo', 'Gentrificación', 'Ecoturismo', 'Fuga de activos'], answer: 0 },
+          { q: 'Proceso urbano que transforma una zona para atraer personas de mayores ingresos, desplazando a los residentes locales:', options: ['Gentrificación', 'Urbanismo', 'Globalización', 'Sobreturismo'], answer: 0 },
+          { q: 'Los paisajes que combinan elementos naturales y la intervención humana (antrópica) a lo largo del tiempo se denominan:', options: ['Paisajes Culturales', 'Paisajes Vírgenes', 'Paisajes Abstractos', 'Ecosistemas Cerrados'], answer: 0 },
+          { q: 'Una estrategia crucial mencionada en el libro para asegurar la sostenibilidad del turismo y evitar su impacto negativo es:', options: ['La planificación y cooperación', 'Aumentar los impuestos', 'Prohibir los viajes', 'Construir más hoteles'], answer: 0 },
+          { q: 'El lugar que habitualmente concentra santuarios religiosos, centros de poder y plazas públicas en una ciudad es:', options: ['El Centro Histórico', 'La zona franca', 'El área metropolitana', 'El parque nacional'], answer: 0 },
+          { q: 'Según la lectura, un ejemplo de turismo sostenible en El Salvador enfocado en fauna marina es el proyecto:', options: ['Viva Ballena', 'Rescate Tortuga', 'Ruta del Arrecife', 'Océano Limpio'], answer: 0 }
+        ]
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,988 @@
+/* ==========================================================================
+   CIVICA Framework v1 - Core CSS (Colorful Notion Style)
+   Profesor José Eliseo Martínez - Ciudadanía y Valores
+   ========================================================================== */
+
+:root {
+  /* Paleta Notion-style: limpia, neutra, con acentos coloridos */
+  --civica-primary:    #4F46E5;          /* indigo (configurable desde index) */
+  --civica-accent:     #F59E0B;          /* ámbar (configurable desde index) */
+  --civica-bg:         #FAFAF7;          /* fondo crema Notion */
+
+  /* Acentos por sección (banderas) */
+  --civica-explore:    #38BDF8;          /* azul cielo - Exploración */
+  --civica-explore-soft: #E0F4FE;
+  --civica-deepen:     #22C55E;          /* verde - Profundización */
+  --civica-deepen-soft: #DCFCE7;
+  --civica-consolidate: #FACC15;         /* amarillo - Consolidación */
+  --civica-consolidate-soft: #FEF9C3;
+
+  /* Estados */
+  --civica-success:    #16A34A;
+  --civica-error:      #DC2626;
+  --civica-info:       #0EA5E9;
+  --civica-warn:       #F59E0B;
+
+  /* Texto Notion */
+  --civica-text:        #1F1F1F;         /* casi negro */
+  --civica-text-soft:   #4A4A4A;
+  --civica-text-muted:  #8A8A8A;
+
+  /* Superficies */
+  --civica-surface:     #FFFFFF;
+  --civica-surface-2:   #F7F6F3;         /* gris cálido Notion */
+  --civica-surface-3:   #EFEEE9;
+  --civica-divider:     #E5E5E0;
+  --civica-divider-2:   #D0D0CB;
+
+  /* Sombras suaves */
+  --civica-shadow-sm: 0 1px 3px rgba(15, 15, 15, 0.05), 0 1px 2px rgba(15, 15, 15, 0.04);
+  --civica-shadow:    0 4px 12px rgba(15, 15, 15, 0.08), 0 2px 4px rgba(15, 15, 15, 0.04);
+  --civica-shadow-lg: 0 10px 30px rgba(15, 15, 15, 0.12), 0 4px 10px rgba(15, 15, 15, 0.06);
+
+  --civica-radius:    10px;
+  --civica-radius-sm: 6px;
+  --civica-radius-lg: 16px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  color: var(--civica-text);
+  background: var(--civica-bg);
+  overflow-x: hidden;
+  min-height: 100vh;
+  line-height: 1.55;
+}
+
+/* Patrón sutil tipo papel Notion */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.025) 1px, transparent 0);
+  background-size: 22px 22px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.civica-app {
+  position: relative;
+  z-index: 1;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 28px 20px 140px;
+}
+
+/* ===== HEADER (Notion-style) ===== */
+.civica-header {
+  background: var(--civica-surface);
+  border: 1px solid var(--civica-divider);
+  border-radius: var(--civica-radius-lg);
+  padding: 28px 28px 22px;
+  margin-bottom: 28px;
+  box-shadow: var(--civica-shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+/* Banda de color superior, configurable */
+.civica-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(90deg,
+    var(--civica-explore) 0%,
+    var(--civica-explore) 33%,
+    var(--civica-deepen) 33%,
+    var(--civica-deepen) 66%,
+    var(--civica-consolidate) 66%,
+    var(--civica-consolidate) 100%);
+}
+.civica-header h1 {
+  margin: 0 0 6px;
+  font-size: clamp(22px, 4.8vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--civica-text);
+}
+.civica-header > p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--civica-text-muted);
+}
+
+/* Subject pill (Ciudadanía y Valores) */
+.civica-subject-pill {
+  display: inline-block;
+  background: var(--civica-surface-2);
+  border: 1px solid var(--civica-divider);
+  color: var(--civica-text-soft);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 4px 10px;
+  border-radius: 50px;
+  margin-bottom: 8px;
+}
+
+/* Estudiantes en el header */
+.civica-header-students {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--civica-surface-2);
+  border: 1px solid var(--civica-divider);
+  border-radius: var(--civica-radius-sm);
+  font-size: 13px;
+  text-align: left;
+  color: var(--civica-text);
+}
+.civica-header-students:empty { display: none; }
+.civica-header-students-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  margin-right: 6px;
+  color: var(--civica-text-muted);
+}
+.civica-header-student-pill {
+  display: inline-block;
+  background: var(--civica-surface);
+  color: var(--civica-text);
+  border: 1px solid var(--civica-divider-2);
+  border-radius: 50px;
+  padding: 3px 11px;
+  margin: 3px 2px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.civica-add-member-btn {
+  margin-top: 14px;
+  font-size: 12px !important;
+  padding: 7px 14px !important;
+}
+.civica-add-member-btn:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* ===== SECCIONES (Exploración, Profundización, Consolidación) ===== */
+.civica-section {
+  margin: 32px 0 20px;
+  position: relative;
+  animation: civicaFadeUp 0.4s ease-out;
+}
+@keyframes civicaFadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.civica-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: var(--civica-radius);
+  margin-bottom: 16px;
+  border: 1px solid;
+}
+.civica-section-header .civica-section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.civica-section-header .civica-section-titles { flex: 1; }
+.civica-section-header .civica-section-eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 2px;
+  opacity: 0.85;
+}
+.civica-section-header .civica-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--civica-text);
+  letter-spacing: -0.3px;
+}
+
+.civica-section--explore .civica-section-header {
+  background: var(--civica-explore-soft);
+  border-color: var(--civica-explore);
+}
+.civica-section--explore .civica-section-icon {
+  background: var(--civica-explore);
+  color: #fff;
+}
+.civica-section--explore .civica-section-eyebrow { color: #0369A1; }
+
+.civica-section--deepen .civica-section-header {
+  background: var(--civica-deepen-soft);
+  border-color: var(--civica-deepen);
+}
+.civica-section--deepen .civica-section-icon {
+  background: var(--civica-deepen);
+  color: #fff;
+}
+.civica-section--deepen .civica-section-eyebrow { color: #15803D; }
+
+.civica-section--consolidate .civica-section-header {
+  background: var(--civica-consolidate-soft);
+  border-color: var(--civica-consolidate);
+}
+.civica-section--consolidate .civica-section-icon {
+  background: var(--civica-consolidate);
+  color: #1F1F1F;
+}
+.civica-section--consolidate .civica-section-eyebrow { color: #A16207; }
+
+/* ===== EXERCISE CARD (Notion block) ===== */
+.civica-exercise {
+  background: var(--civica-surface);
+  border: 1px solid var(--civica-divider);
+  border-radius: var(--civica-radius);
+  padding: 22px 22px 20px;
+  margin-bottom: 18px;
+  box-shadow: var(--civica-shadow-sm);
+  animation: civicaFadeUp 0.35s ease-out;
+  position: relative;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.civica-exercise:hover {
+  border-color: var(--civica-divider-2);
+  box-shadow: var(--civica-shadow);
+}
+/* Borde lateral + fondo coloreado tenue por sección */
+.civica-section--explore .civica-exercise {
+  border-left: 4px solid var(--civica-explore);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--civica-explore-soft) 65%, var(--civica-surface)) 0%,
+    var(--civica-surface) 100%);
+}
+.civica-section--explore .civica-exercise:hover {
+  border-color: var(--civica-explore);
+}
+.civica-section--deepen .civica-exercise {
+  border-left: 4px solid var(--civica-deepen);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--civica-deepen-soft) 65%, var(--civica-surface)) 0%,
+    var(--civica-surface) 100%);
+}
+.civica-section--deepen .civica-exercise:hover {
+  border-color: var(--civica-deepen);
+}
+.civica-section--consolidate .civica-exercise {
+  border-left: 4px solid var(--civica-consolidate);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--civica-consolidate-soft) 65%, var(--civica-surface)) 0%,
+    var(--civica-surface) 100%);
+}
+.civica-section--consolidate .civica-exercise:hover {
+  border-color: var(--civica-consolidate);
+}
+
+.civica-exercise-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--civica-text);
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+}
+.civica-exercise-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--civica-surface-2);
+  color: var(--civica-text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.civica-section--explore .civica-exercise-number {
+  background: var(--civica-explore-soft);
+  color: #0369A1;
+}
+.civica-section--deepen .civica-exercise-number {
+  background: var(--civica-deepen-soft);
+  color: #15803D;
+}
+.civica-section--consolidate .civica-exercise-number {
+  background: var(--civica-consolidate-soft);
+  color: #A16207;
+}
+
+.civica-section--explore .civica-exercise-instruction {
+  border-left-color: var(--civica-explore);
+}
+.civica-section--deepen .civica-exercise-instruction {
+  border-left-color: var(--civica-deepen);
+}
+.civica-section--consolidate .civica-exercise-instruction {
+  border-left-color: #A16207;
+}
+
+.civica-exercise-image {
+  display: block;
+  max-width: 100%;
+  margin: 12px auto;
+  border-radius: var(--civica-radius-sm);
+  border: 1px solid var(--civica-divider);
+}
+
+/* ===== TARJETA DE INSTRUCCIONES Y LIBRO ===== */
+.civica-exercise-meta-card {
+  border-radius: var(--civica-radius-sm);
+  margin: 14px 0 20px;
+  padding: 14px 18px;
+}
+
+/* Colores de fondo por sección */
+.civica-section--explore .civica-exercise-meta-card {
+  background: var(--civica-explore-soft);
+  border: 1px solid color-mix(in srgb, var(--civica-explore) 40%, transparent);
+}
+.civica-section--deepen .civica-exercise-meta-card {
+  background: var(--civica-deepen-soft);
+  border: 1px solid color-mix(in srgb, var(--civica-deepen) 40%, transparent);
+}
+.civica-section--consolidate .civica-exercise-meta-card {
+  background: var(--civica-consolidate-soft);
+  border: 1px solid color-mix(in srgb, var(--civica-consolidate) 40%, transparent);
+}
+
+/* Divisor Horizontal (La línea entre instrucción y libro) */
+.civica-meta-divider {
+  height: 1px;
+  margin: 14px 0;
+  background: rgba(0, 0, 0, 0.08); /* Línea súper sutil */
+}
+
+/* Instrucciones: Se quita el borde viejo y se aplica color temático oscuro */
+.civica-exercise-instruction {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.civica-section--explore .civica-exercise-instruction { color: #0369A1; }
+.civica-section--deepen .civica-exercise-instruction { color: #14532D; }
+.civica-section--consolidate .civica-exercise-instruction { color: #713F12; }
+
+/* Book Bar: Se alinea con el nuevo diseño sin cajas extra */
+.civica-book-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-size: 13.5px;
+}
+.civica-book-bar-text {
+  flex: 1;
+}
+.civica-section--explore .civica-book-bar-text { color: #0369A1; }
+.civica-section--deepen .civica-book-bar-text { color: #14532D; }
+.civica-section--consolidate .civica-book-bar-text { color: #713F12; }
+.civica-book-bar-text b { color: inherit; font-weight: 700; }
+
+.civica-book-bar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--civica-primary);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.civica-book-bar-text {
+  flex: 1;
+  color: var(--civica-text-soft);
+  min-width: 120px;
+}
+.civica-book-bar-text b { color: var(--civica-text); font-weight: 600; }
+.civica-book-bar-link {
+  background: var(--civica-primary);
+  color: #fff !important;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: filter 0.15s ease, transform 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.civica-book-bar-link:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* ===== NOTE ===== */
+.civica-note {
+  background: var(--civica-consolidate-soft);
+  border: 1px solid var(--civica-consolidate);
+  border-left: 4px solid var(--civica-consolidate);
+  border-radius: var(--civica-radius);
+  padding: 16px 20px 16px 24px;
+  margin-bottom: 20px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  position: relative;
+  color: var(--civica-text-soft);
+  box-shadow: var(--civica-shadow-sm);
+}
+.civica-note::before {
+  content: 'i';
+  position: absolute;
+  top: -12px;
+  left: 14px;
+  width: 24px;
+  height: 24px;
+  background: var(--civica-consolidate);
+  color: #1F1F1F;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 14px;
+  border: 2px solid var(--civica-bg);
+}
+
+/* ===== PANEL (estilo Notion block claro) ===== */
+.civica-panel {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--civica-divider);
+  border-radius: var(--civica-radius-sm);
+  padding: 14px 16px;
+  margin: 10px 0;
+  transition: border-color 0.15s ease;
+}
+.civica-panel:hover {
+  border-color: var(--civica-divider-2);
+}
+
+/* ===== INPUTS ===== */
+.civica-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--civica-text);
+  background: var(--civica-surface);
+  border: 1px solid var(--civica-divider-2);
+  border-radius: var(--civica-radius-sm);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.civica-input:focus {
+  border-color: var(--civica-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--civica-primary) 15%, transparent);
+}
+.civica-input.correct {
+  border-color: var(--civica-success);
+  background: #ECFDF5;
+}
+.civica-input.wrong {
+  border-color: var(--civica-error);
+  background: #FEF2F2;
+}
+
+textarea.civica-input {
+  min-height: 90px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+/* ===== BOTONES ===== */
+.civica-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--civica-text);
+  background: var(--civica-surface);
+  border: 1px solid var(--civica-divider-2);
+  border-radius: var(--civica-radius-sm);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.civica-btn:hover {
+  background: var(--civica-surface-2);
+  box-shadow: var(--civica-shadow-sm);
+}
+.civica-btn:active {
+  transform: translateY(1px);
+}
+.civica-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.civica-btn-primary {
+  background: var(--civica-primary);
+  color: #fff;
+  border-color: var(--civica-primary);
+}
+.civica-btn-primary:hover {
+  background: var(--civica-primary);
+  filter: brightness(1.08);
+}
+
+.civica-btn-success {
+  background: var(--civica-success);
+  color: #fff;
+  border-color: var(--civica-success);
+}
+.civica-btn-success:hover { filter: brightness(1.08); }
+
+.civica-btn-accent {
+  background: var(--civica-accent);
+  color: #1F1F1F;
+  border-color: var(--civica-accent);
+}
+.civica-btn-accent:hover { filter: brightness(1.06); }
+
+.civica-btn-info {
+  background: var(--civica-info);
+  color: #fff;
+  border-color: var(--civica-info);
+}
+.civica-btn-info:hover { filter: brightness(1.08); }
+
+.civica-btn-danger {
+  background: var(--civica-error);
+  color: #fff;
+  border-color: var(--civica-error);
+}
+
+.civica-center { text-align: center; margin: 24px 0; }
+
+/* ===== AUDIO ===== */
+.civica-audio {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--civica-surface-2);
+  border: 1px solid var(--civica-divider);
+  border-radius: 50px;
+  padding: 6px 14px 6px 6px;
+  margin: 8px 0;
+}
+.civica-audio-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--civica-primary);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.civica-audio-btn svg { width: 18px; height: 18px; fill: currentColor; }
+.civica-audio-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--civica-text-soft);
+}
+
+/* ===== FEEDBACK BADGES ===== */
+.civica-feedback {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+.civica-feedback.correct {
+  background: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #16A34A;
+}
+.civica-feedback.wrong {
+  background: #FEE2E2;
+  color: #B91C1C;
+  border: 1px solid #DC2626;
+}
+
+/* ===== FINAL SCORE ===== */
+.civica-final-score {
+  background: var(--civica-surface);
+  border: 1px solid var(--civica-divider);
+  border-radius: var(--civica-radius-lg);
+  padding: 26px;
+  margin-top: 28px;
+  text-align: center;
+  box-shadow: var(--civica-shadow-sm);
+}
+.civica-final-score h2 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--civica-text-muted);
+}
+.civica-final-score .score-number {
+  display: inline-block;
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--civica-primary) 0%, var(--civica-accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 6px 0 4px;
+}
+.civica-final-score p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--civica-text-soft);
+}
+
+.civica-extra-badge {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 100;
+  background: var(--civica-success);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: var(--civica-shadow);
+  animation: civicaFadeUp 0.4s ease-out, civicaBadgePulse 1.6s ease-in-out infinite;
+}
+@keyframes civicaBadgePulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+
+/* ===== LOGIN MODAL ===== */
+.civica-login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(15, 15, 15, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: civicaFadeUp 0.25s ease-out;
+}
+.civica-login-modal {
+  width: 100%;
+  max-width: 460px;
+  max-height: 92vh;
+  background: var(--civica-surface);
+  border: 1px solid var(--civica-divider);
+  border-radius: var(--civica-radius-lg);
+  box-shadow: var(--civica-shadow-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.civica-login-header {
+  background: linear-gradient(135deg, var(--civica-primary) 0%, var(--civica-accent) 100%);
+  color: #fff;
+  padding: 22px 26px 20px;
+  text-align: center;
+}
+.civica-login-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.civica-login-header h2 {
+  margin: 4px 0 4px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.civica-login-header p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.92;
+}
+.civica-login-modal-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 24px 8px;
+}
+.civica-login-field {
+  margin-bottom: 16px;
+}
+.civica-login-field label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--civica-text-soft);
+}
+.civica-login-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--civica-primary);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.civica-login-info,
+.civica-login-error {
+  display: none;
+  margin-top: 6px;
+  font-size: 12.5px;
+  padding: 8px 10px;
+  border-radius: var(--civica-radius-sm);
+}
+.civica-login-info.show {
+  display: block;
+  background: var(--civica-deepen-soft);
+  border: 1px solid var(--civica-deepen);
+  color: #15803D;
+}
+.civica-login-error.show {
+  display: block;
+  background: #FEE2E2;
+  border: 1px solid var(--civica-error);
+  color: #B91C1C;
+}
+.civica-login-remove {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--civica-error);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 6px;
+  font-weight: 700;
+}
+.civica-login-actions {
+  display: flex;
+  gap: 10px;
+  padding: 14px 24px 20px;
+  border-top: 1px solid var(--civica-divider);
+  background: var(--civica-surface-2);
+}
+.civica-login-actions .civica-btn { flex: 1; }
+
+.civica-input-allow-copy {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+/* ===== TABLAS DINÁMICAS (cv_table) ===== */
+.civica-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0;
+  border: 1px solid var(--civica-divider);
+  border-radius: var(--civica-radius);
+  background: var(--civica-surface);
+}
+.civica-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.civica-table th,
+.civica-table td {
+  border: 1px solid var(--civica-divider);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+  min-width: 90px;
+  position: relative;
+}
+.civica-table th {
+  background: var(--civica-surface-2);
+  font-weight: 700;
+  color: var(--civica-text);
+  font-size: 13px;
+}
+.civica-table td.civica-cell-image {
+  text-align: center;
+  padding: 6px;
+  background: var(--civica-surface-2);
+}
+.civica-table td.civica-cell-image img {
+  max-width: 90px;
+  max-height: 90px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 6px;
+}
+.civica-table td.civica-cell-input input,
+.civica-table td.civica-cell-input select {
+  width: 100%;
+  border: 1px solid var(--civica-divider);
+  border-radius: var(--civica-radius-sm);
+  padding: 6px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--civica-surface);
+  outline: none;
+}
+.civica-table td.civica-cell-input input:focus,
+.civica-table td.civica-cell-input select:focus {
+  border-color: var(--civica-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--civica-primary) 15%, transparent);
+}
+.civica-table td.civica-cell-checkable {
+  text-align: center;
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--civica-text-muted);
+  user-select: none;
+  transition: background 0.12s ease, color 0.12s ease;
+  min-width: 56px;
+}
+.civica-table td.civica-cell-checkable:hover {
+  background: var(--civica-surface-2);
+}
+.civica-table td.civica-cell-checkable.is-check {
+  color: var(--civica-success);
+  background: var(--civica-deepen-soft);
+}
+.civica-table td.civica-cell-checkable.is-x {
+  color: var(--civica-error);
+  background: #FEE2E2;
+}
+.civica-table td.civica-cell-drop {
+  background: repeating-linear-gradient(45deg,
+    var(--civica-surface-2) 0,
+    var(--civica-surface-2) 8px,
+    var(--civica-surface) 8px,
+    var(--civica-surface) 16px);
+  min-height: 48px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--civica-text-muted);
+  font-style: italic;
+}
+.civica-table td.civica-cell-drop.has-token {
+  background: var(--civica-explore-soft);
+  font-style: normal;
+  color: var(--civica-text);
+  font-weight: 600;
+}
+
+.civica-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  margin: 10px 0;
+  background: var(--civica-surface-2);
+  border: 1px dashed var(--civica-divider-2);
+  border-radius: var(--civica-radius);
+  min-height: 56px;
+}
+.civica-bank-empty-msg {
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: var(--civica-text-muted);
+  font-style: italic;
+}
+.civica-token {
+  display: inline-flex;
+  align-items: center;
+  background: var(--civica-surface);
+  border: 1px solid var(--civica-divider-2);
+  border-radius: 50px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--civica-text);
+  cursor: grab;
+  user-select: none;
+  box-shadow: var(--civica-shadow-sm);
+  transition: transform 0.15s ease;
+}
+.civica-token:active { cursor: grabbing; }
+.civica-token.is-placed {
+  background: var(--civica-explore-soft);
+  border-color: var(--civica-explore);
+  color: #075985;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 540px) {
+  .civica-app { padding: 18px 12px 130px; }
+  .civica-exercise { padding: 18px 16px 16px; }
+  .civica-section-header { padding: 12px 14px; }
+  .civica-section-header .civica-section-title { font-size: 16px; }
+}
