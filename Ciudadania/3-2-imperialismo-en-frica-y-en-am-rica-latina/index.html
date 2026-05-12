@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>3-2 Imperialismo en África y en América Latina - Octavo</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="civica-exercises.js"></script>
+  <script src="civica-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    CIVICA.init({
+      id: 'cv_1778587394515',
+      container: '#app',
+      topic: '3-2 Imperialismo en África y en América Latina',
+      level: 'Octavo',
+      unit: 'Unidad 3 - Semana 2',
+      subjectLabel: 'Ciudadanía y Valores',
+      book: { url: 'https://drive.google.com/file/d/1BwhktHpWOTxAA8lhIjPmzTAbjfLUWfkP/view?usp=drivesdk', label: 'Libro de Octavo' },
+      pdfDesign: 'PopArt', 
+      colors: { primary: '#D4AF37', accent: '#D03C00', bg: '#F7F9B5' },
+            examPools: {
+              '20176655': 'A',
+              '20176656': 'B',
+              '20176657': 'A',
+              '20176661': 'B',
+              '20138869': 'A',
+              '20176662': 'B',
+              '20176663': 'A',
+              '10065035': 'B',
+              '20176664': 'A',
+              '20305579': 'B',
+              '20305581': 'A',
+              '20176667': 'B',
+              '20176668': 'A',
+              '20179890': 'B',
+              '20179891': 'A',
+              '20293665': 'B',
+              '20305583': 'A'
+            },
+      
+      sections: {
+        explore: [
+          {
+            type: 'note',
+            html: '<p><strong>El Imperialismo (1880-1914):</strong> Fue una época en la que las grandes potencias europeas y Estados Unidos expandieron su dominio político, económico y territorial sobre África, Asia y América Latina. En esta sesión exploraremos cómo se repartió el continente africano y las estrategias de control que Estados Unidos aplicó en Latinoamérica. ¡Comencemos el análisis histórico!</p>'
+          },
+          {
+            type: 'cv_textanswer',
+            instruction: 'Actividad 1. Observa el Documento 1 "El Coloso Rhodes" y responde las preguntas.',
+            image: 'files/caricatura_coloso_rhodes_sobre_africa.png',
+            dataA: [
+              {
+                q: 'a. ¿Qué está haciendo el personaje y dónde se encuentra? ¿Qué significados encuentras en los objetos?',
+                minLength: 15,
+                rows: 3,
+                placeholder: 'Ejemplo: El personaje está de pie sobre...',
+                keywords: ['pie', 'áfrica', 'cables', 'ferrocarril', 'dominio', 'grande', 'continente'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'b. Teniendo en cuenta la fecha, el personaje y la actividad, ¿de qué trata la imagen?',
+                minLength: 15,
+                rows: 3,
+                placeholder: 'Trata sobre...',
+                keywords: ['imperialismo', 'británico', 'control', 'inglaterra', 'reparto', 'unir'],
+                keywordsRequired: 1
+              }
+            ],
+            dataB: [
+              {
+                q: 'a. Describe la postura del personaje en la imagen y sobre qué continente está parado. ¿Qué lleva en las manos?',
+                minLength: 15,
+                rows: 3,
+                placeholder: 'Está apoyado sobre...',
+                keywords: ['áfrica', 'hilo', 'cables', 'telegrafía', 'ferrocarril', 'gigante', 'armas'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'b. ¿Qué mensaje intenta transmitir el ilustrador sobre el poder del imperio británico en esa época?',
+                minLength: 15,
+                rows: 3,
+                placeholder: 'El mensaje es que...',
+                keywords: ['superioridad', 'poder', 'conquista', 'dominio', 'expansión'],
+                keywordsRequired: 1
+              }
+            ]
+          },
+          {
+            type: 'cv_textanswer',
+            instruction: 'Actividad 2. Lean el fragmento del discurso (Doc. 2) de Jules Ferry y respondan.',
+            dataA: [
+              {
+                q: 'a. ¿Qué manifestaciones racistas se evidencian en el texto de Jules Ferry?',
+                minLength: 15,
+                rows: 3,
+                placeholder: 'Se evidencia cuando dice que...',
+                keywords: ['razas superiores', 'razas inferiores', 'deber', 'civilizar'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'b. ¿Cómo se explica la vinculación entre imperialismo y racismo propia de finales del siglo XIX?',
+                minLength: 15,
+                rows: 3,
+                placeholder: 'Se usaba el racismo para...',
+                keywords: ['justificar', 'conquista', 'dominio', 'explotación', 'superioridad'],
+                keywordsRequired: 1
+              }
+            ],
+            dataB: [
+              {
+                q: 'a. Según el discurso, ¿qué supuesto "deber" y "derecho" tenían las naciones europeas?',
+                minLength: 15,
+                rows: 3,
+                placeholder: 'Tenían el deber de...',
+                keywords: ['civilizar', 'inferiores', 'derecho', 'generosidad'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'b. ¿De qué manera la idea de una raza superior facilitó el robo y la colonización en África?',
+                minLength: 15,
+                rows: 3,
+                placeholder: 'Facilitó las acciones porque...',
+                keywords: ['excusa', 'ideología', 'sometimiento', 'barbarie', 'justificación'],
+                keywordsRequired: 1
+              }
+            ]
+          }
+        ],
+        deepen: [
+          {
+            type: 'cv_textanswer',
+            instruction: 'Actividad 3. Compara los mapas del continente africano y desarrolla tu habilidad de interpretación histórica.',
+            image: 'files/mapas_comparativos_africa_1870_1914.png',
+            dataA: [
+              {
+                q: 'a. Compara los mapas de 1870 y 1914: ¿Qué cambios principales observas?',
+                minLength: 15,
+                rows: 3,
+                placeholder: 'En 1914 se observa que...',
+                keywords: ['ocupación', 'colonias', 'reparto', 'control', 'interior'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'b. ¿Cuáles potencias europeas tienen mayor territorio o dominio comercial para 1914?',
+                minLength: 5,
+                rows: 2,
+                placeholder: 'Las potencias con más territorio son...',
+                keywords: ['francia', 'reino unido', 'inglaterra'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'c. ¿Cuál es la situación de los territorios de Alemania e Italia?',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Estos países...',
+                keywords: ['tarde', 'menor', 'pocos', 'camerún', 'somalia'],
+                keywordsRequired: 1
+              }
+            ],
+            dataB: [
+              {
+                q: 'a. ¿Cómo evolucionó la presencia europea en África desde 1870 hasta el inicio de la Primera Guerra Mundial en 1914?',
+                minLength: 15,
+                rows: 3,
+                placeholder: 'La presencia europea pasó de...',
+                keywords: ['costas', 'totalidad', 'fronteras', 'conferencia', 'dominio'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'b. Identifica al menos dos países que poseían las colonias más extensas según el mapa de 1914.',
+                minLength: 5,
+                rows: 2,
+                placeholder: '1...',
+                keywords: ['francesa', 'británica', 'francia', 'inglaterra'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'c. ¿Qué potencias llegaron tarde al reparto y tienen colonias más dispersas?',
+                minLength: 5,
+                rows: 2,
+                placeholder: 'Las potencias son...',
+                keywords: ['alemania', 'italia', 'alemán', 'italiano'],
+                keywordsRequired: 1
+              }
+            ]
+          },
+          {
+            type: 'cv_textanswer',
+            instruction: 'Actividad 4. Completa la tabla de características del imperialismo europeo en África (Ingresa tus respuestas para cada aspecto).',
+            dataA: [
+              {
+                q: '1. Características ECONÓMICAS:',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Extracción de...',
+                keywords: ['recursos', 'materias primas', 'diamantes', 'oro', 'explotación', 'comercio'],
+                keywordsRequired: 1
+              },
+              {
+                q: '2. Características SOCIALES:',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Impacto en la población...',
+                keywords: ['esclavitud', 'marginación', 'racismo', 'genocidio', 'exterminio', 'trabajos forzados'],
+                keywordsRequired: 1
+              },
+              {
+                q: '3. Características POLÍTICAS:',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Control del gobierno...',
+                keywords: ['colonias', 'dominio', 'conferencia de berlín', 'reparto', 'fronteras', 'imperios'],
+                keywordsRequired: 1
+              },
+              {
+                q: '4. Características CULTURALES:',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Imposición de ideas...',
+                keywords: ['civilizar', 'imposición', 'cultura europea', 'occidental', 'religión', 'racismo'],
+                keywordsRequired: 1
+              }
+            ],
+            dataB: [
+              {
+                q: '1. Factores ECONÓMICOS del imperialismo:',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Búsqueda de...',
+                keywords: ['minerales', 'esclavos', 'riqueza', 'marfil', 'mercados', 'vías'],
+                keywordsRequired: 1
+              },
+              {
+                q: '2. Factores SOCIALES del imperialismo:',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Situación de las tribus...',
+                keywords: ['expulsión', 'campos de concentración', 'herero', 'nama', 'pobreza'],
+                keywordsRequired: 1
+              },
+              {
+                q: '3. Factores POLÍTICOS del imperialismo:',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Acuerdos entre potencias...',
+                keywords: ['poder', 'expansión', 'estados', 'naciones', 'tratados'],
+                keywordsRequired: 1
+              },
+              {
+                q: '4. Factores CULTURALES del imperialismo:',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Creencias sobre la civilización...',
+                keywords: ['raza superior', 'barbarie', 'ideología', 'educación europea'],
+                keywordsRequired: 1
+              }
+            ]
+          },
+          {
+            type: 'cv_textanswer',
+            instruction: 'Actividad 5. Observa el monumento ecuestre alemán en Namibia y responde para desarrollar empatía histórica.',
+            image: 'files/monumento_soldado_aleman_namibia.png',
+            dataA: [
+              {
+                q: 'a. ¿Qué personas y qué eventos destacan en el monumento ecuestre?',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Destacan a...',
+                keywords: ['alemanes', 'soldados', 'colonos', 'poder', 'caballo', 'victoria'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'b. ¿Quiénes faltan o han sido olvidados en el monumento?',
+                minLength: 5,
+                rows: 2,
+                placeholder: 'Faltan los...',
+                keywords: ['hereros', 'namas', 'nativos', 'africanos', 'víctimas', 'pueblos'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'c. ¿Qué versión de la historia cuenta sobre las personas de las etnias herero y nama?',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'La historia sugiere que...',
+                keywords: ['ignorados', 'sometidos', 'revuelta', 'salvajes', 'inferiores', 'derrotados'],
+                keywordsRequired: 1
+              }
+            ],
+            dataB: [
+              {
+                q: 'a. ¿A quién glorifica la estatua de bronce con el soldado a caballo?',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Glorifica al...',
+                keywords: ['imperio', 'ejército alemán', 'conquistador', 'europeos'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'b. ¿Qué grupos humanos sufrieron el genocidio y no están representados?',
+                minLength: 5,
+                rows: 2,
+                placeholder: 'Las etnias...',
+                keywords: ['herero', 'nama', 'indígenas', 'locales'],
+                keywordsRequired: 1
+              },
+              {
+                q: 'c. ¿Qué ideas raciales fundamentan la construcción de monumentos como este?',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Se fundamentan en la...',
+                keywords: ['superioridad', 'triunfo blanco', 'civilización', 'racismo', 'exterminio justificado'],
+                keywordsRequired: 1
+              }
+            ]
+          }
+        ],
+        consolidate: [
+          {
+            type: 'note',
+            html: '<div style="background-color: #fff; padding: 15px; border-radius: 8px; border-left: 5px solid #D03C00;"><strong>Actividad 6. Simulación en clase:</strong> Con ayuda de tu docente, organicen una simulación de la Conferencia de Berlín. Formen grupos representando a Francia, Alemania, Reino Unido, España, Portugal, Bélgica e Italia. Debatan los argumentos para repartirse África y reflexionen sobre las consecuencias para los pueblos nativos.</div>'
+          },
+          {
+            type: 'cv_textanswer',
+            instruction: 'Actividad 7. Completa la tabla sobre las estrategias del imperialismo estadounidense en América Latina (Ingresa una definición o idea principal para cada concepto).',
+            dataA: [
+              {
+                q: '1. La Doctrina Monroe (1823):',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Se resume en la frase...',
+                keywords: ['américa para los americanos', 'intervención europea', 'rechazo', 'protección'],
+                keywordsRequired: 1
+              },
+              {
+                q: '2. La política del "Big Stick" (El gran garrote):',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Consistía en...',
+                keywords: ['intervención militar', 'fuerza', 'garrote', 'roosevelt', 'amenaza'],
+                keywordsRequired: 1
+              },
+              {
+                q: '3. La Diplomacia del Dólar:',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Se basaba en el uso de...',
+                keywords: ['bancos', 'préstamos', 'deuda', 'aduanas', 'economía', 'inversiones', 'taft'],
+                keywordsRequired: 1
+              }
+            ],
+            dataB: [
+              {
+                q: '1. ¿Cuál era el propósito de la Doctrina Monroe frente a los europeos?',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Su propósito era...',
+                keywords: ['evitar', 'intervención', 'bloquear', 'defender', 'agresión'],
+                keywordsRequired: 1
+              },
+              {
+                q: '2. ¿Cómo aplicó Theodore Roosevelt la política the big stick?',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'La aplicó mediante...',
+                keywords: ['militares', 'agresión', 'poder naval', 'presión diplomática'],
+                keywordsRequired: 1
+              },
+              {
+                q: '3. ¿Qué control obtenía EE.UU. a cambio de los préstamos en la Diplomacia del Dólar?',
+                minLength: 10,
+                rows: 2,
+                placeholder: 'Obtenían el control de...',
+                keywords: ['aduanas', 'ferrocarriles', 'bancos nacionales', 'recursos financieros'],
+                keywordsRequired: 1
+              }
+            ]
+          }
+        ]
+      },
+      
+      game: { type: 'tictactoe' }
+    });
+  </script>
+</body>
+</html>
