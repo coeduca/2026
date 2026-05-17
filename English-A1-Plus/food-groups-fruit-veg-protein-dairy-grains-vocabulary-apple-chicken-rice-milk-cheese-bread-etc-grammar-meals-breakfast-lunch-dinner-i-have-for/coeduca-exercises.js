@@ -1227,7 +1227,7 @@
       <div id="cat-bank-${ctx.exerciseId}" style="display:flex;flex-wrap:wrap;gap:6px;
            padding:10px;background:#FFF8E7;border:3px dashed #1a1a1a;border-radius:10px;
            margin-bottom:14px;min-height:50px;"></div>
-      <div style="display:grid;grid-template-columns:repeat(${cats.length},1fr);gap:10px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:10px;">
         ${cats.map((c, i) => `
           <div class="cat-col" data-cat="${i}" style="background:#fff;border:3px solid #1a1a1a;
                border-radius:10px;padding:10px;min-height:120px;">
