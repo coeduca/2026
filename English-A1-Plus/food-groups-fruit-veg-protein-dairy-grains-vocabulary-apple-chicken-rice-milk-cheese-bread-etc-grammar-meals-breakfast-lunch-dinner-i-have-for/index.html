@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Food Groups - Meals & Vocabulary | Noveno, Primer Año, Segundo Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+
+      container: '#app',
+      topic: "Food Groups (Fruit, Veg, Protein, Dairy, Grains). Vocabulary: Apple, Chicken, Rice, Milk, Cheese, Bread, etc. Grammar: Meals (Breakfast, Lunch, Dinner) & 'I have... for...'",
+      level: 'Noveno, Primer Año, Segundo Año',
+
+      pdfDesign: 'Pastel',
+      colors: { primary: '#00D04C', accent: '#7AB043', bg: '#DD6500' },
+            examPools: {
+              '20062471': 'A',
+              '19967142': 'B',
+              '19971566': 'A',
+              '19971565': 'B',
+              '19967143': 'A',
+              '20062474': 'B',
+              '19967145': 'A',
+              '19967146': 'B',
+              '19934096': 'A',
+              '19934095': 'B',
+              '4210274': 'A',
+              '20200673': 'B',
+              '20062484': 'A',
+              '19934098': 'B',
+              '19967150': 'A',
+              '20062486': 'B',
+              '20062489': 'A',
+              '19976021': 'B',
+              '20023247': 'A',
+              '19976024': 'B',
+              '20062495': 'A',
+              '19956103': 'B',
+              '20062498': 'A',
+              '19967154': 'B',
+              '4210278': 'A',
+              '4210264': 'B',
+              '19967144': 'A',
+              '20068438': 'B',
+              '19959332': 'A',
+              '4210262': 'B',
+              '20062373': 'A',
+              '19843597': 'B',
+              '4210272': 'A',
+              '19967158': 'B',
+              '4210284': 'A',
+              '19934099': 'B',
+              '19967161': 'A',
+              '19967151': 'B',
+              '20062496': 'A',
+              '19788973': 'B',
+              '3167629': 'A',
+              '19967163': 'B',
+              '4210259': 'A',
+              '4210276': 'B',
+              '20062499': 'A',
+              '6954866': 'B',
+              '4210263': 'A',
+              '4210279': 'B',
+              '4210254': 'A',
+              '2724749': 'B',
+              '6473557': 'A',
+              '6473562': 'B',
+              '19724473': 'A',
+              '6473555': 'B',
+              '4210255': 'A',
+              '1964480': 'B',
+              '4210256': 'A',
+              '5531752': 'B',
+              '4210268': 'A',
+              '2295119': 'B',
+              '5531765': 'A',
+              '2294851': 'B',
+              '19769235': 'A',
+              '19929938': 'B',
+              '4210277': 'A'
+            },
+
+      exercises: [
+
+        // ─── EXERCISE 1 ─── emojiphrase: Fruits
+        {
+          type: 'emojiphrase',
+          title: '🍓 Fruit Emojis',
+          instruction: 'Look at each emoji and write the name of the fruit in English.',
+          dataA: [
+            { emojis: '🥭', accept: ['mango'],       example: 'mango'       },
+            { emojis: '🍉', accept: ['watermelon'],   example: 'watermelon'  },
+            { emojis: '🍓', accept: ['strawberry'],   example: 'strawberry'  },
+            { emojis: '🍍', accept: ['pineapple'],    example: 'pineapple'   },
+            { emojis: '🍊', accept: ['orange'],       example: 'orange'      },
+            { emojis: '🍇', accept: ['grapes','grape'], example: 'grapes'   }
+          ],
+          dataB: [
+            { emojis: '🍎', accept: ['apple'],        example: 'apple'       },
+            { emojis: '🍌', accept: ['banana'],       example: 'banana'      },
+            { emojis: '🍑', accept: ['peach'],        example: 'peach'       },
+            { emojis: '🍒', accept: ['cherry','cherries'], example: 'cherry' },
+            { emojis: '🥝', accept: ['kiwi'],         example: 'kiwi'        },
+            { emojis: '🍋', accept: ['lemon'],        example: 'lemon'       }
+          ]
+        },
+
+        // ─── EXERCISE 2 ─── matchlines: Vegetables Spanish ↔ English
+        {
+          type: 'matchlines',
+          title: '🥦 Vegetables – Spanish & English',
+          instruction: 'Draw a line to match each vegetable name in Spanish with its English translation.',
+          dataA: [
+            { left: 'Zanahoria', right: 'Carrot'    },
+            { left: 'Tomate',    right: 'Tomato'    },
+            { left: 'Papa',      right: 'Potato'    },
+            { left: 'Cebolla',   right: 'Onion'     },
+            { left: 'Lechuga',   right: 'Lettuce'   },
+            { left: 'Pepino',    right: 'Cucumber'  },
+            { left: 'Brócoli',   right: 'Broccoli'  },
+            { left: 'Espinaca',  right: 'Spinach'   }
+          ],
+          dataB: [
+            { left: 'Pimiento',  right: 'Pepper'      },
+            { left: 'Ajo',       right: 'Garlic'      },
+            { left: 'Calabaza',  right: 'Pumpkin'     },
+            { left: 'Maíz',      right: 'Corn'        },
+            { left: 'Apio',      right: 'Celery'      },
+            { left: 'Berenjena', right: 'Eggplant'    },
+            { left: 'Remolacha', right: 'Beet'        },
+            { left: 'Coliflor',  right: 'Cauliflower' }
+          ]
+        },
+
+        // ─── EXERCISE 3 ─── reorder_sentences: Proteins – unscramble letter by letter
+        {
+          type: 'reorder_sentences',
+          title: '🍗 Proteins – Unscramble the Letters',
+          instruction: 'Arrange the letter blocks in the correct order to spell the protein food. Use the Spanish hint for help.',
+          dataA: [
+            { sentence: 'C H I C K E N', es: 'Pollo'        },
+            { sentence: 'S A L M O N',   es: 'Salmón'       },
+            { sentence: 'T U N A',       es: 'Atún'         },
+            { sentence: 'B E E F',       es: 'Carne de res' },
+            { sentence: 'E G G S',       es: 'Huevos'       },
+            { sentence: 'T U R K E Y',   es: 'Pavo'         }
+          ],
+          dataB: [
+            { sentence: 'S H R I M P',   es: 'Camarones'    },
+            { sentence: 'P O R K',       es: 'Cerdo'        },
+            { sentence: 'L A M B',       es: 'Cordero'      },
+            { sentence: 'T O F U',       es: 'Tofu'         },
+            { sentence: 'B E A N S',     es: 'Frijoles'     },
+            { sentence: 'L E N T I L S', es: 'Lentejas'     }
+          ]
+        },
+
+        // ─── EXERCISE 4 ─── matchimage: Dairy Products
+        {
+          type: 'matchimage',
+          title: '🥛 Dairy Products',
+          instruction: 'Match each emoji with the correct dairy product name.',
+          dataA: [
+            { word: 'Milk',         emoji: '🥛' },
+            { word: 'Cheese',       emoji: '🧀' },
+            { word: 'Butter',       emoji: '🧈' },
+            { word: 'Ice Cream',    emoji: '🍨' },
+            { word: 'Yogurt',       emoji: '🥣' },
+            { word: 'Cream',        emoji: '🍶' }
+          ],
+          dataB: [
+            { word: 'Milkshake',    emoji: '🥤' },
+            { word: 'Whipped Cream',emoji: '🍦' },
+            { word: 'Pudding',      emoji: '🍮' },
+            { word: 'Custard',      emoji: '🫙' },
+            { word: 'Sour Cream',   emoji: '🫕' },
+            { word: 'Cottage Cheese', emoji: '🧆' }
+          ]
+        },
+
+        // ─── EXERCISE 5 ─── wordsearch: Grains (5 words each pool)
+        {
+          type: 'wordsearch',
+          title: '🌾 Grains Word Search',
+          instruction: 'Find the 5 grain words hidden in the grid. Words can be horizontal, vertical or diagonal.',
+          dataA: { words: ['RICE', 'WHEAT', 'CORN', 'OATS', 'BREAD'],              gridSize: 10 },
+          dataB: { words: ['BARLEY', 'QUINOA', 'RYE', 'MILLET', 'PASTA'],          gridSize: 10 }
+        },
+
+        // ─── EXERCISE 6 ─── truefalse: Meals image (Pool A = Pool B, same image)
+        {
+          type: 'truefalse',
+          title: '🍽️ Meals – True or False?',
+          instruction: 'Look at the image carefully. Read each sentence and decide if it is TRUE or FALSE based on the meals shown.',
+          image: 'files/meals_breakfast_lunch_dinner.png',
+          dataA: [
+            { statement: 'I have eggs for breakfast.',           answer: true  },
+            { statement: 'I have pizza for lunch.',              answer: false },
+            { statement: 'I have salmon for dinner.',            answer: true  },
+            { statement: 'I have soup for breakfast.',           answer: false },
+            { statement: 'I have a sandwich for lunch.',         answer: true  },
+            { statement: 'I have coffee for breakfast.',         answer: true  },
+            { statement: 'I have wine for lunch.',               answer: false },
+            { statement: 'I have asparagus for dinner.',         answer: true  },
+            { statement: 'I have bacon for dinner.',             answer: false },
+            { statement: 'I have mashed potatoes for dinner.',   answer: true  }
+          ],
+          dataB: [
+            { statement: 'I have eggs for breakfast.',           answer: true  },
+            { statement: 'I have pizza for lunch.',              answer: false },
+            { statement: 'I have salmon for dinner.',            answer: true  },
+            { statement: 'I have soup for breakfast.',           answer: false },
+            { statement: 'I have a sandwich for lunch.',         answer: true  },
+            { statement: 'I have coffee for breakfast.',         answer: true  },
+            { statement: 'I have wine for lunch.',               answer: false },
+            { statement: 'I have asparagus for dinner.',         answer: true  },
+            { statement: 'I have bacon for dinner.',             answer: false },
+            { statement: 'I have mashed potatoes for dinner.',   answer: true  }
+          ]
+        },
+
+        // ─── EXERCISE 7 ─── categorize: 12 words → 4 Food Groups
+        {
+          type: 'categorize',
+          title: '🍱 Food Groups – Sort It Out!',
+          instruction: 'Drag each food item into its correct food group: Fruit, Vegetable, Dairy Product, or Grain.',
+          dataA: {
+            categories: ['🍎 Fruit', '🥦 Vegetable', '🥛 Dairy Product', '🌾 Grain'],
+            items: [
+              { text: 'Apple',      cat: 0 },
+              { text: 'Mango',      cat: 0 },
+              { text: 'Strawberry', cat: 0 },
+              { text: 'Carrot',     cat: 1 },
+              { text: 'Spinach',    cat: 1 },
+              { text: 'Broccoli',   cat: 1 },
+              { text: 'Milk',       cat: 2 },
+              { text: 'Cheese',     cat: 2 },
+              { text: 'Yogurt',     cat: 2 },
+              { text: 'Rice',       cat: 3 },
+              { text: 'Bread',      cat: 3 },
+              { text: 'Oats',       cat: 3 }
+            ]
+          },
+          dataB: {
+            categories: ['🍎 Fruit', '🥦 Vegetable', '🥛 Dairy Product', '🌾 Grain'],
+            items: [
+              { text: 'Banana',     cat: 0 },
+              { text: 'Orange',     cat: 0 },
+              { text: 'Grapes',     cat: 0 },
+              { text: 'Tomato',     cat: 1 },
+              { text: 'Onion',      cat: 1 },
+              { text: 'Lettuce',    cat: 1 },
+              { text: 'Butter',     cat: 2 },
+              { text: 'Ice Cream',  cat: 2 },
+              { text: 'Cream',      cat: 2 },
+              { text: 'Wheat',      cat: 3 },
+              { text: 'Corn',       cat: 3 },
+              { text: 'Pasta',      cat: 3 }
+            ]
+          }
+        }
+
+      ],
+
+      // ─── GAME ─── trivia
+      game: {
+        type: 'trivia',
+        questions: [
+          {
+            q: 'Which of the following is a fruit?',
+            options: ['Carrot', 'Potato', 'Apple', 'Spinach'],
+            answer: 2
+          },
+          {
+            q: 'What meal do you usually eat in the morning?',
+            options: ['Lunch', 'Dinner', 'Supper', 'Breakfast'],
+            answer: 3
+          },
+          {
+            q: 'Which food group does milk belong to?',
+            options: ['Grains', 'Dairy', 'Protein', 'Fruit'],
+            answer: 1
+          },
+          {
+            q: 'Complete: "I have eggs ___ breakfast."',
+            options: ['on', 'at', 'for', 'in'],
+            answer: 2
+          },
+          {
+            q: 'Which of these is a grain?',
+            options: ['Apple', 'Chicken', 'Rice', 'Milk'],
+            answer: 2
+          },
+          {
+            q: 'What is "Zanahoria" in English?',
+            options: ['Potato', 'Onion', 'Lettuce', 'Carrot'],
+            answer: 3
+          },
+          {
+            q: 'Which meal is usually eaten at noon?',
+            options: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
+            answer: 1
+          },
+          {
+            q: 'Which of these is a dairy product?',
+            options: ['Bread', 'Salmon', 'Cheese', 'Corn'],
+            answer: 2
+          },
+          {
+            q: 'Which food is a source of protein?',
+            options: ['Orange', 'Chicken', 'Rice', 'Milk'],
+            answer: 1
+          },
+          {
+            q: 'Complete: "I have salmon ___ dinner."',
+            options: ['to', 'with', 'for', 'on'],
+            answer: 2
+          },
+          {
+            q: 'What is "Espinaca" in English?',
+            options: ['Broccoli', 'Celery', 'Spinach', 'Lettuce'],
+            answer: 2
+          },
+          {
+            q: 'Which fruit does this emoji 🥭 represent?',
+            options: ['Peach', 'Mango', 'Pineapple', 'Papaya'],
+            answer: 1
+          },
+          {
+            q: 'Which of these is NOT a grain?',
+            options: ['Rice', 'Wheat', 'Oats', 'Yogurt'],
+            answer: 3
+          },
+          {
+            q: 'Which sentence is grammatically correct?',
+            options: [
+              'I has eggs for breakfast.',
+              'I have eggs for breakfast.',
+              'I haves eggs for breakfast.',
+              'I having eggs for breakfast.'
+            ],
+            answer: 1
+          },
+          {
+            q: 'What meal is usually eaten in the evening?',
+            options: ['Breakfast', 'Brunch', 'Lunch', 'Dinner'],
+            answer: 3
+          },
+          {
+            q: 'Which vegetable is "Brócoli" in English?',
+            options: ['Cauliflower', 'Celery', 'Broccoli', 'Spinach'],
+            answer: 2
+          },
+          {
+            q: 'Complete: "I have ___ for lunch." (Choose the dairy product)',
+            options: ['rice', 'chicken', 'cheese', 'corn'],
+            answer: 2
+          },
+          {
+            q: 'Which emoji represents a "Watermelon"?',
+            options: ['🍊', '🍋', '🍇', '🍉'],
+            answer: 3
+          },
+          {
+            q: 'Bread belongs to which food group?',
+            options: ['Fruit', 'Dairy', 'Protein', 'Grains'],
+            answer: 3
+          },
+          {
+            q: 'Which word correctly completes: "I ___ cereal for breakfast every day."',
+            options: ['has', 'have', 'haves', 'having'],
+            answer: 1
+          }
+        ]
+      }
+
+    });
+  </script>
+</body>
+</html>
