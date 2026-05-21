@@ -1293,8 +1293,15 @@
   // 4. HANGMAN — horca colorida, teclado QWERTY, vidas con corazones
   // =====================================================================
   reg('hangman', function (ctx) {
-    const words = (ctx.config && ctx.config.words) || ['ENGLISH', 'TEACHER', 'SCHOOL'];
-    let word, guessed, mistakes, gameOver;
+    // Acepta items en cualquiera de estas formas:
+    //   ['CASA','PERRO']                   ← strings simples
+    //   [{word:'CASA', hint:'lugar'}, ...]  ← objetos con pista
+    const rawWords = (ctx.config && ctx.config.words) || ['ENGLISH', 'TEACHER', 'SCHOOL'];
+    const wordItems = rawWords.map(w => {
+      if (w && typeof w === 'object') return { word: String(w.word || ''), hint: String(w.hint || '') };
+      return { word: String(w || ''), hint: '' };
+    }).filter(it => it.word.length > 0);
+    let word, hint, guessed, mistakes, gameOver;
     const MAX = 6;
 
     const wrap = document.createElement('div');
@@ -1304,6 +1311,7 @@
       <svg id="hm-svg" class="cv-hm-stage" viewBox="0 0 240 240"></svg>
       <div id="hm-hearts" class="cv-hm-hearts"></div>
       <div id="hm-word" class="cv-hm-word"></div>
+      <div id="hm-hint" style="text-align:center;font-style:italic;margin:6px 0;color:var(--civica-stroke);font-weight:600;display:none;"></div>
       <div id="hm-keys" class="cv-hm-keys"></div>
       <div id="hm-status" class="cv-status"></div>
       <button class="civica-btn civica-btn-success" id="hm-reset" style="margin-top:10px;">🔄 Nueva palabra</button>
@@ -1313,6 +1321,7 @@
     const svg = wrap.querySelector('#hm-svg');
     const heartsEl = wrap.querySelector('#hm-hearts');
     const wordEl = wrap.querySelector('#hm-word');
+    const hintEl = wrap.querySelector('#hm-hint');
     const keysEl = wrap.querySelector('#hm-keys');
     const statusEl = wrap.querySelector('#hm-status');
 
@@ -1397,7 +1406,11 @@
     }
 
     function reset() {
-      word = words[Math.floor(Math.random() * words.length)].toUpperCase();
+      const pick = wordItems.length
+        ? wordItems[Math.floor(Math.random() * wordItems.length)]
+        : { word: 'CIVICA', hint: '' };
+      word = pick.word.toUpperCase();
+      hint = pick.hint || '';
       guessed = new Set();
       mistakes = 0;
       gameOver = false;
@@ -1409,6 +1422,13 @@
       keysEl.innerHTML = '';
       wordEl.innerHTML = '';
       svg.innerHTML = '';
+      if (hint) {
+        hintEl.textContent = '💡 ' + hint;
+        hintEl.style.display = 'block';
+      } else {
+        hintEl.textContent = '';
+        hintEl.style.display = 'none';
+      }
       buildKeys();
       drawHangman();
       renderHearts();

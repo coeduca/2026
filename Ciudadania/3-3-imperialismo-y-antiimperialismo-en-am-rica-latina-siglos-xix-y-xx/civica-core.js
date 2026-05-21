@@ -70,6 +70,40 @@
   };
 
   // =====================================================================
+  // SFX (efectos de sonido) - solo activos en modo actividad, no en examen.
+  // Los archivos victory.ogg / error.ogg se incluyen junto al index.html.
+  // =====================================================================
+  const sfx = {
+    _ready: false,
+    victory: null,
+    error: null,
+    _prep: function () {
+      if (this._ready) return;
+      this._ready = true;
+      try {
+        this.victory = new Audio('victory.ogg');
+        this.error   = new Audio('error.ogg');
+        this.victory.preload = 'auto';
+        this.error.preload   = 'auto';
+        this.victory.volume = 0.6;
+        this.error.volume   = 0.5;
+      } catch (e) { /* silencioso */ }
+    },
+    play: function (kind) {
+      // Examen → no reproducir.
+      if (state.config && state.config.examMode) return;
+      this._prep();
+      const a = this[kind];
+      if (!a) return;
+      try {
+        a.currentTime = 0;
+        const p = a.play();
+        if (p && typeof p.catch === 'function') p.catch(function () {});
+      } catch (e) { /* silencioso */ }
+    }
+  };
+
+  // =====================================================================
   // SANITIZER PARA PDF (Latin-1 only)
   // =====================================================================
   function sanitizeForPDF(text) {
@@ -796,8 +830,14 @@
         examMode: !!(state.config && state.config.examMode),
         recordAnswer: (score, total, details, userAnswer) =>
           recordAnswer('ex_' + idx, score, total, details, userAnswer),
-        cheer: () => global.rigo && global.rigo.cheer && global.rigo.cheer(),
-        comfort: () => global.rigo && global.rigo.comfort && global.rigo.comfort()
+        cheer: () => {
+          if (global.rigo && global.rigo.cheer) global.rigo.cheer();
+          sfx.play('victory');
+        },
+        comfort: () => {
+          if (global.rigo && global.rigo.comfort) global.rigo.comfort();
+          sfx.play('error');
+        }
       });
     } catch (err) {
       console.error('Error rendering exercise', ex.type, err);

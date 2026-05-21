@@ -416,7 +416,9 @@
   // 2. MATCHLINES (unir con líneas usando SVG)
   // =====================================================================
   reg('matchlines', function (ctx) {
-    const pairs = ctx.data || []; // [{left, right}, ...]
+    // Acepta tanto [{left,right}, ...] como { pairs: [{left,right}, ...] }
+    const raw = ctx.data || [];
+    const pairs = Array.isArray(raw) ? raw : (Array.isArray(raw.pairs) ? raw.pairs : []);
     const left = C.shuffle(pairs.map((p, i) => ({ id: i, text: p.left })));
     const right = C.shuffle(pairs.map((p, i) => ({ id: i, text: p.right })));
 
@@ -2076,16 +2078,16 @@
   // =====================================================================
   // Para preguntas conceptuales del libro de Ciudadanía y Valores.
   // No autocalifica el contenido (lo revisa el profesor); solo cuenta como
-  // "respondida" si el alumno escribió al menos `minLength` caracteres.
+  // correcta si el alumno escribió al menos `minLength` caracteres.
   //
   // data: [
   //   { q: '¿Qué entiendes por dignidad humana?', minLength: 30, rows: 3 },
   //   { q: 'Explica con tus palabras...', placeholder: 'Tu respuesta...' }
   // ]
   //
-  // Opcional: keywords:['palabra1','palabra2'] - si se incluyen, cuenta como
-  // correcta si la respuesta contiene al menos `keywordsRequired` (default: 1)
-  // de esas palabras (case-insensitive, sin tildes).
+  // NOTA: `keywords` / `keywordsRequired` se ignoran. Las preguntas abiertas
+  // ya no se invalidan por no contener palabras específicas; basta con
+  // alcanzar el mínimo de caracteres recomendado.
   reg('cv_textanswer', function (ctx) {
     const items = ctx.data || [];
     const wrap = document.createElement('div');
@@ -2134,14 +2136,11 @@
         const minLen = slot.item.minLength || 1;
         userAnswer.push({ q: slot.item.q, a: text });
 
-        let ok = text.length >= minLen;
-        // Si hay keywords, además de min length se requiere coincidencia
-        if (ok && Array.isArray(slot.item.keywords) && slot.item.keywords.length) {
-          const required = slot.item.keywordsRequired || 1;
-          const norm = C.normalize(text);
-          const matched = slot.item.keywords.filter(k => norm.includes(C.normalize(k))).length;
-          ok = matched >= required;
-        }
+        // Solo se requiere alcanzar el mínimo de caracteres recomendado.
+        // Las `keywords` del item se ignoran a propósito: en preguntas abiertas
+        // el alumno puede usar sinónimos o redacciones válidas y antes el
+        // ejercicio las marcaba como incorrectas.
+        const ok = text.length >= minLen;
 
         if (ok) correct++;
         if (!ctx.examMode) {
