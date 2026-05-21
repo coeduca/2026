@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Countable and Uncountable nouns + Containers (Food vocabulary) - Noveno, Segundo Año, Primer Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+      
+      container: '#app',
+      topic: 'Countable and Uncountable nouns + Containers (Food vocabulary)',
+      level: 'Noveno, Segundo Año, Primer Año',
+      
+      pdfDesign: 'PopArtVibrant', 
+      colors: { primary: '#C05800', accent: '#43B069', bg: '#F0A400' },
+            examPools: {
+              '20062471': 'A',
+              '19967142': 'A',
+              '19971566': 'A',
+              '19971565': 'B',
+              '19967143': 'A',
+              '20062474': 'B',
+              '19967145': 'A',
+              '19967146': 'B',
+              '19934096': 'A',
+              '19934095': 'B',
+              '4210274': 'A',
+              '20200673': 'B',
+              '20062484': 'A',
+              '19934098': 'B',
+              '19967150': 'A',
+              '20062486': 'B',
+              '20062489': 'A',
+              '19976021': 'B',
+              '20023247': 'A',
+              '19976024': 'B',
+              '20062495': 'A',
+              '19956103': 'B',
+              '20062498': 'A',
+              '19967154': 'B',
+              '4210278': 'A',
+              '4210264': 'B',
+              '19967144': 'A',
+              '20068438': 'B',
+              '19959332': 'A',
+              '4210262': 'B',
+              '20062373': 'A',
+              '19843597': 'B',
+              '4210272': 'A',
+              '19967158': 'B',
+              '4210284': 'A',
+              '19934099': 'B',
+              '19967161': 'A',
+              '19967151': 'B',
+              '20062496': 'A',
+              '19788973': 'B',
+              '3167629': 'A',
+              '19967163': 'B',
+              '4210259': 'A',
+              '4210276': 'B',
+              '20062499': 'A',
+              '6954866': 'B',
+              '4210263': 'A',
+              '4210279': 'B',
+              '4210254': 'A',
+              '2724749': 'B',
+              '6473557': 'A',
+              '6473562': 'B',
+              '19724473': 'A',
+              '6473555': 'B',
+              '4210255': 'A',
+              '1964480': 'B',
+              '4210256': 'A',
+              '5531752': 'B',
+              '4210268': 'A',
+              '2295119': 'B',
+              '5531765': 'A',
+              '2294851': 'B',
+              '19769235': 'A',
+              '19929938': 'B',
+              '4210277': 'A'
+            },
+      
+      exercises: [
+        {
+          type: 'note',
+          title: 'Grammar Note: Quantifiers',
+          html: `
+            <div style="background: #fff; padding: 20px; border-radius: 10px; border-left: 5px solid #C05800; text-align: left;">
+              <h3 style="color: #43B069; margin-top: 0;">Countable vs Uncountable Nouns</h3>
+              <p>Los sustantivos <b>Contables</b> se pueden contar por unidad (apples, cars) y pueden ser plurales. Los <b>Incontables</b> no se pueden contar individualmente (water, sugar, money) y no tienen forma plural.</p>
+              
+              <h4 style="color: #C05800;">Quantifiers:</h4>
+              <ul style="line-height: 1.6;">
+                <li><b>Much:</b> Se usa con incontables en preguntas y negaciones <i>(How much milk?)</i>.</li>
+                <li><b>Many:</b> Se usa con contables en preguntas y negaciones <i>(How many apples?)</i>.</li>
+                <li><b>A little / Little:</b> "Un poco de", se usa con incontables <i>(A little sugar)</i>.</li>
+                <li><b>A few / Few:</b> "Unos pocos", se usa con contables <i>(A few friends)</i>.</li>
+                <li><b>Some:</b> "Algunos/Algo de", para oraciones afirmativas u ofrecimientos. Sirve para ambos <i>(Some apples, some water)</i>.</li>
+                <li><b>Any:</b> "Ningún/Nada de", para preguntas y negaciones. Sirve para ambos <i>(Any apples?, I don't have any water)</i>.</li>
+                <li><b>A lot of:</b> "Mucho(s)", mayormente en oraciones afirmativas. Sirve para ambos <i>(A lot of cars, a lot of money)</i>.</li>
+              </ul>
+            </div>
+          `
+        },
+        {
+          type: 'wordsearch',
+          title: 'Find the Food Words!',
+          instruction: 'Find 5 words related to food in the word search.',
+          dataA: {
+            words: ['APPLE', 'WATER', 'BREAD', 'CHEESE', 'ONION'],
+            gridSize: 10
+          },
+          dataB: {
+            words: ['SUGAR', 'MILK', 'TOMATO', 'CARROT', 'JUICE'],
+            gridSize: 10
+          }
+        },
+        {
+          type: 'categorize',
+          title: 'Countable or Uncountable?',
+          instruction: 'Classify the food items into Countable or Uncountable Nouns.',
+          dataA: {
+            categories: ['Countable Nouns', 'Uncountable Nouns'],
+            items: [
+              { text: 'Apple', cat: 0 },
+              { text: 'Banana', cat: 0 },
+              { text: 'Egg', cat: 0 },
+              { text: 'Potato', cat: 0 },
+              { text: 'Milk', cat: 1 },
+              { text: 'Rice', cat: 1 },
+              { text: 'Honey', cat: 1 },
+              { text: 'Soup', cat: 1 }
+            ]
+          },
+          dataB: {
+            categories: ['Countable Nouns', 'Uncountable Nouns'],
+            items: [
+              { text: 'Orange', cat: 0 },
+              { text: 'Carrot', cat: 0 },
+              { text: 'Burger', cat: 0 },
+              { text: 'Cookie', cat: 0 },
+              { text: 'Coffee', cat: 1 },
+              { text: 'Tea', cat: 1 },
+              { text: 'Butter', cat: 1 },
+              { text: 'Water', cat: 1 }
+            ]
+          }
+        },
+        {
+          type: 'spoterror',
+          title: 'Spot the Quantifier Error',
+          instruction: 'Find and correct the mistake with much, many, few, or little.',
+          dataA: [
+            { words: ['How', 'much', 'apples', 'do', 'you', 'need?'], errorIndex: 1, fix: 'many' },
+            { words: ['I', 'have', 'a', 'few', 'water.'], errorIndex: 3, fix: 'little' },
+            { words: ['She', 'eats', 'many', 'bread.'], errorIndex: 2, fix: 'much' },
+            { words: ['There', 'are', 'little', 'cars.'], errorIndex: 2, fix: 'few' },
+            { words: ['I', "don't", 'have', 'many', 'money.'], errorIndex: 3, fix: 'much' },
+            { words: ['How', 'few', 'sugar?'], errorIndex: 1, fix: 'much' }
+          ],
+          dataB: [
+            { words: ['How', 'many', 'milk', 'is', 'there?'], errorIndex: 1, fix: 'much' },
+            { words: ['I', 'need', 'a', 'little', 'tomatoes.'], errorIndex: 3, fix: 'few' },
+            { words: ['There', 'is', 'few', 'coffee', 'left.'], errorIndex: 2, fix: 'little' },
+            { words: ['We', 'have', 'much', 'potatoes.'], errorIndex: 2, fix: 'many' },
+            { words: ['They', 'need', 'many', 'time.'], errorIndex: 2, fix: 'much' },
+            { words: ['How', 'much', 'eggs?'], errorIndex: 1, fix: 'many' }
+          ]
+        },
+        {
+          type: 'comicdialogue',
+          title: 'At the Supermarket',
+          instruction: 'Listen to the audio and complete the conversation.',
+          audio: 'files/audio_dialogo_manzanas.mp3',
+          dataA: [
+            {
+              title: 'Making an Apple Pie',
+              bubbles: [
+                { author: 'A', text: 'Hi José, I need some apples.' },
+                { author: 'B', blank: true, answer: 'Are you going to prepare an apple pie?' },
+                { author: 'A', blank: true, answer: 'Yes, and I want a little of sugar too' },
+                { author: 'B', text: 'Well, I have few strawberries too if you need.' }
+              ],
+              bank: ['Do you want some salt?', 'I need a lot of water', 'Are you cooking soup?']
+            }
+          ],
+          dataB: [
+            {
+              title: 'Making an Apple Pie',
+              bubbles: [
+                { author: 'A', text: 'Hi José, I need some apples.' },
+                { author: 'B', blank: true, answer: 'Are you going to prepare an apple pie?' },
+                { author: 'A', blank: true, answer: 'Yes, and I want a little of sugar too' },
+                { author: 'B', text: 'Well, I have few strawberries too if you need.' }
+              ],
+              bank: ['Do you want some salt?', 'I need a lot of water', 'Are you cooking soup?']
+            }
+          ]
+        },
+        {
+          type: 'matchlines',
+          title: 'Match the Containers',
+          instruction: 'Draw a line to match the container with the correct product.',
+          dataA: [
+            { left: 'A carton', right: 'of milk' },
+            { left: 'A bag', right: 'of sugar' },
+            { left: 'A box', right: 'of cereal' },
+            { left: 'A jar', right: 'of honey' },
+            { left: 'A bottle', right: 'of water' }
+          ],
+          dataB: [
+            { left: 'A slice', right: 'of bread' },
+            { left: 'A piece', right: 'of cake' },
+            { left: 'A cup', right: 'of tea' },
+            { left: 'A glass', right: 'of juice' },
+            { left: 'A can', right: 'of soda' }
+          ]
+        },
+        {
+          type: 'memory',
+          title: 'Food Pairs Memory',
+          instruction: 'Find the matching pairs of identical food items.',
+          dataA: [
+            { left: '🍔', right: '🍔' },
+            { left: '🍎', right: '🍎' },
+            { left: '🥛', right: '🥛' },
+            { left: '🍕', right: '🍕' },
+            { left: '🥖', right: '🥖' },
+            { left: '🧀', right: '🧀' }
+          ],
+          dataB: [
+            { left: '🥤', right: '🥤' },
+            { left: '🍉', right: '🍉' },
+            { left: '🍩', right: '🍩' },
+            { left: '🍿', right: '🍿' },
+            { left: '🍓', right: '🍓' },
+            { left: '🍟', right: '🍟' }
+          ]
+        },
+        {
+          type: 'matchimage',
+          title: 'Containers Vocabulary',
+          instruction: 'Select the image that matches the phrase.',
+          dataA: [
+            { word: 'A can of soda', image: 'files/lata_de_soda.png' },
+            { word: 'A slice of pizza', image: 'files/rebanada_de_pizza.png' },
+            { word: 'A bottle of water', image: 'files/botella_de_agua.png' },
+            { word: 'A box of cereal', image: 'files/caja_de_cereal.png' },
+            { word: 'A jar of honey', image: 'files/tarro_de_miel.png' },
+            { word: 'A bag of chips', image: 'files/bolsa_de_papas.png' }
+          ],
+          dataB: [
+            { word: 'A glass of milk', image: 'files/vaso_de_leche.png' },
+            { word: 'A cup of coffee', image: 'files/taza_de_cafe.png' },
+            { word: 'A carton of eggs', image: 'files/carton_de_huevos.png' },
+            { word: 'A bowl of soup', image: 'files/tazon_de_sopa.png' },
+            { word: 'A piece of cake', image: 'files/pedazo_de_pastel.png' },
+            { word: 'A slice of bread', image: 'files/rebanada_de_pan.png' }
+          ]
+        }
+      ],
+      
+      game: { 
+        type: 'hangman', 
+        words: ['APPLE', 'BANANA', 'SUGAR', 'FLOUR', 'WATER', 'CARROT', 'TOMATO', 'COFFEE', 'CHEESE', 'CHICKEN', 'BREAD', 'ONION'] 
+      }
+    });
+  </script>
+</body>
+</html>
