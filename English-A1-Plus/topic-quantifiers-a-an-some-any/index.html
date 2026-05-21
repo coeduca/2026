@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Topic: Quantifiers: a/an, some, any. - Noveno, Primer Año, Segundo Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+      container: '#app',
+      topic: 'Topic: Quantifiers: a/an, some, any.',
+      level: 'Noveno, Primer Año, Segundo Año',
+      pdfDesign: 'Pastel', 
+      colors: { primary: '#81BBF7', accent: '#43B069', bg: '#CCFF76' },
+      exercises: [
+        {
+          type: 'note',
+          title: 'Quantifiers & Containers',
+          html: '<p><strong>Quantifiers</strong> nos ayudan a expresar la cantidad de algo.</p><ul><li><strong>A / An:</strong> Significa "un/una". Se usa con sustantivos contables en singular. Usa <em>"A"</em> antes de sonidos consonantes (a banana) y <em>"An"</em> antes de sonidos vocales (an apple).</li><li><strong>Some:</strong> Significa "algo de" o "algunos". Se usa para oraciones afirmativas (There is some milk).</li><li><strong>Any:</strong> Significa "nada de" o "ningún/ninguna". Se usa para oraciones negativas (There isn\'t any rice) y preguntas (Are there any eggs?).</li></ul><p>Para hablar de comida, usamos <strong>Contenedores (Containers)</strong> para medir sustantivos incontables: <em>a bottle of water, a glass of milk, a bowl of soup, a box of cereal.</em></p>'
+        },
+        {
+          type: 'multiplechoice',
+          instruction: 'Escoge el quantifier correcto para completar la oración.',
+          dataA: [
+            { q: 'I need ___ apple for the recipe.', options: ['an', 'a', 'some'], answer: 0 },
+            { q: 'There is ___ milk in the fridge.', options: ['some', 'any', 'a'], answer: 0 },
+            { q: 'Do we have ___ eggs left?', options: ['any', 'some', 'a'], answer: 0 },
+            { q: 'There isn\'t ___ bread on the table.', options: ['any', 'some', 'an'], answer: 0 },
+            { q: 'She wants to eat ___ banana.', options: ['a', 'an', 'some'], answer: 0 },
+            { q: 'Can I have ___ water, please?', options: ['some', 'any', 'a'], answer: 0 }
+          ],
+          dataB: [
+            { q: 'He is eating ___ orange right now.', options: ['an', 'a', 'some'], answer: 0 },
+            { q: 'There are ___ cookies in the jar.', options: ['some', 'any', 'a'], answer: 0 },
+            { q: 'Are there ___ tomatoes in the salad?', options: ['any', 'some', 'a'], answer: 0 },
+            { q: 'We don\'t have ___ cheese for the pizza.', options: ['any', 'some', 'an'], answer: 0 },
+            { q: 'I will buy ___ pineapple at the supermarket.', options: ['a', 'an', 'some'], answer: 0 },
+            { q: 'Would you like ___ coffee?', options: ['some', 'any', 'a'], answer: 0 }
+          ]
+        },
+        {
+          type: 'matchlines',
+          instruction: 'Une el contenedor en inglés con su traducción al español.',
+          dataA: [
+            { left: 'Box', right: 'Caja' },
+            { left: 'Bottle', right: 'Botella' },
+            { left: 'Bowl', right: 'Tazón' },
+            { left: 'Glass', right: 'Vaso' },
+            { left: 'Jar', right: 'Frasco' }
+          ],
+          dataB: [
+            { left: 'Bag', right: 'Bolsa' },
+            { left: 'Cup', right: 'Taza' },
+            { left: 'Plate', right: 'Plato' },
+            { left: 'Can', right: 'Lata' },
+            { left: 'Piece', right: 'Pedazo' }
+          ]
+        },
+        {
+          type: 'dragbank',
+          title: 'Look at the table and complete',
+          instruction: 'Observa la imagen y arrastra la palabra correcta para completar la oración.',
+          image: 'files/food_table.png',
+          dataA: {
+            sentences: [
+              { text: 'There is ___ apple', answer: 'an' },
+              { text: 'There are ___ fish in the plate', answer: 'two' },
+              { text: 'There are ___ grapes in the bowl', answer: 'some' },
+              { text: 'There is ___ milk in the glass', answer: 'some' },
+              { text: 'There is ___ bottle of water', answer: 'a' },
+              { text: 'There aren\'t ___ cookies on the table', answer: 'any' }
+            ],
+            bank: ['much', 'many']
+          },
+          dataB: {
+            sentences: [
+              { text: 'There is a ___ of cheese', answer: 'piece' },
+              { text: 'There is a ___ of bananas', answer: 'bunch' },
+              { text: 'There are ___ tomatoes', answer: 'three' },
+              { text: 'There are ___ eggs in the bowl', answer: 'some' },
+              { text: 'There are ___ chicken breasts', answer: 'two' },
+              { text: 'There isn\'t ___ rice', answer: 'any' }
+            ],
+            bank: ['slice', 'many']
+          }
+        },
+        {
+          type: 'multiplechoice',
+          instruction: 'Selecciona el contenedor correcto.',
+          dataA: [
+            { q: 'How many ___ of sugar do you need?', options: ['bags', 'bunches', 'glasses'], answer: 0 },
+            { q: 'I drank a ___ of water after running.', options: ['glass', 'piece', 'bowl'], answer: 0 },
+            { q: 'She bought a ___ of milk at the store.', options: ['carton', 'slice', 'bunch'], answer: 0 },
+            { q: 'Can you pass me that ___ of jam?', options: ['jar', 'box', 'bag'], answer: 0 },
+            { q: 'He ate a big ___ of pizza.', options: ['slice', 'bottle', 'can'], answer: 0 },
+            { q: 'There is a ___ of cereal in the cupboard.', options: ['box', 'glass', 'bunch'], answer: 0 }
+          ],
+          dataB: [
+            { q: 'We need a ___ of bananas for the smoothie.', options: ['bunch', 'box', 'can'], answer: 0 },
+            { q: 'Please buy a ___ of soda.', options: ['can', 'slice', 'piece'], answer: 0 },
+            { q: 'I had a delicious ___ of soup for lunch.', options: ['bowl', 'glass', 'bottle'], answer: 0 },
+            { q: 'Give me a ___ of cake, please.', options: ['piece', 'jar', 'bag'], answer: 0 },
+            { q: 'He poured a ___ of hot tea.', options: ['cup', 'bowl', 'box'], answer: 0 },
+            { q: 'They sold a ___ of olive oil.', options: ['bottle', 'slice', 'bunch'], answer: 0 }
+          ]
+        },
+        {
+          type: 'categorize',
+          instruction: 'Clasifica los alimentos dependiendo si usan "A" o "An".',
+          dataA: {
+            categories: ['Uses "A"', 'Uses "An"'],
+            items: [
+              { text: 'Banana', cat: 0 },
+              { text: 'Tomato', cat: 0 },
+              { text: 'Carrot', cat: 0 },
+              { text: 'Lemon', cat: 0 },
+              { text: 'Apple', cat: 1 },
+              { text: 'Onion', cat: 1 },
+              { text: 'Orange', cat: 1 },
+              { text: 'Egg', cat: 1 }
+            ]
+          },
+          dataB: {
+            categories: ['Uses "A"', 'Uses "An"'],
+            items: [
+              { text: 'Potato', cat: 0 },
+              { text: 'Pineapple', cat: 0 },
+              { text: 'Watermelon', cat: 0 },
+              { text: 'Strawberry', cat: 0 },
+              { text: 'Olive', cat: 1 },
+              { text: 'Eggplant', cat: 1 },
+              { text: 'Ice cream', cat: 1 },
+              { text: 'Apricot', cat: 1 }
+            ]
+          }
+        },
+        {
+          type: 'dropdown',
+          instruction: 'Selecciona el quantifier correcto en cada oración.',
+          dataA: [
+            { before: 'We have', options: ['some', 'any', 'a'], answer: 0, after: 'apples in the kitchen.' },
+            { before: 'Is there', options: ['any', 'some', 'an'], answer: 0, after: 'milk left?' },
+            { before: 'I want', options: ['a', 'an', 'some'], answer: 0, after: 'sandwich for lunch.' },
+            { before: 'She needs', options: ['an', 'a', 'some'], answer: 0, after: 'umbrella today.' },
+            { before: 'There isn\'t', options: ['any', 'some', 'a'], answer: 0, after: 'sugar in my coffee.' },
+            { before: 'Let\'s buy', options: ['some', 'any', 'a'], answer: 0, after: 'strawberries.' }
+          ],
+          dataB: [
+            { before: 'Do you have', options: ['any', 'some', 'a'], answer: 0, after: 'questions?' },
+            { before: 'He ate', options: ['an', 'a', 'some'], answer: 0, after: 'entire pizza.' },
+            { before: 'We need', options: ['some', 'any', 'a'], answer: 0, after: 'fresh air.' },
+            { before: 'There are not', options: ['any', 'some', 'an'], answer: 0, after: 'chairs left.' },
+            { before: 'Can I have', options: ['a', 'an', 'some'], answer: 0, after: 'piece of cake?' },
+            { before: 'Would you like', options: ['some', 'any', 'a'], answer: 0, after: 'tea?' }
+          ]
+        },
+        {
+          type: 'fillblank',
+          instruction: 'Escucha el audio y completa los espacios con el quantifier correcto.',
+          audio: 'files/tom_food_audio.mp3',
+          dataA: [
+            { text: 'Hello! My name is Tom. There are ___ fruits and vegetables on my table. There is ___ apple, a watermelon, and ___ bananas. There are ___ fish and ___ chickens too. There is ___ milk in the glass and ___ yogurt next to the cheese. There are ___ potatoes in a bowl, but there aren’t ___ cookies or candies on the table. I like healthy food!', answer: ['some', 'an', 'some', 'two', 'two', 'some', 'some', 'some', 'any'] }
+          ],
+          dataB: [
+            { text: 'Hello! My name is Tom. There are ___ fruits and vegetables on my table. There is ___ apple, a watermelon, and ___ bananas. There are ___ fish and ___ chickens too. There is ___ milk in the glass and ___ yogurt next to the cheese. There are ___ potatoes in a bowl, but there aren’t ___ cookies or candies on the table. I like healthy food!', answer: ['some', 'an', 'some', 'two', 'two', 'some', 'some', 'some', 'any'] }
+          ]
+        }
+      ],
+      game: { type: 'snake', winScore: 5 }
+    });
+  </script>
+</body>
+</html>
