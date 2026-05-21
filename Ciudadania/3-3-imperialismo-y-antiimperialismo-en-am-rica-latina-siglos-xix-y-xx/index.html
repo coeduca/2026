@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>3-3 Imperialismo y antiimperialismo en América Latina siglos XIX y XX - Octavo</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="civica-exercises.js"></script>
+  <script src="civica-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    CIVICA.init({
+      id: 'cv_1779364723000',
+      container: '#app',
+      topic: '3-3 Imperialismo y antiimperialismo en América Latina siglos XIX y XX',
+      level: 'Octavo',
+      unit: 'Unidad 3 - Semana 3',
+      subjectLabel: 'Ciudadanía y Valores',
+      book: { url: 'https://drive.google.com/file/d/1wOJTmZ2ptUPiIGDztCrJvQ0EfpE64e_g/view?usp=drivesdk', label: 'Libro de Octavo' },
+      pdfDesign: 'PopArt',
+      colors: { primary: '#D4AF37', accent: '#9B59B6', bg: '#87CEEB' },
+
+      sections: {
+        explore: [
+          {
+            type: 'note',
+            html: `<div style="background: rgba(255,255,240,0.9); border-radius: 20px; padding: 1.2rem; margin: 0.5rem 0;">
+                    <h3>📖 Imperialismo y antiimperialismo en América Latina (XIX-XX)</h3>
+                    <p>Desde finales del siglo XIX, Estados Unidos consolidó su influencia sobre América Latina mediante la <strong>Doctrina Monroe</strong> ("América para los americanos") y el <strong>Corolario Roosevelt</strong>, justificando intervenciones militares y económicas. La <strong>Enmienda Platt</strong> (1901) convirtió a Cuba en un protectorado, mientras la <strong>Diplomacia del Dólar</strong> y compañías como la <strong>United Fruit Company</strong> controlaban economías centroamericanas. Surgieron resistencias: José Martí, Augusto Sandino, la Revolución Mexicana y movimientos obreros antiimperialistas. Analiza caricaturas, documentos y comprende las luchas por la <em>segunda independencia</em>.</p>
+                   </div>`
+          },
+          {
+            type: 'cv_textanswer',
+            title: '🎨 Caricatura de 1897: "Los camareros pacientes no son perdedores"',
+            instruction: 'Observa la imagen del Tío Sam esperando pacientemente. Responde con argumentos históricos.',
+            image: 'files/caricatura_camareros_pacientes.png',
+            dataA: [
+              {
+                q: 'a) ¿Qué escena describe la caricatura? b) ¿Qué simboliza el personaje (Tío Sam), los frutos y el lugar donde están?',
+                minLength: 40,
+                rows: 4,
+                placeholder: 'Ejemplo: El Tío Sam representa a Estados Unidos esperando...',
+                keywords: ['Tío Sam', 'espera', 'frutas', 'Cuba', 'territorios', 'imperialismo', 'Estados Unidos', 'expansión'],
+                keywordsRequired: 3
+              }
+            ],
+            dataB: [
+              {
+                q: 'Interpreta la imagen: ¿Cuál es la actitud del personaje principal? ¿Qué frutos o territorios aparecen y qué mensaje imperialista transmiten?',
+                minLength: 40,
+                rows: 4,
+                placeholder: 'Analiza la paciencia del Tío Sam y los frutos como metáfora...',
+                keywords: ['Sam', 'paciencia', 'expansión', 'Hawái', 'Centroamérica', 'dominación', 'frutos', 'anexión'],
+                keywordsRequired: 3
+              }
+            ]
+          },
+          {
+            type: 'cv_textanswer',
+            title: '📄 "Hermano mayor": la máscara del imperialismo',
+            instruction: 'Lee el Doc.1 del cuaderno: Estados Unidos se autodenominaba "hermano mayor" de América Latina. Explica el verdadero significado detrás de esa frase.',
+            dataA: [
+              {
+                q: '¿Qué intención tenía EE.UU. al llamarse "hermano mayor"? ¿Cómo encubría sus intereses imperialistas?',
+                minLength: 35,
+                rows: 3,
+                placeholder: 'Relaciona con la protección falsa, el control económico y político...',
+                keywords: ['protección', 'intereses imperialistas', 'dominio', 'intervención', 'doctrina Monroe', 'aparente tutela', 'control'],
+                keywordsRequired: 3
+              }
+            ],
+            dataB: [
+              {
+                q: 'Explica la hipocresía del discurso del "hermano mayor" hacia países latinoamericanos. ¿Qué acciones evidencia el verdadero propósito?',
+                minLength: 35,
+                rows: 3,
+                placeholder: 'Menciona el Canal de Panamá, la Enmienda Platt, intervenciones militares...',
+                keywords: ['asistencia', 'control imperialista', 'pretensión', 'resguardar', 'neocolonialismo', 'poder hegemónico', 'Panamá'],
+                keywordsRequired: 3
+              }
+            ]
+          },
+          {
+            type: 'truefalse',
+            title: '✅ Primeros pasos: conceptos clave del imperialismo',
+            instruction: 'Lee cada afirmación y decide si es verdadera (V) o falsa (F) según lo estudiado.',
+            dataA: [
+              { statement: 'La Doctrina Monroe fue una política que buscaba proteger a América Latina de la recolonización europea, pero terminó justificando la intervención estadounidense.', answer: true },
+              { statement: 'El hundimiento del Maine (1898) fue un ataque deliberado de España y esa fue la única causa de la guerra hispano-estadounidense.', answer: false },
+              { statement: 'La Enmienda Platt impidió que Cuba firmara tratados con otras naciones sin consentimiento de EE.UU. y autorizaba intervenciones militares.', answer: true }
+            ],
+            dataB: [
+              { statement: 'El Tratado de París de 1898 otorgó la independencia total a Cuba y también a Filipinas sin condiciones.', answer: false },
+              { statement: 'La “Diplomacia del Dólar” reemplazó los cañones por inversiones financieras para controlar economías centroamericanas.', answer: true },
+              { statement: 'La United Fruit Company promovió el desarrollo autónomo de Centroamérica sin influir en gobiernos locales.', answer: false }
+            ]
+          }
+        ],
+
+        deepen: [
+          {
+            type: 'matchlines',
+            title: '🔗 Conceptos e imperialismo estadounidense',
+            instruction: 'Une cada término o personaje con su definición o hecho correcto.',
+            dataA: {
+              pairs: [
+                { left: 'Doctrina Monroe (1823)', right: '“América para los americanos” – rechazo a intervención europea' },
+                { left: 'Enmienda Platt (1901)', right: 'Permitió a EE.UU. intervenir en Cuba y controlar sus tratados' },
+                { left: 'United Fruit Company', right: 'Empresa bananera que influyó en política centroamericana (repúblicas bananeras)' },
+                { left: 'Corolario Roosevelt', right: 'Derecho de EE.UU. a intervenir en conflictos latinoamericanos como “policía internacional”' },
+                { left: 'Tratado de París (1898)', right: 'España cedió Puerto Rico, Guam y Filipinas a EE.UU.; Cuba independiente bajo tutela' }
+              ]
+            },
+            dataB: {
+              pairs: [
+                { left: 'José Martí', right: 'Poeta y líder antiimperialista, advirtió sobre el “águila imperial”' },
+                { left: 'Augusto Sandino', right: 'Dirigió la resistencia contra la ocupación estadounidense en Nicaragua' },
+                { left: 'Huelga bananera de 1928 (Colombia)', right: 'Masacre de trabajadores de la United Fruit Company exigiendo mejoras' },
+                { left: 'Doctrina Monroe en la práctica', right: 'Utilizada para justificar el control de Panamá, Cuba y República Dominicana' },
+                { left: '“Segunda independencia” (José Martí)', right: 'Lucha por liberarse del dominio económico y político de EE.UU.' }
+              ]
+            }
+          },
+          {
+            type: 'multiplechoice',
+            title: '📜 La doctrina Monroe y el Caribe bajo influencia',
+            instruction: 'Elige la opción correcta según el contexto histórico de finales del siglo XIX y principios del XX.',
+            dataA: [
+              { q: '¿Qué establecía la Enmienda Platt para Cuba?', options: ['La independencia absoluta sin restricciones', 'El derecho de EE.UU. a intervenir militarmente y vetar tratados cubanos', 'La anexión de Cuba como estado número 51', 'La construcción de una base naval en Guantánamo sin más condiciones'], answer: 1 },
+              { q: '¿Cuál fue una consecuencia inmediata de la guerra hispano-estadounidense (1898)?', options: ['España conservó Filipinas y Puerto Rico', 'EE.UU. obtuvo Puerto Rico, Guam y Filipinas; Cuba quedó bajo tutela militar', 'América Latina se unió en una alianza antiimperialista', 'Inglaterra ocupó el Canal de Panamá'], answer: 1 }
+            ],
+            dataB: [
+              { q: '¿Qué simboliza la caricatura de 1898 (Tío Sam comiendo “bistec cubano, puerco puertorriqueño…”) ?', options: ['La cooperación cultural entre naciones', 'El apetito imperialista de EE.UU. sobre territorios hispanos', 'La independencia alimentaria de América Latina', 'Un tratado comercial justo'], answer: 1 },
+              { q: 'La Doctrina Monroe originalmente: ', options: ['Buscaba la unión continental contra cualquier potencia europea, pero fue usada por EE.UU. para dominar la región', 'Fue un tratado con Inglaterra para repartirse Centroamérica', 'Prohibía la esclavitud en el continente americano', 'Garantizaba la independencia de Canadá'], answer: 0 }
+            ]
+          },
+          {
+            type: 'fillblank',
+            title: '🍌 El poder de las compañías bananeras',
+            instruction: 'Completa los espacios con la palabra correcta según la información del PDF.',
+            dataA: [
+              { text: 'La empresa _______________, fundada por Minor Keith, controlaba vastas plantaciones y ferrocarriles en Centroamérica, influyendo en presidentes y ejerciendo la llamada "diplomacia del dólar".', answer: ['United Fruit Company', 'United Fruit'] },
+              { text: 'Para consolidar su influencia, las compañías bananeras presionaban a los gobiernos ofreciendo _____________ y préstamos a cambio de tierras y exenciones de impuestos.', answer: ['ferrocarriles', 'infraestructura ferroviaria', 'vías férreas'] }
+            ],
+            dataB: [
+              { text: 'Los principales trabajadores bananeros provenían de las Antillas británicas (especialmente de _____________) y enfrentaban discriminación racial junto a indígenas y mestizos.', answer: ['Jamaica', 'Jamaica'] },
+              { text: 'La resistencia al imperialismo no surgió de los gobiernos aliados, sino de _____________ y movimientos antiimperialistas mediante huelgas como la de 1928 en Colombia.', answer: ['los trabajadores', 'obreros', 'sindicatos'] }
+            ]
+          },
+          {
+            type: 'categorize',
+            title: '📊 Clasifica: ¿Imperialismo o Antiimperialismo?',
+            instruction: 'Arrastra cada acción o idea a la categoría correcta: "Imperialismo estadounidense" o "Resistencia antiimperialista".',
+            dataA: {
+              categories: ['Imperialismo estadounidense', 'Resistencia antiimperialista'],
+              items: [
+                { text: 'Enmienda Platt (Cuba)', cat: 0 },
+                { text: 'Apoyo a la separación de Panamá de Colombia', cat: 0 },
+                { text: 'Levantamiento de Augusto Sandino en Nicaragua', cat: 1 },
+                { text: 'Doctrina Monroe aplicada como “policía del mundo”', cat: 0 },
+                { text: 'Huelga bananera en Costa Rica (1934)', cat: 1 },
+                { text: 'Nacionalización del petróleo en México (1938)', cat: 1 }
+              ]
+            },
+            dataB: {
+              categories: ['Imperialismo estadounidense', 'Resistencia antiimperialista'],
+              items: [
+                { text: 'Intervención en República Dominicana (1916)', cat: 0 },
+                { text: 'Discurso de José Martí sobre la segunda independencia', cat: 1 },
+                { text: 'Diplomacia del dólar en Honduras', cat: 0 },
+                { text: 'Ocupación militar de Nicaragua (1912-1933)', cat: 0 },
+                { text: 'Derrocamiento de Estrada Cabrera (Guatemala, 1920)', cat: 1 },
+                { text: 'Masacre de las bananeras (Colombia, 1928) → protestas', cat: 1 }
+              ]
+            }
+          }
+        ],
+
+        consolidate: [
+          {
+            type: 'cv_textanswer',
+            title: '📑 Panamá: dos caras de la historia',
+            instruction: 'Lee los fragmentos de la autobiografía de Theodore Roosevelt (Doc.4) y la carta del presidente colombiano José Marroquín (Doc.6). Luego responde comparando las versiones.',
+            image: 'files/caricatura_huevo_roosevelt.png',
+            dataA: [
+              {
+                q: '¿Qué contradicciones encuentras entre el relato de Roosevelt (autobiografía) y la denuncia de Marroquín? ¿Quién legitima la separación de Panamá y por qué?',
+                minLength: 50,
+                rows: 4,
+                placeholder: 'Roosevelt niega haber incitado la revolución, pero Marroquín lo acusa de violar el derecho internacional...',
+                keywords: ['contradicción', 'Roosevelt', 'Marroquín', 'intervención', 'canal', 'bandidos', 'soberanía', 'derecho internacional', 'revolución'],
+                keywordsRequired: 3
+              }
+            ],
+            dataB: [
+              {
+                q: 'Según las cartas de Roosevelt (1915) y la protesta de Colombia: ¿cómo justifica Roosevelt su intervención en Panamá? ¿Cuál es la postura de Marroquín frente a esa justificación?',
+                minLength: 50,
+                rows: 4,
+                placeholder: 'Roosevelt habla de "bandidos" y necesidad mundial; Marroquín denuncia deshonra y violación de tratados...',
+                keywords: ['justificación', 'fuerza naval', 'bandidos calabreses', 'Colombia débil', 'condenación de la historia', 'reconocimiento inmediato'],
+                keywordsRequired: 3
+              }
+            ]
+          },
+          {
+            type: 'cv_table',
+            title: '📊 Cuadro comparativo: documentos sobre Panamá',
+            instruction: 'Completa la tabla analizando cada fuente histórica: fecha, autor y propósito principal.',
+            dataA: {
+              columns: ['Documento / Fuente', 'Fecha aproximada', 'Autor / redactor', 'Propósito / postura frente a Panamá'],
+              rows: [
+                [{ type: 'text', value: 'Autobiografía de Theodore Roosevelt' }, { type: 'text', value: '' }, { type: 'text', value: '' }, { type: 'text', value: '' }],
+                [{ type: 'text', value: 'Carta a William Roscoe Thayer (1915)' }, { type: 'text', value: '' }, { type: 'text', value: '' }, { type: 'text', value: '' }],
+                [{ type: 'text', value: 'Carta del presidente José Marroquín (1908)' }, { type: 'text', value: '' }, { type: 'text', value: '' }, { type: 'text', value: '' }]
+              ],
+              bank: ['1903-1913', 'Theodore Roosevelt', 'Defender la intervención como necesaria para el canal', '1908', 'José Marroquín', 'Denunciar la violación del derecho internacional y la soberanía colombiana', '1915', 'Mostrar la versión oficial y ocultar el apoyo militar a la revolución']
+            },
+            dataB: {
+              columns: ['Documento', 'Fecha', 'Autor', 'Tesis principal'],
+              rows: [
+                [{ type: 'text', value: 'Discurso de Roosevelt sobre Panamá' }, { type: 'text', value: '' }, { type: 'text', value: '' }, { type: 'text', value: '' }],
+                [{ type: 'text', value: 'Carta de José Marroquín (1908)' }, { type: 'text', value: '' }, { type: 'text', value: '' }, { type: 'text', value: '' }],
+                [{ type: 'text', value: 'Carta privada de Roosevelt (1915)' }, { type: 'text', value: '' }, { type: 'text', value: '' }, { type: 'text', value: '' }]
+              ],
+              bank: ['1908', '1915', 'Theodore Roosevelt', 'José Marroquín', 'Reconoce que usaría la fuerza si no hubiera revolución', 'Acusa a EE.UU. de tratar a Colombia como nación indigna', 'Niega haber incitado la revolución pero justifica el apoyo naval']
+            }
+          },
+          {
+            type: 'multiplechoice',
+            title: '⚖️ Evaluación final: el Canal de Panamá y el imperialismo',
+            instruction: 'Selecciona la respuesta correcta basada en los documentos y el contexto histórico.',
+            dataA: [
+              { q: '¿Qué estrategia usó Theodore Roosevelt para asegurar la construcción del Canal de Panamá?', options: ['Negoció respetuosamente con Colombia durante una década', 'Apoyó militarmente la independencia de Panamá y envió buques de guerra para impedir la intervención colombiana', 'Compró el canal a Francia sin involucrarse en política', 'Firmó el tratado Clayton-Bulwer con Inglaterra'], answer: 1 },
+              { q: 'Según la carta de José Marroquín, ¿por qué Colombia consideraba ilegal el reconocimiento estadounidense de Panamá?', options: ['Porque Colombia ya había vendido el istmo a Francia', 'Porque la revolución no tenía apoyo popular y EE.UU. violó el derecho internacional al reconocerla en pocos días', 'Porque el canal ya estaba construido por España', 'Porque Roosevelt no era presidente legítimo'], answer: 1 }
+            ],
+            dataB: [
+              { q: '¿Cuál fue la reacción de Roosevelt ante la crítica internacional por el caso de Panamá?', options: ['Se disculpó y devolvió el territorio a Colombia', 'Argumentó que Colombia era un “grupo de bandidos” y que actuó por el bien del mundo', 'Renunció a la presidencia', 'Convocó a un arbitraje de la ONU'], answer: 1 },
+              { q: '¿Qué sector social lideró las resistencias antiimperialistas en las repúblicas bananeras?', options: ['Los presidentes aliados de la United Fruit', 'Los terratenientes locales', 'Trabajadores jamaiquinos, indígenas y mestizos mediante huelgas', 'El ejército estadounidense'], answer: 2 }
+            ]
+          },
+          {
+            type: 'memory',
+            title: '🧠 Memoriza: líderes y conceptos antiimperialistas',
+            instruction: 'Encuentra las parejas correctas entre el personaje / hecho y su descripción.',
+            dataA: [
+              { left: 'José Martí', right: '“Nuestra América” – lucha por segunda independencia del imperialismo' },
+              { left: 'Augusto Sandino', right: 'Resistencia nicaragüense contra la ocupación yanqui (1927-1933)' },
+              { left: 'Revolución Mexicana (1938)', right: 'Nacionalización del petróleo frente a empresas extranjeras' },
+              { left: 'Víctor Raúl Haya de la Torre', right: 'Propuso unidad continental y nacionalización del Canal de Panamá' },
+              { left: 'Huelga bananera de 1954 (Honduras)', right: 'Paro masivo contra la United Fruit Company' }
+            ],
+            dataB: [
+              { left: 'Enmienda Platt', right: 'Instrumento que limitó la soberanía cubana' },
+              { left: 'Doctrina Monroe', right: 'Usada para justificar el control estadounidense en el hemisferio' },
+              { left: 'United Fruit Company', right: '“Repúblicas bananeras” y control político en Centroamérica' },
+              { left: 'José Enrique Rodó', right: 'Crítica al materialismo norteamericano en “Ariel”' },
+              { left: 'Canal de Panamá', right: 'Obra estratégica inaugurada en 1914 bajo control de EE.UU.' }
+            ]
+          }
+        ]
+      },
+
+      game: {
+        type: 'hangman',
+        words: [
+          'IMPERIALISMO', 'DOCTRINAMONROE', 'ROOSEVELT', 'ENMIENDAPLATT', 'UNITEDFRUIT',
+          'SANDINO', 'MARTI', 'PANAMA', 'ANTIIMPERIALISMO', 'BANANERAS', 'CANAL',
+          'COLOMBIA', 'COROLARIOROOSEVELT', 'PLATT', 'HAYA', 'GUAM', 'FILIPINAS'
+        ]
+      }
+    });
+  </script>
+</body>
+</html>
