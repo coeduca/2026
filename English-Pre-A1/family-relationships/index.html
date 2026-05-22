@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Family Relationships - Octavo, Séptimo</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+      container: '#app',
+      topic: 'Family Relationships',
+      level: 'Octavo, Séptimo',
+      pdfDesign: 'HollyHobbie',
+      colors: { primary: '#FF9D00', accent: '#43B069', bg: '#008F8F', cardBg: '#C0F5F8', text: '#1A1A1A' },
+            examPools: {
+              '20176655': 'A',
+              '20176656': 'B',
+              '20176657': 'A',
+              '20176661': 'B',
+              '20138869': 'A',
+              '20176662': 'B',
+              '20176663': 'A',
+              '10065035': 'B',
+              '20176664': 'A',
+              '20305579': 'B',
+              '20305581': 'A',
+              '20176667': 'B',
+              '20176668': 'A',
+              '20179890': 'B',
+              '20179891': 'A',
+              '20293665': 'B',
+              '20305583': 'A',
+              '20176653': 'B',
+              '20176654': 'A',
+              '20176658': 'B',
+              '20316947': 'A',
+              '20176659': 'B',
+              '20182709': 'A',
+              '20176660': 'B',
+              '20316949': 'A',
+              '20298183': 'B',
+              '20062372': 'A',
+              '20298185': 'B',
+              '20199089': 'A',
+              '20182722': 'B',
+              '20141583': 'A',
+              '20138865': 'B',
+              '20298188': 'A',
+              '20062488': 'B',
+              '20182730': 'A',
+              '20062492': 'B',
+              '20298191': 'A',
+              '10000395': 'B',
+              '20298192': 'A',
+              '20298195': 'B',
+              '20298194': 'A',
+              '20176670': 'B',
+              '20316951': 'A',
+              '20171117': 'B',
+              '20298196': 'A'
+            },
+      exercises: [
+        {
+          type: 'note',
+          title: 'Family and Possessive Nouns',
+          image: 'files/family_tree_diagram.png',
+          html: '<h3>The Possessive \'s</h3><p>Para indicar relación o posesión en inglés, usamos el apóstrofe y la letra "s" (<b>\'s</b>) justo después de la persona.</p><ul><li><b>Estructura:</b> Sujeto + is + (Dueño)\'s + Familiar</li><li><b>Ejemplo:</b> María is Oscar\'s wife. (María es la esposa de Oscar).</li><li><b>Ejemplo:</b> Homer is Bart\'s father. (Homero es el papá de Bart).</li></ul><p>Recuerda el vocabulario familiar: mother, father, brother, sister, uncle (tío), aunt (tía), cousin (primo/a), nephew (sobrino), niece (sobrina), grandfather, grandmother, husband (esposo), wife (esposa).</p>'
+        },
+        {
+          type: 'wordsearch',
+          title: 'Find the Family Members',
+          instruction: 'Encuentra las palabras de vocabulario sobre la familia en la sopa de letras.',
+          dataA: {
+            words: ['FATHER', 'MOTHER', 'BROTHER', 'SISTER', 'UNCLE', 'AUNT', 'COUSIN', 'WIFE'],
+            gridSize: 12
+          },
+          dataB: {
+            words: ['GRANDFATHER', 'GRANDMOTHER', 'NEPHEW', 'NIECE', 'HUSBAND', 'SON', 'DAUGHTER', 'PARENTS'],
+            gridSize: 12
+          }
+        },
+        {
+          type: 'multiplechoice',
+          title: 'Who is Who?',
+          instruction: 'Elige la opción correcta para describir la relación familiar.',
+          image: 'files/question_mark_family.png',
+          dataA: [
+            { q: 'My mother\'s brother is my...', options: ['uncle', 'aunt', 'grandfather'], answer: 0 },
+            { q: 'My father\'s father is my...', options: ['uncle', 'cousin', 'grandfather'], answer: 2 },
+            { q: 'My aunt\'s daughter is my...', options: ['niece', 'cousin', 'sister'], answer: 1 },
+            { q: 'My sister\'s son is my...', options: ['nephew', 'brother', 'uncle'], answer: 0 },
+            { q: 'Homer is Marge\'s...', options: ['husband', 'wife', 'brother'], answer: 0 },
+            { q: 'My brother is my parents\'...', options: ['daughter', 'son', 'nephew'], answer: 1 }
+          ],
+          dataB: [
+            { q: 'My father\'s sister is my...', options: ['aunt', 'uncle', 'grandmother'], answer: 0 },
+            { q: 'My mother\'s mother is my...', options: ['cousin', 'aunt', 'grandmother'], answer: 2 },
+            { q: 'My uncle\'s son is my...', options: ['nephew', 'brother', 'cousin'], answer: 2 },
+            { q: 'My brother\'s daughter is my...', options: ['niece', 'sister', 'aunt'], answer: 0 },
+            { q: 'Marge is Homer\'s...', options: ['husband', 'wife', 'sister'], answer: 1 },
+            { q: 'My sister is my parents\'...', options: ['son', 'daughter', 'niece'], answer: 1 }
+          ]
+        },
+        {
+          type: 'matchlines',
+          title: 'Match the Relationships',
+          instruction: 'Une la descripción con el miembro correcto de la familia.',
+          dataA: [
+            { left: "Mother's brother", right: "Uncle" },
+            { left: "Father's mother", right: "Grandmother" },
+            { left: "Uncle's child", right: "Cousin" },
+            { left: "Sister's son", right: "Nephew" },
+            { left: "Mother's husband", right: "Father" }
+          ],
+          dataB: [
+            { left: "Father's sister", right: "Aunt" },
+            { left: "Mother's father", right: "Grandfather" },
+            { left: "Brother's daughter", right: "Niece" },
+            { left: "Mother and father", right: "Parents" },
+            { left: "Father's wife", right: "Mother" }
+          ]
+        },
+        {
+          type: 'fillblank',
+          title: 'Complete the Sentence',
+          instruction: 'Escribe la palabra o el posesivo que falta.',
+          dataA: [
+            { text: "My mother's sister is my ___", answer: ["aunt"] },
+            { text: "John is married to Mary. John is ___ husband.", answer: ["Mary's"] },
+            { text: "My aunt's children are my ___", answer: ["cousins"] },
+            { text: "My sister's brother is my ___", answer: ["brother"] },
+            { text: "Peter is my uncle. I am his ___ (boy)", answer: ["nephew"] },
+            { text: "Sarah is Paul ___ wife.", answer: ["'s"] }
+          ],
+          dataB: [
+            { text: "My father's brother is my ___", answer: ["uncle"] },
+            { text: "Ana is married to Luis. Ana is ___ wife.", answer: ["Luis's"] },
+            { text: "My mother's parents are my ___", answer: ["grandparents"] },
+            { text: "My brother's sister is my ___", answer: ["sister"] },
+            { text: "Mary is my aunt. I am her ___ (girl)", answer: ["niece"] },
+            { text: "Tom is Lisa ___ husband.", answer: ["'s"] }
+          ]
+        },
+        {
+          type: 'reorder_sentences',
+          title: 'Order the Family Sentences',
+          instruction: 'Ordena las palabras para formar una oración usando el posesivo correcto.',
+          dataA: [
+            { sentence: "He is my mother's brother", es: "Él es el hermano de mi mamá" },
+            { sentence: "Maria is Juan's sister", es: "María es la hermana de Juan" },
+            { sentence: "They are my father's parents", es: "Ellos son los padres de mi papá" },
+            { sentence: "My cousin's name is Carlos", es: "El nombre de mi primo es Carlos" },
+            { sentence: "She is my uncle's wife", es: "Ella es la esposa de mi tío" },
+            { sentence: "Homer is Bart's father", es: "Homero es el papá de Bart" }
+          ],
+          dataB: [
+            { sentence: "She is my father's sister", es: "Ella es la hermana de mi papá" },
+            { sentence: "Pedro is Ana's brother", es: "Pedro es el hermano de Ana" },
+            { sentence: "They are my mother's parents", es: "Ellos son los padres de mi mamá" },
+            { sentence: "My aunt's name is Laura", es: "El nombre de mi tía es Laura" },
+            { sentence: "He is my aunt's husband", es: "Él es el esposo de mi tía" },
+            { sentence: "Marge is Lisa's mother", es: "Marge es la mamá de Lisa" }
+          ]
+        },
+        {
+          type: 'spoterror',
+          title: 'Find the Mistake',
+          instruction: 'Toca la palabra que tiene un error (especialmente en el apóstrofe) y corrígela.',
+          dataA: [
+            { words: ["My", "mothers", "brother", "is", "tall"], errorIndex: 1, fix: "mother's" },
+            { words: ["John", "is", "Mari", "husband"], errorIndex: 2, fix: "Mari's" },
+            { words: ["My", "uncle", "son", "is", "my", "cousin"], errorIndex: 1, fix: "uncle's" },
+            { words: ["She", "is", "my", "grandfathers", "wife"], errorIndex: 3, fix: "grandfather's" },
+            { words: ["He", "are", "my", "father's", "brother"], errorIndex: 1, fix: "is" },
+            { words: ["Ana", "is", "Pedros'", "sister"], errorIndex: 2, fix: "Pedro's" }
+          ],
+          dataB: [
+            { words: ["My", "fathers", "sister", "is", "short"], errorIndex: 1, fix: "father's" },
+            { words: ["Lisa", "is", "Tom", "wife"], errorIndex: 2, fix: "Tom's" },
+            { words: ["My", "aunt", "daughter", "is", "my", "cousin"], errorIndex: 1, fix: "aunt's" },
+            { words: ["He", "is", "my", "grandmothers", "husband"], errorIndex: 3, fix: "grandmother's" },
+            { words: ["She", "am", "my", "mother's", "sister"], errorIndex: 1, fix: "is" },
+            { words: ["Carlos", "is", "Anas'", "brother"], errorIndex: 2, fix: "Ana's" }
+          ]
+        },
+        {
+          type: 'dragbank',
+          title: 'Drag the Correct Word',
+          instruction: 'Arrastra el miembro de la familia correcto para completar las oraciones.',
+          dataA: {
+            sentences: [
+              { text: "My aunt is my uncle's ___", answer: "wife" },
+              { text: "My brother is my parents' ___", answer: "son" },
+              { text: "My father's father is my ___", answer: "grandfather" },
+              { text: "My mother's sister is my ___", answer: "aunt" },
+              { text: "My cousin is my uncle's ___", answer: "child" },
+              { text: "My sister's son is my ___", answer: "nephew" }
+            ],
+            bank: ["daughter", "uncle"]
+          },
+          dataB: {
+            sentences: [
+              { text: "My uncle is my aunt's ___", answer: "husband" },
+              { text: "My sister is my parents' ___", answer: "daughter" },
+              { text: "My mother's mother is my ___", answer: "grandmother" },
+              { text: "My father's brother is my ___", answer: "uncle" },
+              { text: "My aunt's children are my ___", answer: "cousins" },
+              { text: "My brother's daughter is my ___", answer: "niece" }
+            ],
+            bank: ["son", "aunt"]
+          }
+        },
+        {
+          type: 'truefalse',
+          title: 'True or False?',
+          instruction: 'Lee la afirmación familiar y decide si es verdadera (True) o falsa (False).',
+          dataA: [
+            { statement: "Your mother's sister is your aunt.", answer: true },
+            { statement: "Your father's brother is your cousin.", answer: false },
+            { statement: "Your aunt's son is your nephew.", answer: false },
+            { statement: "Your mother's father is your grandfather.", answer: true },
+            { statement: "Your brother is your parents' son.", answer: true },
+            { statement: "Your sister's daughter is your niece.", answer: true }
+          ],
+          dataB: [
+            { statement: "Your father's sister is your aunt.", answer: true },
+            { statement: "Your mother's brother is your grandfather.", answer: false },
+            { statement: "Your uncle's daughter is your cousin.", answer: true },
+            { statement: "Your father's mother is your sister.", answer: false },
+            { statement: "Your sister is your parents' daughter.", answer: true },
+            { statement: "Your brother's son is your nephew.", answer: true }
+          ]
+        }
+      ],
+      game: { type: 'tictactoe' }
+    });
+  </script>
+</body>
+</html>
