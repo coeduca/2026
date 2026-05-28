@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Quantifiers (A, An, Some, Any) - Noveno, Primer Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+      container: '#app',
+      topic: 'Quantifiers (A, An, Some, Any)',
+      level: 'Noveno, Primer Año',
+      pdfDesign: 'Colorido', 
+      colors: { primary: '#C6FF57', accent: '#43B069', bg: '#FF9643', cardBg: '#FFD470', text: '#1A1A1A' },
+            examPools: {
+              '20062471': 'A',
+              '19967142': 'B',
+              '19971566': 'A',
+              '19971565': 'B',
+              '19967143': 'A',
+              '20062474': 'B',
+              '19967145': 'A',
+              '19967146': 'B',
+              '19934096': 'A',
+              '19934095': 'B',
+              '4210274': 'A',
+              '20200673': 'B',
+              '20062484': 'A',
+              '19934098': 'B',
+              '19967150': 'A',
+              '20062486': 'B',
+              '20062489': 'A',
+              '19976021': 'B',
+              '20023247': 'A',
+              '19976024': 'B',
+              '20062495': 'A',
+              '19956103': 'B',
+              '20062498': 'A',
+              '19967154': 'B',
+              '4210278': 'A',
+              '4210264': 'B',
+              '19967144': 'A',
+              '20068438': 'B',
+              '19959332': 'A',
+              '4210262': 'B',
+              '20062373': 'A',
+              '19843597': 'B',
+              '4210272': 'A',
+              '19967158': 'B',
+              '4210284': 'A',
+              '19934099': 'B',
+              '19967161': 'A',
+              '19967151': 'B',
+              '20062496': 'A',
+              '19788973': 'B',
+              '3167629': 'A',
+              '19967163': 'B',
+              '4210259': 'A',
+              '4210276': 'B',
+              '20062499': 'A',
+              '6954866': 'B',
+              '4210263': 'A'
+            },
+      exercises: [
+        {
+          type: 'note',
+          title: '¡Let\'s learn Quantifiers! 🍽️',
+          html: '<p>Hoy aprenderemos a usar <strong>Quantifiers</strong> para hablar sobre la cantidad de comida que tenemos:</p><ul><li><strong>A / An</strong>: Usados con comida singular contable. "A" si empieza con consonante (<em>a banana</em> 🍌) y "An" si empieza con vocal (<em>an apple</em> 🍎).</li><li><strong>Some</strong>: Significa "algo de" o "algunos". Se usa en oraciones <strong>afirmativas</strong> con incontables o plurales (ej. <em>some milk</em> 🥛, <em>some potatoes</em> 🥔).</li><li><strong>Any</strong>: Significa "nada de" o "ningún/cualquier". Se usa en oraciones <strong>negativas</strong> y <strong>preguntas</strong> (ej. <em>Is there any cheese?</em> 🧀, <em>We don\'t have any tomatoes</em> 🍅).</li></ul>'
+        },
+        {
+          type: 'dragbank',
+          title: 'Complete the sentences',
+          instruction: 'Arrastra el quantifier correcto para completar las oraciones.',
+          dataA: {
+            sentences: [
+              { text: 'We need ___ flour for the cake.', answer: 'some' },
+              { text: 'I have ___ apple in my lunchbox.', answer: 'an' },
+              { text: 'Is there ___ milk left?', answer: 'any' },
+              { text: 'We bought ___ bananas at the store.', answer: 'some' },
+              { text: 'I want ___ burger for dinner.', answer: 'a' },
+              { text: 'There isn\'t ___ rice in the bowl.', answer: 'any' }
+            ],
+            bank: ['much', 'many']
+          },
+          dataB: {
+            sentences: [
+              { text: 'She poured ___ water into the glass.', answer: 'some' },
+              { text: 'I ate ___ sandwich for lunch.', answer: 'a' },
+              { text: 'We don\'t have ___ eggs today.', answer: 'any' },
+              { text: 'He bought ___ orange yesterday.', answer: 'an' },
+              { text: 'They need ___ meat for the barbecue.', answer: 'some' },
+              { text: 'Are there ___ carrots in the fridge?', answer: 'any' }
+            ],
+            bank: ['few', 'little']
+          }
+        },
+        {
+          type: 'categorize',
+          title: 'There is vs. There are',
+          instruction: 'Clasifica la comida dependiendo si se usa "There is" (singular/incontable) o "There are" (plural).',
+          dataA: {
+            categories: ['There is', 'There are'],
+            items: [
+              { text: 'an apple', cat: 0 },
+              { text: 'some milk', cat: 0 },
+              { text: 'a banana', cat: 0 },
+              { text: 'a sandwich', cat: 0 },
+              { text: 'some apples', cat: 1 },
+              { text: 'some carrots', cat: 1 },
+              { text: 'any potatoes', cat: 1 },
+              { text: 'any eggs', cat: 1 }
+            ]
+          },
+          dataB: {
+            categories: ['There is', 'There are'],
+            items: [
+              { text: 'an orange', cat: 0 },
+              { text: 'some water', cat: 0 },
+              { text: 'a hamburger', cat: 0 },
+              { text: 'some rice', cat: 0 },
+              { text: 'some grapes', cat: 1 },
+              { text: 'any cookies', cat: 1 },
+              { text: 'some beans', cat: 1 },
+              { text: 'any onions', cat: 1 }
+            ]
+          }
+        },
+        {
+          type: 'matchimage',
+          title: 'Food Vocabulary',
+          instruction: 'Empareja la palabra con la imagen correcta.',
+          dataA: [
+            { word: 'Apple', image: 'files/apple.png' },
+            { word: 'Banana', image: 'files/banana.png' },
+            { word: 'Bread', image: 'files/bread.png' },
+            { word: 'Cheese', image: 'files/cheese.png' },
+            { word: 'Milk', image: 'files/milk.png' },
+            { word: 'Chicken', image: 'files/chicken.png' }
+          ],
+          dataB: [
+            { word: 'Orange', image: 'files/orange.png' },
+            { word: 'Grape', image: 'files/grape.png' },
+            { word: 'Meat', image: 'files/meat.png' },
+            { word: 'Rice', image: 'files/rice.png' },
+            { word: 'Water', image: 'files/water.png' },
+            { word: 'Fish', image: 'files/fish.png' }
+          ]
+        },
+        {
+          type: 'dropdown',
+          title: 'Choose the correct Quantifier',
+          instruction: 'Selecciona la opción correcta en cada oración.',
+          dataA: [
+            { before: 'I want', options: ['some', 'any'], answer: 0, after: 'water.' },
+            { before: 'She doesn\'t have', options: ['some', 'any'], answer: 1, after: 'apples.' },
+            { before: 'Do we need', options: ['a', 'an'], answer: 1, after: 'onion?' },
+            { before: 'There is', options: ['a', 'some'], answer: 0, after: 'cake on the table.' },
+            { before: 'Are there', options: ['some', 'any'], answer: 1, after: 'tomatoes in the fridge?' },
+            { before: 'I will buy', options: ['some', 'a'], answer: 0, after: 'bread at the bakery.' }
+          ],
+          dataB: [
+            { before: 'We need', options: ['some', 'any'], answer: 0, after: 'cheese for the pizza.' },
+            { before: 'Is there', options: ['some', 'any'], answer: 1, after: 'milk left?' },
+            { before: 'He is eating', options: ['a', 'an'], answer: 1, after: 'orange.' },
+            { before: 'I don\'t want', options: ['some', 'any'], answer: 1, after: 'soup, thanks.' },
+            { before: 'Let\'s make', options: ['a', 'some'], answer: 0, after: 'salad.' },
+            { before: 'There are', options: ['some', 'any'], answer: 0, after: 'cookies in the jar.' }
+          ]
+        },
+        {
+          type: 'reorder_sentences',
+          title: 'Listen and Order',
+          instruction: 'Escucha el audio y ordena las palabras de las oraciones que escuches.',
+          audio: 'files/quantifiers_audio.mp3',
+          dataA: [
+            { sentence: 'I like the way you cook', es: '' },
+            { sentence: 'you use some potatoes', es: '' },
+            { sentence: 'but only a carrot for the meal', es: '' },
+            { sentence: 'you can try baking an apple pie', es: '' },
+            { sentence: 'or making some coffee', es: '' }
+          ],
+          dataB: [
+            { sentence: 'I like the way you cook', es: '' },
+            { sentence: 'you use some potatoes', es: '' },
+            { sentence: 'but only a carrot for the meal', es: '' },
+            { sentence: 'you can try baking an apple pie', es: '' },
+            { sentence: 'or making some coffee', es: '' }
+          ]
+        },
+        {
+          type: 'matchlines',
+          title: 'Match Emoji and Food',
+          instruction: 'Une cada emoji de comida con su nombre en inglés.',
+          dataA: [
+            { left: '🍗', right: 'Chicken' },
+            { left: '🍞', right: 'Bread' },
+            { left: '🧀', right: 'Cheese' },
+            { left: '🥩', right: 'Meat' },
+            { left: '🥗', right: 'Salad' }
+          ],
+          dataB: [
+            { left: '🥚', right: 'Egg' },
+            { left: '🍟', right: 'Fries' },
+            { left: '🍚', right: 'Rice' },
+            { left: '🍕', right: 'Pizza' },
+            { left: '🌭', right: 'Hot dog' }
+          ]
+        },
+        {
+          type: 'dropdown',
+          title: 'A or An?',
+          instruction: 'Selecciona "a" o "an" para cada alimento en singular.',
+          dataA: [
+            { before: 'I have', options: ['a', 'an'], answer: 0, after: 'banana.' },
+            { before: 'She wants', options: ['a', 'an'], answer: 1, after: 'apple.' },
+            { before: 'He is eating', options: ['a', 'an'], answer: 1, after: 'egg.' },
+            { before: 'We need', options: ['a', 'an'], answer: 0, after: 'tomato.' },
+            { before: 'It is', options: ['a', 'an'], answer: 1, after: 'orange.' },
+            { before: 'Buy', options: ['a', 'an'], answer: 0, after: 'carrot.' }
+          ],
+          dataB: [
+            { before: 'They bought', options: ['a', 'an'], answer: 0, after: 'pizza.' },
+            { before: 'I saw', options: ['a', 'an'], answer: 1, after: 'onion.' },
+            { before: 'Make', options: ['a', 'an'], answer: 0, after: 'sandwich.' },
+            { before: 'Eat', options: ['a', 'an'], answer: 1, after: 'olive.' },
+            { before: 'There is', options: ['a', 'an'], answer: 0, after: 'hamburger.' },
+            { before: 'Cut', options: ['a', 'an'], answer: 1, after: 'avocado.' }
+          ]
+        },
+        {
+          type: 'wordselect',
+          title: 'Find the Food Vocabulary',
+          instruction: 'Lee el texto y selecciona todas las palabras que sean comida o bebida.',
+          dataA: [
+            { 
+              text: 'For breakfast, I usually have some [milk] and a [banana]. My brother prefers to eat an [apple] and some [bread]. For lunch, we eat [chicken] with [rice].', 
+              hint: 'Selecciona las comidas y bebidas' 
+            }
+          ],
+          dataB: [
+            { 
+              text: 'At dinner, my mom cooks some [meat] with a big [tomato] salad. Sometimes we have [pizza] or a [hamburger]. We always drink some [water] or [juice].', 
+              hint: 'Selecciona las comidas y bebidas' 
+            }
+          ]
+        }
+      ],
+      game: { type: 'snake', winScore: 5 }
+    });
+  </script>
+</body>
+</html>
