@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Numbers 1–100, Prices & Shopping Vocabulary - Noveno, Primer Año, Segundo Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+      container: '#app',
+      topic: 'Numbers 1–100, Prices & Shopping Vocabulary',
+      level: 'Noveno, Primer Año, Segundo Año',
+      pdfDesign: 'Pastel', 
+      colors: { 
+        primary: '#CCBD00', 
+        accent: '#43B069', 
+        bg: '#82C7C2', 
+        cardBg: '#CCFFFC', 
+        text: '#1A1A1A' 
+      },
+            examPools: {
+              '20062471': 'A',
+              '19967142': 'B',
+              '19971566': 'A',
+              '19971565': 'B',
+              '19967143': 'A',
+              '20062474': 'B',
+              '19967145': 'A',
+              '19967146': 'B',
+              '19934096': 'A',
+              '19934095': 'B',
+              '4210274': 'A',
+              '20200673': 'B',
+              '20062484': 'A',
+              '19934098': 'B',
+              '19967150': 'A',
+              '20062486': 'B',
+              '20062489': 'A',
+              '19976021': 'B',
+              '20023247': 'A',
+              '19976024': 'B',
+              '20062495': 'A',
+              '19956103': 'B',
+              '20062498': 'A',
+              '19967154': 'B',
+              '4210278': 'A',
+              '4210264': 'B',
+              '19967144': 'A',
+              '20068438': 'B',
+              '19959332': 'A',
+              '4210262': 'B',
+              '20062373': 'A',
+              '19843597': 'B',
+              '4210272': 'A',
+              '19967158': 'B',
+              '4210284': 'A',
+              '19934099': 'B',
+              '19967161': 'A',
+              '19967151': 'B',
+              '20062496': 'A',
+              '19788973': 'B',
+              '3167629': 'A',
+              '19967163': 'B',
+              '4210259': 'A',
+              '4210276': 'B',
+              '20062499': 'A',
+              '6954866': 'B',
+              '4210263': 'A',
+              '4210279': 'B',
+              '4210254': 'A',
+              '2724749': 'B',
+              '6473557': 'A',
+              '6473562': 'B',
+              '19724473': 'A',
+              '6473555': 'B',
+              '4210255': 'A',
+              '1964480': 'B',
+              '4210256': 'A',
+              '5531752': 'B',
+              '4210268': 'A',
+              '2295119': 'B',
+              '5531765': 'A',
+              '2294851': 'B',
+              '19769235': 'A',
+              '19929938': 'B',
+              '4210277': 'A'
+            },
+      exercises: [
+        {
+          type: 'note',
+          title: 'Grammar & Vocabulary Review',
+          html: `
+            <h3>Numbers: -teen vs. -ty</h3>
+            <p>Be careful with pronunciation and spelling! <strong>Thirteen (13)</strong> ends in <em>-teen</em> and has the stress at the end, while <strong>Thirty (30)</strong> ends in <em>-ty</em> and has the stress at the beginning.</p>
+            <ul>
+              <li>14 = Fourteen vs. 40 = Forty</li>
+              <li>15 = Fifteen vs. 50 = Fifty</li>
+            </ul>
+            <h3>Currency & Prices</h3>
+            <p>We use <strong>dollar(s)</strong> for main currency units and <strong>cent(s)</strong> for fractions ($1.00 = 100 cents).</p>
+            <p><strong>Grammar:</strong> Use <em>How much is...?</em> for singular items and <em>How much are...?</em> for plural items.</p>
+            <ul>
+              <li>"How much <strong>is</strong> this shirt?" -> "It <strong>is</strong> $25.00."</li>
+              <li>"How much <strong>are</strong> these shoes?" -> "They <strong>are</strong> $60.00."</li>
+            </ul>
+            <h3>Useful Cashier & Customer Phrases</h3>
+            <ul>
+              <li><strong>Cashier:</strong> "Can I help you?" / "Anything else?" / "Here is your change."</li>
+              <li><strong>Customer:</strong> "I'll take it." (When you decide to buy something).</li>
+            </ul>
+          `
+        },
+        {
+          type: 'matchlines',
+          title: 'Shopping Interactions Match',
+          instruction: 'Match the sentences, questions, or numbers with their correct pair.',
+          dataA: [
+            { left: 'How much is this shirt?', right: 'It is $25.00.' },
+            { left: 'Can I help you?', right: 'Yes, I am looking for shoes.' },
+            { left: 'Anything else?', right: 'No, that is all, thank you.' },
+            { left: 'Here is your change.', right: 'Thank you very much.' },
+            { left: 'Thirteen', right: '13' },
+            { left: 'Thirty', right: '30' }
+          ],
+          dataB: [
+            { left: 'How much are these boots?', right: 'They are $75.00.' },
+            { left: 'I\'ll take it.', right: 'Great, let\'s go to the cashier.' },
+            { left: 'Fifteen', right: '15' },
+            { left: 'Fifty', right: '50' },
+            { left: 'One Dollar', right: '100 cents' },
+            { left: 'Do you need a bag?', right: 'Yes, please.' }
+          ]
+        },
+        {
+          type: 'multiplechoice',
+          title: 'Numbers and Shopping Expressions Quiz',
+          instruction: 'Choose the correct option to complete each sentence.',
+          dataA: [
+            { q: 'How ______ is this book? It costs $12.', options: ['much', 'many', 'cost'], answer: 0 },
+            { q: 'The price is 45 cents. \'45\' is written as:', options: ['Fourteen-five', 'Forty-five', 'Fifty-four'], answer: 1 },
+            { q: 'Cashier: \'Anything else?\' - Customer: \'______\'', options: ['Yes, please. That is all.', 'No, thank you.', 'Here is your change.'], answer: 1 },
+            { q: 'Nineteen is written in digits as:', options: ['90', '19', '91'], answer: 1 },
+            { q: 'How ______ are those sneakers over there?', options: ['much', 'many', 'is'], answer: 0 },
+            { q: 'If a hat is $15 and you pay with $20, your ______ is $5.', options: ['price', 'change', 'dollar'], answer: 1 }
+          ],
+          dataB: [
+            { q: 'How ______ are these fresh apples?', options: ['much', 'many', 'is'], answer: 0 },
+            { q: 'The number 70 is spelled:', options: ['Seventeen', 'Seventy', 'Seven'], answer: 1 },
+            { q: 'Cashier: \'Can I ______ you find something?\'', options: ['help', 'take', 'want'], answer: 0 },
+            { q: 'Customer: \'I\'ll ______ this blue jacket, please.\'', options: ['take', 'give', 'cost'], answer: 0 },
+            { q: 'Eighty-eight in digits is:', options: ['18', '80', '88'], answer: 2 },
+            { q: 'One ______ is equal to exactly one hundred cents.', options: ['dollar', 'coin', 'price'], answer: 0 }
+          ]
+        },
+        {
+          type: 'categorize',
+          title: 'Vocabulary Categorization',
+          instruction: 'Classify each item into the correct category.',
+          dataA: {
+            categories: ['Cashier Phrases', 'Numbers & Prices'],
+            items: [
+              { text: 'Can I help you?', cat: 0 },
+              { text: 'Here is your change', cat: 0 },
+              { text: 'Anything else?', cat: 0 },
+              { text: 'Seventy-five', cat: 1 },
+              { text: 'Twelve dollars', cat: 1 },
+              { text: 'Nineteen cents', cat: 1 }
+            ]
+          },
+          dataB: {
+            categories: ['Shopping Phrases', 'Numbers & Currency'],
+            items: [
+              { text: 'I\'ll take it', cat: 0 },
+              { text: 'How much is it?', cat: 0 },
+              { text: 'Do you need a receipt?', cat: 0 },
+              { text: 'Eighty-two', cat: 1 },
+              { text: 'Fifty cents', cat: 1 },
+              { text: 'One hundred', cat: 1 }
+            ]
+          }
+        },
+        {
+          type: 'matchimage',
+          title: 'Shopping Vocabulary & Visuals',
+          instruction: 'Match the vocabulary term with its corresponding illustration.',
+          dataA: [
+            { word: 'Dollar bills', image: 'files/dollar_bills.png' },
+            { word: 'Coins and Cents', image: 'files/coins.png' },
+            { word: 'Shopping bag', image: 'files/shopping_bag.png' },
+            { word: 'Price tag', image: 'files/price_tag.png' },
+            { word: 'Cash register', image: 'files/cash_register.png' },
+            { word: 'Receipt', image: 'files/receipt.png' }
+          ],
+          dataB: [
+            { word: 'Shopping cart', image: 'files/shopping_cart.png' },
+            { word: 'Credit card', image: 'files/credit_card.png' },
+            { word: 'Wallet', image: 'files/wallet.png' },
+            { word: 'Storefront', image: 'files/store.png' },
+            { word: 'Cereal box', image: 'files/cereal_box.png' },
+            { word: 'Milk bottle', image: 'files/milk_bottle.png' }
+          ]
+        },
+        {
+          type: 'memory',
+          title: 'Shopping Concentration Game',
+          instruction: 'Find the matching pairs connecting terms, numbers, and translations.',
+          dataA: [
+            { left: 'Fourteen', right: '14' },
+            { left: 'Forty', right: '40' },
+            { left: 'Sixteen', right: '16' },
+            { left: 'Sixty', right: '60' },
+            { left: 'How much is it?', right: '¿Cuánto cuesta?' },
+            { left: 'Change', right: 'Cambio / Vuelto' }
+          ],
+          dataB: [
+            { left: 'Thirteen', right: '13' },
+            { left: 'Thirty', right: '30' },
+            { left: 'Eighteen', right: '18' },
+            { left: 'Eighty', right: '80' },
+            { left: 'Anything else?', right: '¿Algo más?' },
+            { left: 'I\'ll take it', right: 'Me lo llevo' }
+          ]
+        },
+        {
+          type: 'comicdialogue',
+          title: 'Grocery Shopping Dialogue',
+          instruction: 'Listen to the audio and complete the missing parts of the dialogue.',
+          audio: 'files/shopping_dialogue.mp3',
+          dataA: [
+            {
+              title: 'At the Grocery Store - Missing Clerk Responses',
+              bubbles: [
+                { author: 'A', text: 'How much is the box of cereal?' },
+                { author: 'B', blank: true, answer: 'It costs $2.50' },
+                { author: 'A', text: 'And how much is the bottle of milk?' },
+                { author: 'B', blank: true, answer: 'The milk costs $1.' },
+                { author: 'A', text: 'I\'ll buy those and a bunch of bananas' }
+              ],
+              bank: ['It costs $5.00', 'The milk costs $10.00']
+            }
+          ],
+          dataB: [
+            {
+              title: 'At the Grocery Store - Missing Customer Lines',
+              bubbles: [
+                { author: 'A', blank: true, answer: 'How much is the box of cereal?' },
+                { author: 'B', text: 'It costs $2.50' },
+                { author: 'A', blank: true, answer: 'And how much is the bottle of milk?' },
+                { author: 'B', text: 'The milk costs $1.' },
+                { author: 'A', blank: true, answer: 'I\'ll buy those and a bunch of bananas' }
+              ],
+              bank: ['How much is the car?', 'I want some apples']
+            }
+          ]
+        }
+      ],
+      game: { type: 'tictactoe' }
+    });
+  </script>
+</body>
+</html>
