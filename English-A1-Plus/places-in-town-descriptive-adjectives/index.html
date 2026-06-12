@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Places in Town & Descriptive Adjectives - Noveno, Primer Año, Segundo Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+      container: '#app',
+      topic: 'Places in Town & Descriptive Adjectives',
+      level: 'Noveno, Primer Año, Segundo Año',
+      pdfDesign: 'PopArt', 
+      colors: { primary: '#FF00BF', accent: '#7843B0', bg: '#FF73B9', cardBg: '#FF7609', text: '#1A1A1A' },
+            examPools: {
+              '20062471': 'A',
+              '19967142': 'B',
+              '19971566': 'A',
+              '19971565': 'B',
+              '19967143': 'A',
+              '20062474': 'B',
+              '19967145': 'A',
+              '19967146': 'B',
+              '19934096': 'A',
+              '19934095': 'B',
+              '4210274': 'A',
+              '20200673': 'B',
+              '20062484': 'A',
+              '19934098': 'B',
+              '19967150': 'A',
+              '20062486': 'B',
+              '20062489': 'A',
+              '19976021': 'B',
+              '20023247': 'A',
+              '19976024': 'B',
+              '20062495': 'A',
+              '19956103': 'B',
+              '20062498': 'A',
+              '19967154': 'B',
+              '4210278': 'A',
+              '4210264': 'B',
+              '19967144': 'A',
+              '20068438': 'B',
+              '19959332': 'A',
+              '4210262': 'B',
+              '20062373': 'A',
+              '19843597': 'B',
+              '4210272': 'A',
+              '19967158': 'B',
+              '4210284': 'A',
+              '19934099': 'B',
+              '19967161': 'A',
+              '19967151': 'B',
+              '20062496': 'A',
+              '19788973': 'B',
+              '3167629': 'A',
+              '19967163': 'B',
+              '4210259': 'A',
+              '4210276': 'B',
+              '20062499': 'A',
+              '6954866': 'B',
+              '4210263': 'A',
+              '4210279': 'B',
+              '4210254': 'A',
+              '2724749': 'B',
+              '6473557': 'A',
+              '6473562': 'B',
+              '19724473': 'A',
+              '6473555': 'B',
+              '4210255': 'A',
+              '1964480': 'B',
+              '4210256': 'A',
+              '5531752': 'B',
+              '4210268': 'A',
+              '2295119': 'B',
+              '5531765': 'A',
+              '2294851': 'B',
+              '19769235': 'A',
+              '19929938': 'B',
+              '4210277': 'A'
+            },
+      exercises: [
+        {
+          type: 'note',
+          title: 'Places in Town & Adjectives',
+          html: '<p>Welcome! Today we will learn about <b>Places in Town</b> and how to describe them using <b>Adjectives</b>.</p><p>An adjective describes a noun. For example:<br>- The stadium is <b>big</b>.<br>- The library is <b>quiet</b>.<br>- The park is <b>beautiful</b>.</p><p>Let\'s practice identifying these places and describing them!</p>'
+        },
+        {
+          type: 'emojiphrase',
+          title: 'Guess the Place',
+          instruction: 'Type the name of the place based on the emoji.',
+          dataA: [
+            { emojis: '🎢', accept: ['park', 'water park', 'amusement park'], example: 'park' },
+            { emojis: '🏖️', accept: ['beach'], example: 'beach' },
+            { emojis: '🏥', accept: ['hospital'], example: 'hospital' },
+            { emojis: '🏟️', accept: ['stadium'], example: 'stadium' },
+            { emojis: '🏫', accept: ['school'], example: 'school' },
+            { emojis: '🏪', accept: ['supermarket', 'store'], example: 'supermarket' }
+          ],
+          dataB: [
+            { emojis: '🏦', accept: ['bank'], example: 'bank' },
+            { emojis: '📚', accept: ['library'], example: 'library' },
+            { emojis: '👮', accept: ['police station'], example: 'police station' },
+            { emojis: '🍽️', accept: ['restaurant'], example: 'restaurant' },
+            { emojis: '⛽', accept: ['gas station'], example: 'gas station' },
+            { emojis: '✉️', accept: ['post office'], example: 'post office' }
+          ]
+        },
+        {
+          type: 'matchlines',
+          title: 'Match Place and Adjective',
+          instruction: 'Connect the place with the adjective that best describes it.',
+          dataA: [
+            { left: 'Library', right: 'Quiet' },
+            { left: 'Stadium', right: 'Noisy' },
+            { left: 'Park', right: 'Green' },
+            { left: 'Supermarket', right: 'Crowded' },
+            { left: 'Museum', right: 'Interesting' }
+          ],
+          dataB: [
+            { left: 'Hospital', right: 'Clean' },
+            { left: 'Beach', right: 'Sunny' },
+            { left: 'Restaurant', right: 'Delicious' },
+            { left: 'Street', right: 'Busy' },
+            { left: 'Water park', right: 'Fun' }
+          ]
+        },
+        {
+          type: 'wordsearch',
+          title: 'Find the Places',
+          instruction: 'Find the hidden words in the soup.',
+          dataA: { words: ['BANK', 'PARK', 'SCHOOL', 'BEACH'], gridSize: 10 },
+          dataB: { words: ['STADIUM', 'LIBRARY', 'HOSPITAL', 'MARKET'], gridSize: 10 }
+        },
+        {
+          type: 'matchimage',
+          title: 'Identify the Place',
+          instruction: 'Select the correct image for each word.',
+          dataA: [
+            { word: 'Bank', image: 'files/bank_building.png' },
+            { word: 'Stadium', image: 'files/soccer_stadium.png' },
+            { word: 'Hospital', image: 'files/city_hospital.png' },
+            { word: 'School', image: 'files/high_school.png' },
+            { word: 'Supermarket', image: 'files/grocery_supermarket.png' },
+            { word: 'Library', image: 'files/public_library.png' }
+          ],
+          dataB: [
+            { word: 'Police Station', image: 'files/police_building.png' },
+            { word: 'Restaurant', image: 'files/fancy_restaurant.png' },
+            { word: 'Park', image: 'files/green_park.png' },
+            { word: 'Gas Station', image: 'files/fuel_gas_station.png' },
+            { word: 'Post Office', image: 'files/mail_post_office.png' },
+            { word: 'Water Park', image: 'files/fun_water_park.png' }
+          ]
+        },
+        {
+          type: 'memory',
+          title: 'Memory Game: Emojis and Places',
+          instruction: 'Find the matching pairs between the place and its emoji.',
+          dataA: [
+            { left: 'Beach', right: '🏖️' },
+            { left: 'Hospital', right: '🏥' },
+            { left: 'Bank', right: '🏦' },
+            { left: 'School', right: '🏫' },
+            { left: 'Restaurant', right: '🍽️' },
+            { left: 'Park', right: '🌳' }
+          ],
+          dataB: [
+            { left: 'Library', right: '📚' },
+            { left: 'Stadium', right: '🏟️' },
+            { left: 'Police Station', right: '👮' },
+            { left: 'Gas Station', right: '⛽' },
+            { left: 'Post Office', right: '✉️' },
+            { left: 'Supermarket', right: '🛒' }
+          ]
+        },
+        {
+          type: 'comicdialogue',
+          title: 'Vacation Plans',
+          instruction: 'Listen to the audio and complete the dialogue with the correct sentences.',
+          audio: 'files/vacation_dialogue.mp3',
+          dataA: [
+            {
+              title: 'Choosing a destination',
+              bubbles: [
+                { author: 'A', blank: true, answer: 'I want to go to the beach on vacations.' },
+                { author: 'B', text: 'Nice, you can go to La Costa del Sol, is very accessible.' },
+                { author: 'A', text: "You're right, but maybe I'll go to the water park." },
+                { author: 'B', blank: true, answer: "The water park is cool too. Let's go!" }
+              ],
+              bank: [
+                'I want to stay home all day.', 
+                'The beach is too far from here.'
+              ]
+            }
+          ],
+          dataB: [
+            {
+              title: 'Choosing a destination',
+              bubbles: [
+                { author: 'A', text: 'I want to go to the beach on vacations.' },
+                { author: 'B', blank: true, answer: 'Nice, you can go to La Costa del Sol, is very accessible.' },
+                { author: 'A', blank: true, answer: "You're right, but maybe I'll go to the water park." },
+                { author: 'B', text: "The water park is cool too. Let's go!" }
+              ],
+              bank: [
+                'No, I don\'t like the sun at all.', 
+                'We should go to the mountains instead.'
+              ]
+            }
+          ]
+        },
+        {
+          type: 'truefalse',
+          title: 'What is in town?',
+          instruction: 'Look at the map of the town and decide if the statements are True or False.',
+          image: 'files/map_of_town_places.png',
+          dataA: [
+            { statement: 'There is a School in town.', answer: true },
+            { statement: 'There is an Aquarium in town.', answer: false },
+            { statement: 'There is a Stadium in town.', answer: true },
+            { statement: 'There is an Airport in town.', answer: false },
+            { statement: 'There is a Library in town.', answer: true },
+            { statement: 'There is a Cinema in town.', answer: false }
+          ],
+          dataB: [
+            { statement: 'There is a Hospital in town.', answer: true },
+            { statement: 'There is a Zoo in town.', answer: false },
+            { statement: 'There is a Gas Station in town.', answer: true },
+            { statement: 'There is a Museum in town.', answer: false },
+            { statement: 'There is a Water park in town.', answer: true },
+            { statement: 'There is a Fire station in town.', answer: false }
+          ]
+        }
+      ],
+      game: { type: 'dino', winScore: 300 }
+    });
+  </script>
+</body>
+</html>
