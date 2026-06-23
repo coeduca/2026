@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Prepositions of Place & Map Skills - Primer Año, Segundo Año, Séptimo</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+      container: '#app',
+      topic: 'Prepositions of Place & Map Skills',
+      level: 'Primer Año, Segundo Año, Séptimo',
+      pdfDesign: 'HollyHobbie', 
+      colors: { 
+        primary: '#81BBF7', 
+        accent: '#43B069', 
+        bg: '#FFF1F8', 
+        cardBg: '#FFFFFF', 
+        text: '#1A1A1A' 
+      },
+            examPools: {
+              '4210278': 'A',
+              '4210264': 'B',
+              '19967144': 'A',
+              '20068438': 'B',
+              '19959332': 'A',
+              '4210262': 'B',
+              '20062373': 'A',
+              '19843597': 'B',
+              '4210272': 'A',
+              '19967158': 'B',
+              '4210284': 'A',
+              '19934099': 'B',
+              '19967161': 'A',
+              '19967151': 'B',
+              '20062496': 'A',
+              '19788973': 'B',
+              '3167629': 'A',
+              '19967163': 'B',
+              '4210259': 'A',
+              '4210276': 'B',
+              '20062499': 'A',
+              '6954866': 'B',
+              '4210263': 'A',
+              '4210279': 'B',
+              '4210254': 'A',
+              '2724749': 'B',
+              '6473557': 'A',
+              '6473562': 'B',
+              '19724473': 'A',
+              '6473555': 'B',
+              '4210255': 'A',
+              '1964480': 'B',
+              '4210256': 'A',
+              '5531752': 'B',
+              '4210268': 'A',
+              '2295119': 'B',
+              '5531765': 'A',
+              '2294851': 'B',
+              '19769235': 'A',
+              '19929938': 'B',
+              '4210277': 'A',
+              '20176653': 'B',
+              '20176654': 'A',
+              '20176658': 'B',
+              '20316947': 'A',
+              '20176659': 'B',
+              '20182709': 'A',
+              '20176660': 'B',
+              '20316949': 'A',
+              '20298183': 'B',
+              '20062372': 'A',
+              '20298185': 'B',
+              '20199089': 'A',
+              '20182722': 'B',
+              '20141583': 'A',
+              '20138865': 'B',
+              '20298188': 'A',
+              '20062488': 'B',
+              '20182730': 'A',
+              '20062492': 'B',
+              '20298191': 'A',
+              '10000395': 'B',
+              '20298192': 'A',
+              '20298195': 'B',
+              '20298194': 'A',
+              '20176670': 'B',
+              '20316951': 'A',
+              '20171117': 'B',
+              '20298196': 'A'
+            },
+      exercises: [
+        {
+          type: 'note',
+          title: 'Grammar Note: Prepositions of Place',
+          html: `
+            <div style="font-size: 1.1em; line-height: 1.6;">
+                <p>Las preposiciones nos ayudan a indicar dónde está ubicado algo o alguien de manera sencilla.</p>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li style="margin-bottom: 8px;">📍 <strong>In:</strong> Adentro de / En.</li>
+                    <li style="margin-bottom: 8px;">📍 <strong>On:</strong> Sobre (una superficie o calle).</li>
+                    <li style="margin-bottom: 8px;">📍 <strong>Next to:</strong> Al lado de.</li>
+                    <li style="margin-bottom: 8px;">📍 <strong>Behind:</strong> Detrás de.</li>
+                    <li style="margin-bottom: 8px;">📍 <strong>In front of:</strong> Enfrente de (delante).</li>
+                    <li style="margin-bottom: 8px;">📍 <strong>Between:</strong> Entre (en medio de dos lugares).</li>
+                    <li style="margin-bottom: 8px;">📍 <strong>Across from:</strong> Cruzando la calle / Enfrente (opuesto).</li>
+                    <li style="margin-bottom: 8px;">📍 <strong>On the corner of:</strong> En la esquina de.</li>
+                </ul>
+            </div>
+          `
+        },
+        {
+          type: 'wordsearch',
+          title: 'Prepositions Wordsearch',
+          instruction: 'Encuentra las 6 preposiciones de lugar ocultas en la sopa de letras.',
+          dataA: {
+            words: ['BEHIND', 'BETWEEN', 'ACROSS', 'NEXT', 'CORNER', 'FRONT'],
+            gridSize: 10
+          },
+          dataB: {
+            words: ['UNDER', 'BESIDE', 'INSIDE', 'ABOVE', 'NEAR', 'OUTSIDE'],
+            gridSize: 10
+          }
+        },
+        {
+          type: 'wordselect',
+          title: 'Select the Prepositions',
+          instruction: 'Toca las 5 preposiciones de lugar dentro del siguiente texto.',
+          dataA: [
+            { 
+              text: 'The hospital is [next] to the bank. The park is [behind] the school. I am waiting [in] the car. The restaurant is [between] the bakery and the gym. The bus stop is [across] from the street.', 
+              hint: 'Busca y selecciona 5 preposiciones de lugar' 
+            }
+          ],
+          dataB: [
+            { 
+              text: 'The cinema is [on] the corner of Main Street. The dog is [under] the table. My house is [beside] the supermarket. We are standing [outside] the mall. The bank is [near] the pharmacy.', 
+              hint: 'Busca y selecciona 5 preposiciones de lugar' 
+            }
+          ]
+        },
+        {
+          type: 'dragbank',
+          title: 'Listen and Complete',
+          instruction: 'Escucha el audio y arrastra la palabra correcta para completar las oraciones.',
+          audio: 'files/audio_prepositions.mp3',
+          dataA: {
+            sentences: [
+              { text: 'The park is ___ to the super market.', answer: 'next' },
+              { text: 'There is a gas station ___ the bank and the restaurant.', answer: 'between' },
+              { text: 'The nearest store is ___ the mall.', answer: 'in' },
+              { text: 'The stadium is ___ the school.', answer: 'behind' }
+            ],
+            bank: ['across', 'on']
+          },
+          dataB: {
+            sentences: [
+              { text: 'The ___ is next to the super market.', answer: 'park' },
+              { text: 'There is a gas station between the ___ and the restaurant.', answer: 'bank' },
+              { text: 'The nearest store is in the ___.', answer: 'mall' },
+              { text: 'The ___ is behind the school.', answer: 'stadium' }
+            ],
+            bank: ['hospital', 'gym']
+          }
+        },
+        {
+          type: 'reorder_letters',
+          title: 'Unscramble the Words',
+          instruction: 'Ordena las letras para formar preposiciones o lugares de la ciudad.',
+          dataA: [
+            { word: 'BEHIND', hint: 'Detrás de' },
+            { word: 'BETWEEN', hint: 'Entre dos cosas' },
+            { word: 'SCHOOL', hint: 'Lugar para estudiar' },
+            { word: 'STREET', hint: 'Calle' },
+            { word: 'CORNER', hint: 'Esquina' },
+            { word: 'BANK', hint: 'Lugar para guardar dinero' }
+          ],
+          dataB: [
+            { word: 'ACROSS', hint: 'Cruzando' },
+            { word: 'FRONT', hint: 'Al frente' },
+            { word: 'PARK', hint: 'Parque' },
+            { word: 'CINEMA', hint: 'Lugar para ver películas' },
+            { word: 'AVENUE', hint: 'Avenida' },
+            { word: 'HOSPITAL', hint: 'Lugar para curar enfermos' }
+          ]
+        },
+        {
+          type: 'truefalse',
+          title: 'Map Skills: True or False',
+          instruction: 'Observa detenidamente el mapa de la ciudad y responde si la oración es verdadera (True) o falsa (False).',
+          image: 'files/town_map.png',
+          dataA: [
+            { statement: 'The library is next to the school.', answer: true },
+            { statement: 'The supermarket is behind the post office.', answer: false },
+            { statement: 'The hospital is next to the supermarket.', answer: true },
+            { statement: 'The cafe is next to the restaurant.', answer: true },
+            { statement: 'The post office is in front of the park.', answer: false }
+          ],
+          dataB: [
+            { statement: 'The gym is next to the drugstore.', answer: false },
+            { statement: 'The bank is next to the river.', answer: true },
+            { statement: 'The school is behind the park.', answer: false },
+            { statement: 'The police station is next to the fire station.', answer: true },
+            { statement: 'The cinema is on the corner.', answer: false }
+          ]
+        },
+        {
+          type: 'reorder_sentences',
+          title: 'Build the Sentence',
+          instruction: 'Ordena las palabras para formar oraciones correctas sobre lugares y preposiciones.',
+          dataA: [
+            { sentence: 'The bank is next to the park', es: 'El banco está al lado del parque' },
+            { sentence: 'My school is across from the bakery', es: 'Mi escuela está frente a la panadería' },
+            { sentence: 'The cat is behind the sofa', es: 'El gato está detrás del sofá' },
+            { sentence: 'The restaurant is on the corner', es: 'El restaurante está en la esquina' },
+            { sentence: 'He is in front of the door', es: 'Él está enfrente de la puerta' }
+          ],
+          dataB: [
+            { sentence: 'The library is between the cafe and the gym', es: 'La biblioteca está entre la cafetería y el gimnasio' },
+            { sentence: 'Our house is next to the supermarket', es: 'Nuestra casa está al lado del supermercado' },
+            { sentence: 'I parked my car behind the building', es: 'Estacioné mi auto detrás del edificio' },
+            { sentence: 'The pharmacy is across from the hospital', es: 'La farmacia está frente al hospital' },
+            { sentence: 'There is a bus stop on the corner', es: 'Hay una parada de autobús en la esquina' }
+          ]
+        },
+        {
+          type: 'matchimage',
+          title: 'Places in Town',
+          instruction: 'Une cada lugar de la ciudad con su imagen correspondiente.',
+          dataA: [
+            { word: 'School', emoji: '🏫' },
+            { word: 'Hospital', emoji: '🏥' },
+            { word: 'Bank', emoji: '🏦' },
+            { word: 'Park', emoji: '🏞️' },
+            { word: 'Police Station', emoji: '🚓' },
+            { word: 'Post Office', emoji: '📮' }
+          ],
+          dataB: [
+            { word: 'Fire Station', emoji: '🚒' },
+            { word: 'Cinema', emoji: '🍿' },
+            { word: 'Supermarket', emoji: '🛒' },
+            { word: 'Cafe', emoji: '☕' },
+            { word: 'Gym', emoji: '🏋️‍♂️' },
+            { word: 'Bus Stop', emoji: '🚏' }
+          ]
+        }
+      ],
+      game: { 
+        type: 'trivia',
+        questions: [
+          { q: 'Which preposition means "in the middle of two things"?', options: ['Between', 'Behind', 'Next to', 'In'], answer: 0 },
+          { q: 'If I am at the back of the building, I am ___ it.', options: ['in front of', 'behind', 'across', 'on'], answer: 1 },
+          { q: 'The opposite of "behind" is...', options: ['in front of', 'next to', 'between', 'under'], answer: 0 },
+          { q: 'What is the correct preposition for a street? "The bank is ___ Main Street."', options: ['in', 'at', 'on', 'to'], answer: 2 },
+          { q: 'Which word is a place in town where you buy food?', options: ['Bank', 'Supermarket', 'Gym', 'Park'], answer: 1 },
+          { q: 'Where do you go to read books?', options: ['Library', 'Cinema', 'Hospital', 'Cafe'], answer: 0 },
+          { q: 'If you cross the street to get to the park, the park is ___ the street.', options: ['between', 'behind', 'next to', 'across from'], answer: 3 },
+          { q: 'A place where you can watch movies.', options: ['Hospital', 'Bank', 'Cinema', 'School'], answer: 2 },
+          { q: 'The car is parked ___ the house.', options: ['next to', 'under', 'between', 'above'], answer: 0 },
+          { q: 'The post office is ___ the corner.', options: ['in', 'at', 'on', 'with'], answer: 2 }
+        ]
+      }
+    });
+  </script>
+</body>
+</html>
