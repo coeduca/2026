@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Las mujeres y la política en diferentes momentos históricos de Occidente - Octavo</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="civica-exercises.js"></script>
+  <script src="civica-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    CIVICA.init({
+      id: 'cv_1783084347007',
+      container: '#app',
+      topic: 'Las mujeres y la política en diferentes momentos históricos de Occidente',
+      level: 'Octavo',
+      unit: 'Unidad 3 - Semana 5',
+      subjectLabel: 'Ciudadanía y Valores',
+      book: { url: 'https://drive.google.com/file/d/1PxMNbKCJC7fQPq9EFtAAK__vh7VyZBIU/view?usp=drivesdk', label: 'Abrir Libro' },
+      pdfDesign: 'Default', 
+      colors: { primary: '#37D464', accent: '#69B659', bg: '#87CEEB', cardBg: '#FFFFFF', text: '#1A1A1A' },
+      
+      sections: {
+        explore: [
+          { 
+            type: 'note', 
+            html: '<p><b>¡Bienvenidos!</b> En esta lección exploraremos cómo ha evolucionado la participación política, los roles y los derechos de las mujeres a lo largo de distintas épocas: la República Romana, la Edad Media, Mesoamérica prehispánica y los siglos XIX y XX.</p>' 
+          },
+          {
+            type: 'cv_textanswer',
+            title: 'Análisis de la actualidad',
+            instruction: 'Reflexiona sobre el rol de las mujeres en la actualidad respondiendo las siguientes preguntas.',
+            dataA: [
+              { q: '¿Cuáles son las actividades políticas, económicas y sociales en las que las mujeres participan actualmente?', minLength: 20, rows: 3, placeholder: 'Escribe tu respuesta aquí...' },
+              { q: '¿En qué espacios es limitada su participación? ¿Por qué consideras que hay exclusión de la mujer?', minLength: 20, rows: 3, placeholder: 'Escribe tu respuesta aquí...' }
+            ],
+            dataB: [
+              { q: '¿Qué estereotipos se asignan a las mujeres y cómo estos limitan su inclusión en diferentes ámbitos?', minLength: 20, rows: 3, placeholder: 'Escribe tu respuesta aquí...' },
+              { q: '¿Qué ha cambiado en la participación de la mujer en la actualidad respecto a otros momentos históricos?', minLength: 20, rows: 3, placeholder: 'Escribe tu respuesta aquí...' }
+            ]
+          },
+          {
+            type: 'matchlines',
+            title: 'Acciones y épocas históricas',
+            instruction: 'Relaciona cada época histórica con las acciones que las mujeres podían realizar o que las caracterizaban en ese momento.',
+            dataA: [
+              { left: 'República romana', right: 'Poseer y administrar riqueza' },
+              { left: 'Edad Media', right: 'Administrar feudos' },
+              { left: 'Mesoamérica prehispánica', right: 'Gobernar como reinas' },
+              { left: 'Siglos XIX y XX', right: 'Votar y ocupar cargos' }
+            ],
+            dataB: [
+              { left: 'Mesoamérica prehispánica', right: 'Diosas madres y fundadoras' },
+              { left: 'Edad Media', right: 'Alianzas por parentesco' },
+              { left: 'República romana', right: 'Excluidas de magistraturas' },
+              { left: 'Siglos XIX y XX', right: 'Derechos civiles plenos' }
+            ]
+          }
+        ],
+        deepen: [
+          {
+            type: 'truefalse',
+            title: 'República Romana y Edad Media',
+            instruction: 'Lee las afirmaciones sobre la situación de las mujeres en estas épocas y determina si son verdaderas o falsas.',
+            dataA: [
+              { statement: 'En la República romana, las mujeres podían ocupar magistraturas y ser juezas sin restricciones.', answer: false },
+              { statement: 'Fulvia Flaca Bambalia mostró un gran instinto político y fue considerada gobernanta de Roma en su tiempo.', answer: true },
+              { statement: 'Durante la Edad Media, los gobernantes eran elegidos mediante el voto popular y elecciones directas.', answer: false },
+              { statement: 'En la Edad Media, las mujeres de la familia real cumplían funciones esenciales en la legitimación del poder.', answer: true }
+            ],
+            dataB: [
+              { statement: 'Las costumbres romanas admitían que las mujeres debían desempeñar todas las funciones civiles del Estado.', answer: false },
+              { statement: 'Las mujeres nobles de la antigua Roma podían recibir educación y honores como estatuas con su imagen.', answer: true },
+              { statement: 'En la Edad Media, ninguna mujer llegó a poseer o administrar feudos de manera independiente.', answer: false },
+              { statement: 'La infanta doña Leonor fue pieza clave en alianzas políticas firmadas en 1375 entre reinos.', answer: true }
+            ]
+          },
+          {
+            type: 'multiplechoice',
+            title: 'Mesoamérica y Época Contemporánea',
+            instruction: 'Selecciona la opción correcta que describe el papel político de la mujer en estas épocas.',
+            dataA: [
+              { q: 'En Mesoamérica prehispánica, el intercambio de mujeres entre grupos étnicos servía principalmente para:', options: ['Venderlas como sirvientas', 'Forjar alianzas y establecer relaciones sociales duraderas', 'Decidir quién sería el próximo rey'], answer: 1 },
+              { q: 'En reinos mayas como Palenque, los datos históricos demuestran que las mujeres:', options: ['Ejercieron el poder real de modo pleno', 'Tenían prohibido acercarse a los gobernantes', 'Solo se dedicaban a labores domésticas'], answer: 0 },
+              { q: '¿Qué sistema excluyó inicialmente a las mujeres en el siglo XIX, relegándolas al espacio privado del hogar?', options: ['La Monarquía absoluta', 'El Estado moderno constitucional', 'El Feudalismo medieval'], answer: 1 }
+            ],
+            dataB: [
+              { q: 'En el Códice Xolotl, las mujeres toltecas aparecen cumpliendo la tarea política y social de:', options: ['Liderar los ejércitos en batalla', 'Arraigar, casar y civilizar a los guerreros', 'Escribir las leyes del nuevo reino'], answer: 1 },
+              { q: 'En Chichen Itzá, además del guerrero tolteca, la mujer es representada políticamente como:', options: ['Diosa madre y fundadora del reino', 'Únicamente como esclava', 'Extranjera sin derechos'], answer: 0 },
+              { q: 'Para las mujeres, el siglo XX representó la conquista de:', options: ['Nuevas tierras en América', 'Autonomía económica, jurídica y derechos políticos plenos', 'El imperio romano de Occidente'], answer: 1 }
+            ]
+          },
+          {
+            type: 'cv_textanswer',
+            title: 'Comprensión Lectora: Análisis Histórico',
+            instruction: 'A partir de lo aprendido, redacta una respuesta detallada a las siguientes interrogantes.',
+            dataA: [
+              { q: 'Según el texto, ¿De qué funciones estaban excluidas las mujeres durante la República romana y cuáles eran las razones dadas por las costumbres?', minLength: 20, rows: 3, placeholder: 'Escribe tu respuesta aquí...' },
+              { q: '¿Qué rol político desempeñó la mujer en Mesoamérica precolombina (por ejemplo, en el caso de la reina de Palenque)?', minLength: 20, rows: 3, placeholder: 'Escribe tu respuesta aquí...' }
+            ],
+            dataB: [
+              { q: '¿Cuál era la situación política de las mujeres en la Edad Media y de qué forma lograban legitimar su poder o influir en el gobierno?', minLength: 20, rows: 3, placeholder: 'Escribe tu respuesta aquí...' },
+              { q: '¿Qué similitudes o diferencias encuentras entre la situación de la mujer maya y la condición de la mujer en Roma o la Edad Media europea?', minLength: 20, rows: 3, placeholder: 'Escribe tu respuesta aquí...' }
+            ]
+          }
+        ],
+        consolidate: [
+          {
+            type: 'dropdown',
+            title: 'Orden Cronológico y Protagonistas',
+            instruction: 'Identifica la época a la que pertenece cada figura histórica femenina o evento, eligiendo la opción correcta.',
+            dataA: [
+              { before: 'Livia Drusila (emperatriz que vivió en el siglo I d. C.) pertenece a la', options: ['República Romana', 'Edad Media', 'Época Contemporánea'], answer: 0, after: '.' },
+              { before: 'Leonor de Aquitania, quien gobernó territorios por derecho de nacimiento, es de la', options: ['República Romana', 'Edad Media', 'Mesoamérica'], answer: 1, after: '.' },
+              { before: 'Las mujeres sufragistas que marcharon con carteles por sus derechos son representativas de los', options: ['Tiempos Antiguos', 'Siglos XIX y XX', 'Tiempos Prehispánicos'], answer: 1, after: '.' }
+            ],
+            dataB: [
+              { before: 'Fulvia Flaca Bambalia, viuda del tribuno Clodio, mostró gran instinto político en la', options: ['República Romana', 'Mesoamérica', 'Edad Media'], answer: 0, after: '.' },
+              { before: 'La señora Sak K´uk´, reina que entregó el trono a Janaab Pakal, es una figura de', options: ['Roma Antigua', 'Mesoamérica Prehispánica', 'Europa Medieval'], answer: 1, after: '.' },
+              { before: 'La consolidación del derecho al voto femenino a nivel masivo ocurrió principalmente durante el', options: ['Siglo V', 'Siglo XV', 'Siglo XX'], answer: 2, after: '.' }
+            ]
+          },
+          {
+            type: 'cv_table',
+            title: 'Cambios y Continuidades',
+            instruction: 'Completa la tabla explicando de forma breve cómo era la situación política y social de la mujer en cada época.',
+            dataA: {
+              columns: ['Aspecto a evaluar', 'República Romana', 'Edad Media', 'Mesoamérica Prehispánica', 'Siglos XIX y XX'],
+              rows: [
+                [
+                  { type: 'text', value: 'Roles y exclusión política' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Excluidas de magistraturas y funciones civiles' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Piezas de alianzas y legitimación por linaje' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Intercambio para forjar pactos o diosas madres' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Primero excluidas, luego conquistaron derechos' }
+                ],
+                [
+                  { type: 'text', value: 'Mecanismos de participación' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Influencia a través del matrimonio y riqueza' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Administración de feudos y regencias' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Gobernantes absolutas (reinas)' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Voto, autonomía jurídica y protestas sociales' }
+                ]
+              ],
+              bank: []
+            },
+            dataB: {
+              columns: ['Situación Política', 'Antigua Roma', 'Edad Media', 'Mesoamérica', 'Siglos XIX y XX'],
+              rows: [
+                [
+                  { type: 'text', value: 'Posesión de riquezas y autonomía' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Administraban riquezas propias' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Podían poseer y heredar feudos' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Posición de poder territorial' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Autonomía económica y profesional' }
+                ],
+                [
+                  { type: 'text', value: 'Participación política directa' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Prohibición de ejercer cargos públicos' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Gobernaban en casos de crisis o regencia' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Ejercieron el poder real de modo pleno' },
+                  { type: 'input', placeholder: 'Escribe aquí...', answer: 'Conquista del sufragio y ciudadanía' }
+                ]
+              ],
+              bank: []
+            }
+          }
+        ]
+      },
+      
+      game: { type: 'tictactoe' }
+    });
+  </script>
+</body>
+</html>
