@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>4-1 La sociedad europea después de la Primera Guerra Mundial - Octavo</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="civica-exercises.js"></script>
+  <script src="civica-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    CIVICA.init({
+      id: 'cv_1783645538794',
+      container: '#app',
+      topic: '4-1 La sociedad europea después de la Primera Guerra Mundial',
+      level: 'Octavo',
+      unit: 'Unidad 4 - Semana 1',
+      subjectLabel: 'Ciudadanía y Valores',
+      book: { url: 'https://drive.google.com/file/d/1hWocFEKQdFHIFFPs6-Oy675iTw_0iBzQ/view?usp=drivesdk', label: 'Abrir Libro' },
+      pdfDesign: 'Colorido', 
+      colors: { primary: '#AA8200', accent: '#A22C94', bg: '#008DC7', cardBg: '#FFFFFF', text: '#1A1A1A' },
+            examPools: {
+              '20176655': 'A',
+              '20176656': 'B',
+              '20176657': 'A',
+              '20176661': 'B',
+              '20138869': 'A',
+              '20176662': 'B',
+              '20176663': 'A',
+              '10065035': 'B',
+              '20176664': 'A',
+              '20305579': 'B',
+              '20305581': 'A',
+              '20176667': 'B',
+              '20176668': 'A',
+              '20179890': 'B',
+              '20179891': 'A',
+              '20293665': 'B',
+              '20305583': 'A'
+            },
+      
+      sections: {
+        explore: [
+          {
+            type: 'multiplechoice',
+            title: 'Explicación del Tema: Europa en la Posguerra',
+            instruction: 'Antes de realizar las actividades, evalúa tu comprensión básica sobre la situación de Europa tras la guerra.',
+            dataA: [
+              { q: '¿Qué sucedió con la "situación de privilegio" que disfrutaba Europa hasta 1914?', options: ['Aumentó gracias a los tratados', 'Experimentó un acentuado descenso', 'Se mantuvo intacta tras la guerra', 'Se trasladó exclusivamente a Alemania'], answer: 1 },
+              { q: '¿A qué país quedó Europa fuertemente endeudada después del conflicto?', options: ['Francia', 'Unión Soviética', 'Alemania', 'Estados Unidos'], answer: 3 },
+              { q: 'Además de la crisis económica, ¿cuál fue uno de los grandes problemas inmediatos?', options: ['Falta de materias primas y zonas devastadas', 'Exceso de mano de obra masculina', 'Crecimiento desmedido de la natalidad', 'Superávit en los productos manufacturados'], answer: 0 }
+            ],
+            dataB: [
+              { q: '¿Qué sucedió con la "situación de privilegio" que disfrutaba Europa hasta 1914?', options: ['Aumentó gracias a los tratados', 'Experimentó un acentuado descenso', 'Se mantuvo intacta tras la guerra', 'Se trasladó exclusivamente a Alemania'], answer: 1 },
+              { q: '¿A qué país quedó Europa fuertemente endeudada después del conflicto?', options: ['Francia', 'Unión Soviética', 'Alemania', 'Estados Unidos'], answer: 3 },
+              { q: 'Además de la crisis económica, ¿cuál fue uno de los grandes problemas inmediatos?', options: ['Falta de materias primas y zonas devastadas', 'Exceso de mano de obra masculina', 'Crecimiento desmedido de la natalidad', 'Superávit en los productos manufacturados'], answer: 0 }
+            ]
+          },
+          {
+            type: 'cv_textanswer',
+            title: 'Actividad 1: Reflexión Individual',
+            instruction: 'A partir de tus conocimientos previos, reflexiona y responde las siguientes preguntas.',
+            dataA: [
+              { q: '1. Escribe tu opinión sobre el impacto de las guerras en la sociedad y en las personas.', minLength: 40, rows: 4, placeholder: 'Yo considero que el impacto de las guerras...' },
+              { q: '2. Escribe una lista de lecciones que consideres que se pueden aprender de las guerras para evitar futuros conflictos.', minLength: 40, rows: 4, placeholder: '- Lección 1: ...\n- Lección 2: ...' }
+            ],
+            dataB: [
+              { q: '1. Escribe tu opinión sobre el impacto de las guerras en la sociedad y en las personas.', minLength: 40, rows: 4, placeholder: 'Yo considero que el impacto de las guerras...' },
+              { q: '2. Escribe una lista de lecciones que consideres que se pueden aprender de las guerras para evitar futuros conflictos.', minLength: 40, rows: 4, placeholder: '- Lección 1: ...\n- Lección 2: ...' }
+            ]
+          },
+          {
+            type: 'cv_textanswer',
+            title: 'Actividad 2: Europa después de la Primera Guerra Mundial',
+            instruction: 'Observa la imagen del Documento 1 (Mujeres y niños afectados por la Primera Guerra Mundial) y lee tu libro de texto. Luego responde.',
+            image: 'files/mujeres_y_ninos_chateau_thierry.png',
+            dataA: [
+              { q: 'a. ¿A qué se refiere el autor con «la situación de privilegio que vivió Europa antes de la Primera Guerra Mundial»?', minLength: 30, rows: 3, placeholder: 'Hace referencia a que Europa...' },
+              { q: 'b. ¿Cómo se vio afectada esa situación de privilegio después del conflicto bélico?', minLength: 30, rows: 3, placeholder: 'Se vio afectada porque...' },
+              { q: 'c. ¿Cómo consideras que se evidenciaron las consecuencias de la guerra en la sociedad en general?', minLength: 30, rows: 3, placeholder: 'Se evidenciaron a través de...' },
+              { q: 'd. ¿Cuáles son las principales situaciones políticas, sociales y económicas que dejó la Primera Guerra Mundial?', minLength: 40, rows: 4, placeholder: 'Políticas: ...\nSociales: ...\nEconómicas: ...' }
+            ],
+            dataB: [
+              { q: 'a. ¿A qué se refiere el autor con «la situación de privilegio que vivió Europa antes de la Primera Guerra Mundial»?', minLength: 30, rows: 3, placeholder: 'Hace referencia a que Europa...' },
+              { q: 'b. ¿Cómo se vio afectada esa situación de privilegio después del conflicto bélico?', minLength: 30, rows: 3, placeholder: 'Se vio afectada porque...' },
+              { q: 'c. ¿Cómo consideras que se evidenciaron las consecuencias de la guerra en la sociedad en general?', minLength: 30, rows: 3, placeholder: 'Se evidenciaron a través de...' },
+              { q: 'd. ¿Cuáles son las principales situaciones políticas, sociales y económicas que dejó la Primera Guerra Mundial?', minLength: 40, rows: 4, placeholder: 'Políticas: ...\nSociales: ...\nEconómicas: ...' }
+            ]
+          }
+        ],
+        deepen: [
+          {
+            type: 'fillblank',
+            title: 'Actividad 3: Repercusiones Políticas y Geopolíticas',
+            instruction: 'Completa los siguientes enunciados sobre los acuerdos de paz y la nueva potencia mundial utilizando las palabras correctas.',
+            dataA: [
+              { text: 'El Tratado de ___ responsabilizó a Alemania de la guerra y le exigió pagar indemnizaciones.', answer: ['Versalles'] },
+              { text: 'La Conferencia de París instauró la ___ de Naciones para mantener la paz.', answer: ['Sociedad'] },
+              { text: 'Tras la Primera Guerra Mundial, ___ surgió como la nueva potencia económica.', answer: ['Estados Unidos'] },
+              { text: 'Los grandes imperios, como el antiguo Imperio ___ y el austrohúngaro, desaparecieron dando lugar a repúblicas.', answer: ['alemán'] }
+            ],
+            dataB: [
+              { text: 'El Tratado de ___ responsabilizó a Alemania de la guerra y le exigió pagar indemnizaciones.', answer: ['Versalles'] },
+              { text: 'La Conferencia de París instauró la ___ de Naciones para mantener la paz.', answer: ['Sociedad'] },
+              { text: 'Tras la Primera Guerra Mundial, ___ surgió como la nueva potencia económica.', answer: ['Estados Unidos'] },
+              { text: 'Los grandes imperios, como el antiguo Imperio ___ y el austrohúngaro, desaparecieron dando lugar a repúblicas.', answer: ['alemán'] }
+            ]
+          },
+          {
+            type: 'truefalse',
+            title: 'Actividad 4: Transformaciones y Descontento Social (Doc. 2)',
+            instruction: 'Evalúa las siguientes afirmaciones sobre la situación social y los estereotipos fomentados después de la guerra.',
+            dataA: [
+              { statement: 'La masiva muerte de jóvenes provocó una devastadora caída demográfica que tardó décadas en recuperarse.', answer: true },
+              { statement: 'Durante la guerra, hubo abundancia de bienes de consumo debido a la gran cantidad de fábricas disponibles.', answer: false },
+              { statement: 'Las mujeres tuvieron que incorporarse al mundo laboral asumiendo trabajos que antes eran exclusivos de hombres.', answer: true },
+              { statement: 'Para justificar la crisis en los países vencidos, se buscó culpar a la población judía mediante mitos como "la traición interna".', answer: true },
+              { statement: 'Los sectores extremistas consideraban que los judíos habían traído grandes beneficios a Europa gracias a las reparaciones de guerra.', answer: false }
+            ],
+            dataB: [
+              { statement: 'La masiva muerte de jóvenes provocó una devastadora caída demográfica que tardó décadas en recuperarse.', answer: true },
+              { statement: 'Durante la guerra, hubo abundancia de bienes de consumo debido a la gran cantidad de fábricas disponibles.', answer: false },
+              { statement: 'Las mujeres tuvieron que incorporarse al mundo laboral asumiendo trabajos que antes eran exclusivos de hombres.', answer: true },
+              { statement: 'Para justificar la crisis en los países vencidos, se buscó culpar a la población judía mediante mitos como "la traición interna".', answer: true },
+              { statement: 'Los sectores extremistas consideraban que los judíos habían traído grandes beneficios a Europa gracias a las reparaciones de guerra.', answer: false }
+            ]
+          }
+        ],
+        consolidate: [
+          {
+            type: 'multiplechoice',
+            title: 'Actividad 5: Conclusiones sobre los acuerdos de la posguerra (Doc. 3)',
+            instruction: 'Responde analizando el texto final sobre las secuelas que dejó la Primera Guerra Mundial.',
+            dataA: [
+              { q: '¿A qué se refiere el texto al proponer que Europa perdió su «hegemonía mundial»?', options: ['A que Europa dejó de ser el continente dominante y perdió poder global frente a EE. UU.', 'A que Europa decidió regalar sus colonias pacíficamente', 'A que todos los países europeos se unieron en un solo gran imperio'], answer: 0 },
+              { q: '¿Por qué es viable asegurar que los acuerdos de paz "contenían el germen de una nueva guerra generalizada"?', options: ['Porque no había suficientes armas en Europa', 'Por la gran rivalidad generada, las duras sanciones a los vencidos y las discrepancias entre aliados', 'Porque el Tratado de Versalles perdonó las deudas de Alemania'], answer: 1 },
+              { q: 'El documento describe los acuerdos de paz simplemente como...', options: ['Una solución permanente y definitiva', 'Un triunfo diplomático inquebrantable', 'Un breve e inestable armisticio de 20 años'], answer: 2 }
+            ],
+            dataB: [
+              { q: '¿A qué se refiere el texto al proponer que Europa perdió su «hegemonía mundial»?', options: ['A que Europa dejó de ser el continente dominante y perdió poder global frente a EE. UU.', 'A que Europa decidió regalar sus colonias pacíficamente', 'A que todos los países europeos se unieron en un solo gran imperio'], answer: 0 },
+              { q: '¿Por qué es viable asegurar que los acuerdos de paz "contenían el germen de una nueva guerra generalizada"?', options: ['Porque no había suficientes armas en Europa', 'Por la gran rivalidad generada, las duras sanciones a los vencidos y las discrepancias entre aliados', 'Porque el Tratado de Versalles perdonó las deudas de Alemania'], answer: 1 },
+              { q: 'El documento describe los acuerdos de paz simplemente como...', options: ['Una solución permanente y definitiva', 'Un triunfo diplomático inquebrantable', 'Un breve e inestable armisticio de 20 años'], answer: 2 }
+            ]
+          },
+          {
+            type: 'cv_table',
+            title: 'Actividad 5: Cuadro Resumen de la Sociedad Europea',
+            instruction: 'Clasifica las características de la sociedad europea después de la Primera Guerra Mundial arrastrando los conceptos a la categoría correcta.',
+            dataA: {
+              columns: ['Tipo de Característica', 'Descripción del Cambio o Efecto'],
+              bank: [
+                'Desaparición de los grandes imperios e instauración de repúblicas',
+                'Caída demográfica drástica y transformación del rol de la mujer',
+                'Surgimiento de tensiones sociales, levantamientos obreros y racismo',
+                'Aumento del desempleo, alta inflación y endeudamiento nacional',
+                'Creación de la Sociedad de Naciones y rediseño de fronteras',
+                'Estados Unidos se posiciona como la nueva gran potencia global'
+              ],
+              rows: [
+                [ { type: 'text', value: 'Políticas' }, { type: 'drop', placeholder: 'Suelta una característica política aquí', answer: 'Desaparición de los grandes imperios e instauración de repúblicas' } ],
+                [ { type: 'text', value: 'Políticas' }, { type: 'drop', placeholder: 'Suelta una característica política aquí', answer: 'Creación de la Sociedad de Naciones y rediseño de fronteras' } ],
+                [ { type: 'text', value: 'Sociales' }, { type: 'drop', placeholder: 'Suelta una característica social aquí', answer: 'Caída demográfica drástica y transformación del rol de la mujer' } ],
+                [ { type: 'text', value: 'Sociales' }, { type: 'drop', placeholder: 'Suelta una característica social aquí', answer: 'Surgimiento de tensiones sociales, levantamientos obreros y racismo' } ],
+                [ { type: 'text', value: 'Económicas' }, { type: 'drop', placeholder: 'Suelta una característica económica aquí', answer: 'Aumento del desempleo, alta inflación y endeudamiento nacional' } ],
+                [ { type: 'text', value: 'Económicas' }, { type: 'drop', placeholder: 'Suelta una característica económica aquí', answer: 'Estados Unidos se posiciona como la nueva gran potencia global' } ]
+              ]
+            },
+            dataB: {
+              columns: ['Tipo de Característica', 'Descripción del Cambio o Efecto'],
+              bank: [
+                'Desaparición de los grandes imperios e instauración de repúblicas',
+                'Caída demográfica drástica y transformación del rol de la mujer',
+                'Surgimiento de tensiones sociales, levantamientos obreros y racismo',
+                'Aumento del desempleo, alta inflación y endeudamiento nacional',
+                'Creación de la Sociedad de Naciones y rediseño de fronteras',
+                'Estados Unidos se posiciona como la nueva gran potencia global'
+              ],
+              rows: [
+                [ { type: 'text', value: 'Políticas' }, { type: 'drop', placeholder: 'Suelta una característica política aquí', answer: 'Desaparición de los grandes imperios e instauración de repúblicas' } ],
+                [ { type: 'text', value: 'Políticas' }, { type: 'drop', placeholder: 'Suelta una característica política aquí', answer: 'Creación de la Sociedad de Naciones y rediseño de fronteras' } ],
+                [ { type: 'text', value: 'Sociales' }, { type: 'drop', placeholder: 'Suelta una característica social aquí', answer: 'Caída demográfica drástica y transformación del rol de la mujer' } ],
+                [ { type: 'text', value: 'Sociales' }, { type: 'drop', placeholder: 'Suelta una característica social aquí', answer: 'Surgimiento de tensiones sociales, levantamientos obreros y racismo' } ],
+                [ { type: 'text', value: 'Económicas' }, { type: 'drop', placeholder: 'Suelta una característica económica aquí', answer: 'Aumento del desempleo, alta inflación y endeudamiento nacional' } ],
+                [ { type: 'text', value: 'Económicas' }, { type: 'drop', placeholder: 'Suelta una característica económica aquí', answer: 'Estados Unidos se posiciona como la nueva gran potencia global' } ]
+              ]
+            }
+          }
+        ]
+      },
+      
+      game: { type: 'snake', winScore: 5 }
+    });
+  </script>
+</body>
+</html>
