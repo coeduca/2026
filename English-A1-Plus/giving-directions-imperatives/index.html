@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Giving Directions (Imperatives) - Noveno, Primer Año, Segundo Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+      container: '#app',
+      topic: 'Giving Directions (Imperatives)',
+      level: 'Noveno, Primer Año, Segundo Año',
+      pdfDesign: 'PopArtVibrant', 
+      colors: { primary: '#FF8700', accent: '#FFFFFF', bg: '#B4F6FF', cardBg: '#63CDFF', text: '#1A1A1A' },
+            examPools: {
+              '20062471': 'A',
+              '19967142': 'B',
+              '19971566': 'A',
+              '19971565': 'B',
+              '19967143': 'A',
+              '20062474': 'B',
+              '19967145': 'A',
+              '19967146': 'B',
+              '19934096': 'A',
+              '19934095': 'B',
+              '4210274': 'A',
+              '20200673': 'B',
+              '20062484': 'A',
+              '19934098': 'B',
+              '19967150': 'A',
+              '20062486': 'B',
+              '20062489': 'A',
+              '19976021': 'B',
+              '20023247': 'A',
+              '19976024': 'B',
+              '20062495': 'A',
+              '19956103': 'B',
+              '20062498': 'A',
+              '19967154': 'B',
+              '4210278': 'A',
+              '4210264': 'B',
+              '19967144': 'A',
+              '20068438': 'B',
+              '19959332': 'A',
+              '4210262': 'B',
+              '20062373': 'A',
+              '19843597': 'B',
+              '4210272': 'A',
+              '19967158': 'B',
+              '4210284': 'A',
+              '19934099': 'B',
+              '19967161': 'A',
+              '19967151': 'B',
+              '20062496': 'A',
+              '19788973': 'B',
+              '3167629': 'A',
+              '19967163': 'B',
+              '4210259': 'A',
+              '4210276': 'B',
+              '20062499': 'A',
+              '6954866': 'B',
+              '4210263': 'A',
+              '4210279': 'B',
+              '4210254': 'A',
+              '2724749': 'B',
+              '6473557': 'A',
+              '6473562': 'B',
+              '19724473': 'A',
+              '6473555': 'B',
+              '4210255': 'A',
+              '1964480': 'B',
+              '4210256': 'A',
+              '5531752': 'B',
+              '4210268': 'A',
+              '2295119': 'B',
+              '5531765': 'A',
+              '2294851': 'B',
+              '19769235': 'A',
+              '19929938': 'B',
+              '4210277': 'A'
+            },
+      exercises: [
+        {
+          type: 'note',
+          title: 'Giving Directions',
+          html: '<p><strong>Giving Directions (Imperatives)</strong></p><p>Para dar indicaciones o direcciones en inglés, utilizamos el <strong>Imperativo</strong>. El imperativo se forma usando el verbo en su forma base (sin "to") y no lleva un sujeto explícito, ya que siempre se dirige a "tú" (you) de manera directa.</p><ul><li><strong>Turn right:</strong> Gira a la derecha</li><li><strong>Turn left:</strong> Gira a la izquierda</li><li><strong>Go straight:</strong> Sigue derecho / recto</li><li><strong>Go past:</strong> Pasa por (de largo)</li><li><strong>Go back:</strong> Regresa / Ve hacia atrás</li><li><strong>Block:</strong> Cuadra / Manzana</li><li><strong>Cross the street:</strong> Cruza la calle</li><li><strong>On the right:</strong> A la derecha</li><li><strong>On the left:</strong> A la izquierda</li></ul>'
+        },
+        {
+          type: 'wordsearch',
+          title: 'Direction Words',
+          instruction: 'Encuentra las palabras relacionadas con dar direcciones.',
+          dataA: {
+            words: ['RIGHT', 'LEFT', 'STRAIGHT', 'PAST', 'BACK', 'BLOCK', 'CROSS', "STREET"],
+            gridSize: 12
+          },
+          dataB: {
+            words: ['TURN', 'CORNER', 'AVENUE', 'ROAD', "HIGHWAY", "AHEAD", "WALK", "STOP"],
+            gridSize: 12
+          }
+        },
+        {
+          type: 'matchimage',
+          title: 'Match the Signs',
+          instruction: 'Une cada indicación con su imagen representativa.',
+          dataA: [
+            { word: 'Turn left', image: 'files/sign_turn_left.png' },
+            { word: 'Go straight', image: 'files/sign_go_straight.png' },
+            { word: 'Cross the street', image: 'files/sign_crosswalk.png' },
+            { word: 'Go past the bank', image: 'files/building_bank.png' },
+            { word: 'On the right', image: 'files/arrow_right_side.png' },
+            { word: 'Stop', image: 'files/sign_stop.png' }
+          ],
+          dataB: [
+            { word: 'Turn right', image: 'files/sign_turn_right.png' },
+            { word: 'Go back', image: 'files/sign_u_turn.png' },
+            { word: 'Walk two blocks', image: 'files/city_blocks.png' },
+            { word: 'On the left', image: 'files/arrow_left_side.png' },
+            { word: 'Traffic light', image: 'files/traffic_light_object.png' },
+            { word: 'Corner', image: 'files/street_corner.png' }
+          ]
+        },
+        {
+          type: 'dragbank',
+          title: 'Listen to the Route',
+          instruction: 'Escucha el audio y arrastra las palabras correctas para completar las indicaciones hacia la escuela Las Ánimas.',
+          audio: 'files/directions_audio.mp3',
+          dataA: {
+            sentences: [
+              { text: "If you're going to las Ánimas school from San Vicente ___ straight on the highway,", answer: "go" },
+              { text: "then ___ right on Las Ánimas street,", answer: "turn" },
+              { text: "___ past the houses and then you will see the school,", answer: "go" },
+              { text: "___ left,", answer: "turn" },
+              { text: "___ the street and you are there.", answer: "cross" }
+            ],
+            bank: ["walk", "stop", "drive"]
+          },
+          dataB: {
+            sentences: [
+              { text: "If you're going to las Ánimas ___ from San Vicente go straight on the highway,", answer: "school" },
+              { text: "then turn right on Las Ánimas ___,", answer: "street" },
+              { text: "go past the ___ and then you will see the school,", answer: "houses" },
+              { text: "turn left, cross the street and you are ___.", answer: "there" }
+            ],
+            bank: ["hospital", "avenue", "here", "corner"]
+          }
+        },
+        {
+          type: 'matchlines',
+          title: 'Connect the Directions',
+          instruction: 'Une la primera parte de la instrucción con su complemento correcto.',
+          dataA: [
+            { left: 'Turn right', right: 'at the next corner.' },
+            { left: 'Go straight', right: 'for two blocks.' },
+            { left: 'Cross', right: 'the street carefully.' },
+            { left: 'The bank is on', right: 'the left side.' },
+            { left: 'Go past', right: 'the supermarket.' },
+            { left: 'Walk down', right: 'this main avenue.' }
+          ],
+          dataB: [
+            { left: 'Turn left', right: 'at the traffic light.' },
+            { left: 'Go back', right: 'to the main square.' },
+            { left: 'Stop at', right: 'the intersection.' },
+            { left: 'The school is on', right: 'the right side.' },
+            { left: 'Walk past', right: 'the police station.' },
+            { left: 'Drive up', right: 'the steep hill.' }
+          ]
+        },
+        {
+          type: 'categorize',
+          title: 'Sort the Vocabulary',
+          instruction: 'Clasifica las palabras en acciones (verbos imperativos) o lugares/referencias de la ciudad.',
+          dataA: {
+            categories: ['Actions (Verbs)', 'Places / References'],
+            items: [
+              { text: 'Turn', cat: 0 },
+              { text: 'Go', cat: 0 },
+              { text: 'Cross', cat: 0 },
+              { text: 'Walk', cat: 0 },
+              { text: 'Stop', cat: 0 },
+              { text: 'Street', cat: 1 },
+              { text: 'Block', cat: 1 },
+              { text: 'Corner', cat: 1 },
+              { text: 'Highway', cat: 1 },
+              { text: 'School', cat: 1 }
+            ]
+          },
+          dataB: {
+            categories: ['Directions / Positions', 'Landmarks'],
+            items: [
+              { text: 'Right', cat: 0 },
+              { text: 'Left', cat: 0 },
+              { text: 'Straight', cat: 0 },
+              { text: 'Back', cat: 0 },
+              { text: 'Ahead', cat: 0 },
+              { text: 'Hospital', cat: 1 },
+              { text: 'Supermarket', cat: 1 },
+              { text: 'Park', cat: 1 },
+              { text: 'Traffic light', cat: 1 },
+              { text: 'Bridge', cat: 1 }
+            ]
+          }
+        },
+        {
+          type: 'multiplechoice',
+          title: 'Choose the Correct Word',
+          instruction: 'Selecciona la opción correcta para completar la indicación de ruta.',
+          dataA: [
+            { q: '___ straight on this street until you see the hospital.', options: ['Turn', 'Go', 'Cross', 'Stop'], answer: 1 },
+            { q: '___ right at the corner.', options: ['Go', 'Walk', 'Turn', 'Past'], answer: 2 },
+            { q: 'The pharmacy is ___ the left.', options: ['in', 'on', 'at', 'to'], answer: 1 },
+            { q: '___ the street at the pedestrian crossing.', options: ['Cross', 'Turn', 'Block', 'Drive'], answer: 0 },
+            { q: 'Go ___ the gas station, the park is right after it.', options: ['back', 'straight', 'past', 'right'], answer: 2 },
+            { q: 'Walk for two ___ and then stop.', options: ['streets', 'blocks', 'corners', 'lefts'], answer: 1 }
+          ],
+          dataB: [
+            { q: '___ left at the traffic light.', options: ['Turn', 'Go', 'Walk', 'Drive'], answer: 0 },
+            { q: 'Don\'t turn, just go ___ ahead.', options: ['right', 'left', 'straight', 'back'], answer: 2 },
+            { q: 'The supermarket is ___ the right.', options: ['on', 'in', 'by', 'at'], answer: 0 },
+            { q: 'You went too far. Go ___ to the main avenue.', options: ['past', 'back', 'straight', 'cross'], answer: 1 },
+            { q: '___ down this road for five minutes.', options: ['Cross', 'Turn', 'Walk', 'Block'], answer: 2 },
+            { q: 'Wait at the ___ before crossing.', options: ['corner', 'straight', 'past', 'turn'], answer: 0 }
+          ]
+        },
+        {
+          type: 'reorder_sentences',
+          title: 'Build the Instructions',
+          instruction: 'Ordena las palabras para formar instrucciones coherentes.',
+          dataA: [
+            { sentence: 'Turn right at the corner', es: 'Gira a la derecha en la esquina' },
+            { sentence: 'Go straight for two blocks', es: 'Sigue derecho por dos cuadras' },
+            { sentence: 'The hospital is on the left', es: 'El hospital está a la izquierda' },
+            { sentence: 'Cross the street carefully', es: 'Cruza la calle con cuidado' },
+            { sentence: 'Go past the police station', es: 'Pasa por la estación de policía' },
+            { sentence: 'Walk down the main avenue', es: 'Camina por la avenida principal' }
+          ],
+          dataB: [
+            { sentence: 'Turn left at the traffic light', es: 'Gira a la izquierda en el semáforo' },
+            { sentence: 'Go back to the park', es: 'Regresa al parque' },
+            { sentence: 'The bank is on the right', es: 'El banco está a la derecha' },
+            { sentence: 'Stop at the next intersection', es: 'Detente en la siguiente intersección' },
+            { sentence: 'Drive straight ahead now', es: 'Conduce en línea recta ahora' },
+            { sentence: 'Walk past the big supermarket', es: 'Pasa por el supermercado grande' }
+          ]
+        }
+      ],
+      game: { type: 'snake', winScore: 5 }
+    });
+  </script>
+</body>
+</html>
