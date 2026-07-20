@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Furniture and Appliances - Octavo, Séptimo</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "Furniture and Appliances",
+  "level": "Octavo, Séptimo",
+  "pdfDesign": "HollyHobbie",
+  "colors": {
+    "primary": "#995B00",
+    "accent": "#CB9603",
+    "bg": "#BEA88F",
+    "cardBg": "#FFFFFF",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "wordsearch",
+      "title": "Sopa de letras",
+      "instruction": "Instrucción: Encuentra las siguientes palabras",
+      "dataA": {
+        "words": [
+          "SOFA",
+          "TABLE",
+          "STOVE",
+          "BLENDER",
+          "COACH",
+          "DRYER"
+        ],
+        "gridSize": 12
+      }
+    },
+    {
+      "type": "reorder_letters",
+      "title": "Ordenar letras",
+      "instruction": "Instrucción: Ordena las letras para formar la palabra correcta.",
+      "dataA": [
+        {
+          "word": "TOASTER",
+          "hint": "PISTA: 🔥🍞"
+        },
+        {
+          "word": "BED",
+          "hint": "PISTA: 😴🛏️"
+        },
+        {
+          "word": "CLOSET",
+          "hint": "PISTA: 👚🚪"
+        },
+        {
+          "word": "IRON",
+          "hint": "PISTA: 🔥👕"
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Unir con imagen",
+      "instruction": "Instrucción: ",
+      "dataA": [
+        {
+          "word": "STOVE",
+          "image": "files/edited_1784554376471_pic_1784554141927.png"
+        },
+        {
+          "word": "MICROWAVE",
+          "image": "files/edited_1784554381524_pic_1784554141927.png"
+        },
+        {
+          "word": "REFRIGERATOR",
+          "image": "files/edited_1784554384142_pic_1784554141927.png"
+        },
+        {
+          "word": "COFFEE MAKER",
+          "image": "files/edited_1784554397827_pic_1784554141927.png"
+        },
+        {
+          "word": "CHAIR",
+          "image": "files/edited_1784554420239_pic_1784554081734.png"
+        },
+        {
+          "word": "BOOKSHELF",
+          "image": "files/edited_1784554429961_pic_1784554081734.png"
+        },
+        {
+          "word": "DESK",
+          "image": "files/edited_1784554436578_pic_1784554081734.png"
+        },
+        {
+          "word": "DRESSER",
+          "image": "files/edited_1784554446828_pic_1784554081734.png"
+        }
+      ]
+    },
+    {
+      "type": "truefalse",
+      "title": "Verdadero o falso",
+      "instruction": "Instrucción: Selecciona Verdadero (TRUE) o Falso (FALSE) según los muebles y electrodomésticos qué observes en la imagen. ",
+      "image": "files/file_00000000de6c81f592b6661fa89b034f.png",
+      "dataA": [
+        {
+          "statement": "There is a refrigerator",
+          "answer": true
+        },
+        {
+          "statement": "There is an armchair",
+          "answer": false
+        },
+        {
+          "statement": "There is a microwave",
+          "answer": true
+        },
+        {
+          "statement": "There is a table and four chairs",
+          "answer": true
+        },
+        {
+          "statement": "There is a washing machine",
+          "answer": true
+        }
+      ]
+    },
+    {
+      "type": "categorize",
+      "title": "Categorizar",
+      "instruction": "Instrucción: arrastra el mueble o electrodomésticos a su grupo correcto.",
+      "dataA": {
+        "categories": [
+          "FURNITURE",
+          "APPLIANCES"
+        ],
+        "items": [
+          {
+            "text": "TV stand",
+            "cat": 0
+          },
+          {
+            "text": "Wardrobe",
+            "cat": 0
+          },
+          {
+            "text": "Desk",
+            "cat": 0
+          },
+          {
+            "text": "Dresser",
+            "cat": 0
+          },
+          {
+            "text": "Vacuum Cleaner",
+            "cat": 1
+          },
+          {
+            "text": "Dryer",
+            "cat": 1
+          },
+          {
+            "text": "Dishwasher",
+            "cat": 1
+          },
+          {
+            "text": "Television",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "wordselect",
+      "title": "Seleccionar palabras",
+      "instruction": "Instrucción: Escucha el audio y selecciona las palabras que se mencionan en cada frase. ",
+      "audio": "files/kikivoice-tts-file-2026-07-20-07-57-19-6361.mp3",
+      "dataA": [
+        {
+          "text": "I need to buy a new [TELEVISION] / PHONE, the old one is older than the [SOFA] / COACH in the living room, also my CHAIR / [BED] should be renewed. My mother has a big [TABLE] / DRESSER that I can use instead of a STOVE / [DESK]. "
+        }
+      ]
+    },
+    {
+      "type": "matchlines",
+      "title": "Unir con una línea",
+      "instruction": "Instrucción: Une cada palabra con su traducción correcta.",
+      "dataA": [
+        {
+          "left": "Coach ",
+          "right": "Sillón"
+        },
+        {
+          "left": "Blender",
+          "right": "Licuadora"
+        },
+        {
+          "left": "Dryer",
+          "right": "Secadora"
+        },
+        {
+          "left": "Air Conditioner",
+          "right": "Aire Acondicionado"
+        },
+        {
+          "left": "Desk",
+          "right": "Escritorio"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "pills"
+  }
+});
+  </script>
+</body>
+</html>
