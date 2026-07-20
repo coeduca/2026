@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Comparative Adjectives - Noveno, Primer Año, Segundo Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+      
+      container: '#app',
+      topic: 'Comparative Adjectives',
+      level: 'Noveno, Primer Año, Segundo Año',
+      
+      
+      pdfDesign: 'PopArtVibrant', 
+      colors: { primary: '#F781C8', accent: '#FF00CC', bg: '#FFF1F8', cardBg: '#FFFFFF', text: '#1A1A1A' },
+            examPools: {
+              '20062471': 'A',
+              '19967142': 'B',
+              '19971566': 'A',
+              '19971565': 'B',
+              '19967143': 'A',
+              '20062474': 'B',
+              '19967145': 'A',
+              '19967146': 'B',
+              '19934096': 'A',
+              '19934095': 'B',
+              '4210274': 'A',
+              '20200673': 'B',
+              '20062484': 'A',
+              '19934098': 'B',
+              '19967150': 'A',
+              '20062486': 'B',
+              '20062489': 'A',
+              '19976021': 'B',
+              '20023247': 'A',
+              '19976024': 'B',
+              '20062495': 'A',
+              '19956103': 'B',
+              '20062498': 'A',
+              '19967154': 'B',
+              '4210278': 'A',
+              '4210264': 'B',
+              '19967144': 'A',
+              '20068438': 'B',
+              '19959332': 'A',
+              '4210262': 'B',
+              '20062373': 'A',
+              '19843597': 'B',
+              '4210272': 'A',
+              '19967158': 'B',
+              '4210284': 'A',
+              '19934099': 'B',
+              '19967161': 'A',
+              '19967151': 'B',
+              '20062496': 'A',
+              '19788973': 'B',
+              '3167629': 'A',
+              '19967163': 'B',
+              '4210259': 'A',
+              '4210276': 'B',
+              '20062499': 'A',
+              '6954866': 'B',
+              '4210263': 'A',
+              '4210279': 'B',
+              '4210254': 'A',
+              '2724749': 'B',
+              '6473557': 'A',
+              '6473562': 'B',
+              '19724473': 'A',
+              '6473555': 'B',
+              '4210255': 'A',
+              '1964480': 'B',
+              '4210256': 'A',
+              '5531752': 'B',
+              '4210268': 'A',
+              '2295119': 'B',
+              '5531765': 'A',
+              '2294851': 'B',
+              '19769235': 'A',
+              '19929938': 'B',
+              '4210277': 'A'
+            },
+      
+      exercises: [
+        {
+          type: 'note',
+          title: '📘 Explicación breve: Comparative Adjectives',
+          html: `<p>Los adjetivos comparativos se usan para comparar dos personas, animales o cosas. En inglés se forman así:</p>
+          <ul>
+            <li><strong>Adjetivos cortos (1 sílaba):</strong> añade <em>-er</em> al final. <br>Ejemplo: <em>tall → taller</em> (alto → más alto).</li>
+            <li><strong>Adjetivos de 2 sílabas terminados en -y:</strong> cambia la <em>-y</em> por <em>-i</em> y añade <em>-er</em>. <br>Ejemplo: <em>happy → happier</em>.</li>
+            <li><strong>Adjetivos largos (2 sílabas o más):</strong> usa <em>more</em> antes del adjetivo. <br>Ejemplo: <em>beautiful → more beautiful</em>.</li>
+            <li><strong>Irregulares:</strong> no siguen regla fija. <br>Ejemplo: <em>good → better</em>, <em>bad → worse</em>, <em>far → farther/further</em>.</li>
+          </ul>
+          <p>Siempre se usa <strong>than</strong> después del comparativo para introducir el segundo elemento: <em>She is taller than her brother.</em></p>`
+        },
+        {
+          type: 'multiplechoice',
+          title: '🐾 Elige el comparativo correcto',
+          instruction: 'Selecciona la opción que complete la oración correctamente.',
+          dataA: [
+            { q: 'A cheetah is ___ than a horse.', options: ['faster','more fast','fast'], answer: 0 },
+            { q: 'This exam is ___ than the last one.', options: ['easier','more easy','easyer'], answer: 0 },
+            { q: 'She is ___ than her sister.', options: ['taller','more tall','tall'], answer: 0 },
+            { q: 'My car is ___ than yours.', options: ['more expensive','expensiver','expensive'], answer: 0 },
+            { q: 'He feels ___ today than yesterday.', options: ['better','more good','good'], answer: 0 },
+            { q: 'The weather is ___ in summer.', options: ['hotter','more hot','hot'], answer: 0 },
+            { q: 'This book is ___ than the movie.', options: ['more interesting','interestinger','interesting'], answer: 0 },
+            { q: 'She speaks English ___ than I do.', options: ['better','more well','good'], answer: 0 }
+          ],
+          dataB: [
+            { q: 'An elephant is ___ than a cat.', options: ['bigger','more big','big'], answer: 0 },
+            { q: 'This puzzle is ___ than that one.', options: ['harder','more hard','hard'], answer: 0 },
+            { q: 'My brother is ___ than me.', options: ['stronger','more strong','strong'], answer: 0 },
+            { q: 'This dress is ___ than the other.', options: ['prettier','more pretty','prettyer'], answer: 0 },
+            { q: 'I feel ___ when I exercise.', options: ['happier','more happy','happy'], answer: 0 },
+            { q: 'The coffee is ___ than the tea.', options: ['hotter','more hot','hot'], answer: 0 },
+            { q: 'This city is ___ than the countryside.', options: ['more polluted','polluted','polluter'], answer: 0 },
+            { q: 'He can run ___ than anyone.', options: ['faster','more fast','fast'], answer: 0 }
+          ]
+        },
+        {
+          type: 'dragbank',
+          title: '🧩 Completa con la palabra correcta',
+          instruction: 'Arrastra la palabra que falta en cada oración.',
+          dataA: {
+            sentences: [
+              { text: 'Elephants are ___ than mice.', answer: 'bigger' },
+              { text: 'This test is ___ than the previous one.', answer: 'harder' },
+              { text: 'She is ___ than him.', answer: 'taller' },
+              { text: 'My phone is ___ than yours.', answer: 'newer' },
+              { text: 'Gold is ___ than silver.', answer: 'more expensive' },
+              { text: 'He feels ___ after resting.', answer: 'better' },
+              { text: 'The movie was ___ than the book.', answer: 'more interesting' },
+              { text: 'Summer is ___ than spring.', answer: 'hotter' }
+            ],
+            bank: ['big','more big','hard','hardest','tall','new','expensive','good','interesting','hot','small','best']
+          },
+          dataB: {
+            sentences: [
+              { text: 'A lion is ___ than a cat.', answer: 'stronger' },
+              { text: 'This room is ___ than that one.', answer: 'cleaner' },
+              { text: 'She is ___ than her brother.', answer: 'smarter' },
+              { text: 'The river is ___ than the lake.', answer: 'wider' },
+              { text: 'My bag is ___ than yours.', answer: 'heavier' },
+              { text: 'This chair is ___ than the sofa.', answer: 'more comfortable' },
+              { text: 'He runs ___ than me.', answer: 'faster' },
+              { text: 'The food smells ___ today.', answer: 'better' }
+            ],
+            bank: ['strong','more strong','clean','smart','wide','heavy','comfortable','fast','good','small']
+          }
+        },
+        {
+          type: 'fillblank',
+          title: '✍️ Escribe la forma comparativa',
+          instruction: 'Completa cada espacio con el adjetivo comparativo correcto.',
+          dataA: [
+            { text: 'Cats are usually ___ (small) than dogs.', answer: ['smaller'] },
+            { text: 'This question is ___ (easy) than the last one.', answer: ['easier'] },
+            { text: 'My father is ___ (old) than my mother.', answer: ['older'] },
+            { text: 'The sun is ___ (bright) today than yesterday.', answer: ['brighter'] },
+            { text: 'Math is ___ (difficult) than art.', answer: ['more difficult'] },
+            { text: 'She feels ___ (good) after the medicine.', answer: ['better'] },
+            { text: 'This jacket is ___ (expensive) than that one.', answer: ['more expensive'] },
+            { text: 'He can swim ___ (fast) than me.', answer: ['faster'] }
+          ],
+          dataB: [
+            { text: 'A whale is ___ (big) than a dolphin.', answer: ['bigger'] },
+            { text: 'This puzzle is ___ (hard) than the last one.', answer: ['harder'] },
+            { text: 'My sister is ___ (young) than me.', answer: ['younger'] },
+            { text: 'The coffee is ___ (hot) than the tea.', answer: ['hotter'] },
+            { text: 'Her hair is ___ (long) than mine.', answer: ['longer'] },
+            { text: 'This movie is ___ (boring) than the book.', answer: ['more boring'] },
+            { text: 'He is ___ (bad) at singing than his brother.', answer: ['worse'] },
+            { text: 'The new phone is ___ (cheap) than the old model.', answer: ['cheaper'] }
+          ]
+        },
+        {
+          type: 'reorder_sentences',
+          title: '🔤 Ordena las palabras',
+          instruction: 'Forma la oración comparativa correcta. (Pista en español)',
+          dataA: [
+            { sentence: 'My car is faster than yours.', es: 'Mi coche es más rápido que el tuyo.' },
+            { sentence: 'She is smarter than him.', es: 'Ella es más lista que él.' },
+            { sentence: 'This book is more interesting than that one.', es: 'Este libro es más interesante que ese.' },
+            { sentence: 'He runs faster than me.', es: 'Él corre más rápido que yo.' },
+            { sentence: 'My house is bigger than yours.', es: 'Mi casa es más grande que la tuya.' },
+            { sentence: 'Summer is hotter than spring.', es: 'El verano es más caluroso que la primavera.' },
+            { sentence: 'The exam was easier than expected.', es: 'El examen fue más fácil de lo esperado.' },
+            { sentence: 'I feel better than yesterday.', es: 'Me siento mejor que ayer.' }
+          ],
+          dataB: [
+            { sentence: 'Dogs are friendlier than cats.', es: 'Los perros son más amigables que los gatos.' },
+            { sentence: 'This road is wider than that one.', es: 'Este camino es más ancho que ese.' },
+            { sentence: 'Gold is more valuable than silver.', es: 'El oro es más valioso que la plata.' },
+            { sentence: 'He is stronger than me.', es: 'Él es más fuerte que yo.' },
+            { sentence: 'This soup is tastier than the salad.', es: 'Esta sopa es más sabrosa que la ensalada.' },
+            { sentence: 'The city is more polluted than the village.', es: 'La ciudad está más contaminada que el pueblo.' },
+            { sentence: 'My brother is taller than my father.', es: 'Mi hermano es más alto que mi padre.' },
+            { sentence: 'She speaks English better than I do.', es: 'Ella habla inglés mejor que yo.' }
+          ]
+        },
+        {
+          type: 'spoterror',
+          title: '🔍 Encuentra el error',
+          instruction: 'Toca la palabra incorrecta y escribe la corrección.',
+          dataA: [
+            { words: ['This','car','is','more','fast','than','that','one.'], errorIndex: 3, fix: 'faster' },
+            { words: ['She','is','more','pretty','than','her','sister.'], errorIndex: 2, fix: 'prettier' },
+            { words: ['My','house','is','bigger','that','yours.'], errorIndex: 4, fix: 'than' },
+            { words: ['He','is','more','good','at','math','than','me.'], errorIndex: 2, fix: 'better' },
+            { words: ['This','test','is','more','easy','than','the','last.'], errorIndex: 3, fix: 'easier' },
+            { words: ['The','weather','is','more','hot','in','summer.'], errorIndex: 3, fix: 'hotter' },
+            { words: ['She','runs','more','fast','than','I','do.'], errorIndex: 2, fix: 'faster' },
+            { words: ['He','is','taller','then','his','brother.'], errorIndex: 3, fix: 'than' },
+            { words: ['This','book','is','more','interest','than','the','movie.'], errorIndex: 4, fix: 'interesting' }
+          ],
+          dataB: [
+            { words: ['Elephants','are','more','big','than','mice.'], errorIndex: 2, fix: 'bigger' },
+            { words: ['This','puzzle','is','more','hard','than','that','one.'], errorIndex: 3, fix: 'harder' },
+            { words: ['My','dad','is','more','old','than','my','mom.'], errorIndex: 3, fix: 'older' },
+            { words: ['She','is','more','bad','at','cooking','than','me.'], errorIndex: 2, fix: 'worse' },
+            { words: ['Gold','is','more','value','than','silver.'], errorIndex: 3, fix: 'valuable' },
+            { words: ['The','river','is','more','wide','than','the','lake.'], errorIndex: 3, fix: 'wider' },
+            { words: ['He','feels','more','good','today','than','yesterday.'], errorIndex: 2, fix: 'better' },
+            { words: ['This','bag','is','more','heavy','than','that','one.'], errorIndex: 3, fix: 'heavier' }
+          ]
+        },
+        {
+          type: 'dropdown',
+          title: '🔽 Escoge el comparativo',
+          instruction: 'Selecciona la forma comparativa adecuada en cada menú.',
+          dataA: [
+            { before:'My dog is', options:['bigger','more big','big'], answer:0, after:'than yours.' },
+            { before:'She is', options:['taller','more tall','tall'], answer:0, after:'than her friend.' },
+            { before:'This test was', options:['easier','more easy','easy'], answer:0, after:'than I thought.' },
+            { before:'He can run', options:['faster','more fast','fast'], answer:0, after:'than the coach.' },
+            { before:'This book is', options:['more interesting','interestinger','interesting'], answer:0, after:'than the movie.' },
+            { before:'I feel', options:['better','more good','good'], answer:0, after:'after sleeping.' },
+            { before:'Summer is', options:['hotter','more hot','hot'], answer:0, after:'than spring.' },
+            { before:'The car is', options:['more expensive','expensiver','expensive'], answer:0, after:'than the bike.' }
+          ],
+          dataB: [
+            { before:'An elephant is', options:['bigger','more big','big'], answer:0, after:'than a horse.' },
+            { before:'My brother is', options:['stronger','more strong','strong'], answer:0, after:'than me.' },
+            { before:'This puzzle is', options:['harder','more hard','hard'], answer:0, after:'than the last one.' },
+            { before:'She speaks English', options:['better','more well','good'], answer:0, after:'than I do.' },
+            { before:'The soup is', options:['more delicious','deliciouser','delicious'], answer:0, after:'than the salad.' },
+            { before:'The dress is', options:['prettier','more pretty','prettyer'], answer:0, after:'than the skirt.' },
+            { before:'He is', options:['smarter','more smart','smart'], answer:0, after:'than his sister.' },
+            { before:'The river is', options:['wider','more wide','wide'], answer:0, after:'than the stream.' }
+          ]
+        },
+        {
+          type: 'matchimage',
+          title: '🖼️ Une la imagen con el comparativo',
+          instruction: 'Arrastra cada palabra hasta la imagen que la representa.',
+          dataA: [
+            { word: 'Taller', image: 'files/taller.png' },
+            { word: 'Shorter', image: 'files/shorter.png' },
+            { word: 'Faster', image: 'files/faster.png' },
+            { word: 'Stronger', image: 'files/stronger.png' },
+            { word: 'Happier', image: 'files/happier.png' },
+            { word: 'More beautiful', image: 'files/more_beautiful.png' },
+            { word: 'Better', image: 'files/better.png' },
+            { word: 'More comfortable', image: 'files/more_comfortable.png' }
+          ],
+          dataB: [
+            { word: 'Heavier', image: 'files/heavier.png' },
+            { word: 'Lighter', image: 'files/lighter.png' },
+            { word: 'More difficult', image: 'files/more_difficult.png' },
+            { word: 'Easier', image: 'files/easier.png' },
+            { word: 'Cleaner', image: 'files/cleaner.png' },
+            { word: 'Dirtier', image: 'files/dirtier.png' },
+            { word: 'More intelligent', image: 'files/more_intelligent.png' },
+            { word: 'Worse', image: 'files/worse.png' }
+          ]
+        }
+      ],
+      
+      game: { 
+        type: 'hangman',
+        words: ['MEJOR','PEOR','MAYOR','MENOR','SUPERIOR','INFERIOR','ANTERIOR','POSTERIOR','EXTERIOR','INTERIOR']
+      }
+    });
+  </script>
+</body>
+</html>
