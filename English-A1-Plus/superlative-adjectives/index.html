@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Superlative Adjectives - Noveno, Primer Año, Segundo Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "Superlative Adjectives",
+  "level": "Noveno, Primer Año, Segundo Año",
+  "pdfDesign": "PopArt",
+  "colors": {
+    "primary": "#ACF781",
+    "accent": "#E1FF51",
+    "bg": "#FFF1F8",
+    "cardBg": "#FFFFFF",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "wordsearch",
+      "title": "Sopa de letras",
+      "instruction": "Instrucción: Encuentra las palabras",
+      "dataA": {
+        "words": [
+          "BEST",
+          "WORST",
+          "OLDEST",
+          "NEWEST",
+          "SHORTEST"
+        ],
+        "gridSize": 12
+      }
+    },
+    {
+      "type": "matchlines",
+      "title": "Unir con líneas",
+      "instruction": "Instrucción: une con una línea el adjetivo base y su superlativo. ",
+      "dataA": [
+        {
+          "left": "Bad",
+          "right": "Worst"
+        },
+        {
+          "left": "Good",
+          "right": "Best"
+        },
+        {
+          "left": "Small",
+          "right": "Smallest"
+        },
+        {
+          "left": "Black",
+          "right": "Blackest"
+        }
+      ]
+    },
+    {
+      "type": "reorder_letters",
+      "title": "Ordenar letras",
+      "instruction": "Instrucción: toca las letras una por una para ordenar la palabra correcta",
+      "dataA": [
+        {
+          "word": "HOTTEST",
+          "hint": "PISTA: 🔥"
+        },
+        {
+          "word": "COLDEST",
+          "hint": "PISTA: 🧊"
+        },
+        {
+          "word": "BIGGEST",
+          "hint": "PISTA: 🐘"
+        },
+        {
+          "word": "SMALLEST",
+          "hint": "PISTA: 🐜"
+        },
+        {
+          "word": "FASTEST",
+          "hint": "PISTA: 🏃‍♂️"
+        }
+      ]
+    },
+    {
+      "type": "categorize",
+      "title": "Categorizar",
+      "instruction": "Instrucción: Separa correctamente los siguientes adjetivos según su regla. ",
+      "dataA": {
+        "categories": [
+          "...EST",
+          "MOST..."
+        ],
+        "items": [
+          {
+            "text": "Tall",
+            "cat": 0
+          },
+          {
+            "text": "Pretty",
+            "cat": 0
+          },
+          {
+            "text": "Heavy",
+            "cat": 0
+          },
+          {
+            "text": "Beautiful",
+            "cat": 1
+          },
+          {
+            "text": "handsome",
+            "cat": 1
+          },
+          {
+            "text": "Expensive",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "fillblank",
+      "title": "Rellenar espacios",
+      "instruction": "Instrucción: Escribe el superlativo correcto para cada adjetivo.",
+      "dataA": [
+        {
+          "text": "Cool = ___",
+          "answer": [
+            "Coolest"
+          ]
+        },
+        {
+          "text": "Happy = ___",
+          "answer": [
+            "Happiest"
+          ]
+        },
+        {
+          "text": "Dark = ___",
+          "answer": [
+            "Darkest"
+          ]
+        },
+        {
+          "text": "Tiny = ___",
+          "answer": [
+            "Tiniest"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Unir con imagen",
+      "instruction": "Instrucción: Arrastra el superlativo a la imagen correcta.",
+      "dataA": [
+        {
+          "word": "SADDEST",
+          "image": "files/descarga-1-.jpeg"
+        },
+        {
+          "word": "SMARTEST",
+          "image": "files/descarga.png"
+        },
+        {
+          "word": "OLDEST",
+          "image": "files/descarga.jpeg"
+        },
+        {
+          "word": "MOST DANGEROUS",
+          "image": "files/images-26-.jpeg"
+        },
+        {
+          "word": "UGLIEST",
+          "image": "files/images-25-.jpeg"
+        },
+        {
+          "word": "HEAVIEST",
+          "image": "files/images-17-.jpeg"
+        },
+        {
+          "word": "CLEANEST",
+          "image": "files/images-21-.jpeg"
+        },
+        {
+          "word": "STRONGEST",
+          "image": "files/images-12-.jpeg"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "dino"
+  }
+});
+  </script>
+</body>
+</html>
