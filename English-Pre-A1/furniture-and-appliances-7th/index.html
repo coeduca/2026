@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>furniture and Appliances 7th - Séptimo</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "furniture and Appliances 7th",
+  "level": "Séptimo",
+  "pdfDesign": "PopArt",
+  "colors": {
+    "primary": "#B481F7",
+    "accent": "#A32AFF",
+    "bg": "#FFF1F8",
+    "cardBg": "#FFFFFF",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "wordsearch",
+      "title": "Sopa de letras",
+      "instruction": "Instrucción: Encuentra las 10 palabras en la sopa de letras.",
+      "dataA": {
+        "words": [
+          "SOFA",
+          "CHAIR",
+          "REFRIGERATOR",
+          "STOVE",
+          "TELEVISION",
+          "WARDROBE",
+          "DRESSER",
+          "BLENDER",
+          "MICROWAVE",
+          "BED"
+        ],
+        "gridSize": 12
+      }
+    },
+    {
+      "type": "matchlines",
+      "title": "Unir con líneas",
+      "instruction": "Instrucción: une con una línea la palabra y su traducción.",
+      "dataA": [
+        {
+          "left": "Wardrobe",
+          "right": "Ropero"
+        },
+        {
+          "left": "Vacuum Cleaner",
+          "right": "Aspiradora"
+        },
+        {
+          "left": "Dryer",
+          "right": "Secadora"
+        },
+        {
+          "left": "Iron",
+          "right": "Plancha"
+        },
+        {
+          "left": "Armchair",
+          "right": "Sillón"
+        },
+        {
+          "left": "Chair",
+          "right": "Silla"
+        },
+        {
+          "left": "Desk",
+          "right": "Escritorio"
+        },
+        {
+          "left": "Coffee table",
+          "right": "Mesa se café"
+        }
+      ]
+    },
+    {
+      "type": "dragbank",
+      "title": "Banco de palabras",
+      "instruction": "Instrucción: arrastra la palabra a su oración correcta para completarla. ",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "I keep my food in the ___",
+            "answer": "refrigerator"
+          },
+          {
+            "text": "I sit on a ___",
+            "answer": "chair"
+          },
+          {
+            "text": "I watch the news on a ___",
+            "answer": "television"
+          },
+          {
+            "text": "I sleep on a ___",
+            "answer": "bed"
+          },
+          {
+            "text": "I wash my clothes in the ___",
+            "answer": "washing machine"
+          }
+        ],
+        "bank": [
+          "iron",
+          "radio"
+        ]
+      }
+    },
+    {
+      "type": "reorder_sentences",
+      "title": "Ordenar oraciones",
+      "instruction": "Instrucción: ordena las siguientes oraciones de manera correcta.",
+      "dataA": [
+        {
+          "sentence": "there is one pillow"
+        },
+        {
+          "sentence": "there are two beds"
+        },
+        {
+          "sentence": "there is an armchair"
+        },
+        {
+          "sentence": "there are six chairs"
+        }
+      ]
+    },
+    {
+      "type": "emojiphrase",
+      "title": "Frase con emojis",
+      "instruction": "Instrucción: escribe el nombre de la habitación según los emojis. ",
+      "dataA": [
+        {
+          "emojis": "🛏️ 😴",
+          "accept": [
+            "bedroom"
+          ]
+        },
+        {
+          "emojis": "🥘 🍳",
+          "accept": [
+            "kitchen"
+          ]
+        },
+        {
+          "emojis": "🧻 🚽 ",
+          "accept": [
+            "bathroom"
+          ]
+        },
+        {
+          "emojis": "🌸 🌳 ",
+          "accept": [
+            "garden"
+          ]
+        },
+        {
+          "emojis": "🛻 🧰",
+          "accept": [
+            "garage"
+          ]
+        },
+        {
+          "emojis": "📺 🛋️",
+          "accept": [
+            "living room",
+            "livingroom"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "multiplechoice",
+      "title": "Opción múltiple",
+      "instruction": "Instrucción: selecciona la habitación correcta para completar cada oración.",
+      "dataA": [
+        {
+          "q": "We watch TV in the",
+          "options": [
+            "bathroom",
+            "living room",
+            "garden",
+            "yard"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "I cook pasta in the",
+          "options": [
+            "bedroom",
+            "garage",
+            "kitchen",
+            "attic"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "I keep my car in the ",
+          "options": [
+            "garage",
+            "kitchen",
+            "living room",
+            "dining room"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Flowers blossom in the ",
+          "options": [
+            "kitchen",
+            "bathroom",
+            "garden",
+            "basement"
+          ],
+          "answer": 2
+        }
+      ]
+    },
+    {
+      "type": "spoterror",
+      "title": "Encontrar el error",
+      "instruction": "Instrucción: selecciona la palabra que está escrita incorrectamente.",
+      "dataA": [
+        {
+          "words": [
+            "bed",
+            "talbe",
+            "chair"
+          ],
+          "errorIndex": 1,
+          "fix": "table"
+        },
+        {
+          "words": [
+            "oven",
+            "stobe",
+            "dryer"
+          ],
+          "errorIndex": 1,
+          "fix": "stove"
+        },
+        {
+          "words": [
+            "refrigereitor",
+            "wardrobe",
+            "microwave"
+          ],
+          "errorIndex": 0,
+          "fix": "refrigerator"
+        },
+        {
+          "words": [
+            "closet",
+            "blemder",
+            "bed"
+          ],
+          "errorIndex": 1,
+          "fix": "blender"
+        }
+      ]
+    },
+    {
+      "type": "reorder_letters",
+      "title": "Ordenar letras",
+      "instruction": "Instrucción: ordena las letras para formar la palabra correcta.",
+      "dataA": [
+        {
+          "word": "CHAIR",
+          "hint": "PISTA: 🪑"
+        },
+        {
+          "word": "BED",
+          "hint": "PISTA: 🛏️"
+        },
+        {
+          "word": "SOFA",
+          "hint": "PISTA: 🛋️"
+        },
+        {
+          "word": "TOASTER",
+          "hint": "PISTA: 🍞"
+        },
+        {
+          "word": "BOOKSHELF",
+          "hint": "PISTA: 📚"
+        }
+      ]
+    },
+    {
+      "type": "categorize",
+      "title": "Categorizar",
+      "instruction": "Instrucción: organiza las siguientes palabras en muebles (furniture) y electrodomésticos (appliances). ",
+      "dataA": {
+        "categories": [
+          "FURNITURE",
+          "APPLIANCES"
+        ],
+        "items": [
+          {
+            "text": "Desk",
+            "cat": 0
+          },
+          {
+            "text": "TV stand",
+            "cat": 0
+          },
+          {
+            "text": "Bookshelf",
+            "cat": 0
+          },
+          {
+            "text": "Armchair",
+            "cat": 0
+          },
+          {
+            "text": "Dishwasher",
+            "cat": 1
+          },
+          {
+            "text": "Coffee maker",
+            "cat": 1
+          },
+          {
+            "text": "Air conditioner",
+            "cat": 1
+          },
+          {
+            "text": "Blender",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "matchimage",
+      "title": "Unir con imagen",
+      "instruction": "Instrucción: arrastra la palabra a la imagen correcta.",
+      "dataA": [
+        {
+          "word": "dresser",
+          "image": "files/edited_1784554446828_pic_1784554081734.png"
+        },
+        {
+          "word": "desk",
+          "image": "files/edited_1784554436578_pic_1784554081734.png"
+        },
+        {
+          "word": "bookshelf",
+          "image": "files/edited_1784554429961_pic_1784554081734.png"
+        },
+        {
+          "word": "chair",
+          "image": "files/edited_1784554420239_pic_1784554081734.png"
+        },
+        {
+          "word": "coffee maker",
+          "image": "files/edited_1784554397827_pic_1784554141927.png"
+        },
+        {
+          "word": "refrigerator",
+          "image": "files/edited_1784554384142_pic_1784554141927.png"
+        },
+        {
+          "word": "microwave",
+          "image": "files/edited_1784554381524_pic_1784554141927.png"
+        },
+        {
+          "word": "stove",
+          "image": "files/edited_1784554376471_pic_1784554141927.png"
+        }
+      ]
+    },
+    {
+      "type": "wordselect",
+      "title": "Seleccionar palabras",
+      "instruction": "Instrucción: lee y selecciona las palabras clave que aparecen en el texto.",
+      "dataA": [
+        {
+          "text": "My house is small but nice. In the living room, there is a [sofa] and a [table]. In my bedroom, I have a [bed] and a [wardrobe]. I also have a [chair] in my study. I like my house because it is comfortable.",
+          "hint": "selecciona los 5 muebles."
+        },
+        {
+          "text": "My family has many appliances at home. In the kitchen, we use a [refrigerator], a [microwave], and a [blender]. We also have a [stove] to cook food. In the laundry room, there is a [washing machine]. These appliances make our daily life easier.",
+          "hint": "selecciona los 5 electrodomésticos."
+        }
+      ]
+    },
+    {
+      "type": "truefalse",
+      "title": "Verdadero o falso",
+      "instruction": "Instrucción: observa la imagen y selecciona verdadero o falso según los muebles o electrodomésticos que hay. ",
+      "image": "files/file_000000007a9081f7b7a2638e7ba8e5a6.jpg",
+      "dataA": [
+        {
+          "statement": "There is one blender",
+          "answer": true
+        },
+        {
+          "statement": "There is one refrigerator",
+          "answer": true
+        },
+        {
+          "statement": "There are two sofas",
+          "answer": false
+        },
+        {
+          "statement": "There is one washing machine",
+          "answer": false
+        },
+        {
+          "statement": "There are two chairs",
+          "answer": true
+        },
+        {
+          "statement": "There are three stoves",
+          "answer": false
+        }
+      ]
+    },
+    {
+      "type": "memory",
+      "title": "Memorama / Pareja",
+      "instruction": "Instrucción: revela cada tarjeta para formar parejas.",
+      "dataA": [
+        {
+          "left": "🛋️",
+          "right": "🛋️"
+        },
+        {
+          "left": "🪑",
+          "right": "🪑"
+        },
+        {
+          "left": "🛏️",
+          "right": "🛏️"
+        },
+        {
+          "left": "🛀 ",
+          "right": "🛀"
+        },
+        {
+          "left": "🚽 ",
+          "right": "🚽 "
+        },
+        {
+          "left": "🛖",
+          "right": "🛖"
+        }
+      ]
+    },
+    {
+      "type": "comicdialogue",
+      "title": "Diálogo de cómic / chat",
+      "instruction": "Instrucción: completa la conversación.",
+      "dataA": [
+        {
+          "title": "What's in there?",
+          "bubbles": [
+            {
+              "author": "A",
+              "blank": false,
+              "text": "I love your house"
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "What's in the kitchen?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "there is one refrigerator and one stove"
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "And what is in the living room?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "There are two sofas and one big TV"
+            }
+          ],
+          "bank": [
+            "I have plenty of cats",
+            "Nothing at all"
+          ]
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "dino"
+  }
+});
+  </script>
+</body>
+</html>
