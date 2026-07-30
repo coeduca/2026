@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Comparative and Superlative Adjectives - Primer Año, Segundo Año, Noveno</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "Comparative and Superlative Adjectives",
+  "level": "Primer Año, Segundo Año, Noveno",
+  "pdfDesign": "PopArt",
+  "uiTheme": "Skeuomorphic",
+  "colors": {
+    "primary": "#3999FC",
+    "accent": "#43ABB0",
+    "bg": "#619EC5",
+    "cardBg": "#FFFFFF",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "html": "\n<h2>Comparative and Superlative Adjectives</h2>\n\n<p><b>Comparative adjectives</b> se usan para comparar <b>dos</b> personas, animales, lugares o cosas.</p>\n\n<ul>\n<li>small → <b>smaller</b></li>\n<li>big → <b>bigger</b></li>\n<li>happy → <b>happier</b></li>\n<li>beautiful → <b>more beautiful</b></li>\n</ul>\n\n<p>Usamos <b>than</b> para hacer la comparación.</p>\n\n<p><b>Ejemplos:</b></p>\n<ul>\n<li>My car is faster <b>than</b> yours.</li>\n<li>Math is easier <b>than</b> Physics.</li>\n</ul>\n\n<hr>\n\n<p><b>Superlative adjectives</b> se usan para comparar <b>tres o más</b> elementos.</p>\n\n<ul>\n<li>small → <b>the smallest</b></li>\n<li>big → <b>the biggest</b></li>\n<li>happy → <b>the happiest</b></li>\n<li>beautiful → <b>the most beautiful</b></li>\n</ul>\n\n<p>Generalmente llevan <b>the</b>.</p>\n\n<p><b>Ejemplos:</b></p>\n<ul>\n<li>Mount Everest is <b>the highest</b> mountain.</li>\n<li>This is <b>the most interesting</b> book.</li>\n</ul>\n\n<h3>Recuerda</h3>\n\n<ul>\n<li>2 cosas → Comparative.</li>\n<li>3 o más → Superlative.</li>\n<li>Comparative + than.</li>\n<li>Superlative + the.</li>\n</ul>\n\n<p>Ahora completa los siguientes ocho ejercicios.</p>\n"
+    },
+    {
+      "type": "multiplechoice",
+      "title": "Choose the correct answer",
+      "instruction": "Select the correct comparative or superlative adjective.",
+      "dataA": [
+        {
+          "q": "A lion is ___ than a dog.",
+          "options": [
+            "stronger",
+            "strongest",
+            "more strong"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Mount Everest is the ___ mountain.",
+          "options": [
+            "higher",
+            "highest",
+            "high"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "My bike is ___ than yours.",
+          "options": [
+            "faster",
+            "fastest",
+            "more fastest"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "This is the ___ movie.",
+          "options": [
+            "funniest",
+            "funnier",
+            "funny"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Winter is ___ than summer.",
+          "options": [
+            "colder",
+            "coldest",
+            "most cold"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "She is the ___ student.",
+          "options": [
+            "smart",
+            "smarter",
+            "smartest"
+          ],
+          "answer": 2
+        }
+      ],
+      "dataB": [
+        {
+          "q": "A rabbit is ___ than a turtle.",
+          "options": [
+            "faster",
+            "fastest",
+            "most fast"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "This is the ___ building.",
+          "options": [
+            "tallest",
+            "taller",
+            "tall"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "English is ___ than Math for me.",
+          "options": [
+            "easier",
+            "easiest",
+            "easy"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Today is the ___ day of the week.",
+          "options": [
+            "hotter",
+            "hottest",
+            "hot"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "My sister is ___ than me.",
+          "options": [
+            "older",
+            "oldest",
+            "most old"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "The elephant is the ___ animal here.",
+          "options": [
+            "big",
+            "bigger",
+            "biggest"
+          ],
+          "answer": 2
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "Complete the sentence",
+      "dataA": [
+        {
+          "before": "My house is",
+          "options": [
+            "bigger",
+            "biggest",
+            "big"
+          ],
+          "answer": 0,
+          "after": "than yours."
+        },
+        {
+          "before": "This is",
+          "options": [
+            "the tallest",
+            "taller",
+            "tall"
+          ],
+          "answer": 0,
+          "after": "tree."
+        },
+        {
+          "before": "Cats are",
+          "options": [
+            "smaller",
+            "smallest",
+            "small"
+          ],
+          "answer": 0,
+          "after": "than lions."
+        },
+        {
+          "before": "She is",
+          "options": [
+            "the happiest",
+            "happier",
+            "happy"
+          ],
+          "answer": 0,
+          "after": "girl."
+        },
+        {
+          "before": "Today is",
+          "options": [
+            "hotter",
+            "the hottest",
+            "hot"
+          ],
+          "answer": 1,
+          "after": "day."
+        },
+        {
+          "before": "My brother is",
+          "options": [
+            "older",
+            "oldest",
+            "old"
+          ],
+          "answer": 0,
+          "after": "than me."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "This book is",
+          "options": [
+            "more interesting",
+            "most interesting",
+            "interesting"
+          ],
+          "answer": 0,
+          "after": "than that one."
+        },
+        {
+          "before": "He is",
+          "options": [
+            "the fastest",
+            "faster",
+            "fast"
+          ],
+          "answer": 0,
+          "after": "runner."
+        },
+        {
+          "before": "Winter is",
+          "options": [
+            "colder",
+            "coldest",
+            "cold"
+          ],
+          "answer": 0,
+          "after": "than spring."
+        },
+        {
+          "before": "This is",
+          "options": [
+            "the biggest",
+            "bigger",
+            "big"
+          ],
+          "answer": 0,
+          "after": "house."
+        },
+        {
+          "before": "My phone is",
+          "options": [
+            "newer",
+            "newest",
+            "new"
+          ],
+          "answer": 0,
+          "after": "than yours."
+        },
+        {
+          "before": "It is",
+          "options": [
+            "the most beautiful",
+            "more beautiful",
+            "beautiful"
+          ],
+          "answer": 0,
+          "after": "place."
+        }
+      ]
+    },
+    {
+      "type": "fillblank",
+      "title": "Write the missing adjective",
+      "dataA": [
+        {
+          "text": "A giraffe is (tall) ___ than a horse.",
+          "answer": [
+            "taller"
+          ]
+        },
+        {
+          "text": "My grandpa is the (old) ___ person in my family.",
+          "answer": [
+            "oldest"
+          ]
+        },
+        {
+          "text": "Ice is (cold) ___ than water.",
+          "answer": [
+            "colder"
+          ]
+        },
+        {
+          "text": "Today is the (hot) ___ day this week.",
+          "answer": [
+            "hottest"
+          ]
+        },
+        {
+          "text": "My bag is (heavy) ___ than yours.",
+          "answer": [
+            "heavier"
+          ]
+        },
+        {
+          "text": "This is the (best) ___ book.",
+          "answer": [
+            "best"
+          ]
+        }
+      ],
+      "dataB": [
+        {
+          "text": "A bike is (small) ___ than a bus.",
+          "answer": [
+            "smaller"
+          ]
+        },
+        {
+          "text": "The blue whale is the (large) ___ animal.",
+          "answer": [
+            "largest"
+          ]
+        },
+        {
+          "text": "English is (easy) ___ than Science.",
+          "answer": [
+            "easier"
+          ]
+        },
+        {
+          "text": "She is the (good) ___ singer.",
+          "answer": [
+            "best"
+          ]
+        },
+        {
+          "text": "My room is (clean) ___ than yours.",
+          "answer": [
+            "cleaner"
+          ]
+        },
+        {
+          "text": "It is the (beautiful) ___ city.",
+          "answer": [
+            "most beautiful"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Match the picture",
+      "image": "files/comparative_images.png",
+      "dataA": [
+        {
+          "word": "Bigger",
+          "image": "files/bigger.png"
+        },
+        {
+          "word": "Smaller",
+          "image": "files/smaller.png"
+        },
+        {
+          "word": "Taller",
+          "image": "files/taller.png"
+        },
+        {
+          "word": "Shorter",
+          "image": "files/shorter.png"
+        },
+        {
+          "word": "Faster",
+          "image": "files/faster.png"
+        },
+        {
+          "word": "The biggest",
+          "image": "files/biggest.png"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "Older",
+          "image": "files/older.png"
+        },
+        {
+          "word": "Younger",
+          "image": "files/younger.png"
+        },
+        {
+          "word": "Longer",
+          "image": "files/longer.png"
+        },
+        {
+          "word": "The tallest",
+          "image": "files/tallest.png"
+        },
+        {
+          "word": "The smallest",
+          "image": "files/smallest.png"
+        },
+        {
+          "word": "The fastest",
+          "image": "files/fastest.png"
+        }
+      ]
+    },
+    {
+      "type": "dragbank",
+      "title": "Listening",
+      "instruction": "Listen and drag the missing words.",
+      "audio": "files/comparatives_story.mp3",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "I live in a ___ town.",
+            "answer": "small"
+          },
+          {
+            "text": "It is ___ than the big city.",
+            "answer": "quieter"
+          },
+          {
+            "text": "My apartment is ___ than my parents house.",
+            "answer": "smaller"
+          },
+          {
+            "text": "Their house is the ___ house.",
+            "answer": "biggest"
+          },
+          {
+            "text": "My bedroom is the ___ comfortable place.",
+            "answer": "most"
+          }
+        ],
+        "bank": [
+          "small",
+          "quieter",
+          "smaller",
+          "biggest",
+          "most",
+          "older",
+          "faster"
+        ]
+      },
+      "dataB": {
+        "sentences": [
+          {
+            "text": "The town is ___ than the city.",
+            "answer": "quieter"
+          },
+          {
+            "text": "My apartment is ___ than theirs.",
+            "answer": "smaller"
+          },
+          {
+            "text": "Their home is the ___ one.",
+            "answer": "biggest"
+          },
+          {
+            "text": "My room is the ___ comfortable place.",
+            "answer": "most"
+          },
+          {
+            "text": "I live in a ___ town.",
+            "answer": "small"
+          }
+        ],
+        "bank": [
+          "small",
+          "quieter",
+          "smaller",
+          "biggest",
+          "most",
+          "better",
+          "longer"
+        ]
+      }
+    },
+    {
+      "type": "reorder_sentences",
+      "title": "Put the words in order",
+      "dataA": [
+        {
+          "sentence": "My dog is bigger than yours.",
+          "es": "Mi perro es más grande que el tuyo."
+        },
+        {
+          "sentence": "This is the tallest tree.",
+          "es": "Este es el árbol más alto."
+        },
+        {
+          "sentence": "English is easier than Math.",
+          "es": "Inglés es más fácil que Matemáticas."
+        },
+        {
+          "sentence": "She is the happiest girl.",
+          "es": "Ella es la niña más feliz."
+        },
+        {
+          "sentence": "Winter is colder than summer.",
+          "es": "El invierno es más frío que el verano."
+        },
+        {
+          "sentence": "My father is older than me.",
+          "es": "Mi padre es mayor que yo."
+        }
+      ],
+      "dataB": [
+        {
+          "sentence": "This book is more interesting than that one.",
+          "es": "Este libro es más interesante."
+        },
+        {
+          "sentence": "He is the fastest runner.",
+          "es": "Es el corredor más rápido."
+        },
+        {
+          "sentence": "My room is cleaner than yours.",
+          "es": "Mi habitación es más limpia."
+        },
+        {
+          "sentence": "Today is the hottest day.",
+          "es": "Hoy es el día más caluroso."
+        },
+        {
+          "sentence": "The elephant is the biggest animal.",
+          "es": "El elefante es el animal más grande."
+        },
+        {
+          "sentence": "Spring is warmer than winter.",
+          "es": "La primavera es más cálida."
+        }
+      ]
+    },
+    {
+      "type": "wordsearch",
+      "title": "Word Search",
+      "dataA": {
+        "words": [
+          "BIGGER",
+          "SMALLER",
+          "TALLER",
+          "FASTER",
+          "OLDER",
+          "BEST",
+          "BIGGEST",
+          "HAPPIEST"
+        ],
+        "gridSize": 14
+      },
+      "dataB": {
+        "words": [
+          "LONGER",
+          "SHORTER",
+          "YOUNGER",
+          "EASIER",
+          "HIGHEST",
+          "COLDEST",
+          "SMARTEST",
+          "BEAUTIFUL"
+        ],
+        "gridSize": 14
+      }
+    },
+    {
+      "type": "memory",
+      "title": "Memory Game",
+      "dataA": [
+        {
+          "left": "Bigger",
+          "right": "Más grande"
+        },
+        {
+          "left": "Smaller",
+          "right": "Más pequeño"
+        },
+        {
+          "left": "Taller",
+          "right": "Más alto"
+        },
+        {
+          "left": "Older",
+          "right": "Mayor"
+        },
+        {
+          "left": "Fastest",
+          "right": "Más rápido"
+        },
+        {
+          "left": "Best",
+          "right": "Mejor"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "Longest",
+          "right": "Más largo"
+        },
+        {
+          "left": "Shortest",
+          "right": "Más corto"
+        },
+        {
+          "left": "Youngest",
+          "right": "Más joven"
+        },
+        {
+          "left": "Coldest",
+          "right": "Más frío"
+        },
+        {
+          "left": "Happiest",
+          "right": "Más feliz"
+        },
+        {
+          "left": "Most beautiful",
+          "right": "El más hermoso"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "tictactoe"
+  }
+});
+  </script>
+</body>
+</html>
