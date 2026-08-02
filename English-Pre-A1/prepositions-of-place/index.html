@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Prepositions Of Place - Octavo, Séptimo</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "Prepositions Of Place",
+  "level": "Octavo, Séptimo",
+  "pdfDesign": "PopArt",
+  "uiTheme": "HollyHobbie",
+  "colors": {
+    "primary": "#81F0F7",
+    "accent": "#43A3B0",
+    "bg": "#FFF1F8",
+    "cardBg": "#FFFFFF",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Nota / texto libre",
+      "instruction": "Instrucción: ",
+      "image": "files/pixybay_20260723_191912.png",
+      "html": "<!-- Copiar desde aquí -->\n<div class=\"card-container\">\n  <p class=\"intro-text\">\n    Las <strong>preposiciones</strong> son palabras que usamos para indicar la posición de un objeto, por ejemplo:\n  </p>\n\n  <div class=\"example-box\">\n    <div class=\"example-item\">\n      <span class=\"lang-tag en\">EN</span>\n      <span class=\"sentence\">The book is in the box.</span>\n    </div>\n    <div class=\"example-item\">\n      <span class=\"lang-tag es\">ES</span>\n      <span class=\"sentence translation\">El libro está en la caja.</span>\n    </div>\n  </div>\n\n  <div class=\"prepositions-grid\">\n    <div class=\"prep-card\">\n      <span class=\"prep-badge\">In</span>\n      <span class=\"prep-meaning\">Adentro</span>\n    </div>\n    <div class=\"prep-card\">\n      <span class=\"prep-badge\">On</span>\n      <span class=\"prep-meaning\">Sobre / Encima</span>\n    </div>\n    <div class=\"prep-card\">\n      <span class=\"prep-badge\">Under</span>\n      <span class=\"prep-meaning\">Debajo</span>\n    </div>\n    <div class=\"prep-card\">\n      <span class=\"prep-badge\">Next to</span>\n      <span class=\"prep-meaning\">Al lado de</span>\n    </div>\n    <div class=\"prep-card\">\n      <span class=\"prep-badge\">Between</span>\n      <span class=\"prep-meaning\">En medio</span>\n    </div>\n  </div>\n</div>\n\n<style>\n  .card-container {\n    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n    max-width: 520px;\n    margin: 20px auto;\n    padding: 24px;\n    background: #ffffff;\n    border-radius: 16px;\n    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);\n    border: 1px solid #e2e8f0;\n    color: #1a202c;\n  }\n\n  .intro-text {\n    font-size: 1.05rem;\n    line-height: 1.5;\n    color: #4a5568;\n    margin-top: 0;\n    margin-bottom: 20px;\n  }\n\n  .intro-text strong {\n    color: #2b6cb0;\n  }\n\n  .example-box {\n    background-color: #f7fafc;\n    border-left: 4px solid #3182ce;\n    border-radius: 4px 12px 12px 4px;\n    padding: 14px 16px;\n    margin-bottom: 24px;\n  }\n\n  .example-item {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    margin-bottom: 6px;\n  }\n\n  .example-item:last-child {\n    margin-bottom: 0;\n  }\n\n  .lang-tag {\n    font-size: 0.7rem;\n    font-weight: 700;\n    padding: 2px 6px;\n    border-radius: 4px;\n    letter-spacing: 0.5px;\n  }\n\n  .lang-tag.en {\n    background-color: #ebf8ff;\n    color: #2b6cb0;\n  }\n\n  .lang-tag.es {\n    background-color: #feebc8;\n    color: #c05621;\n  }\n\n  .sentence {\n    font-size: 0.95rem;\n    font-weight: 500;\n    color: #2d3748;\n  }\n\n  .sentence.translation {\n    color: #718096;\n    font-style: italic;\n  }\n\n  .prepositions-grid {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n  }\n\n  .prep-card {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    padding: 10px 16px;\n    background-color: #ffffff;\n    border: 1px solid #edf2f7;\n    border-radius: 10px;\n    transition: transform 0.1s ease, border-color 0.1s ease;\n  }\n\n  .prep-card:hover {\n    border-color: #cbd5e0;\n    transform: translateY(-1px);\n  }\n\n  .prep-badge {\n    font-weight: 700;\n    color: #2b6cb0;\n    background-color: #ebf8ff;\n    padding: 4px 12px;\n    border-radius: 20px;\n    font-size: 0.9rem;\n  }\n\n  .prep-meaning {\n    color: #4a5568;\n    font-weight: 500;\n    font-size: 0.95rem;\n  }\n</style>\n<!-- Hasta aquí -->"
+    },
+    {
+      "type": "dragbank",
+      "title": "Banco de palabras",
+      "instruction": "Instrucción: arrastra la palabra correcta al espacio en blanco.",
+      "image": "files/pixybay_20260723_192721.png",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "There is one orange ___ the refrigerator.",
+            "answer": "in"
+          }
+        ],
+        "bank": [
+          "on",
+          "behind",
+          "below"
+        ]
+      }
+    },
+    {
+      "type": "dragbank",
+      "image": "files/pixybay_20260723_192734.png",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "There is one pot ___ the table.",
+            "answer": "on"
+          }
+        ],
+        "bank": [
+          "in",
+          "in front of",
+          "next to"
+        ]
+      }
+    },
+    {
+      "type": "dragbank",
+      "image": "files/pixybay_20260723_192727.png",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "There is one TV ___ the armchairs.",
+            "answer": "between"
+          }
+        ],
+        "bank": [
+          "in",
+          "on",
+          "behind"
+        ]
+      }
+    },
+    {
+      "type": "dragbank",
+      "image": "files/pixybay_20260723_192737.png",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "There is one picture ___ the window.",
+            "answer": "next to"
+          }
+        ],
+        "bank": [
+          "above",
+          "in front of",
+          "at"
+        ]
+      }
+    },
+    {
+      "type": "wordsearch",
+      "title": "Sopa de letras",
+      "instruction": "Instrucción: Encuentra las 4 palabras.",
+      "dataA": {
+        "words": [
+          "BETWEEN",
+          "BEHIND",
+          "ABOVE",
+          "BELOW"
+        ],
+        "gridSize": 12
+      }
+    },
+    {
+      "type": "wordselect",
+      "title": "Seleccionar palabras",
+      "instruction": "Instrucción: selecciona la preposición en cada oración.",
+      "dataA": [
+        {
+          "text": "There is one apple [on] the table."
+        },
+        {
+          "text": "There are two chairs [under] the table."
+        },
+        {
+          "text": "There are four glasses [in] the china cabinets."
+        },
+        {
+          "text": "There is one pillow [on] the bed."
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Unir con imagen",
+      "instruction": "Instrucción: arrastra la palabra a la imagen correcta.",
+      "dataA": [
+        {
+          "word": "Between",
+          "image": "files/edited_1784857906940_pixybay_20260723_194750.png"
+        },
+        {
+          "word": "In",
+          "image": "files/edited_1784857915799_pixybay_20260723_194758.png"
+        },
+        {
+          "word": "On",
+          "image": "files/edited_1784857926123_pixybay_20260723_194806.png"
+        },
+        {
+          "word": "Under",
+          "image": "files/edited_1784857935087_pixybay_20260723_194818.png"
+        },
+        {
+          "word": "Behind",
+          "image": "files/edited_1784857945545_pixybay_20260723_194827.png"
+        },
+        {
+          "word": "In front of",
+          "image": "files/edited_1784857958534_pixybay_20260723_194844.png"
+        },
+        {
+          "word": "Next to",
+          "image": "files/edited_1784857969645_pixybay_20260723_194853.png"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "dino",
+    "winScore": 500
+  }
+});
+  </script>
+</body>
+</html>
