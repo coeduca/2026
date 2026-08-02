@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>How many... are there? - Octavo, Séptimo</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "How many... are there?",
+  "level": "Octavo, Séptimo",
+  "pdfDesign": "Pastel",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#00D38E",
+    "accent": "#43B069",
+    "bg": "#B4F1D9",
+    "cardBg": "#B8F0A1",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Nota / texto libre",
+      "instruction": "Instrucción: ",
+      "html": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Lección: How Many</title>\n<style>\n  /* Contenedor principal de la tarjeta */\n  .grammar-card {\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    background-color: #f4fbf4; /* Fondo verde muy claro */\n    border-radius: 12px;\n    padding: 35px;\n    max-width: 650px;\n    margin: 40px auto;\n    color: #2d5a27; /* Texto verde oscuro */\n    box-shadow: 0 10px 25px rgba(76, 175, 80, 0.15);\n    border-top: 6px solid #4CAF50; /* Acento superior verde brillante */\n  }\n\n  .grammar-card h2 {\n    color: #1b4317;\n    text-align: center;\n    margin-top: 0;\n    font-size: 28px;\n    border-bottom: 2px solid #c8e6c9;\n    padding-bottom: 10px;\n    margin-bottom: 20px;\n  }\n\n  .grammar-card h3 {\n    color: #388e3c;\n    font-size: 20px;\n    margin-top: 30px;\n  }\n\n  .grammar-card p {\n    line-height: 1.6;\n    font-size: 16px;\n    color: #333;\n  }\n\n  /* Caja para los ejemplos */\n  .example-box {\n    background-color: #e8f5e9;\n    border-left: 5px solid #4CAF50;\n    padding: 15px 20px;\n    margin: 15px 0;\n    border-radius: 0 8px 8px 0;\n  }\n\n  .example-en {\n    font-weight: bold;\n    font-size: 18px;\n    color: #1b4317;\n  }\n\n  .example-es {\n    font-style: italic;\n    color: #558b50;\n    margin-top: 4px;\n    font-size: 15px;\n  }\n\n  .spacer {\n    margin-top: 15px;\n  }\n\n  /* Diseño de las tablas para las fórmulas */\n  .formula-table {\n    width: 100%;\n    border-collapse: collapse;\n    margin: 20px 0;\n    text-align: center;\n    border-radius: 8px;\n    overflow: hidden;\n    box-shadow: 0 4px 10px rgba(0,0,0,0.05);\n  }\n\n  .formula-table th {\n    background-color: #4CAF50;\n    color: white;\n    padding: 12px;\n    font-size: 14px;\n    text-transform: uppercase;\n    letter-spacing: 1px;\n  }\n\n  .formula-table td {\n    background-color: #ffffff;\n    padding: 15px 10px;\n    font-weight: 600;\n    color: #2d5a27;\n    border: 1px solid #c8e6c9;\n    font-size: 16px;\n  }\n\n  /* Estilo especial para los signos de \"más\" en la tabla */\n  .formula-table td.plus {\n    background-color: #f1f8f1;\n    color: #81c784;\n    width: 30px;\n    font-size: 20px;\n  }\n</style>\n</head>\n<body>\n\n  <div class=\"grammar-card\">\n    <h2>Uso de \"How Many\"</h2>\n    <p><strong>\"How Many\"</strong> es usado para preguntar la cantidad de objetos disponibles en una habitación o en un lugar específico.</p>\n\n    <div class=\"example-box\">\n      <div class=\"example-en\">How many chairs are there?</div>\n      <div class=\"example-es\">¿Cuántas sillas hay?</div>\n    </div>\n\n    <h3>Estructura de la pregunta</h3>\n    <table class=\"formula-table\">\n      <tr>\n        <th colspan=\"5\">Fórmula</th>\n      </tr>\n      <tr>\n        <td>How many</td>\n        <td class=\"plus\">+</td>\n        <td>Objects</td>\n        <td class=\"plus\">+</td>\n        <td>are there?</td>\n      </tr>\n    </table>\n\n    <h3>Estructura de la respuesta</h3>\n    <p>Para responder de forma correcta, utilizamos la siguiente estructura:</p>\n    \n    <table class=\"formula-table\">\n      <tr>\n        <th colspan=\"5\">Fórmula</th>\n      </tr>\n      <tr>\n        <td>There is / are</td>\n        <td class=\"plus\">+</td>\n        <td>Number</td>\n        <td class=\"plus\">+</td>\n        <td>Objects</td>\n      </tr>\n    </table>\n\n    <div class=\"example-box\">\n      <div class=\"example-en\">There is one chair.</div>\n      <div class=\"example-es\">Hay una silla.</div>\n      \n      <div class=\"spacer\"></div>\n      \n      <div class=\"example-en\">There are two chairs.</div>\n      <div class=\"example-es\">Hay dos sillas.</div>\n    </div>\n  </div>\n\n</body>\n</html>"
+    },
+    {
+      "type": "fillblank",
+      "instruction": "Instrucción: Observa la sala de Rigo y escribe la respuesta correcta para completar la conversación entre Rigo y Osiel.",
+      "image": "files/file_00000000ae88820d901e2fb549aec3ba.png",
+      "dataA": [
+        {
+          "text": "Osiel: How ___ pictures are there in your living room?",
+          "answer": [
+            "many"
+          ]
+        },
+        {
+          "text": "Rigo: I have ___ pictures in my living room.",
+          "answer": [
+            "six"
+          ]
+        },
+        {
+          "text": "Osiel:  There are ___ sofas too.",
+          "answer": [
+            "two"
+          ]
+        },
+        {
+          "text": "Rigo: Yes, I love to read books on my sofa. How many chairs ___ there in your house?",
+          "answer": [
+            "are"
+          ]
+        },
+        {
+          "text": "Osiel: There are many ___ in my house.",
+          "answer": [
+            "chairs"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "reorder_sentences",
+      "title": "Ordenar oraciones",
+      "instruction": "Instrucción: ",
+      "dataA": [
+        {
+          "sentence": "How many portraits are there?",
+          "es": "¿Cuantos retratos hay?"
+        },
+        {
+          "sentence": "There are five irons.",
+          "es": "Hay cinco planchas."
+        },
+        {
+          "sentence": "How mamy windows are there?",
+          "es": "¿Cuántas ventanas hay?"
+        },
+        {
+          "sentence": "Theres is only one.",
+          "es": "Solo hay una."
+        },
+        {
+          "sentence": "How many glasses are there?",
+          "es": "¿Cuantos vasos hay?"
+        },
+        {
+          "sentence": "There are four chairs.",
+          "es": "Hay cuatro sillas."
+        }
+      ]
+    },
+    {
+      "type": "comicdialogue",
+      "title": "Diálogo de cómic / chat",
+      "instruction": "Instrucción: Escucha el audio y arrastra las frases para completar la conversación.",
+      "audio": "files/elevenlabs_2026-08-02t18_45_03_sadie---calm-gritty-expressive_pvc_sp100_s50_sb75_v3.mp3",
+      "dataA": [
+        {
+          "bubbles": [
+            {
+              "author": "A",
+              "blank": true,
+              "answer": "How many apples are there in the fridge?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "There are seven apples."
+            },
+            {
+              "author": "A",
+              "blank": true,
+              "answer": "and how many bananas are there?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "There is only one banana."
+            }
+          ],
+          "bank": [
+            "There are seven bananas.",
+            "There ia only one apple."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "emojiphrase",
+      "title": "Frase con emojis",
+      "instruction": "Instrucción: escribe el nombre de cada fruta en inglés.",
+      "dataA": [
+        {
+          "emojis": "🍏",
+          "accept": [
+            "apple"
+          ]
+        },
+        {
+          "emojis": "🍌",
+          "accept": [
+            "banana"
+          ]
+        },
+        {
+          "emojis": "🍐",
+          "accept": [
+            "pear"
+          ]
+        },
+        {
+          "emojis": "🍋",
+          "accept": [
+            "lemon"
+          ]
+        },
+        {
+          "emojis": "🥭",
+          "accept": [
+            "mango"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "matchlines",
+      "title": "Unir con líneas",
+      "instruction": "Instrucción: une con una línea las oraciones.",
+      "dataA": [
+        {
+          "left": "There are many apples",
+          "right": "in the fridge."
+        },
+        {
+          "left": "How many blenders are there",
+          "right": "in the kitchen?"
+        },
+        {
+          "left": "There is one TV",
+          "right": "on the TVstand."
+        },
+        {
+          "left": "How many mirrors are",
+          "right": "there in the bathroom?"
+        },
+        {
+          "left": "There are many plants",
+          "right": "in the garden."
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "trivia",
+    "questions": [
+      {
+        "q": "¿Cuanto es 3x3?",
+        "options": [
+          "12",
+          "6",
+          "9",
+          "0"
+        ],
+        "answer": 2
+      },
+      {
+        "q": "¿Cuál es la capital de Estados Unidos?",
+        "options": [
+          "Washington",
+          "New York",
+          "Texas",
+          "California"
+        ],
+        "answer": 0
+      },
+      {
+        "q": "¿Cual de los siguientes animales marinos es un mamífero? ",
+        "options": [
+          "Pulpo",
+          "Calamar",
+          "Ballena",
+          "Medusa"
+        ],
+        "answer": 2
+      },
+      {
+        "q": "¿Cual es el planeta más grande del sistema solar?",
+        "options": [
+          "Marte",
+          "Venus",
+          "La Tierra",
+          "Jupiter"
+        ],
+        "answer": 3
+      },
+      {
+        "q": "¿En qué país se encuentra la Torre Eiffel?",
+        "options": [
+          "Italia",
+          "Francia",
+          "Inglaterra",
+          "Dinamarca"
+        ],
+        "answer": 1
+      },
+      {
+        "q": "¿Cuál es el océano más grande del mundo?",
+        "options": [
+          "Atlántico",
+          "Pacífico",
+          "Indico",
+          "Ártico"
+        ],
+        "answer": 1
+      },
+      {
+        "q": "¿Qué instrumentos se utiliza para medir la temperatura?",
+        "options": [
+          "Nanómetro",
+          "Cronómetro",
+          "Termómetro",
+          "Metrónomo"
+        ],
+        "answer": 2
+      },
+      {
+        "q": "¿Cuál es el país más grande del mundo?",
+        "options": [
+          "Rusia",
+          "China",
+          "India",
+          "Estados Unidos"
+        ],
+        "answer": 0
+      },
+      {
+        "q": "¿Cuantos lados tiene un exagono?",
+        "options": [
+          "16",
+          "12",
+          "8",
+          "6"
+        ],
+        "answer": 3
+      },
+      {
+        "q": "¿Cuál es el idioma más hablado del mundo?",
+        "options": [
+          "Español",
+          "Chino mandarin",
+          "Inglés",
+          "Esperanto"
+        ],
+        "answer": 1
+      }
+    ]
+  }
+});
+  </script>
+</body>
+</html>
