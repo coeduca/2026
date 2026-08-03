@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Movie &amp; Book Genres and Key Vocabulary - Noveno, Primer Año, Segundo Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "Movie & Book Genres and Key Vocabulary",
+  "level": "Noveno, Primer Año, Segundo Año",
+  "pdfDesign": "Pastel",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#8C81F7",
+    "accent": "#4743B0",
+    "bg": "#FFF1F8",
+    "cardBg": "#B39FCD",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Movie and Book Genres",
+      "html": "<h2>Movie & Book Genres and Key Vocabulary</h2><p>Los <strong>genres</strong> son categorías que permiten clasificar películas y libros según sus historias, personajes y características.</p><h3>Genres</h3><p><strong>Sci-fi:</strong> ciencia ficción; presenta tecnología avanzada, viajes espaciales o mundos futuros.</p><p><strong>Thriller:</strong> suspenso; mantiene al público en tensión mediante peligros, secretos o misterios.</p><p><strong>Horror:</strong> terror; busca provocar miedo mediante criaturas, situaciones sobrenaturales o amenazas.</p><p><strong>Comedy:</strong> comedia; presenta situaciones divertidas y busca hacer reír.</p><p><strong>Fantasy:</strong> fantasía; incluye magia, criaturas imaginarias y mundos extraordinarios.</p><p><strong>Western:</strong> género del viejo oeste; suele incluir vaqueros, caballos, pueblos pequeños y duelos.</p><p><strong>Documentary:</strong> documental; presenta información sobre hechos, personas o situaciones reales.</p><h3>Key Vocabulary</h3><p><strong>Director:</strong> persona que dirige la producción de una película.</p><p><strong>Cast:</strong> grupo de actores y actrices que participa en una película.</p><p><strong>Plot:</strong> trama o conjunto de acontecimientos principales de una historia.</p><p><strong>Setting:</strong> lugar y época en que ocurre una historia.</p><p><strong>Dubbed:</strong> doblada; las voces originales son reemplazadas por voces en otro idioma.</p><p><strong>Subtitles:</strong> subtítulos; texto que aparece en la pantalla para traducir o representar los diálogos.</p><p><strong>Protagonist:</strong> personaje principal de una historia.</p><p><strong>Author:</strong> persona que escribe un libro o una historia.</p><h3>Examples</h3><p><em>This sci-fi movie has an interesting plot and a talented cast.</em></p><p><em>The protagonist travels through a magical fantasy world.</em></p><p><em>I prefer movies with subtitles because I can hear the original cast.</em></p>"
+    },
+    {
+      "type": "multiplechoice",
+      "title": "Choose the Correct Word",
+      "instruction": "Selecciona la palabra que completa correctamente cada oración.",
+      "dataA": [
+        {
+          "q": "A movie about spaceships and life on other planets is usually ___.",
+          "options": [
+            "sci-fi",
+            "western",
+            "comedy",
+            "documentary"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "The group of actors in a movie is called the ___.",
+          "options": [
+            "setting",
+            "cast",
+            "plot",
+            "author"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "A story with magic, dragons and imaginary kingdoms is ___.",
+          "options": [
+            "thriller",
+            "documentary",
+            "fantasy",
+            "western"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "The person who controls the artistic production of a movie is the ___.",
+          "options": [
+            "protagonist",
+            "author",
+            "cast",
+            "director"
+          ],
+          "answer": 3
+        },
+        {
+          "q": "A movie designed to make the audience laugh is a ___.",
+          "options": [
+            "comedy",
+            "horror",
+            "thriller",
+            "sci-fi"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "The sequence of events in a story is its ___.",
+          "options": [
+            "cast",
+            "plot",
+            "subtitles",
+            "director"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "A movie that presents real information is a ___.",
+          "options": [
+            "western",
+            "fantasy",
+            "documentary",
+            "horror"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "The principal character in a story is the ___.",
+          "options": [
+            "setting",
+            "director",
+            "author",
+            "protagonist"
+          ],
+          "answer": 3
+        }
+      ],
+      "dataB": [
+        {
+          "q": "A film that creates fear and includes frightening events is ___.",
+          "options": [
+            "horror",
+            "comedy",
+            "documentary",
+            "western"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "The person who writes a novel is its ___.",
+          "options": [
+            "cast",
+            "author",
+            "director",
+            "protagonist"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "A tense story involving danger, mysteries and unexpected events is a ___.",
+          "options": [
+            "fantasy",
+            "comedy",
+            "thriller",
+            "documentary"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "The place and historical period of a story form its ___.",
+          "options": [
+            "plot",
+            "cast",
+            "subtitles",
+            "setting"
+          ],
+          "answer": 3
+        },
+        {
+          "q": "A movie with cowboys and towns in the old American frontier is a ___.",
+          "options": [
+            "western",
+            "sci-fi",
+            "horror",
+            "fantasy"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "When the original voices are replaced in another language, the movie is ___.",
+          "options": [
+            "written",
+            "dubbed",
+            "directed",
+            "published"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Words displayed at the bottom of a screen are called ___.",
+          "options": [
+            "plots",
+            "settings",
+            "subtitles",
+            "genres"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "The people who perform the characters in a film belong to the ___.",
+          "options": [
+            "plot",
+            "setting",
+            "genre",
+            "cast"
+          ],
+          "answer": 3
+        }
+      ]
+    },
+    {
+      "type": "matchlines",
+      "title": "Match the Vocabulary",
+      "instruction": "Relaciona cada término con su significado correcto.",
+      "dataA": [
+        {
+          "left": "Sci-fi",
+          "right": "A genre about futuristic science and technology"
+        },
+        {
+          "left": "Plot",
+          "right": "The main events that form a story"
+        },
+        {
+          "left": "Cast",
+          "right": "The actors and actresses in a production"
+        },
+        {
+          "left": "Subtitles",
+          "right": "Written dialogue displayed on the screen"
+        },
+        {
+          "left": "Protagonist",
+          "right": "The main character in a story"
+        },
+        {
+          "left": "Documentary",
+          "right": "A production based on real information"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "Fantasy",
+          "right": "A genre containing magic and imaginary worlds"
+        },
+        {
+          "left": "Director",
+          "right": "The person who guides the creation of a movie"
+        },
+        {
+          "left": "Setting",
+          "right": "The time and place where a story happens"
+        },
+        {
+          "left": "Dubbed",
+          "right": "Presented with replacement voices in another language"
+        },
+        {
+          "left": "Author",
+          "right": "The person who writes a book"
+        },
+        {
+          "left": "Thriller",
+          "right": "A genre based on tension, danger and suspense"
+        }
+      ]
+    },
+    {
+      "type": "categorize",
+      "title": "Genres or Production Vocabulary?",
+      "instruction": "Clasifica cada palabra en la categoría correcta.",
+      "dataA": {
+        "categories": [
+          "Genre",
+          "Movie or Book Vocabulary"
+        ],
+        "items": [
+          {
+            "text": "Comedy",
+            "cat": 0
+          },
+          {
+            "text": "Horror",
+            "cat": 0
+          },
+          {
+            "text": "Western",
+            "cat": 0
+          },
+          {
+            "text": "Documentary",
+            "cat": 0
+          },
+          {
+            "text": "Thriller",
+            "cat": 0
+          },
+          {
+            "text": "Director",
+            "cat": 1
+          },
+          {
+            "text": "Plot",
+            "cat": 1
+          },
+          {
+            "text": "Cast",
+            "cat": 1
+          },
+          {
+            "text": "Author",
+            "cat": 1
+          },
+          {
+            "text": "Setting",
+            "cat": 1
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "Genre",
+          "Movie or Book Vocabulary"
+        ],
+        "items": [
+          {
+            "text": "Sci-fi",
+            "cat": 0
+          },
+          {
+            "text": "Fantasy",
+            "cat": 0
+          },
+          {
+            "text": "Adventure comedy",
+            "cat": 0
+          },
+          {
+            "text": "Historical documentary",
+            "cat": 0
+          },
+          {
+            "text": "Psychological thriller",
+            "cat": 0
+          },
+          {
+            "text": "Protagonist",
+            "cat": 1
+          },
+          {
+            "text": "Subtitles",
+            "cat": 1
+          },
+          {
+            "text": "Dubbed",
+            "cat": 1
+          },
+          {
+            "text": "Supporting cast",
+            "cat": 1
+          },
+          {
+            "text": "Film director",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "dragbank",
+      "title": "Complete the Reviews",
+      "instruction": "Arrastra la palabra correcta para completar cada oración.",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "The ___ takes place on a distant planet in the year 2500.",
+            "answer": "setting"
+          },
+          {
+            "text": "The ___ includes several famous actors.",
+            "answer": "cast"
+          },
+          {
+            "text": "The movie is a ___ because it contains spaceships and robots.",
+            "answer": "sci-fi"
+          },
+          {
+            "text": "The ___ discovers the secret at the end of the story.",
+            "answer": "protagonist"
+          },
+          {
+            "text": "The unexpected ___ makes the movie exciting.",
+            "answer": "plot"
+          },
+          {
+            "text": "The film was ___ into Spanish for local audiences.",
+            "answer": "dubbed"
+          },
+          {
+            "text": "The ___ used special effects to create the futuristic city.",
+            "answer": "director"
+          },
+          {
+            "text": "The ___ wrote the original novel in 1998.",
+            "answer": "author"
+          }
+        ],
+        "bank": [
+          "subtitles",
+          "western"
+        ]
+      },
+      "dataB": {
+        "sentences": [
+          {
+            "text": "The movie has Spanish ___ at the bottom of the screen.",
+            "answer": "subtitles"
+          },
+          {
+            "text": "The story is a ___ because a detective faces constant danger.",
+            "answer": "thriller"
+          },
+          {
+            "text": "The magical creatures make this book a ___.",
+            "answer": "fantasy"
+          },
+          {
+            "text": "The film is a ___ about the life of a famous scientist.",
+            "answer": "documentary"
+          },
+          {
+            "text": "The frightening house makes the movie a ___.",
+            "answer": "horror"
+          },
+          {
+            "text": "The funny dialogue makes this film a ___.",
+            "answer": "comedy"
+          },
+          {
+            "text": "The cowboys and desert town identify the film as a ___.",
+            "answer": "western"
+          },
+          {
+            "text": "The story has an unusual ___ in nineteenth-century London.",
+            "answer": "setting"
+          }
+        ],
+        "bank": [
+          "cast",
+          "director"
+        ]
+      }
+    },
+    {
+      "type": "truefalse",
+      "title": "True or False",
+      "instruction": "Lee cada afirmación y determina si es verdadera o falsa.",
+      "dataA": [
+        {
+          "statement": "A documentary normally presents information about real people or events.",
+          "answer": true
+        },
+        {
+          "statement": "The cast is the place where a story happens.",
+          "answer": false
+        },
+        {
+          "statement": "A protagonist is usually the main character of a story.",
+          "answer": true
+        },
+        {
+          "statement": "A western commonly includes spaceships and alien civilizations.",
+          "answer": false
+        },
+        {
+          "statement": "Subtitles allow viewers to read the dialogue on the screen.",
+          "answer": true
+        },
+        {
+          "statement": "The plot refers to the main events of a story.",
+          "answer": true
+        },
+        {
+          "statement": "A comedy is primarily created to frighten the audience.",
+          "answer": false
+        },
+        {
+          "statement": "A director helps guide the creation of a film.",
+          "answer": true
+        }
+      ],
+      "dataB": [
+        {
+          "statement": "Fantasy stories may include magic and imaginary creatures.",
+          "answer": true
+        },
+        {
+          "statement": "The author is always the actor who plays the main character.",
+          "answer": false
+        },
+        {
+          "statement": "A dubbed movie uses voices recorded in another language.",
+          "answer": true
+        },
+        {
+          "statement": "A thriller usually avoids tension, danger and mystery.",
+          "answer": false
+        },
+        {
+          "statement": "The setting includes the time and location of a story.",
+          "answer": true
+        },
+        {
+          "statement": "Sci-fi stories can explore futuristic inventions and space travel.",
+          "answer": true
+        },
+        {
+          "statement": "The cast is composed only of the people who wrote the script.",
+          "answer": false
+        },
+        {
+          "statement": "Horror stories are generally intended to create fear or uneasiness.",
+          "answer": true
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Unir con imagen",
+      "instruction": "Instrucción: Coloca el género correcto a cada película.",
+      "dataA": [
+        {
+          "word": "Thriller",
+          "image": "files/images-17-.jpeg"
+        },
+        {
+          "word": "Sci-fi",
+          "image": "files/images-18-.jpeg"
+        },
+        {
+          "word": "Comedy",
+          "image": "files/images-19-.jpeg"
+        },
+        {
+          "word": "Fantasy",
+          "image": "files/images-20-.jpeg"
+        },
+        {
+          "word": "Western",
+          "image": "files/images-21-.jpeg"
+        },
+        {
+          "word": "Documentary",
+          "image": "files/images-22-.jpeg"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "tictactoe"
+  }
+});
+  </script>
+</body>
+</html>
