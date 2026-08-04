@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Past Participles: Regular &amp; Irregular - Noveno, Primer Año, Segundo Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "Past Participles: Regular & Irregular",
+  "level": "Noveno, Primer Año, Segundo Año",
+  "pdfDesign": "HollyHobbie",
+  "uiTheme": "HollyHobbie",
+  "colors": {
+    "primary": "#CB81F7",
+    "accent": "#FF7AFE",
+    "bg": "#FFF1F8",
+    "cardBg": "#F2B9B9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Past Participles: Regular & Irregular",
+      "html": "<div style=\"font-family: Georgia, serif; background: linear-gradient(135deg, #FFF1F8, #F2E1FA); border: 2px dashed #CB81F7; border-radius: 16px; padding: 20px; color: #1A1A1A;\"><h2 style=\"color:#8B3FC9; text-align:center; margin-top:0;\">✨ El Past Participle ✨</h2><p style=\"text-align:center; font-size:15px;\">El <b>past participle</b> (participio pasado) es la tercera forma del verbo. Se usa con <b>have/has</b> (Present Perfect) y en la voz pasiva.</p><table style=\"width:100%; border-collapse:collapse; margin:12px 0; box-shadow:0 2px 6px rgba(203,129,247,0.3);\"><tr style=\"background:#CB81F7; color:white;\"><th style=\"padding:8px; border:1px solid #FF7AFE;\">Tipo</th><th style=\"padding:8px; border:1px solid #FF7AFE;\">Regla</th><th style=\"padding:8px; border:1px solid #FF7AFE;\">Ejemplo</th></tr><tr style=\"background:#FFF1F8;\"><td style=\"padding:8px; border:1px solid #F2B9B9;\">Regulares</td><td style=\"padding:8px; border:1px solid #F2B9B9;\">Verbo + <b>-ed</b> (igual que Past Simple)</td><td style=\"padding:8px; border:1px solid #F2B9B9;\">walk → walked → walked</td></tr><tr style=\"background:#F2E1FA;\"><td style=\"padding:8px; border:1px solid #F2B9B9;\">Grupo AAA</td><td style=\"padding:8px; border:1px solid #F2B9B9;\">No cambia (base = pasado = participio)</td><td style=\"padding:8px; border:1px solid #F2B9B9;\">cut → cut → cut</td></tr><tr style=\"background:#FFF1F8;\"><td style=\"padding:8px; border:1px solid #F2B9B9;\">Grupo ABB</td><td style=\"padding:8px; border:1px solid #F2B9B9;\">Pasado = Participio (col. 2 = col. 3)</td><td style=\"padding:8px; border:1px solid #F2B9B9;\">buy → bought → bought</td></tr><tr style=\"background:#F2E1FA;\"><td style=\"padding:8px; border:1px solid #F2B9B9;\">Grupo ABC</td><td style=\"padding:8px; border:1px solid #F2B9B9;\">Las tres formas son distintas</td><td style=\"padding:8px; border:1px solid #F2B9B9;\">go → went → gone</td></tr></table><p style=\"text-align:center; background:#CB81F7; color:white; border-radius:10px; padding:8px; font-weight:bold;\">💜 Recuerda: have/has + Past Participle = Present Perfect</p></div>"
+    },
+    {
+      "type": "categorize",
+      "title": "Clasifica los verbos",
+      "instruction": "Arrastra cada verbo al grupo correcto: AAA (no cambia), ABB (col.2=col.3) o ABC (todas distintas).",
+      "dataA": {
+        "categories": [
+          "Group AAA (no change)",
+          "Group ABB",
+          "Group ABC"
+        ],
+        "items": [
+          {
+            "text": "cut",
+            "cat": 0
+          },
+          {
+            "text": "put",
+            "cat": 0
+          },
+          {
+            "text": "buy",
+            "cat": 1
+          },
+          {
+            "text": "teach",
+            "cat": 1
+          },
+          {
+            "text": "sell",
+            "cat": 1
+          },
+          {
+            "text": "go",
+            "cat": 2
+          },
+          {
+            "text": "see",
+            "cat": 2
+          },
+          {
+            "text": "eat",
+            "cat": 2
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "Group AAA (no change)",
+          "Group ABB",
+          "Group ABC"
+        ],
+        "items": [
+          {
+            "text": "hit",
+            "cat": 0
+          },
+          {
+            "text": "let",
+            "cat": 0
+          },
+          {
+            "text": "catch",
+            "cat": 1
+          },
+          {
+            "text": "think",
+            "cat": 1
+          },
+          {
+            "text": "find",
+            "cat": 1
+          },
+          {
+            "text": "do",
+            "cat": 2
+          },
+          {
+            "text": "write",
+            "cat": 2
+          },
+          {
+            "text": "speak",
+            "cat": 2
+          }
+        ]
+      }
+    },
+    {
+      "type": "matchlines",
+      "title": "Une el verbo con su Past Participle",
+      "instruction": "Une cada verbo base con su participio pasado correcto.",
+      "dataA": [
+        {
+          "left": "go",
+          "right": "gone"
+        },
+        {
+          "left": "buy",
+          "right": "bought"
+        },
+        {
+          "left": "cut",
+          "right": "cut"
+        },
+        {
+          "left": "eat",
+          "right": "eaten"
+        },
+        {
+          "left": "sell",
+          "right": "sold"
+        },
+        {
+          "left": "write",
+          "right": "written"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "do",
+          "right": "done"
+        },
+        {
+          "left": "make",
+          "right": "made"
+        },
+        {
+          "left": "put",
+          "right": "put"
+        },
+        {
+          "left": "see",
+          "right": "seen"
+        },
+        {
+          "left": "teach",
+          "right": "taught"
+        },
+        {
+          "left": "speak",
+          "right": "spoken"
+        }
+      ]
+    },
+    {
+      "type": "fillblank",
+      "title": "Completa con el Past Participle",
+      "instruction": "Escribe el past participle correcto del verbo entre paréntesis.",
+      "dataA": [
+        {
+          "text": "She has ___ (eat) breakfast already.",
+          "answer": [
+            "eaten"
+          ]
+        },
+        {
+          "text": "They have ___ (go) to the park.",
+          "answer": [
+            "gone"
+          ]
+        },
+        {
+          "text": "He has ___ (write) three letters.",
+          "answer": [
+            "written"
+          ]
+        },
+        {
+          "text": "We have ___ (cut) the paper.",
+          "answer": [
+            "cut"
+          ]
+        },
+        {
+          "text": "I have ___ (buy) a new bike.",
+          "answer": [
+            "bought"
+          ]
+        },
+        {
+          "text": "She has ___ (see) that movie.",
+          "answer": [
+            "seen"
+          ]
+        },
+        {
+          "text": "They have ___ (sell) their car.",
+          "answer": [
+            "sold"
+          ]
+        }
+      ],
+      "dataB": [
+        {
+          "text": "He has ___ (do) his homework.",
+          "answer": [
+            "done"
+          ]
+        },
+        {
+          "text": "We have ___ (make) a cake.",
+          "answer": [
+            "made"
+          ]
+        },
+        {
+          "text": "She has ___ (put) the books away.",
+          "answer": [
+            "put"
+          ]
+        },
+        {
+          "text": "They have ___ (speak) to the teacher.",
+          "answer": [
+            "spoken"
+          ]
+        },
+        {
+          "text": "I have ___ (catch) a cold.",
+          "answer": [
+            "caught"
+          ]
+        },
+        {
+          "text": "He has ___ (break) the window.",
+          "answer": [
+            "broken"
+          ]
+        },
+        {
+          "text": "We have ___ (find) the keys.",
+          "answer": [
+            "found"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "Elige el Past Participle correcto",
+      "instruction": "Selecciona la opción correcta para completar la oración.",
+      "dataA": [
+        {
+          "before": "She has already",
+          "options": [
+            "eat",
+            "ate",
+            "eaten"
+          ],
+          "answer": 2,
+          "after": "lunch."
+        },
+        {
+          "before": "They have",
+          "options": [
+            "went",
+            "go",
+            "gone"
+          ],
+          "answer": 2,
+          "after": "home."
+        },
+        {
+          "before": "He has",
+          "options": [
+            "wrote",
+            "write",
+            "written"
+          ],
+          "answer": 2,
+          "after": "a letter."
+        },
+        {
+          "before": "We have",
+          "options": [
+            "cut",
+            "cutted",
+            "cutting"
+          ],
+          "answer": 0,
+          "after": "the grass."
+        },
+        {
+          "before": "I have",
+          "options": [
+            "buyed",
+            "bought",
+            "buy"
+          ],
+          "answer": 1,
+          "after": "a car."
+        },
+        {
+          "before": "She has",
+          "options": [
+            "saw",
+            "see",
+            "seen"
+          ],
+          "answer": 2,
+          "after": "the film."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "He has",
+          "options": [
+            "done",
+            "did",
+            "do"
+          ],
+          "answer": 0,
+          "after": "the dishes."
+        },
+        {
+          "before": "They have",
+          "options": [
+            "maked",
+            "made",
+            "make"
+          ],
+          "answer": 1,
+          "after": "dinner."
+        },
+        {
+          "before": "She has",
+          "options": [
+            "putted",
+            "put",
+            "puts"
+          ],
+          "answer": 1,
+          "after": "the vase on the table."
+        },
+        {
+          "before": "We have",
+          "options": [
+            "spoke",
+            "speak",
+            "spoken"
+          ],
+          "answer": 2,
+          "after": "to the manager."
+        },
+        {
+          "before": "I have",
+          "options": [
+            "catched",
+            "caught",
+            "catch"
+          ],
+          "answer": 1,
+          "after": "the ball."
+        },
+        {
+          "before": "He has",
+          "options": [
+            "broke",
+            "break",
+            "broken"
+          ],
+          "answer": 2,
+          "after": "his arm."
+        }
+      ]
+    },
+    {
+      "type": "spoterror",
+      "title": "Encuentra el error",
+      "instruction": "Toca la palabra incorrecta y descubre la forma correcta del past participle.",
+      "dataA": [
+        {
+          "words": [
+            "She",
+            "has",
+            "wrote",
+            "a",
+            "story."
+          ],
+          "errorIndex": 2,
+          "fix": "written"
+        },
+        {
+          "words": [
+            "They",
+            "have",
+            "went",
+            "to",
+            "Paris."
+          ],
+          "errorIndex": 2,
+          "fix": "gone"
+        },
+        {
+          "words": [
+            "He",
+            "has",
+            "eated",
+            "all",
+            "the",
+            "cake."
+          ],
+          "errorIndex": 2,
+          "fix": "eaten"
+        },
+        {
+          "words": [
+            "We",
+            "have",
+            "buyed",
+            "new",
+            "shoes."
+          ],
+          "errorIndex": 2,
+          "fix": "bought"
+        },
+        {
+          "words": [
+            "I",
+            "have",
+            "seed",
+            "that",
+            "before."
+          ],
+          "errorIndex": 2,
+          "fix": "seen"
+        },
+        {
+          "words": [
+            "She",
+            "has",
+            "maked",
+            "a",
+            "mistake."
+          ],
+          "errorIndex": 2,
+          "fix": "made"
+        }
+      ],
+      "dataB": [
+        {
+          "words": [
+            "He",
+            "has",
+            "did",
+            "his",
+            "best."
+          ],
+          "errorIndex": 2,
+          "fix": "done"
+        },
+        {
+          "words": [
+            "They",
+            "have",
+            "breaked",
+            "the",
+            "rules."
+          ],
+          "errorIndex": 2,
+          "fix": "broken"
+        },
+        {
+          "words": [
+            "We",
+            "have",
+            "catched",
+            "the",
+            "train."
+          ],
+          "errorIndex": 2,
+          "fix": "caught"
+        },
+        {
+          "words": [
+            "She",
+            "has",
+            "speaked",
+            "to",
+            "him."
+          ],
+          "errorIndex": 2,
+          "fix": "spoken"
+        },
+        {
+          "words": [
+            "I",
+            "have",
+            "putted",
+            "it",
+            "away."
+          ],
+          "errorIndex": 2,
+          "fix": "put"
+        },
+        {
+          "words": [
+            "They",
+            "have",
+            "findeed",
+            "the",
+            "answer."
+          ],
+          "errorIndex": 2,
+          "fix": "found"
+        }
+      ]
+    },
+    {
+      "type": "wordselect",
+      "title": "Selecciona el Past Participle",
+      "instruction": "Toca solo la palabra que es el past participle en cada oración.",
+      "dataA": [
+        {
+          "text": "She has [eaten] her lunch already.",
+          "hint": "Selecciona el participio pasado"
+        },
+        {
+          "text": "They have [gone] to the store and bought milk.",
+          "hint": "Selecciona el participio pasado"
+        },
+        {
+          "text": "He has [written] a letter to his friend.",
+          "hint": "Selecciona el participio pasado"
+        },
+        {
+          "text": "We have [cut] the grass in the garden.",
+          "hint": "Selecciona el participio pasado"
+        },
+        {
+          "text": "I have [bought] a new phone this week.",
+          "hint": "Selecciona el participio pasado"
+        },
+        {
+          "text": "She has [seen] that movie twice.",
+          "hint": "Selecciona el participio pasado"
+        }
+      ],
+      "dataB": [
+        {
+          "text": "He has [done] his homework carefully.",
+          "hint": "Selecciona el participio pasado"
+        },
+        {
+          "text": "They have [made] a delicious cake today.",
+          "hint": "Selecciona el participio pasado"
+        },
+        {
+          "text": "She has [put] the books on the shelf.",
+          "hint": "Selecciona el participio pasado"
+        },
+        {
+          "text": "We have [spoken] with the teacher already.",
+          "hint": "Selecciona el participio pasado"
+        },
+        {
+          "text": "I have [caught] a bad cold this winter.",
+          "hint": "Selecciona el participio pasado"
+        },
+        {
+          "text": "He has [broken] his phone screen.",
+          "hint": "Selecciona el participio pasado"
+        }
+      ]
+    },
+    {
+      "type": "memory",
+      "title": "Memorama de Past Participles",
+      "instruction": "Encuentra las parejas de verbo base y su past participle.",
+      "dataA": [
+        {
+          "left": "go",
+          "right": "gone"
+        },
+        {
+          "left": "eat",
+          "right": "eaten"
+        },
+        {
+          "left": "write",
+          "right": "written"
+        },
+        {
+          "left": "cut",
+          "right": "cut"
+        },
+        {
+          "left": "buy",
+          "right": "bought"
+        },
+        {
+          "left": "see",
+          "right": "seen"
+        },
+        {
+          "left": "sell",
+          "right": "sold"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "do",
+          "right": "done"
+        },
+        {
+          "left": "make",
+          "right": "made"
+        },
+        {
+          "left": "put",
+          "right": "put"
+        },
+        {
+          "left": "speak",
+          "right": "spoken"
+        },
+        {
+          "left": "catch",
+          "right": "caught"
+        },
+        {
+          "left": "break",
+          "right": "broken"
+        },
+        {
+          "left": "find",
+          "right": "found"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "hangman",
+    "words": [
+      "GONE",
+      "EATEN",
+      "WRITTEN",
+      "BOUGHT",
+      "SEEN",
+      "SOLD",
+      "DONE",
+      "MADE",
+      "SPOKEN",
+      "CAUGHT",
+      "BROKEN",
+      "FOUND",
+      "TAUGHT",
+      "TAKEN",
+      "GIVEN"
+    ]
+  }
+});
+  </script>
+</body>
+</html>
