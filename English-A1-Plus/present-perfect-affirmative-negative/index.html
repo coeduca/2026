@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Present Perfect: Affirmative &amp; Negative - Noveno, Primer Año, Segundo Año</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "Present Perfect: Affirmative & Negative",
+  "level": "Noveno, Primer Año, Segundo Año",
+  "pdfDesign": "PopArt",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#F781B5",
+    "accent": "#B043A4",
+    "bg": "#FFF1F8",
+    "cardBg": "#FCE8FF",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Present Perfect: Forma Afirmativa y Negativa",
+      "html": "<div style=\"font-family: Arial, sans-serif; color: #1A1A1A;\"><div style=\"background: linear-gradient(135deg, #B043A4, #F781B5); padding: 16px; border-radius: 14px; color: #FFFFFF; margin-bottom: 14px;\"><h2 style=\"margin: 0 0 6px 0; font-size: 20px;\">¿Qué es el Present Perfect?</h2><p style=\"margin: 0; font-size: 14px;\">Usamos el <b>Present Perfect</b> para hablar de experiencias de vida, cosas que hemos hecho (o no) en algún momento de nuestra vida, sin decir exactamente cuándo.</p></div><div style=\"background: #FCE8FF; border: 2px solid #B043A4; border-radius: 12px; padding: 14px; margin-bottom: 14px;\"><h3 style=\"color: #B043A4; margin-top: 0;\">Estructura</h3><table style=\"width: 100%; border-collapse: collapse; font-size: 14px;\"><tr style=\"background:#B043A4; color:#FFFFFF;\"><th style=\"padding:8px; border:1px solid #B043A4;\">Forma</th><th style=\"padding:8px; border:1px solid #B043A4;\">Estructura</th><th style=\"padding:8px; border:1px solid #B043A4;\">Ejemplo</th></tr><tr><td style=\"padding:8px; border:1px solid #B043A4; background:#FFF1F8;\">Afirmativa</td><td style=\"padding:8px; border:1px solid #B043A4; background:#FFF1F8;\">Sujeto + have/has + participio</td><td style=\"padding:8px; border:1px solid #B043A4; background:#FFF1F8;\">I have visited a volcano.</td></tr><tr><td style=\"padding:8px; border:1px solid #B043A4; background:#FCE8FF;\">Negativa</td><td style=\"padding:8px; border:1px solid #B043A4; background:#FCE8FF;\">Sujeto + have/has + not + participio</td><td style=\"padding:8px; border:1px solid #B043A4; background:#FCE8FF;\">She has not broken a bone.</td></tr></table></div><div style=\"background: #FFF1F8; border: 2px dashed #F781B5; border-radius: 12px; padding: 14px; margin-bottom: 14px;\"><h3 style=\"color: #B043A4; margin-top: 0;\">Contracciones</h3><table style=\"width: 100%; border-collapse: collapse; font-size: 14px;\"><tr style=\"background:#F781B5; color:#FFFFFF;\"><th style=\"padding:8px; border:1px solid #B043A4;\">Completo</th><th style=\"padding:8px; border:1px solid #B043A4;\">Contracción</th></tr><tr><td style=\"padding:8px; border:1px solid #B043A4;\">I have</td><td style=\"padding:8px; border:1px solid #B043A4;\"><b>I&#39;ve</b></td></tr><tr><td style=\"padding:8px; border:1px solid #B043A4;\">She has</td><td style=\"padding:8px; border:1px solid #B043A4;\"><b>She&#39;s</b></td></tr><tr><td style=\"padding:8px; border:1px solid #B043A4;\">have not</td><td style=\"padding:8px; border:1px solid #B043A4;\"><b>haven&#39;t</b></td></tr><tr><td style=\"padding:8px; border:1px solid #B043A4;\">has not</td><td style=\"padding:8px; border:1px solid #B043A4;\"><b>hasn&#39;t</b></td></tr></table></div><div style=\"background: #B043A4; color: #FFFFFF; border-radius: 12px; padding: 14px;\"><h3 style=\"margin-top: 0;\">Vocabulario: Life Experiences</h3><p style=\"margin: 0; font-size: 14px;\">visit a volcano &bull; break a bone &bull; see a horror film &bull; climb a mountain &bull; travel abroad &bull; eat sushi &bull; meet a celebrity &bull; win a prize &bull; lose a wallet</p></div></div>"
+    },
+    {
+      "type": "matchlines",
+      "title": "Conecta las Contracciones Afirmativas",
+      "instruction": "Une cada forma completa con su contracción correcta.",
+      "dataA": [
+        {
+          "left": "I have",
+          "right": "I've"
+        },
+        {
+          "left": "She has",
+          "right": "She's"
+        },
+        {
+          "left": "He has",
+          "right": "He's"
+        },
+        {
+          "left": "They have",
+          "right": "They've"
+        },
+        {
+          "left": "We have",
+          "right": "We've"
+        },
+        {
+          "left": "You have",
+          "right": "You've"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "I have not",
+          "right": "I haven't"
+        },
+        {
+          "left": "She has not",
+          "right": "She hasn't"
+        },
+        {
+          "left": "He has not",
+          "right": "He hasn't"
+        },
+        {
+          "left": "They have not",
+          "right": "They haven't"
+        },
+        {
+          "left": "We have not",
+          "right": "We haven't"
+        },
+        {
+          "left": "You have not",
+          "right": "You haven't"
+        }
+      ]
+    },
+    {
+      "type": "dragbank",
+      "title": "Completa con Have o Has",
+      "instruction": "Arrastra la palabra correcta para completar las oraciones afirmativas.",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "I ___ visited a volcano.",
+            "answer": "have"
+          },
+          {
+            "text": "She ___ seen a horror film.",
+            "answer": "has"
+          },
+          {
+            "text": "They ___ broken a bone.",
+            "answer": "have"
+          },
+          {
+            "text": "He ___ traveled abroad.",
+            "answer": "has"
+          },
+          {
+            "text": "We ___ eaten sushi.",
+            "answer": "have"
+          },
+          {
+            "text": "You ___ met a celebrity.",
+            "answer": "have"
+          }
+        ],
+        "bank": [
+          "have",
+          "has",
+          "had",
+          "having"
+        ]
+      },
+      "dataB": {
+        "sentences": [
+          {
+            "text": "I ___ climbed a mountain.",
+            "answer": "have"
+          },
+          {
+            "text": "She ___ lost her wallet.",
+            "answer": "has"
+          },
+          {
+            "text": "They ___ won a prize.",
+            "answer": "have"
+          },
+          {
+            "text": "He ___ broken his arm.",
+            "answer": "has"
+          },
+          {
+            "text": "We ___ visited a volcano.",
+            "answer": "have"
+          },
+          {
+            "text": "You ___ seen a ghost.",
+            "answer": "have"
+          }
+        ],
+        "bank": [
+          "have",
+          "has",
+          "had",
+          "having"
+        ]
+      }
+    },
+    {
+      "type": "matchimage",
+      "title": "Unir con imagen",
+      "instruction": "Instrucción: arrastra la oración correcta a cada imagen.",
+      "dataA": [
+        {
+          "word": "I have climbed a tree",
+          "image": "files/tree-climbing-boy-illustration-free-vector.jpg"
+        },
+        {
+          "word": "She has drawn a sun",
+          "image": "files/desktop_30c0695d-0fda-44f3-9127-31b53acc2671.jpg"
+        },
+        {
+          "word": "He has bought new clothes",
+          "image": "files/hand-drawn-shopping-cartoon-illustration_52683-155990.jpg"
+        },
+        {
+          "word": "I have cooked a salad",
+          "image": "files/a11a28cc98e2b160f4fc5c8eb9dac5fd.jpg"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "I have won a trophy",
+          "image": "files/young-boy-jumping-with-trophy-vector-illustration_1023984-34984.jpg"
+        },
+        {
+          "word": "She has drawn a sun",
+          "image": "files/desktop_30c0695d-0fda-44f3-9127-31b53acc2671.jpg"
+        },
+        {
+          "word": "He has bought new clothes",
+          "image": "files/hand-drawn-shopping-cartoon-illustration_52683-155990.jpg"
+        },
+        {
+          "word": "I have cooked a salad",
+          "image": "files/a11a28cc98e2b160f4fc5c8eb9dac5fd.jpg"
+        }
+      ]
+    },
+    {
+      "type": "multiplechoice",
+      "title": "Elige la Forma Negativa Correcta",
+      "instruction": "Selecciona la opción correcta para completar cada oración negativa.",
+      "dataA": [
+        {
+          "q": "I ___ visited a volcano.",
+          "options": [
+            "haven't",
+            "hasn't",
+            "don't"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "She ___ broken a bone.",
+          "options": [
+            "haven't",
+            "hasn't",
+            "doesn't"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "They ___ seen a horror film.",
+          "options": [
+            "hasn't",
+            "haven't",
+            "didn't"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "He ___ traveled abroad.",
+          "options": [
+            "haven't",
+            "hasn't",
+            "isn't"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "We ___ eaten sushi.",
+          "options": [
+            "haven't",
+            "hasn't",
+            "aren't"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "You ___ met a celebrity.",
+          "options": [
+            "hasn't",
+            "haven't",
+            "weren't"
+          ],
+          "answer": 1
+        }
+      ],
+      "dataB": [
+        {
+          "q": "I ___ climbed a mountain.",
+          "options": [
+            "haven't",
+            "hasn't",
+            "didn't"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "She ___ lost her wallet.",
+          "options": [
+            "haven't",
+            "hasn't",
+            "doesn't"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "They ___ won a prize.",
+          "options": [
+            "hasn't",
+            "haven't",
+            "don't"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "He ___ broken his arm.",
+          "options": [
+            "haven't",
+            "hasn't",
+            "isn't"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "We ___ visited a volcano.",
+          "options": [
+            "haven't",
+            "hasn't",
+            "aren't"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "You ___ seen a ghost.",
+          "options": [
+            "hasn't",
+            "haven't",
+            "weren't"
+          ],
+          "answer": 1
+        }
+      ]
+    },
+    {
+      "type": "spoterror",
+      "title": "Encuentra el Error",
+      "instruction": "Toca la palabra incorrecta en cada oración y observa la corrección.",
+      "dataA": [
+        {
+          "words": [
+            "I",
+            "has",
+            "visited",
+            "a",
+            "volcano",
+            "."
+          ],
+          "errorIndex": 1,
+          "fix": "have"
+        },
+        {
+          "words": [
+            "She",
+            "have",
+            "seen",
+            "a",
+            "horror",
+            "film",
+            "."
+          ],
+          "errorIndex": 1,
+          "fix": "has"
+        },
+        {
+          "words": [
+            "They",
+            "haven't",
+            "break",
+            "a",
+            "bone",
+            "."
+          ],
+          "errorIndex": 2,
+          "fix": "broken"
+        },
+        {
+          "words": [
+            "He",
+            "hasn't",
+            "seeing",
+            "a",
+            "ghost",
+            "."
+          ],
+          "errorIndex": 2,
+          "fix": "seen"
+        },
+        {
+          "words": [
+            "We",
+            "has",
+            "eaten",
+            "sushi",
+            "."
+          ],
+          "errorIndex": 1,
+          "fix": "have"
+        },
+        {
+          "words": [
+            "You",
+            "hasn't",
+            "visited",
+            "the",
+            "museum",
+            "."
+          ],
+          "errorIndex": 1,
+          "fix": "haven't"
+        }
+      ],
+      "dataB": [
+        {
+          "words": [
+            "I",
+            "hasn't",
+            "climbed",
+            "a",
+            "mountain",
+            "."
+          ],
+          "errorIndex": 1,
+          "fix": "haven't"
+        },
+        {
+          "words": [
+            "She",
+            "haven't",
+            "lost",
+            "her",
+            "wallet",
+            "."
+          ],
+          "errorIndex": 1,
+          "fix": "hasn't"
+        },
+        {
+          "words": [
+            "They",
+            "has",
+            "won",
+            "a",
+            "prize",
+            "."
+          ],
+          "errorIndex": 1,
+          "fix": "have"
+        },
+        {
+          "words": [
+            "He",
+            "have",
+            "broken",
+            "his",
+            "arm",
+            "."
+          ],
+          "errorIndex": 1,
+          "fix": "has"
+        },
+        {
+          "words": [
+            "We",
+            "hasn't",
+            "visited",
+            "a",
+            "volcano",
+            "."
+          ],
+          "errorIndex": 1,
+          "fix": "haven't"
+        },
+        {
+          "words": [
+            "You",
+            "has",
+            "seen",
+            "a",
+            "ghost",
+            "."
+          ],
+          "errorIndex": 1,
+          "fix": "have"
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "Selecciona el Auxiliar Correcto",
+      "instruction": "Elige \"have\" o \"has\" según el sujeto de la oración.",
+      "dataA": [
+        {
+          "before": "I",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 0,
+          "after": "visited a volcano."
+        },
+        {
+          "before": "She",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 1,
+          "after": "seen a horror film."
+        },
+        {
+          "before": "They",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 0,
+          "after": "broken a bone."
+        },
+        {
+          "before": "He",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 1,
+          "after": "traveled abroad."
+        },
+        {
+          "before": "We",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 0,
+          "after": "eaten sushi."
+        },
+        {
+          "before": "You",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 0,
+          "after": "met a celebrity."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "I",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 0,
+          "after": "climbed a mountain."
+        },
+        {
+          "before": "She",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 1,
+          "after": "lost her wallet."
+        },
+        {
+          "before": "They",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 0,
+          "after": "won a prize."
+        },
+        {
+          "before": "He",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 1,
+          "after": "broken his arm."
+        },
+        {
+          "before": "We",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 0,
+          "after": "visited a volcano."
+        },
+        {
+          "before": "You",
+          "options": [
+            "have",
+            "has"
+          ],
+          "answer": 0,
+          "after": "seen a ghost."
+        }
+      ]
+    },
+    {
+      "type": "truefalse",
+      "title": "Verdadero o Falso: Reglas del Present Perfect",
+      "instruction": "Indica si cada afirmación sobre el Present Perfect es verdadera o falsa.",
+      "dataA": [
+        {
+          "statement": "'I've' is the contraction of 'I have'.",
+          "answer": true
+        },
+        {
+          "statement": "'She's' can mean 'She has' in Present Perfect.",
+          "answer": true
+        },
+        {
+          "statement": "'Haven't' is used with He/She/It.",
+          "answer": false
+        },
+        {
+          "statement": "The Present Perfect uses 'have/has + past participle'.",
+          "answer": true
+        },
+        {
+          "statement": "'Broken' is the past participle of 'break'.",
+          "answer": true
+        },
+        {
+          "statement": "'Hasn't' is the contraction of 'has not'.",
+          "answer": true
+        }
+      ],
+      "dataB": [
+        {
+          "statement": "'We've' is the contraction of 'We have'.",
+          "answer": true
+        },
+        {
+          "statement": "'Hasn't' is used with I/You/We/They.",
+          "answer": false
+        },
+        {
+          "statement": "'Seen' is the past participle of 'see'.",
+          "answer": true
+        },
+        {
+          "statement": "The negative form is 'have/has + not + past participle'.",
+          "answer": true
+        },
+        {
+          "statement": "'Haven't' is the contraction of 'have not'.",
+          "answer": true
+        },
+        {
+          "statement": "'He's' can never mean 'He has'.",
+          "answer": false
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "pills"
+  }
+});
+  </script>
+</body>
+</html>
