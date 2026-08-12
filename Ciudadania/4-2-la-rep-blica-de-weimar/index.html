@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>4.2 La República de Weimar - Octavo</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="civica-exercises.js"></script>
+  <script src="civica-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    CIVICA.init({
+  "id": "cv_4_2_la_republica_de_weimar_1786536509",
+  "container": "#app",
+  "topic": "4.2 La República de Weimar",
+  "unit": "Unidad 4 - Semana 2",
+  "subjectLabel": "Ciudadanía y Valores",
+  "book": {
+    "url": "https://drive.google.com/file/d/1ADEtHEywzjEkH7ijKzdSAWLrFhS0qkWh/view?usp=drivesdk",
+    "label": "Abrir libro"
+  },
+  "colors": {
+    "primary": "#376CD4",
+    "accent": "#59B683",
+    "bg": "#87CEEB",
+    "cardBg": "#FFFFFF",
+    "text": "#1A1A1A"
+  },
+  "pdfDesign": "Default",
+  "sections": {
+    "explore": [
+      {
+        "type": "note",
+        "title": "La República de Weimar",
+        "html": "<h3>¿Qué fue la República de Weimar?</h3><p>Después de perder la Primera Guerra Mundial, Alemania tuvo que reconstruirse y cambió su forma de gobierno: dejó atrás el Imperio y la monarquía para organizarse como una república.</p><p>La República de Weimar atravesó tres etapas principales. Entre <strong>1919 y 1923</strong> se estableció la nueva república, se realizaron elecciones parlamentarias y se aprobó una constitución, pero hubo gran inestabilidad política y una grave hiperinflación. Entre <strong>1924 y 1929</strong> existió una estabilidad relativa, acompañada de medidas económicas, mayor estabilidad política y un importante desarrollo cultural y artístico. Entre <strong>1929 y 1933</strong>, la crisis económica volvió a provocar desempleo, descontento, tensiones políticas y el crecimiento de movimientos extremistas.</p><p>El <strong>Tratado de Versalles</strong> tuvo un gran impacto: Alemania fue responsabilizada por la guerra, tuvo que pagar reparaciones económicas, perdió territorios y debió limitar su ejército. Estas condiciones generaron sentimientos de humillación y descontento en parte de la población.</p><p>Durante los años de relativa estabilidad también hubo cambios sociales importantes. Las mujeres mayores de veinte años pudieron participar en las elecciones parlamentarias y aumentó la libertad de expresión y la producción cultural. Berlín se convirtió en un importante centro artístico y surgieron espacios como la <strong>Bauhaus</strong>.</p><p>Sin embargo, las tensiones sociales y políticas continuaron. La población judía participaba en diferentes ámbitos de la sociedad alemana, pero también enfrentaba antisemitismo, discriminación y acusaciones promovidas por sectores extremistas. La crisis iniciada en 1929 favoreció el crecimiento de estos grupos y debilitó progresivamente a la República de Weimar.</p>"
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "1. Actividad en pares",
+        "instruction": "Lean el Documento 1 y respondan las preguntas. Observen con atención el mensaje de recibimiento a los soldados alemanes después de la derrota en la Primera Guerra Mundial.",
+        "image": "files/documento1_recibimiento_soldados_alemanes.png",
+        "dataA": [
+          {
+            "q": "a. ¿Qué sentimientos transmite el Documento 1, considerando que Alemania perdió la Primera Guerra Mundial?",
+            "minLength": 40,
+            "rows": 3,
+            "placeholder": "Explica los sentimientos que identificas..."
+          },
+          {
+            "q": "b. ¿Cuáles piensan que eran los sentimientos de los soldados alemanes ante el resultado de la guerra?",
+            "minLength": 40,
+            "rows": 3,
+            "placeholder": "Describe cómo pudieron sentirse los soldados..."
+          },
+          {
+            "q": "c. ¿Cómo se puede describir la situación de una población ante estas circunstancias?",
+            "minLength": 40,
+            "rows": 3,
+            "placeholder": "Describe la situación de la población alemana..."
+          }
+        ]
+      },
+      {
+        "type": "cv_table",
+        "title": "2. Actividad con docente",
+        "instruction": "Después de la Primera Guerra Mundial, Alemania cambió su forma de gobierno de monarquía a república. Organicen sus ideas y completen tres ideas principales para cada forma de organización política.",
+        "dataA": {
+          "columns": [
+            "Monarquía",
+            "República"
+          ],
+          "rows": [
+            [
+              {
+                "type": "input",
+                "answer": "imperio",
+                "placeholder": "Idea 1"
+              },
+              {
+                "type": "input",
+                "answer": "constitución",
+                "placeholder": "Idea 1"
+              }
+            ],
+            [
+              {
+                "type": "input",
+                "answer": "régimen imperial",
+                "placeholder": "Idea 2"
+              },
+              {
+                "type": "input",
+                "answer": "elecciones parlamentarias",
+                "placeholder": "Idea 2"
+              }
+            ],
+            [
+              {
+                "type": "input",
+                "answer": "monarquía alemana",
+                "placeholder": "Idea 3"
+              },
+              {
+                "type": "input",
+                "answer": "república",
+                "placeholder": "Idea 3"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "2. Monarquía y república",
+        "instruction": "A partir de las ideas anteriores, comparen ambas formas de organización política.",
+        "dataA": [
+          {
+            "q": "d-e. Explica una semejanza y una diferencia entre la monarquía y la república.",
+            "minLength": 45,
+            "rows": 3,
+            "placeholder": "Escribe una semejanza y una diferencia..."
+          },
+          {
+            "q": "f. Concluye explicando una ventaja y una desventaja que identifiques en estas formas de gobierno.",
+            "minLength": 45,
+            "rows": 3,
+            "placeholder": "Escribe tu conclusión..."
+          }
+        ]
+      }
+    ],
+    "deepen": [
+      {
+        "type": "cv_textanswer",
+        "title": "3. Actividad en equipo",
+        "instruction": "Desarrollen la habilidad de empatía histórica. Consideren la hiperinflación, el aumento de precios, las reparaciones económicas, la ocupación de zonas industriales y el descontento de la población.",
+        "image": "files/hiperinflacion_republica_weimar.png",
+        "dataA": [
+          {
+            "q": "Explica el impacto de la crisis económica en la población y en el ámbito político de la República de Weimar.",
+            "minLength": 80,
+            "rows": 5,
+            "placeholder": "Explica qué ocurrió con la población y qué consecuencias tuvo en la política..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "4. Actividad en pares",
+        "instruction": "Desarrollen la habilidad de empatía histórica a partir de lo estudiado sobre la sociedad, la población judía y las tensiones políticas de la República de Weimar.",
+        "image": "files/sociedad_judia_republica_weimar.png",
+        "dataA": [
+          {
+            "q": "e. ¿Qué elementos culturales sobre la identidad alemana y la identidad judía destacan del testimonio estudiado?",
+            "minLength": 60,
+            "rows": 4,
+            "placeholder": "Menciona y explica elementos del testimonio..."
+          },
+          {
+            "q": "f. ¿Qué factores contribuyeron al incremento de acciones contra la población judía durante la República de Weimar?",
+            "minLength": 60,
+            "rows": 4,
+            "placeholder": "Explica los factores políticos y sociales..."
+          }
+        ]
+      }
+    ],
+    "consolidate": [
+      {
+        "type": "cv_table",
+        "title": "5. Actividad en pares",
+        "instruction": "Completen la tabla con los principales desafíos y oportunidades de la República de Weimar en los ámbitos económico, social y cultural, y político.",
+        "dataA": {
+          "columns": [
+            "Tipo",
+            "Aspecto económico",
+            "Aspectos sociales y culturales",
+            "Aspecto político"
+          ],
+          "rows": [
+            [
+              {
+                "type": "header",
+                "value": "Desafíos"
+              },
+              {
+                "type": "input",
+                "answer": "hiperinflación",
+                "placeholder": "Desafío económico"
+              },
+              {
+                "type": "input",
+                "answer": "tensiones sociales",
+                "placeholder": "Desafío social o cultural"
+              },
+              {
+                "type": "input",
+                "answer": "inestabilidad política",
+                "placeholder": "Desafío político"
+              }
+            ],
+            [
+              {
+                "type": "header",
+                "value": "Oportunidades"
+              },
+              {
+                "type": "input",
+                "answer": "estabilidad relativa",
+                "placeholder": "Oportunidad económica"
+              },
+              {
+                "type": "input",
+                "answer": "libertad creativa",
+                "placeholder": "Oportunidad social o cultural"
+              },
+              {
+                "type": "input",
+                "answer": "elecciones parlamentarias",
+                "placeholder": "Oportunidad política"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "6. Actividad en equipo",
+        "instruction": "Respondan las preguntas y utilicen lo estudiado para debatir sus respuestas con el equipo.",
+        "dataA": [
+          {
+            "q": "a. ¿Qué influencia tuvo el Tratado de Versalles en la conformación y desarrollo de la República de Weimar?",
+            "minLength": 60,
+            "rows": 4,
+            "placeholder": "Explica la influencia del Tratado de Versalles..."
+          },
+          {
+            "q": "b. ¿Cómo impactó la crisis económica y política en la vida de los alemanes durante la República?",
+            "minLength": 60,
+            "rows": 4,
+            "placeholder": "Explica las consecuencias para la población..."
+          },
+          {
+            "q": "c. ¿Cómo afectó el surgimiento y crecimiento de grupos extremistas al Gobierno de la República de Weimar?",
+            "minLength": 60,
+            "rows": 4,
+            "placeholder": "Explica cómo afectaron al sistema político..."
+          },
+          {
+            "q": "d. Redacta una conclusión de lo estudiado en la que expliques las principales características de la República de Weimar.",
+            "minLength": 100,
+            "rows": 6,
+            "placeholder": "Escribe una conclusión sobre el periodo estudiado..."
+          }
+        ]
+      }
+    ]
+  },
+  "game": {
+    "type": "hangman",
+    "words": [
+      {
+        "word": "WEIMAR",
+        "hint": "Nombre de la república alemana estudiada"
+      },
+      {
+        "word": "REPUBLICA",
+        "hint": "Forma de gobierno establecida después del Imperio"
+      },
+      {
+        "word": "VERSALLES",
+        "hint": "Tratado aceptado por Alemania después de la guerra"
+      },
+      {
+        "word": "HIPERINFLACION",
+        "hint": "Aumento extremo de precios y pérdida de valor del dinero"
+      },
+      {
+        "word": "DEMOCRACIA",
+        "hint": "Sistema relacionado con elecciones y participación política"
+      },
+      {
+        "word": "CONSTITUCION",
+        "hint": "Norma fundamental de la nueva república"
+      },
+      {
+        "word": "PARLAMENTO",
+        "hint": "Institución elegida mediante elecciones"
+      },
+      {
+        "word": "BAUHAUS",
+        "hint": "Escuela alemana de artes y diseño"
+      },
+      {
+        "word": "CULTURA",
+        "hint": "Ámbito que vivió un importante auge creativo"
+      },
+      {
+        "word": "ECONOMIA",
+        "hint": "Ámbito afectado por inflación y reparaciones"
+      },
+      {
+        "word": "CRISIS",
+        "hint": "Situación que se agravó nuevamente desde 1929"
+      },
+      {
+        "word": "EXTREMISMO",
+        "hint": "Creció durante los periodos de inestabilidad"
+      }
+    ]
+  }
+});
+  </script>
+</body>
+</html>
