@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>4.3 El ascenso del nazismo - Octavo</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="civica-exercises.js"></script>
+  <script src="civica-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    CIVICA.init({
+  "id": "cv_4_3_el_ascenso_del_nazismo_1786733870",
+  "container": "#app",
+  "topic": "4.3 El ascenso del nazismo",
+  "unit": "Unidad 4 - Semana 3",
+  "subjectLabel": "Ciudadanía y Valores",
+  "book": {
+    "url": "https://drive.google.com/file/d/1c5tUnn8gTcWU-pb23a4eMiG3zLJM1GqQ/view?usp=drivesdk",
+    "label": "Abrir Libro"
+  },
+  "colors": {
+    "primary": "#D4AF37",
+    "accent": "#6EB659",
+    "bg": "#87CEEB",
+    "cardBg": "#FFFFFF",
+    "text": "#1A1A1A"
+  },
+  "pdfDesign": "HollyHobbie",
+  "sections": {
+    "explore": [
+      {
+        "type": "note",
+        "title": "El ascenso del nazismo",
+        "html": "<p>Después de la Primera Guerra Mundial, Alemania atravesó dificultades políticas, sociales y económicas. En este contexto surgieron explicaciones falsas sobre la derrota alemana, como el llamado mito de la puñalada por la espalda. El Partido Nazi aprovechó el descontento de parte de la población, la crisis económica, el nacionalismo y la propaganda para aumentar su apoyo. Durante los años siguientes, Adolf Hitler y el NSDAP fueron obteniendo mayor influencia política hasta llegar al gobierno en 1933. El estudio de este proceso permite comprender cómo las crisis, la propaganda y la búsqueda de culpables pueden ser utilizadas para debilitar una democracia y promover ideas discriminatorias y autoritarias.</p>"
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "1. Actividad individual",
+        "instruction": "Lee y observa (Doc. 1). Responde.",
+        "image": "files/documento_1_mito_punalada_espalda.png",
+        "dataA": [
+          {
+            "q": "a. ¿Cómo puede afectar a un grupo de personas las aseveraciones hechas por el general Paul von Hindenburg?",
+            "minLength": 30,
+            "rows": 3,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "b. Explica la relación entre el texto y la imagen.",
+            "minLength": 30,
+            "rows": 3,
+            "placeholder": "Escribe tu respuesta..."
+          }
+        ]
+      },
+      {
+        "type": "cv_table",
+        "title": "1. Actividad individual",
+        "instruction": "Completa la tabla a partir de la imagen del documento 1.",
+        "image": "files/documento_1_mito_punalada_espalda.png",
+        "dataA": {
+          "columns": [
+            "¿Qué idea transmite?",
+            "¿Cómo se presentan los personajes?",
+            "¿Qué elementos resaltan en la propaganda?",
+            "¿Cómo se relaciona los elementos de la propaganda con el contexto histórico?"
+          ],
+          "rows": [
+            [
+              {
+                "type": "input",
+                "answer": "Propaganda",
+                "placeholder": "Escribe..."
+              },
+              {
+                "type": "input",
+                "answer": "Personajes",
+                "placeholder": "Escribe..."
+              },
+              {
+                "type": "input",
+                "answer": "Propaganda",
+                "placeholder": "Escribe..."
+              },
+              {
+                "type": "input",
+                "answer": "Alemania",
+                "placeholder": "Escribe..."
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "1. Actividad individual",
+        "dataA": [
+          {
+            "q": "c. Redacta una conclusión a partir de lo que has realizado.",
+            "minLength": 40,
+            "rows": 4,
+            "placeholder": "Escribe tu conclusión..."
+          }
+        ]
+      }
+    ],
+    "deepen": [
+      {
+        "type": "cv_textanswer",
+        "title": "2. Actividad en pares",
+        "instruction": "Desarrollen la habilidad de interpretación histórica. Para ello, respondan:",
+        "image": "files/documento_3_distribucion_partidos_parlamento_aleman.png",
+        "dataA": [
+          {
+            "q": "a. ¿Por qué los demócratas, los comunistas y los judíos eran considerados los enemigos de Alemania, según Hitler?",
+            "minLength": 30,
+            "rows": 3,
+            "placeholder": "Escriban su respuesta..."
+          },
+          {
+            "q": "b. ¿Qué relación existe entre los objetivos del Partido Nazi y la abolición de los Tratados de Versalles y de Saint Germain?",
+            "minLength": 30,
+            "rows": 3,
+            "placeholder": "Escriban su respuesta..."
+          },
+          {
+            "q": "c. ¿Por qué el programa del Partido Nazi fue atractivo para la población alemana?",
+            "minLength": 30,
+            "rows": 3,
+            "placeholder": "Escriban su respuesta..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "3. Actividad individual",
+        "instruction": "Desarrolla la habilidad de conciencia histórica temporal. Para ello:",
+        "dataA": [
+          {
+            "q": "a. Elabora un mapa conceptual para comprender los factores que contribuyeron al ascenso de Adolf Hitler al poder.",
+            "minLength": 50,
+            "rows": 6,
+            "placeholder": "Organiza aquí las ideas principales de tu mapa conceptual..."
+          }
+        ]
+      },
+      {
+        "type": "note",
+        "title": "3. Actividad individual",
+        "html": "<p><strong>b.</strong> Comenta con el resto de la clase cómo se relacionan entre sí todos los factores.</p>"
+      }
+    ],
+    "consolidate": [
+      {
+        "type": "cv_table",
+        "title": "4. Actividad en pares",
+        "instruction": "Observen las imágenes y completen la tabla.",
+        "image": "files/tres_carteles_propaganda_nazi.png",
+        "dataA": {
+          "columns": [
+            "Pregunta",
+            "El NSDAP protege al pueblo",
+            "Nuestra última esperanza: Hitler",
+            "Las nuevas personas"
+          ],
+          "rows": [
+            [
+              {
+                "type": "text",
+                "value": "¿Cuál es el contexto histórico en el que se produjeron?"
+              },
+              {
+                "type": "input",
+                "answer": "Nazismo",
+                "placeholder": "Escriban..."
+              },
+              {
+                "type": "input",
+                "answer": "Crisis",
+                "placeholder": "Escriban..."
+              },
+              {
+                "type": "input",
+                "answer": "Régimen nazi",
+                "placeholder": "Escriban..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "¿Qué mensaje buscaban transmitir?"
+              },
+              {
+                "type": "input",
+                "answer": "NSDAP",
+                "placeholder": "Escriban..."
+              },
+              {
+                "type": "input",
+                "answer": "Hitler",
+                "placeholder": "Escriban..."
+              },
+              {
+                "type": "input",
+                "answer": "Familia",
+                "placeholder": "Escriban..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "¿Qué valores o creencias promueven los carteles?"
+              },
+              {
+                "type": "input",
+                "answer": "Unidad",
+                "placeholder": "Escriban..."
+              },
+              {
+                "type": "input",
+                "answer": "Liderazgo",
+                "placeholder": "Escriban..."
+              },
+              {
+                "type": "input",
+                "answer": "Familia",
+                "placeholder": "Escriban..."
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "4. Actividad en pares",
+        "dataA": [
+          {
+            "q": "Escriban una conclusión que explique las causas del ascenso del nazismo y el rol de la propaganda en este contexto.",
+            "minLength": 60,
+            "rows": 5,
+            "placeholder": "Escriban su conclusión..."
+          }
+        ]
+      }
+    ]
+  },
+  "game": {
+    "type": "pills"
+  }
+});
+  </script>
+</body>
+</html>
