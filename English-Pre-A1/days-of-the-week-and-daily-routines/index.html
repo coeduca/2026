@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Days of the week and daily routines - Octavo, Séptimo, Noveno</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "Days of the week and daily routines",
+  "level": "Octavo, Séptimo, Noveno",
+  "pdfDesign": "Pastel",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#D0F781",
+    "accent": "#43B069",
+    "bg": "#FFF1F8",
+    "cardBg": "#D1F6D6",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Days of the Week and Daily Routines",
+      "html": "<h3>Days of the Week and Daily Routines</h3><p>We use the <strong>days of the week</strong> to say when activities happen: <strong>Monday, Tuesday, Wednesday, Thursday, Friday, Saturday</strong> and <strong>Sunday</strong>.</p><p>A <strong>daily routine</strong> is an activity we usually do every day, such as <strong>wake up, get dressed, have breakfast, go to school, do homework, have dinner</strong> and <strong>go to bed</strong>.</p><p>To talk about routines, we usually use the <strong>Simple Present</strong>: <em>I wake up at 6:00 a.m. I go to school on Monday. She does homework in the afternoon.</em></p><p>Remember: use <strong>on</strong> before days of the week and <strong>at</strong> before specific times. Complete the following activities to practice the vocabulary and sentences.</p>"
+    },
+    {
+      "type": "wordsearch",
+      "title": "Word Search",
+      "instruction": "Find the hidden words related to days of the week and daily routines.",
+      "dataA": {
+        "words": [
+          "MONDAY",
+          "TUESDAY",
+          "FRIDAY",
+          "SUNDAY",
+          "BREAKFAST",
+          "SCHOOL",
+          "HOMEWORK",
+          "SLEEP"
+        ],
+        "gridSize": 13
+      },
+      "dataB": {
+        "words": [
+          "WEDNESDAY",
+          "THURSDAY",
+          "SATURDAY",
+          "WAKE",
+          "SHOWER",
+          "DINNER",
+          "STUDY",
+          "BEDTIME"
+        ],
+        "gridSize": 13
+      }
+    },
+    {
+      "type": "matchimage",
+      "title": "Routine Pictures",
+      "instruction": "Match each daily routine with the correct picture or emoji.",
+      "dataA": [
+        {
+          "word": "Wake up",
+          "emoji": "⏰"
+        },
+        {
+          "word": "Brush my teeth",
+          "image": "files/brush_teeth.png"
+        },
+        {
+          "word": "Have breakfast",
+          "emoji": "🥣"
+        },
+        {
+          "word": "Go to school",
+          "emoji": "🏫"
+        },
+        {
+          "word": "Do homework",
+          "image": "files/do_homework.png"
+        },
+        {
+          "word": "Have dinner",
+          "emoji": "🍽️"
+        },
+        {
+          "word": "Go to bed",
+          "emoji": "🛏️"
+        },
+        {
+          "word": "Take a shower",
+          "emoji": "🚿"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "Get dressed",
+          "image": "files/get_dressed.png"
+        },
+        {
+          "word": "Comb my hair",
+          "image": "files/comb_hair.png"
+        },
+        {
+          "word": "Have lunch",
+          "emoji": "🥪"
+        },
+        {
+          "word": "Study English",
+          "image": "files/study_english.png"
+        },
+        {
+          "word": "Play soccer",
+          "emoji": "⚽"
+        },
+        {
+          "word": "Watch TV",
+          "emoji": "📺"
+        },
+        {
+          "word": "Read a book",
+          "emoji": "📖"
+        },
+        {
+          "word": "Clean my room",
+          "image": "files/clean_room.png"
+        }
+      ]
+    },
+    {
+      "type": "memory",
+      "title": "Routine Memory Game",
+      "instruction": "Find the matching pairs.",
+      "dataA": [
+        {
+          "left": "Wake up",
+          "right": "Despertarse"
+        },
+        {
+          "left": "Have breakfast",
+          "right": "Desayunar"
+        },
+        {
+          "left": "Go to school",
+          "right": "Ir a la escuela"
+        },
+        {
+          "left": "Have lunch",
+          "right": "Almorzar"
+        },
+        {
+          "left": "Do homework",
+          "right": "Hacer la tarea"
+        },
+        {
+          "left": "Go to bed",
+          "right": "Ir a la cama"
+        },
+        {
+          "left": "Monday",
+          "right": "Lunes"
+        },
+        {
+          "left": "Friday",
+          "right": "Viernes"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "Take a shower",
+          "right": "Bañarse"
+        },
+        {
+          "left": "Get dressed",
+          "right": "Vestirse"
+        },
+        {
+          "left": "Study",
+          "right": "Estudiar"
+        },
+        {
+          "left": "Have dinner",
+          "right": "Cenar"
+        },
+        {
+          "left": "Watch TV",
+          "right": "Ver televisión"
+        },
+        {
+          "left": "Brush my teeth",
+          "right": "Cepillarme los dientes"
+        },
+        {
+          "left": "Wednesday",
+          "right": "Miércoles"
+        },
+        {
+          "left": "Sunday",
+          "right": "Domingo"
+        }
+      ]
+    },
+    {
+      "type": "dragbank",
+      "title": "Complete the Routine",
+      "instruction": "Drag the correct word or phrase to complete each sentence.",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "I ___ at 6:00 a.m.",
+            "answer": "wake up"
+          },
+          {
+            "text": "I ___ breakfast before school.",
+            "answer": "have"
+          },
+          {
+            "text": "I go to school on ___.",
+            "answer": "Monday"
+          },
+          {
+            "text": "I ___ my homework in the afternoon.",
+            "answer": "do"
+          },
+          {
+            "text": "I have ___ with my family at night.",
+            "answer": "dinner"
+          },
+          {
+            "text": "I ___ my teeth before bed.",
+            "answer": "brush"
+          },
+          {
+            "text": "I go to ___ at 9:30 p.m.",
+            "answer": "bed"
+          },
+          {
+            "text": "On Saturday, I ___ soccer.",
+            "answer": "play"
+          }
+        ],
+        "bank": [
+          "wake up",
+          "have",
+          "Monday",
+          "do",
+          "dinner",
+          "brush",
+          "bed",
+          "play",
+          "Tuesday",
+          "lunch"
+        ]
+      },
+      "dataB": {
+        "sentences": [
+          {
+            "text": "I ___ a shower in the morning.",
+            "answer": "take"
+          },
+          {
+            "text": "I ___ dressed before breakfast.",
+            "answer": "get"
+          },
+          {
+            "text": "We study English on ___.",
+            "answer": "Thursday"
+          },
+          {
+            "text": "I ___ lunch at noon.",
+            "answer": "have"
+          },
+          {
+            "text": "I ___ English after school.",
+            "answer": "study"
+          },
+          {
+            "text": "I ___ TV in the evening.",
+            "answer": "watch"
+          },
+          {
+            "text": "I ___ a book before sleeping.",
+            "answer": "read"
+          },
+          {
+            "text": "On Sunday, I ___ my room.",
+            "answer": "clean"
+          }
+        ],
+        "bank": [
+          "take",
+          "get",
+          "Thursday",
+          "have",
+          "study",
+          "watch",
+          "read",
+          "clean",
+          "Friday",
+          "school"
+        ]
+      }
+    },
+    {
+      "type": "matchlines",
+      "title": "Match the Routines",
+      "instruction": "Connect each routine with its correct meaning.",
+      "dataA": [
+        {
+          "left": "Wake up",
+          "right": "Despertarse"
+        },
+        {
+          "left": "Go to school",
+          "right": "Ir a la escuela"
+        },
+        {
+          "left": "Do homework",
+          "right": "Hacer la tarea"
+        },
+        {
+          "left": "Have dinner",
+          "right": "Cenar"
+        },
+        {
+          "left": "Go to bed",
+          "right": "Ir a la cama"
+        },
+        {
+          "left": "Brush my teeth",
+          "right": "Cepillarme los dientes"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "Get dressed",
+          "right": "Vestirse"
+        },
+        {
+          "left": "Take a shower",
+          "right": "Bañarse"
+        },
+        {
+          "left": "Have lunch",
+          "right": "Almorzar"
+        },
+        {
+          "left": "Study English",
+          "right": "Estudiar inglés"
+        },
+        {
+          "left": "Watch TV",
+          "right": "Ver televisión"
+        },
+        {
+          "left": "Clean my room",
+          "right": "Limpiar mi habitación"
+        }
+      ]
+    },
+    {
+      "type": "multiplechoice",
+      "title": "Choose the Correct Answer",
+      "instruction": "Select the best answer for each question.",
+      "dataA": [
+        {
+          "q": "Which day comes after Monday?",
+          "options": [
+            "Sunday",
+            "Tuesday",
+            "Friday",
+            "Saturday"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Which day comes before Friday?",
+          "options": [
+            "Thursday",
+            "Tuesday",
+            "Saturday",
+            "Monday"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "I ___ up at 6:00 a.m.",
+          "options": [
+            "wake",
+            "wakes",
+            "waking",
+            "bed"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "I go to school ___ Monday.",
+          "options": [
+            "at",
+            "in",
+            "on",
+            "from"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "What do you usually do before school?",
+          "options": [
+            "Have breakfast",
+            "Go to bed",
+            "Have dinner",
+            "Sleep at school"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Which activity is usually done at night?",
+          "options": [
+            "Go to bed",
+            "Go to school",
+            "Have breakfast",
+            "Wake up"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Saturday and Sunday are the ___.",
+          "options": [
+            "morning",
+            "weekend",
+            "routine",
+            "breakfast"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "I ___ my homework after school.",
+          "options": [
+            "do",
+            "have",
+            "go",
+            "take"
+          ],
+          "answer": 0
+        }
+      ],
+      "dataB": [
+        {
+          "q": "Which day comes after Wednesday?",
+          "options": [
+            "Monday",
+            "Thursday",
+            "Tuesday",
+            "Sunday"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Which day comes before Tuesday?",
+          "options": [
+            "Monday",
+            "Wednesday",
+            "Friday",
+            "Saturday"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "I ___ a shower in the morning.",
+          "options": [
+            "do",
+            "take",
+            "play",
+            "read"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "We have English class ___ Thursday.",
+          "options": [
+            "on",
+            "at",
+            "in",
+            "to"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Which activity means \"vestirse\"?",
+          "options": [
+            "Get dressed",
+            "Wake up",
+            "Have lunch",
+            "Read a book"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Which activity usually happens around noon?",
+          "options": [
+            "Have lunch",
+            "Go to bed",
+            "Wake up",
+            "Have dinner"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Friday comes between ___.",
+          "options": [
+            "Thursday and Saturday",
+            "Monday and Tuesday",
+            "Saturday and Sunday",
+            "Tuesday and Wednesday"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "I ___ TV in the evening.",
+          "options": [
+            "watch",
+            "brush",
+            "take",
+            "get"
+          ],
+          "answer": 0
+        }
+      ]
+    },
+    {
+      "type": "categorize",
+      "title": "Organize the Vocabulary",
+      "instruction": "Place each word or phrase in the correct category.",
+      "dataA": {
+        "categories": [
+          "Days of the week",
+          "Morning routines",
+          "Evening routines"
+        ],
+        "items": [
+          {
+            "text": "Monday",
+            "cat": 0
+          },
+          {
+            "text": "Wednesday",
+            "cat": 0
+          },
+          {
+            "text": "Friday",
+            "cat": 0
+          },
+          {
+            "text": "Wake up",
+            "cat": 1
+          },
+          {
+            "text": "Have breakfast",
+            "cat": 1
+          },
+          {
+            "text": "Brush my teeth",
+            "cat": 1
+          },
+          {
+            "text": "Have dinner",
+            "cat": 2
+          },
+          {
+            "text": "Go to bed",
+            "cat": 2
+          },
+          {
+            "text": "Watch TV",
+            "cat": 2
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "Weekdays",
+          "School routines",
+          "Free-time routines"
+        ],
+        "items": [
+          {
+            "text": "Tuesday",
+            "cat": 0
+          },
+          {
+            "text": "Thursday",
+            "cat": 0
+          },
+          {
+            "text": "Friday",
+            "cat": 0
+          },
+          {
+            "text": "Go to school",
+            "cat": 1
+          },
+          {
+            "text": "Study English",
+            "cat": 1
+          },
+          {
+            "text": "Do homework",
+            "cat": 1
+          },
+          {
+            "text": "Play soccer",
+            "cat": 2
+          },
+          {
+            "text": "Read a book",
+            "cat": 2
+          },
+          {
+            "text": "Listen to music",
+            "cat": 2
+          }
+        ]
+      }
+    },
+    {
+      "type": "wordselect",
+      "title": "Find the Routine Words",
+      "instruction": "Tap only the words indicated in each sentence.",
+      "dataA": [
+        {
+          "text": "I [wake] up early on Monday.",
+          "hint": "Selecciona el verbo de rutina."
+        },
+        {
+          "text": "I [brush] my teeth before breakfast.",
+          "hint": "Selecciona el verbo de rutina."
+        },
+        {
+          "text": "We go to school on [Tuesday].",
+          "hint": "Selecciona el día de la semana."
+        },
+        {
+          "text": "I [have] lunch at school.",
+          "hint": "Selecciona el verbo de rutina."
+        },
+        {
+          "text": "I [do] my homework in the afternoon.",
+          "hint": "Selecciona el verbo de rutina."
+        },
+        {
+          "text": "My English class is on [Thursday].",
+          "hint": "Selecciona el día de la semana."
+        },
+        {
+          "text": "I [watch] TV after dinner.",
+          "hint": "Selecciona el verbo de rutina."
+        },
+        {
+          "text": "I rest at home on [Sunday].",
+          "hint": "Selecciona el día de la semana."
+        }
+      ],
+      "dataB": [
+        {
+          "text": "I [take] a shower every morning.",
+          "hint": "Selecciona el verbo de rutina."
+        },
+        {
+          "text": "I [get] dressed before school.",
+          "hint": "Selecciona el verbo de rutina."
+        },
+        {
+          "text": "We have classes on [Wednesday].",
+          "hint": "Selecciona el día de la semana."
+        },
+        {
+          "text": "I [study] English after lunch.",
+          "hint": "Selecciona el verbo de rutina."
+        },
+        {
+          "text": "I [clean] my room in the afternoon.",
+          "hint": "Selecciona el verbo de rutina."
+        },
+        {
+          "text": "The school week ends on [Friday].",
+          "hint": "Selecciona el día de la semana."
+        },
+        {
+          "text": "I [read] a book before bed.",
+          "hint": "Selecciona el verbo de rutina."
+        },
+        {
+          "text": "I play soccer on [Saturday].",
+          "hint": "Selecciona el día de la semana."
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "Complete the Schedule",
+      "instruction": "Choose the correct option to complete each sentence.",
+      "dataA": [
+        {
+          "before": "I",
+          "options": [
+            "wake up",
+            "wakes up",
+            "waking up"
+          ],
+          "answer": 0,
+          "after": "at 6:00 a.m."
+        },
+        {
+          "before": "I go to school",
+          "options": [
+            "on",
+            "at",
+            "in"
+          ],
+          "answer": 0,
+          "after": "Monday."
+        },
+        {
+          "before": "I",
+          "options": [
+            "have",
+            "has",
+            "having"
+          ],
+          "answer": 0,
+          "after": "breakfast before school."
+        },
+        {
+          "before": "After school, I",
+          "options": [
+            "do",
+            "take",
+            "get"
+          ],
+          "answer": 0,
+          "after": "my homework."
+        },
+        {
+          "before": "I have dinner",
+          "options": [
+            "at",
+            "on",
+            "from"
+          ],
+          "answer": 0,
+          "after": "7:00 p.m."
+        },
+        {
+          "before": "Friday comes after",
+          "options": [
+            "Thursday",
+            "Saturday",
+            "Tuesday"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "At night, I",
+          "options": [
+            "go to bed",
+            "go to school",
+            "have breakfast"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "On Sunday, I",
+          "options": [
+            "rest",
+            "rests",
+            "resting"
+          ],
+          "answer": 0,
+          "after": "at home."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "Every morning, I",
+          "options": [
+            "take",
+            "takes",
+            "taking"
+          ],
+          "answer": 0,
+          "after": "a shower."
+        },
+        {
+          "before": "We study English",
+          "options": [
+            "on",
+            "at",
+            "to"
+          ],
+          "answer": 0,
+          "after": "Wednesday."
+        },
+        {
+          "before": "I",
+          "options": [
+            "get dressed",
+            "gets dressed",
+            "getting dressed"
+          ],
+          "answer": 0,
+          "after": "before breakfast."
+        },
+        {
+          "before": "At noon, I",
+          "options": [
+            "have lunch",
+            "go to bed",
+            "wake up"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "I study",
+          "options": [
+            "at",
+            "on",
+            "from"
+          ],
+          "answer": 0,
+          "after": "4:00 p.m."
+        },
+        {
+          "before": "Thursday comes before",
+          "options": [
+            "Friday",
+            "Wednesday",
+            "Monday"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "In the evening, I",
+          "options": [
+            "watch TV",
+            "go to school",
+            "wake up"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "On Saturday, I",
+          "options": [
+            "play soccer",
+            "plays soccer",
+            "playing soccer"
+          ],
+          "answer": 0,
+          "after": "with my friends."
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "hangman",
+    "words": [
+      "MONDAY",
+      "TUESDAY",
+      "WEDNESDAY",
+      "THURSDAY",
+      "FRIDAY",
+      "SATURDAY",
+      "SUNDAY",
+      "BREAKFAST",
+      "HOMEWORK",
+      "SCHOOL",
+      "DINNER",
+      "SHOWER",
+      "BEDTIME",
+      "STUDY",
+      "ROUTINE"
+    ]
+  }
+});
+  </script>
+</body>
+</html>
