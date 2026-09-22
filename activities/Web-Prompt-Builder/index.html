@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7f5ef" />
+  <meta name="description" content="WEB Rrompt Builder: crea un prompt en inglés para generar tu página personal en GitHub Pages." />
+  <title>WEB Rrompt Builder</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦎</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="brand-badge" aria-hidden="true">&lt;/&gt;</div>
+      <div class="hero-copy">
+        <p class="eyebrow">CREATE · COPY · BUILD</p>
+        <p class="course-context">Ciencias de la Computación · Actividad Integradora · Periodo 4</p>
+        <h1>WEB <span>Rrompt</span> Builder</h1>
+        <p class="hero-text">
+          Completa tus datos y convierte tus ideas en un prompt listo para pedirle a una IA que construya tu página personal.
+        </p>
+      </div>
+      <div class="hero-sticker" aria-hidden="true">GitHub Pages ready!</div>
+    </header>
+
+    <main class="layout">
+      <section class="builder-card" aria-labelledby="builder-title">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">PASO 01</p>
+            <h2 id="builder-title">Cuéntame sobre ti</h2>
+          </div>
+          <span class="save-pill" id="saveStatus">Guardado automático ✓</span>
+        </div>
+
+        <div class="progress-wrap" aria-label="Progreso del formulario">
+          <div class="progress-meta">
+            <span>Tu progreso</span>
+            <strong id="progressText">0%</strong>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <p id="progressHint">Empieza con tu nombre. Rigo no juzga… mucho.</p>
+        </div>
+
+        <form id="profileForm" autocomplete="on">
+          <div class="form-grid two-columns">
+            <label class="field">
+              <span>Nombre completo <b>*</b></span>
+              <input id="fullName" name="fullName" type="text" placeholder="Ej. Andrea Martínez" maxlength="80" autocomplete="name" />
+            </label>
+
+            <label class="field">
+              <span>Edad <b>*</b></span>
+              <input id="age" name="age" type="number" min="1" max="120" inputmode="numeric" placeholder="Ej. 15" />
+            </label>
+          </div>
+
+          <div class="form-grid two-columns">
+            <label class="field">
+              <span>NIE <b>*</b></span>
+              <input id="nie" name="nie" type="text" inputmode="numeric" placeholder="Escribe tu NIE" maxlength="30" autocomplete="off" />
+              <small class="privacy-note">Se guarda únicamente en este dispositivo.</small>
+            </label>
+
+            <label class="field">
+              <span>Institución Educativa <b>*</b></span>
+              <input id="institution" name="institution" type="text" placeholder="Ej. Complejo Educativo..." maxlength="120" />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Grado <b>*</b></span>
+            <select id="grade" name="grade">
+              <option value="">Selecciona tu grado</option>
+              <option value="Séptimo">Séptimo</option>
+              <option value="Octavo">Octavo</option>
+              <option value="Noveno">Noveno</option>
+              <option value="Primer Año">Primer Año de Bachillerato</option>
+              <option value="Segundo Año">Segundo Año de Bachillerato</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>¿Quién soy? <b>*</b></span>
+            <textarea id="aboutMe" name="aboutMe" rows="5" maxlength="700" placeholder="Escribe una breve descripción sobre ti: cómo eres, qué te caracteriza, qué te gustaría que alguien supiera de ti..."></textarea>
+            <small><span id="aboutCount">0</span>/700 caracteres</small>
+          </label>
+
+          <fieldset class="hobbies-fieldset">
+            <legend>Mis gustos y pasatiempos <b>*</b></legend>
+            <p class="field-help">Puedes elegir varios y agregar los tuyos.</p>
+
+            <div class="preset-grid" id="hobbyPresets">
+              <button type="button" class="preset" data-value="Music">🎧 Música</button>
+              <button type="button" class="preset" data-value="Video games">🎮 Videojuegos</button>
+              <button type="button" class="preset" data-value="Sports">⚽ Deportes</button>
+              <button type="button" class="preset" data-value="Reading">📚 Lectura</button>
+              <button type="button" class="preset" data-value="Movies and series">🎬 Películas y series</button>
+              <button type="button" class="preset" data-value="Drawing and art">🎨 Dibujo y arte</button>
+              <button type="button" class="preset" data-value="Technology">💻 Tecnología</button>
+              <button type="button" class="preset" data-value="Photography">📷 Fotografía</button>
+              <button type="button" class="preset" data-value="Cooking">🍳 Cocina</button>
+              <button type="button" class="preset" data-value="Dancing">💃 Baile</button>
+              <button type="button" class="preset" data-value="Animals">🐾 Animales</button>
+              <button type="button" class="preset" data-value="Traveling">🌎 Viajar</button>
+            </div>
+
+            <label class="field custom-hobby-field">
+              <span>Otros gustos o pasatiempos</span>
+              <input id="customHobbies" name="customHobbies" type="text" maxlength="240" placeholder="Ej. tocar guitarra, plantas, astronomía..." />
+            </label>
+          </fieldset>
+        </form>
+      </section>
+
+      <aside class="prompt-card" aria-labelledby="prompt-title">
+        <div class="section-heading compact">
+          <div>
+            <p class="step-label">PASO 02</p>
+            <h2 id="prompt-title">Tu prompt</h2>
+          </div>
+          <span class="language-pill">EN</span>
+        </div>
+
+        <div class="prompt-window">
+          <div class="window-top" aria-hidden="true">
+            <span></span><span></span><span></span>
+            <strong>prompt.txt</strong>
+          </div>
+          <textarea id="promptOutput" readonly aria-label="Prompt generado en inglés"></textarea>
+        </div>
+
+        <div class="prompt-actions">
+          <button type="button" class="copy-button" id="copyButton">
+            <span class="copy-icon" aria-hidden="true">⧉</span>
+            <span id="copyLabel">Copiar prompt</span>
+          </button>
+          <button type="button" class="reset-button" id="resetButton">Borrar datos</button>
+        </div>
+
+        <div class="instruction-note">
+          <strong>¿Y luego?</strong>
+          <p>Pega el prompt en la IA que usarás. Tu foto debe estar guardada en <code>perfil.jpg</code>.</p>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <span>WEB Rrompt Builder</span>
+      <span>•</span>
+      <span>Tu información se guarda solo en este dispositivo.</span>
+    </footer>
+  </div>
+
+  <rigo-mascot id="rigoMascot"></rigo-mascot>
+
+  <script src="rigo.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
