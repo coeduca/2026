@@ -8,3 +8,6 @@ https://coeduca.github.io/2026/English-A1-Plus/
 
 
 https://coeduca.github.io/2026/Ciudadania/
+
+
+https://coeduca.github.io/2026/activities/
