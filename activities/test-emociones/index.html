@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4fbf4">
+  <meta name="description" content="Mi Termómetro Emocional - Autoevaluación de gestión de emociones para Octavo grado.">
+  <title>Mi Termómetro Emocional · Octavo</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="shortcut icon" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/favicon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section id="loginView" class="view active" aria-labelledby="loginTitle">
+      <div class="hero-card hero-grid">
+        <div class="hero-copy-wrap">
+          <div class="eyebrow">CIUDADANÍA Y VALORES · OCTAVO GRADO</div>
+          <div class="hero-badges">
+            <span>25 preguntas</span>
+            <span>5 áreas</span>
+            <span>5–7 minutos</span>
+          </div>
+          <h1 id="loginTitle">Mi Termómetro Emocional</h1>
+          <p class="hero-copy">Una autoevaluación bonita, clara y sincera para descubrir cómo reconoces, expresas y manejas tus emociones.</p>
+          <div class="notice"><strong>Importante:</strong> no hay respuestas buenas ni malas. Responde pensando en cómo actúas normalmente.</div>
+
+          <form id="loginForm" class="panel login-panel" autocomplete="off">
+            <label for="nieInput">Ingresa tu NIE</label>
+            <div class="input-row">
+              <input id="nieInput" name="nie" inputmode="numeric" pattern="[0-9]*" maxlength="12" placeholder="Ej. 20176655" required aria-describedby="loginHelp loginError">
+              <button class="primary-btn" type="submit">Entrar</button>
+            </div>
+            <small id="loginHelp">Tu NIE se usa solamente para identificarte dentro de esta actividad.</small>
+            <p id="loginError" class="form-error" role="alert" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="hero-art-wrap">
+          <div class="hero-art-card">
+            <img src="assets/hero-rigo.webp" alt="Rigo, la mascota escolar, mostrando un termómetro emocional" class="hero-art">
+          </div>
+          <div class="mini-floating-card f1">💚 Conócete mejor</div>
+          <div class="mini-floating-card f2">🧠 Responde con sinceridad</div>
+          <div class="mini-floating-card f3">🌱 Siempre podemos mejorar</div>
+        </div>
+      </div>
+
+      <p class="privacy-note">Este test es educativo y orientativo. No realiza diagnósticos psicológicos.</p>
+    </section>
+
+    <section id="introView" class="view" aria-labelledby="introTitle">
+      <div class="topbar no-print">
+        <button class="ghost-btn" id="logoutBtn" type="button">Salir</button>
+        <span class="student-chip" id="studentChip"></span>
+      </div>
+
+      <div class="panel intro-panel intro-grid">
+        <div class="intro-main">
+          <p class="eyebrow">ANTES DE COMENZAR</p>
+          <h2 id="introTitle">Conócete un poco mejor</h2>
+          <p class="intro-copy">Encontrarás <strong>25 afirmaciones</strong> divididas en cinco áreas. Marca la opción que mejor describa cómo actúas <strong>la mayoría de las veces</strong>.</p>
+
+          <div class="stats-grid">
+            <div class="stat-card"><strong>25</strong><span>preguntas</span></div>
+            <div class="stat-card"><strong>5</strong><span>áreas emocionales</span></div>
+            <div class="stat-card"><strong>300</strong><span>puntos máximos</span></div>
+          </div>
+
+          <div class="scale-preview" aria-label="Escala de respuestas">
+            <span><b>1</b>Nunca</span>
+            <span><b>2</b>A veces</span>
+            <span><b>3</b>Casi siempre</span>
+            <span><b>4</b>Siempre</span>
+          </div>
+
+          <div class="step-list">
+            <div class="step-item"><span>1</span><p>Lee con calma cada afirmación.</p></div>
+            <div class="step-item"><span>2</span><p>Responde según tu forma habitual de actuar.</p></div>
+            <div class="step-item"><span>3</span><p>Al final verás un semáforo y tus áreas más fuertes.</p></div>
+          </div>
+
+          <div class="tip-card">💡 <span>No respondas pensando en lo que “deberías” hacer. Este test sirve más cuando respondes como realmente eres.</span></div>
+          <div class="cta-row">
+            <button class="primary-btn wide" id="startBtn" type="button">Comenzar mi test</button>
+            <button class="text-btn" id="resumeBtn" type="button" hidden>Continuar donde quedé</button>
+          </div>
+        </div>
+
+        <div class="intro-side">
+          <img src="assets/hero-rigo.webp" alt="Rigo acompañando el inicio del test" class="intro-art">
+          <div class="quote-card">
+            <strong>Mensaje de Rigo</strong>
+            <p>“Tus emociones no son enemigas. Son señales que puedes aprender a entender.”</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="testView" class="view" aria-labelledby="questionText">
+      <div class="test-header">
+        <button id="backToIntroBtn" class="icon-btn" type="button" aria-label="Volver">←</button>
+        <div class="progress-wrap">
+          <div class="progress-meta"><span id="areaLabel"></span><span id="progressLabel"></span></div>
+          <div class="progress-track" aria-hidden="true"><div id="progressBar" class="progress-bar"></div></div>
+        </div>
+      </div>
+
+      <article class="question-card">
+        <div class="question-top">
+          <div id="areaIcon" class="question-icon" aria-hidden="true"></div>
+          <div class="question-badge">Autoevaluación emocional</div>
+        </div>
+        <p id="questionNumber" class="question-number"></p>
+        <h2 id="questionText"></h2>
+        <p class="question-sub">Marca la opción que más se parezca a tu manera habitual de actuar.</p>
+        <div id="answerOptions" class="answer-grid" role="radiogroup" aria-label="Selecciona una respuesta"></div>
+      </article>
+
+      <div class="question-nav no-print">
+        <button id="prevBtn" class="secondary-btn" type="button">Anterior</button>
+        <button id="nextBtn" class="primary-btn" type="button">Siguiente</button>
+      </div>
+      <p id="answerHint" class="answer-hint" aria-live="polite"></p>
+    </section>
+
+    <section id="resultView" class="view" aria-labelledby="resultTitle">
+      <div class="topbar no-print">
+        <span class="student-chip" id="resultStudentChip"></span>
+        <button id="resultLogoutBtn" class="ghost-btn" type="button">Salir</button>
+      </div>
+
+      <section class="panel report-meta-card">
+        <div class="report-meta-head">
+          <div>
+            <p class="eyebrow">REPORTE PERSONAL</p>
+            <h2 class="report-title">Resultado del test emocional</h2>
+          </div>
+          <div class="report-stamp">Octavo grado</div>
+        </div>
+        <div class="report-meta-grid">
+          <div class="report-meta-item"><span>Estudiante</span><strong id="resultStudentName">—</strong></div>
+          <div class="report-meta-item"><span>Grado</span><strong id="resultStudentGrade">—</strong></div>
+          <div class="report-meta-item"><span>Fecha</span><strong id="resultDate">—</strong></div>
+          <div class="report-meta-item"><span>Puntaje</span><strong id="resultScoreMini">—</strong></div>
+        </div>
+      </section>
+
+      <div class="result-hero panel result-grid">
+        <div class="result-copy-side">
+          <p class="eyebrow">MI RESULTADO</p>
+          <h2 id="resultTitle">Tu termómetro emocional</h2>
+          <div class="gauge" id="gauge" role="img" aria-label="Puntaje emocional">
+            <div class="gauge-inner">
+              <strong id="scoreValue">0</strong>
+              <span>/ 300</span>
+            </div>
+          </div>
+          <div id="resultBadge" class="result-badge"></div>
+          <p id="resultMessage" class="result-message"></p>
+          <p class="result-note">Este resultado describe tendencias de tus respuestas; no define quién eres ni es un diagnóstico.</p>
+        </div>
+
+        <div class="result-art-side">
+          <img src="assets/result-rigo.webp" alt="Rigo celebrando el resultado del test" class="result-art">
+        </div>
+      </div>
+
+      <section class="panel" aria-labelledby="areasTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">MIRA MÁS ALLÁ DEL TOTAL</p>
+            <h3 id="areasTitle">Tus cinco áreas</h3>
+          </div>
+          <span class="mini-legend">🔴 practicar · 🟡 desarrollando · 🟢 fortaleza</span>
+        </div>
+        <div id="areaResults" class="area-results"></div>
+      </section>
+
+      <section class="panel reflection-panel">
+        <p class="eyebrow">MI PEQUEÑO COMPROMISO</p>
+        <h3>¿Qué te llevas de este test?</h3>
+        <label for="strengthText">Una habilidad emocional que considero una fortaleza:</label>
+        <textarea id="strengthText" rows="2" placeholder="Escribe aquí..."></textarea>
+        <label for="improveText">Una habilidad que me gustaría fortalecer:</label>
+        <textarea id="improveText" rows="2" placeholder="Escribe aquí..."></textarea>
+        <label for="actionText">Algo que puedo intentar cuando tenga una emoción difícil:</label>
+        <textarea id="actionText" rows="2" placeholder="Escribe aquí..."></textarea>
+        <p id="reflectionSaved" class="saved-msg" aria-live="polite"></p>
+      </section>
+
+      <div class="result-actions no-print">
+        <button id="printBtn" class="secondary-btn" type="button">Imprimir / Guardar PDF</button>
+        <button id="restartBtn" class="primary-btn" type="button">Repetir test</button>
+      </div>
+      <p class="footer-note">Gestionar una emoción no significa dejar de sentirla; significa reconocerla y elegir qué hacer con ella.</p>
+    </section>
+  </main>
+
+  <rigo-mascot grade="Octavo"></rigo-mascot>
+
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
