@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Simple Present: Affirmative - Octavo, Séptimo</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-games.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "container": "#app",
+  "topic": "Simple Present: Affirmative",
+  "level": "Octavo, Séptimo",
+  "pdfDesign": "PopArt",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#BB8200",
+    "accent": "#43B069",
+    "bg": "#FFF1F8",
+    "cardBg": "#E4C79C",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Simple Present: Affirmative",
+      "html": "<div style=\"padding:18px;border:3px solid #1A1A1A;border-radius:18px;background:#FFF7E8;\"><h2 style=\"margin-top:0;\">☀️ My Daily Routine</h2><p>Usamos el <strong>Simple Present</strong> para hablar de rutinas, hábitos y actividades que hacemos regularmente.</p><div style=\"padding:12px;margin:12px 0;background:#FFFFFF;border:2px solid #1A1A1A;border-radius:12px;\"><strong>👥 I / You / We / They</strong><p>Usamos el verbo en su forma base.</p><p><strong>I play soccer every day.</strong><br><strong>They watch TV at night.</strong></p></div><div style=\"padding:12px;margin:12px 0;background:#FFFFFF;border:2px solid #1A1A1A;border-radius:12px;\"><strong>👤 He / She / It</strong><p>Normalmente agregamos <strong>-s</strong> o <strong>-es</strong> al verbo.</p><p><strong>He plays soccer every day.</strong><br><strong>She watches TV at night.</strong></p></div><div style=\"padding:12px;margin:12px 0;background:#FFFFFF;border:2px dashed #43B069;border-radius:12px;\"><strong>🧠 Personal Pronouns</strong><p>I = yo · You = tú/ustedes · He = él · She = ella · It = eso · We = nosotros · They = ellos</p></div><div style=\"padding:12px;margin-top:12px;background:#FFF1F8;border:2px solid #BB8200;border-radius:12px;\"><strong>⏰ Useful expressions</strong><p><strong>in the morning</strong> = por la mañana<br><strong>at night</strong> = por la noche<br><strong>every day</strong> = todos los días</p><strong>🏃 Daily activities</strong><p><strong>take a shower</strong> = bañarse<br><strong>watch TV</strong> = ver televisión<br><strong>play soccer</strong> = jugar fútbol<br><strong>go to school</strong> = ir a la escuela</p></div><p style=\"margin-bottom:0;\"><strong>⭐ Remember:</strong> He, She, It → verb + s/es.</p></div>"
+    },
+    {
+      "type": "multiplechoice",
+      "title": "1. Choose the correct form",
+      "instruction": "Selecciona la opción correcta para completar cada oración.",
+      "dataA": [
+        {
+          "q": "I ___ soccer every day.",
+          "options": [
+            "play",
+            "plays",
+            "playing"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "She ___ TV at night.",
+          "options": [
+            "watch",
+            "watches",
+            "watching"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "They ___ to school in the morning.",
+          "options": [
+            "go",
+            "goes",
+            "going"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "He ___ a shower in the morning.",
+          "options": [
+            "take",
+            "takes",
+            "taking"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "We ___ soccer after school.",
+          "options": [
+            "plays",
+            "play",
+            "playing"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "You ___ TV every day.",
+          "options": [
+            "watch",
+            "watches",
+            "watching"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Maria ___ to school every day.",
+          "options": [
+            "go",
+            "goes",
+            "going"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "My friends ___ soccer in the afternoon.",
+          "options": [
+            "play",
+            "plays",
+            "playing"
+          ],
+          "answer": 0
+        }
+      ],
+      "dataB": [
+        {
+          "q": "He ___ soccer every day.",
+          "options": [
+            "play",
+            "plays",
+            "playing"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "We ___ TV at night.",
+          "options": [
+            "watches",
+            "watch",
+            "watching"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Carlos ___ to school in the morning.",
+          "options": [
+            "goes",
+            "go",
+            "going"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "They ___ a shower in the morning.",
+          "options": [
+            "takes",
+            "take",
+            "taking"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "She ___ soccer after school.",
+          "options": [
+            "plays",
+            "play",
+            "playing"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "I ___ TV every day.",
+          "options": [
+            "watches",
+            "watching",
+            "watch"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "My brother ___ a shower every day.",
+          "options": [
+            "takes",
+            "take",
+            "taking"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "You ___ to school every morning.",
+          "options": [
+            "goes",
+            "going",
+            "go"
+          ],
+          "answer": 2
+        }
+      ]
+    },
+    {
+      "type": "wordsearch",
+      "title": "Sopa de letras",
+      "instruction": "Instrucción: Encuentra cada palabra",
+      "dataA": {
+        "words": [
+          "PLAY",
+          "COOK",
+          "STUDY",
+          "EAT",
+          "HAVE",
+          "WATER"
+        ],
+        "gridSize": 12
+      }
+    },
+    {
+      "type": "dragbank",
+      "title": "2. Complete the routine",
+      "instruction": "Arrastra el verbo correcto a cada oración.",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "I ___ to school every day.",
+            "answer": "go"
+          },
+          {
+            "text": "She ___ TV at night.",
+            "answer": "watches"
+          },
+          {
+            "text": "We ___ soccer every day.",
+            "answer": "play"
+          },
+          {
+            "text": "He ___ a shower in the morning.",
+            "answer": "takes"
+          },
+          {
+            "text": "They ___ TV at night.",
+            "answer": "watch"
+          },
+          {
+            "text": "Luis ___ soccer after school.",
+            "answer": "plays"
+          },
+          {
+            "text": "You ___ a shower every morning.",
+            "answer": "take"
+          },
+          {
+            "text": "Ana ___ to school every day.",
+            "answer": "goes"
+          }
+        ],
+        "bank": [
+          "go",
+          "watches",
+          "play",
+          "takes",
+          "watch",
+          "plays",
+          "take",
+          "goes"
+        ]
+      },
+      "dataB": {
+        "sentences": [
+          {
+            "text": "He ___ to school every morning.",
+            "answer": "goes"
+          },
+          {
+            "text": "I ___ TV at night.",
+            "answer": "watch"
+          },
+          {
+            "text": "She ___ soccer every day.",
+            "answer": "plays"
+          },
+          {
+            "text": "They ___ a shower in the morning.",
+            "answer": "take"
+          },
+          {
+            "text": "We ___ to school every day.",
+            "answer": "go"
+          },
+          {
+            "text": "Pedro ___ TV at night.",
+            "answer": "watches"
+          },
+          {
+            "text": "You ___ soccer after school.",
+            "answer": "play"
+          },
+          {
+            "text": "My sister ___ a shower every morning.",
+            "answer": "takes"
+          }
+        ],
+        "bank": [
+          "goes",
+          "watch",
+          "plays",
+          "take",
+          "go",
+          "watches",
+          "play",
+          "takes"
+        ]
+      }
+    },
+    {
+      "type": "reorder_sentences",
+      "title": "3. Put the words in order",
+      "instruction": "Ordena las palabras para formar oraciones afirmativas correctas.",
+      "dataA": [
+        {
+          "sentence": "I go to school every day",
+          "es": "Yo voy a la escuela todos los días."
+        },
+        {
+          "sentence": "She watches TV at night",
+          "es": "Ella ve televisión por la noche."
+        },
+        {
+          "sentence": "They play soccer every day",
+          "es": "Ellos juegan fútbol todos los días."
+        },
+        {
+          "sentence": "He takes a shower in the morning",
+          "es": "Él se baña por la mañana."
+        },
+        {
+          "sentence": "We watch TV at night",
+          "es": "Nosotros vemos televisión por la noche."
+        },
+        {
+          "sentence": "You go to school in the morning",
+          "es": "Tú vas a la escuela por la mañana."
+        },
+        {
+          "sentence": "Carlos plays soccer every day",
+          "es": "Carlos juega fútbol todos los días."
+        }
+      ],
+      "dataB": [
+        {
+          "sentence": "He goes to school every day",
+          "es": "Él va a la escuela todos los días."
+        },
+        {
+          "sentence": "I take a shower in the morning",
+          "es": "Yo me baño por la mañana."
+        },
+        {
+          "sentence": "She plays soccer every day",
+          "es": "Ella juega fútbol todos los días."
+        },
+        {
+          "sentence": "We go to school in the morning",
+          "es": "Nosotros vamos a la escuela por la mañana."
+        },
+        {
+          "sentence": "They watch TV at night",
+          "es": "Ellos ven televisión por la noche."
+        },
+        {
+          "sentence": "You play soccer after school",
+          "es": "Tú juegas fútbol después de la escuela."
+        },
+        {
+          "sentence": "Maria takes a shower every morning",
+          "es": "María se baña todas las mañanas."
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "4. Pronoun Challenge",
+      "instruction": "Elige el pronombre personal que corresponde.",
+      "dataA": [
+        {
+          "before": "",
+          "options": [
+            "He",
+            "They",
+            "I"
+          ],
+          "answer": 0,
+          "after": " plays soccer every day. Tom is my friend."
+        },
+        {
+          "before": "",
+          "options": [
+            "She",
+            "We",
+            "You"
+          ],
+          "answer": 0,
+          "after": " watches TV at night. Ana is my sister."
+        },
+        {
+          "before": "",
+          "options": [
+            "They",
+            "He",
+            "It"
+          ],
+          "answer": 0,
+          "after": " go to school every day. Carlos and Luis are students."
+        },
+        {
+          "before": "",
+          "options": [
+            "We",
+            "She",
+            "He"
+          ],
+          "answer": 0,
+          "after": " take a shower in the morning. My brother and I have the same routine."
+        },
+        {
+          "before": "",
+          "options": [
+            "It",
+            "I",
+            "They"
+          ],
+          "answer": 1,
+          "after": " play soccer every day. I love sports."
+        },
+        {
+          "before": "",
+          "options": [
+            "You",
+            "He",
+            "She"
+          ],
+          "answer": 0,
+          "after": " watch TV at night. This sentence is about you."
+        },
+        {
+          "before": "",
+          "options": [
+            "She",
+            "They",
+            "We"
+          ],
+          "answer": 1,
+          "after": " play soccer after school. My friends love the game."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "",
+          "options": [
+            "She",
+            "They",
+            "He"
+          ],
+          "answer": 2,
+          "after": " goes to school every day. Pedro is a student."
+        },
+        {
+          "before": "",
+          "options": [
+            "They",
+            "She",
+            "We"
+          ],
+          "answer": 1,
+          "after": " takes a shower in the morning. Marta starts her day early."
+        },
+        {
+          "before": "",
+          "options": [
+            "We",
+            "It",
+            "He"
+          ],
+          "answer": 0,
+          "after": " watch TV at night. My family and I enjoy a program."
+        },
+        {
+          "before": "",
+          "options": [
+            "They",
+            "She",
+            "He"
+          ],
+          "answer": 0,
+          "after": " play soccer every day. Rosa and Elena love sports."
+        },
+        {
+          "before": "",
+          "options": [
+            "I",
+            "It",
+            "She"
+          ],
+          "answer": 0,
+          "after": " go to school in the morning. This sentence is about me."
+        },
+        {
+          "before": "",
+          "options": [
+            "You",
+            "He",
+            "They"
+          ],
+          "answer": 0,
+          "after": " take a shower every morning. This sentence is about you."
+        },
+        {
+          "before": "",
+          "options": [
+            "She",
+            "We",
+            "It"
+          ],
+          "answer": 0,
+          "after": " watches TV at night. Sofia likes cartoons."
+        }
+      ]
+    },
+    {
+      "type": "spoterror",
+      "title": "5. Find the mistake",
+      "instruction": "Encuentra la palabra incorrecta y corrígela.",
+      "dataA": [
+        {
+          "words": [
+            "She",
+            "watch",
+            "TV",
+            "at",
+            "night"
+          ],
+          "errorIndex": 1,
+          "fix": "watches"
+        },
+        {
+          "words": [
+            "He",
+            "play",
+            "soccer",
+            "every",
+            "day"
+          ],
+          "errorIndex": 1,
+          "fix": "plays"
+        },
+        {
+          "words": [
+            "I",
+            "goes",
+            "to",
+            "school",
+            "every",
+            "day"
+          ],
+          "errorIndex": 1,
+          "fix": "go"
+        },
+        {
+          "words": [
+            "They",
+            "takes",
+            "a",
+            "shower",
+            "in",
+            "the",
+            "morning"
+          ],
+          "errorIndex": 1,
+          "fix": "take"
+        },
+        {
+          "words": [
+            "We",
+            "watches",
+            "TV",
+            "at",
+            "night"
+          ],
+          "errorIndex": 1,
+          "fix": "watch"
+        },
+        {
+          "words": [
+            "Maria",
+            "go",
+            "to",
+            "school",
+            "every",
+            "day"
+          ],
+          "errorIndex": 1,
+          "fix": "goes"
+        },
+        {
+          "words": [
+            "You",
+            "plays",
+            "soccer",
+            "every",
+            "day"
+          ],
+          "errorIndex": 1,
+          "fix": "play"
+        }
+      ],
+      "dataB": [
+        {
+          "words": [
+            "He",
+            "watch",
+            "TV",
+            "at",
+            "night"
+          ],
+          "errorIndex": 1,
+          "fix": "watches"
+        },
+        {
+          "words": [
+            "She",
+            "take",
+            "a",
+            "shower",
+            "in",
+            "the",
+            "morning"
+          ],
+          "errorIndex": 1,
+          "fix": "takes"
+        },
+        {
+          "words": [
+            "We",
+            "goes",
+            "to",
+            "school",
+            "every",
+            "day"
+          ],
+          "errorIndex": 1,
+          "fix": "go"
+        },
+        {
+          "words": [
+            "They",
+            "plays",
+            "soccer",
+            "after",
+            "school"
+          ],
+          "errorIndex": 1,
+          "fix": "play"
+        },
+        {
+          "words": [
+            "I",
+            "watches",
+            "TV",
+            "every",
+            "day"
+          ],
+          "errorIndex": 1,
+          "fix": "watch"
+        },
+        {
+          "words": [
+            "Carlos",
+            "take",
+            "a",
+            "shower",
+            "every",
+            "morning"
+          ],
+          "errorIndex": 1,
+          "fix": "takes"
+        },
+        {
+          "words": [
+            "You",
+            "goes",
+            "to",
+            "school",
+            "in",
+            "the",
+            "morning"
+          ],
+          "errorIndex": 1,
+          "fix": "go"
+        }
+      ]
+    },
+    {
+      "type": "categorize",
+      "title": "6. Who uses this verb?",
+      "instruction": "Clasifica cada forma verbal según los pronombres que la utilizan.",
+      "dataA": {
+        "categories": [
+          "I / You / We / They",
+          "He / She / It"
+        ],
+        "items": [
+          {
+            "text": "play",
+            "cat": 0
+          },
+          {
+            "text": "watches",
+            "cat": 1
+          },
+          {
+            "text": "go",
+            "cat": 0
+          },
+          {
+            "text": "takes",
+            "cat": 1
+          },
+          {
+            "text": "watch",
+            "cat": 0
+          },
+          {
+            "text": "plays",
+            "cat": 1
+          },
+          {
+            "text": "take",
+            "cat": 0
+          },
+          {
+            "text": "goes",
+            "cat": 1
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "He / She / It",
+          "I / You / We / They"
+        ],
+        "items": [
+          {
+            "text": "goes",
+            "cat": 0
+          },
+          {
+            "text": "play",
+            "cat": 1
+          },
+          {
+            "text": "takes",
+            "cat": 0
+          },
+          {
+            "text": "watch",
+            "cat": 1
+          },
+          {
+            "text": "plays",
+            "cat": 0
+          },
+          {
+            "text": "go",
+            "cat": 1
+          },
+          {
+            "text": "watches",
+            "cat": 0
+          },
+          {
+            "text": "take",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "matchimage",
+      "title": "Unir con imagen",
+      "instruction": "Instrucción: Arrastra la palabra a la imagen correcta",
+      "dataA": [
+        {
+          "word": "I play the guitar",
+          "image": "files/images-2-.jpeg"
+        },
+        {
+          "word": "She watches TV",
+          "image": "files/images-10-.jpeg"
+        },
+        {
+          "word": "He waters the plants",
+          "image": "files/images-11-.jpeg"
+        },
+        {
+          "word": "They have breakfast",
+          "image": "files/images-13-.jpeg"
+        },
+        {
+          "word": "You cook the dinner",
+          "image": "files/images-14-.jpeg"
+        },
+        {
+          "word": "We read books",
+          "image": "files/images-15-.jpeg"
+        },
+        {
+          "word": "It plays with the ball",
+          "image": "files/cute-cartoon-beagle-puppy-playing-with-red-ball-happy-dog-character-illustration-adorable-pet-animal-isolated-on-white-background-for-kids-design-vector.jpg"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "tictactoe"
+  }
+});
+  </script>
+</body>
+</html>
