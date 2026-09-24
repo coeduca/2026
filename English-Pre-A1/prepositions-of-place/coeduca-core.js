@@ -1127,6 +1127,7 @@
         renderer({
           container: document.getElementById('coeduca-game-body'),
           config: gameCfg,
+          student: state.student,
           onWin: () => {
             const wasWin = state.gameResult === 'win';
             if (global.rigo) global.rigo.setEmotion && global.rigo.setEmotion('excited');

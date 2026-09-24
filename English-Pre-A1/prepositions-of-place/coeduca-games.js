@@ -1,6 +1,6 @@
 /**
  * COEDUCA Framework v2 - Games (Pop Art ENHANCED)
- * 5 juegos: tictactoe, snake, dino, hangman, trivia
+ * 7 juegos: tictactoe, snake, dino, hangman, trivia, pills, sandwich
  * Depende de coeduca-core.js.
  *
  * Cada juego recibe ctx = { container, config, onWin, onTie, onLose }
@@ -66,6 +66,17 @@
       @keyframes cgWiggle {
         0%, 100% { transform: rotate(-3deg); }
         50%      { transform: rotate(3deg); }
+      }
+
+      #snake-start:disabled,
+      #dino-start:disabled,
+      #pl-start:disabled,
+      #sw-start:disabled {
+        opacity: 0.52;
+        cursor: not-allowed;
+        filter: grayscale(0.3);
+        transform: none !important;
+        box-shadow: 1px 1px 0 var(--coeduca-stroke, #1a1a1a) !important;
       }
 
       /* === Avatar de jugador / Rigo === */
@@ -406,24 +417,46 @@
     tie:     () => { beep(440, 440, 0.12, 'triangle', 0.1); beep(440, 440, 0.12, 'triangle', 0.1, 0.14); }
   };
 
-  // Boton flotante de sonido (se recuerda en localStorage). Estilos inline
-  // para que funcione igual en todas las variantes del framework.
+  // Iconos Material proporcionados para el estado activo y silenciado.
+  const SOUND_ON_ICON = '<svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M640-440v-80h160v80H640Zm48 280-128-96 48-64 128 96-48 64Zm-80-480-48-64 128-96 48 64-128 96ZM120-360v-240h160l200-200v640L280-360H120Z"/></svg>';
+  const SOUND_OFF_ICON = '<svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="m616-320-56-56 104-104-104-104 56-56 104 104 104-104 56 56-104 104 104 104-56 56-104-104-104 104Zm-496-40v-240h160l200-200v640L280-360H120Z"/></svg>';
+
+  // Botón de sonido en la esquina de la card de Juego final.
   function makeSoundToggle(wrap) {
-    wrap.style.position = 'relative';
+    const host = wrap.closest('.coeduca-exercise, .civica-section--consolidate') || wrap;
+    host.style.position = 'relative';
     const b = document.createElement('button');
     b.type = 'button';
-    b.title = 'Activar/silenciar sonido';
-    b.setAttribute('aria-label', 'Activar o silenciar sonido');
-    b.textContent = sndMuted() ? '\uD83D\uDD07' : '\uD83D\uDD0A';
-    b.style.cssText = 'position:absolute;top:0;right:0;z-index:5;width:44px;height:44px;' +
-      'font-size:20px;border:3px solid #1a1a1a;border-radius:12px;background:#fff;' +
-      'cursor:pointer;box-shadow:2px 2px 0 #1a1a1a;padding:0;line-height:1;';
+    b.className = 'coeduca-game-sound-toggle';
+    b.style.cssText = 'position:absolute;top:12px;right:12px;z-index:10;width:42px;height:42px;' +
+      'display:grid;place-items:center;color:#1a1a1a;border:3px solid #1a1a1a;' +
+      'border-radius:12px;background:#fff;cursor:pointer;box-shadow:2px 2px 0 #1a1a1a;' +
+      'padding:0;line-height:1;transition:transform .15s ease,box-shadow .15s ease;';
+    const renderState = () => {
+      const muted = sndMuted();
+      b.innerHTML = muted ? SOUND_OFF_ICON : SOUND_ON_ICON;
+      b.title = muted ? 'Activar sonido' : 'Desactivar sonido';
+      b.setAttribute('aria-label', b.title);
+      b.setAttribute('aria-pressed', String(muted));
+    };
+    b.addEventListener('pointerdown', () => {
+      b.style.transform = 'translate(2px,2px)';
+      b.style.boxShadow = '0 0 0 #1a1a1a';
+    });
+    const releaseButton = () => {
+      b.style.transform = '';
+      b.style.boxShadow = '2px 2px 0 #1a1a1a';
+    };
+    b.addEventListener('pointerup', releaseButton);
+    b.addEventListener('pointercancel', releaseButton);
+    b.addEventListener('pointerleave', releaseButton);
     b.addEventListener('click', () => {
       sndSetMuted(!sndMuted());
-      b.textContent = sndMuted() ? '\uD83D\uDD07' : '\uD83D\uDD0A';
+      renderState();
       if (!sndMuted()) SFX.tap();
     });
-    wrap.appendChild(b);
+    renderState();
+    host.appendChild(b);
     return b;
   }
 
@@ -677,7 +710,14 @@
   // =====================================================================
   reg('snake', function (ctx) {
     const SIZE = 15, CELL = 22;
+    const START_STEP_MS = 250;
+    const PRE_BOOST_MIN_STEP_MS = 150;
+    const HIGH_SCORE_STEP_MS = 120;
+    const SPEED_UP_SCORE = 20;
+    const MAX_SNAKE_LENGTH = 30;
     let snake, dir, nextDir, food, score, gameOver, loop, foodPulse = 0, stepMs = 250, paused = false;
+    let previousSnake = [], animationFrame = null, lastStepAt = 0;
+    let bonusEarned = false;
 
     const wrap = document.createElement('div');
     wrap.className = 'cg-snake-wrap';
@@ -686,7 +726,7 @@
         <span>🍎</span>
         <span>PUNTOS: <span id="snake-score-val">0</span></span>
         <span>·</span>
-        <span>META: <span id="snake-meta">5</span></span>
+        <span>BONUS: <span id="snake-meta">5</span></span>
       </div>
       <canvas class="cg-snake-canvas" id="snake-canvas"
               width="${SIZE * CELL}" height="${SIZE * CELL}"></canvas>
@@ -713,15 +753,83 @@
     const statusEl = wrap.querySelector('#snake-status');
     const winThreshold = (ctx.config && ctx.config.winScore) || 5;
     wrap.querySelector('#snake-meta').textContent = winThreshold;
+    const leaderboard = global.COEDUCA_LEADERBOARD
+      ? global.COEDUCA_LEADERBOARD.create(ctx, 'snake', winThreshold)
+      : { submit: () => Promise.resolve(false) };
+    const SWIPE_THRESHOLD = 18;
+    const touchCapable = 'ontouchstart' in global || (navigator.maxTouchPoints || 0) > 0;
+    let touchControlsActive = false;
+    let touchStart = null;
+    let previousBodyTouchAction = '';
+    let previousOverscrollBehavior = '';
+
+    function handleGameTouchStart(event) {
+      if (!touchControlsActive) return;
+      if (!document.body.contains(wrap)) { unlockTouchControls(); return; }
+      const touch = event.touches[0];
+      if (!touch) return;
+      touchStart = { x: touch.clientX, y: touch.clientY };
+      event.preventDefault();
+    }
+
+    function handleGameTouchMove(event) {
+      if (!touchControlsActive) return;
+      event.preventDefault();
+      if (!touchStart) return;
+      const touch = event.touches[0];
+      if (!touch) return;
+      const dx = touch.clientX - touchStart.x;
+      const dy = touch.clientY - touchStart.y;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_THRESHOLD) return;
+      setDir(Math.abs(dx) > Math.abs(dy)
+        ? (dx > 0 ? 'right' : 'left')
+        : (dy > 0 ? 'down' : 'up'));
+      // Permite encadenar varios giros sin levantar el dedo.
+      touchStart = { x: touch.clientX, y: touch.clientY };
+    }
+
+    function handleGameTouchEnd(event) {
+      if (!touchControlsActive) return;
+      event.preventDefault();
+      touchStart = null;
+    }
+
+    function lockTouchControls() {
+      if (!touchCapable || touchControlsActive) return false;
+      touchControlsActive = true;
+      previousBodyTouchAction = document.body.style.touchAction;
+      previousOverscrollBehavior = document.documentElement.style.overscrollBehavior;
+      document.body.style.touchAction = 'none';
+      document.documentElement.style.overscrollBehavior = 'none';
+      document.addEventListener('touchstart', handleGameTouchStart, { passive: false, capture: true });
+      document.addEventListener('touchmove', handleGameTouchMove, { passive: false, capture: true });
+      document.addEventListener('touchend', handleGameTouchEnd, { passive: false, capture: true });
+      document.addEventListener('touchcancel', handleGameTouchEnd, { passive: false, capture: true });
+      return true;
+    }
+
+    function unlockTouchControls() {
+      if (!touchControlsActive) return;
+      touchControlsActive = false;
+      touchStart = null;
+      document.body.style.touchAction = previousBodyTouchAction;
+      document.documentElement.style.overscrollBehavior = previousOverscrollBehavior;
+      document.removeEventListener('touchstart', handleGameTouchStart, true);
+      document.removeEventListener('touchmove', handleGameTouchMove, true);
+      document.removeEventListener('touchend', handleGameTouchEnd, true);
+      document.removeEventListener('touchcancel', handleGameTouchEnd, true);
+    }
 
     function reset() {
       snake = [{ x: 7, y: 7 }, { x: 6, y: 7 }, { x: 5, y: 7 }];
       dir = { x: 1, y: 0 };
       nextDir = { x: 1, y: 0 };
+      previousSnake = snake.map(segment => ({ ...segment }));
       placeFood();
       score = 0;
-      stepMs = 250;
+      stepMs = START_STEP_MS;
       gameOver = false;
+      bonusEarned = false;
       scoreVal.textContent = '0';
       statusEl.textContent = '';
       statusEl.className = 'cg-status';
@@ -733,8 +841,30 @@
       } while (snake.some(s => s.x === food.x && s.y === food.y));
     }
 
+    function stopSmoothRendering() {
+      if (animationFrame !== null) global.cancelAnimationFrame(animationFrame);
+      animationFrame = null;
+    }
+
+    function renderSmoothFrame(now) {
+      if (gameOver || paused) { animationFrame = null; return; }
+      foodPulse = (now / 16) % 60;
+      const progress = lastStepAt ? Math.min(1, (now - lastStepAt) / stepMs) : 1;
+      draw(progress);
+      animationFrame = global.requestAnimationFrame(renderSmoothFrame);
+    }
+
+    function startSmoothRendering() {
+      stopSmoothRendering();
+      previousSnake = snake.map(segment => ({ ...segment }));
+      lastStepAt = performance.now();
+      animationFrame = global.requestAnimationFrame(renderSmoothFrame);
+    }
+
     function step() {
       if (gameOver) return;
+      previousSnake = snake.map(segment => ({ ...segment }));
+      lastStepAt = performance.now();
       dir = nextDir;
       const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
       if (head.x < 0 || head.x >= SIZE || head.y < 0 || head.y >= SIZE ||
@@ -747,23 +877,25 @@
         score++;
         scoreVal.textContent = score;
         SFX.eat();
-        // La serpiente acelera un poco con cada manzana (minimo 130ms por paso)
-        stepMs = Math.max(130, stepMs - 12);
+        // Acelera gradualmente y recibe un impulso adicional a los 20 puntos.
+        stepMs = score >= SPEED_UP_SCORE
+          ? HIGH_SCORE_STEP_MS
+          : Math.max(PRE_BOOST_MIN_STEP_MS, START_STEP_MS - score * 5);
         clearInterval(loop);
         loop = setInterval(step, stepMs);
         // Pop animado del score
         scoreVal.style.animation = 'cgPopBounce 0.3s';
         setTimeout(() => { scoreVal.style.animation = ''; }, 300);
-        if (score >= winThreshold) return win();
+        if (score >= winThreshold) awardBonus();
         placeFood();
+        // Al llegar a 30 segmentos continúa sumando, pero deja de crecer.
+        if (snake.length > MAX_SNAKE_LENGTH) snake.pop();
       } else {
         snake.pop();
       }
-      foodPulse = (foodPulse + 1) % 60;
-      draw();
     }
 
-    function draw() {
+    function draw(interpolation = 1) {
       // Fondo con grid sutil
       cctx.fillStyle = '#1d3b1f';
       cctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -802,7 +934,9 @@
 
       // Serpiente
       snake.forEach((s, i) => {
-        const x = s.x * CELL, y = s.y * CELL;
+        const previous = previousSnake[i] || s;
+        const x = (previous.x + (s.x - previous.x) * interpolation) * CELL;
+        const y = (previous.y + (s.y - previous.y) * interpolation) * CELL;
         const isHead = i === 0;
         const t = i / Math.max(snake.length - 1, 1);
         // Color: cabeza más oscura, cola más clara
@@ -844,13 +978,19 @@
 
     function end() {
       gameOver = true; clearInterval(loop);
+      stopSmoothRendering();
+      draw(1);
+      unlockTouchControls();
+      snakeStartButton.disabled = false;
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cg-status is-lose';
-      ctx.onLose();
+      leaderboard.submit(score);
+      if (!bonusEarned) ctx.onLose();
     }
-    function win() {
-      gameOver = true; clearInterval(loop);
-      statusEl.textContent = '🎉 ¡GANASTE!';
+    function awardBonus() {
+      if (bonusEarned) return;
+      bonusEarned = true;
+      statusEl.textContent = '🎉 ¡PUNTO EXTRA! Sigue jugando para mejorar tu récord.';
       statusEl.className = 'cg-status is-win';
       SFX.win();
       spawnConfetti(wrap, 35);
@@ -874,24 +1014,13 @@
       const map = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
       if (map[e.key]) { setDir(map[e.key]); e.preventDefault(); }
     });
-    // Swipe táctil
-    let touchStart = null;
-    canvas.addEventListener('touchstart', e => {
-      const t = e.touches[0]; touchStart = { x: t.clientX, y: t.clientY };
-    }, { passive: true });
-    canvas.addEventListener('touchend', e => {
-      if (!touchStart) return;
-      const t = e.changedTouches[0];
-      const dx = t.clientX - touchStart.x, dy = t.clientY - touchStart.y;
-      if (Math.abs(dx) > Math.abs(dy)) setDir(dx > 0 ? 'right' : 'left');
-      else setDir(dy > 0 ? 'down' : 'up');
-      touchStart = null;
-    }, { passive: true });
-
     // Pausa automatica si la pestana pierde el foco (evita muertes injustas)
     autoPause(wrap,
       () => {
-        if (!gameOver && loop) { clearInterval(loop); loop = null; paused = true; }
+        if (!gameOver && loop) {
+          clearInterval(loop); loop = null; paused = true;
+          stopSmoothRendering(); draw(1);
+        }
       },
       () => {
         if (!paused) return;
@@ -900,21 +1029,30 @@
           if (gameOver || paused) return;
           clearInterval(loop);
           loop = setInterval(step, stepMs);
+          startSmoothRendering();
         }, 600);
       }
     );
 
-    wrap.querySelector('#snake-start').addEventListener('click', () => {
+    const snakeStartButton = wrap.querySelector('#snake-start');
+    snakeStartButton.addEventListener('click', () => {
+      stopSmoothRendering();
       reset(); draw();
+      snakeStartButton.disabled = true;
       clearInterval(loop);
       loop = setInterval(step, stepMs);
+      startSmoothRendering();
+      lockTouchControls();
+      if (touchControlsActive) {
+        statusEl.textContent = '📱 Desliza en cualquier dirección para controlar la serpiente.';
+      }
     });
     reset(); draw();
   });
 
   // =====================================================================
   // 3. DINO RUNNER — física mejorada (salto variable), parallax de fondo,
-  //    META visible al final y globo sorpresa de +1 punto extra.
+  //    umbral de bonus, carrera continua y globo sorpresa de +1 punto extra.
   // =====================================================================
   reg('dino', function (ctx) {
     const W = 600, H = 180;
@@ -930,7 +1068,8 @@
     const JUMP_CUT_VELOCITY = -5; // al soltar se recorta el salto (saltos cortos)
     const BUFFER_FRAMES = 6;      // si pulsa justo antes de aterrizar, salta al tocar suelo
     const START_SPEED = 5.2;
-    const MAX_SPEED = 9.5;
+    const MAX_SPEED = 17;
+    const SPEED_GAIN_PER_FRAME = 0.0028;
     const PTS_PER_DIST = 1 / 24;  // puntos mostrados por píxel recorrido
     const GRACE_FRAMES = 50;
 
@@ -938,6 +1077,7 @@
     let frames, sunX, groundOffset, dustParticles, started;
     let distance, finishDist, gate, jumpBuffer, jumpHeld;
     let balloon, balloonSpawned, balloonFx, plusOne;
+    let bonusEarned = false;
 
     const wrap = document.createElement('div');
     wrap.style.position = 'relative';
@@ -947,7 +1087,7 @@
              background:var(--coeduca-stroke);color:var(--coeduca-primary);
              display:inline-block;padding:6px 18px;border-radius:50px;letter-spacing:1.5px;
              box-shadow:3px 3px 0 var(--coeduca-stroke);">
-          🏃 PUNTOS: <span id="dino-score-val">0</span> &nbsp;·&nbsp; 🏁 META: ${winThreshold}
+          🏃 PUNTOS: <span id="dino-score-val">0</span> &nbsp;·&nbsp; ⭐ BONUS: ${winThreshold}
         </div>
         <div class="cg-progress-bar" style="max-width:${W - 40}px;">
           <div id="dino-progress" class="cg-progress-fill" style="width:0%"></div>
@@ -961,8 +1101,14 @@
           · 🎈 ¡Atrapa el globo para +1 extra!
         </div>
         <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-          <button class="coeduca-btn coeduca-btn-success" id="dino-start">▶ START</button>
-          <button class="coeduca-btn coeduca-btn-accent" id="dino-jump-btn">⬆ SALTAR</button>
+          <button class="coeduca-btn coeduca-btn-success" id="dino-start" style="display:inline-flex;align-items:center;gap:6px;">
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M320-200v-560l440 280-440 280Z"/></svg>
+            <span>START</span>
+          </button>
+          <button class="coeduca-btn coeduca-btn-accent" id="dino-jump-btn" style="display:inline-flex;align-items:center;gap:6px;">
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M360-160v-120H160l320-360 320 360H600v120H360ZM160-480l320-360 320 360H693L480-720 267-480H160Z"/></svg>
+            <span>SALTAR</span>
+          </button>
         </div>
         <div id="dino-status" class="cg-status"></div>
       </div>
@@ -975,6 +1121,9 @@
     const scoreVal = wrap.querySelector('#dino-score-val');
     const progressEl = wrap.querySelector('#dino-progress');
     const statusEl = wrap.querySelector('#dino-status');
+    const leaderboard = global.COEDUCA_LEADERBOARD
+      ? global.COEDUCA_LEADERBOARD.create(ctx, 'dino', winThreshold)
+      : { submit: () => Promise.resolve(false) };
 
     function reset() {
       dino = { x: 50, y: H - 42 - GROUND_H, w: 36, h: 42 };
@@ -992,6 +1141,7 @@
       }
       vy = 0; onGround = true;
       gameOver = false; speed = START_SPEED;
+      bonusEarned = false;
       frames = 0;
       sunX = W - 60;
       groundOffset = 0;
@@ -1009,7 +1159,7 @@
     }
 
     function displayedScore() {
-      return Math.min(winThreshold, Math.floor(distance * PTS_PER_DIST));
+      return Math.floor(distance * PTS_PER_DIST);
     }
 
     function spawnDust(n, cx, dirY) {
@@ -1119,6 +1269,7 @@
       distance += speed;
       scoreVal.textContent = displayedScore();
       progressEl.style.width = Math.min(100, (distance / finishDist) * 100) + '%';
+      if (displayedScore() >= winThreshold) awardBonus();
 
       // --- Obstáculos ---
       obstacles.forEach(o => {
@@ -1127,12 +1278,14 @@
       });
       obstacles = obstacles.filter(o => o.x + o.w > 0);
 
-      // Cerca de la meta dejamos de generar obstáculos: la recta final es libre.
-      const nearFinish = distance >= finishDist - (W + 550);
-      if (frames > GRACE_FRAMES && !nearFinish) {
+      // La carrera no termina en la meta: los obstaculos siguen apareciendo.
+      if (frames > GRACE_FRAMES) {
         const last = obstacles.length ? obstacles[obstacles.length - 1].x : -Infinity;
-        const gap = 190 + speed * 18; // separación mínima crece con la velocidad
-        const chance = 0.025 + Math.min(0.02, frames / 8000);
+        const difficulty = Math.min(1, frames / 3200);
+        // Con el tiempo aparecen antes y, al subir la velocidad, hay menos
+        // segundos de descanso entre ellos sin crear combinaciones imposibles.
+        const gap = 285 - difficulty * 70 + speed * 5;
+        const chance = 0.055 + difficulty * 0.045;
         if (W - last >= gap && Math.random() < chance) spawnObstacle();
       }
 
@@ -1165,15 +1318,6 @@
         plusOne.y -= 0.8;
         plusOne.life--;
         if (plusOne.life <= 0) plusOne = null;
-      }
-
-      // La META aparece de modo que al cruzarla se cumplan justo los puntos.
-      if (!gate && distance >= finishDist - (W + 20 - dino.x - dino.w)) {
-        gate = { x: W + 20 };
-      }
-      if (gate) {
-        gate.x -= speed;
-        if (gate.x + 35 < dino.x + dino.w / 2) return win();
       }
 
       // --- Parallax: nubes, montañas, lomas, sol, suelo ---
@@ -1217,8 +1361,9 @@
         }
       }
 
-      // Aceleración suave con límite
-      if (frames % 240 === 0 && speed < MAX_SPEED) speed += 0.25;
+      // Aceleración continua: se nota desde los primeros segundos y sigue
+      // aumentando hasta una velocidad realmente desafiante.
+      speed = Math.min(MAX_SPEED, START_SPEED + frames * SPEED_GAIN_PER_FRAME);
 
       draw();
     }
@@ -1858,18 +2003,18 @@
 
     function end() {
       gameOver = true; clearInterval(loop);
+      dinoStartButton.disabled = false;
       SFX.die();
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cg-status is-lose';
-      ctx.onLose();
+      leaderboard.submit(displayedScore());
+      if (!bonusEarned) ctx.onLose();
     }
-    function win() {
-      gameOver = true; clearInterval(loop);
-      scoreVal.textContent = winThreshold;
-      progressEl.style.width = '100%';
-      draw();
+    function awardBonus() {
+      if (bonusEarned) return;
+      bonusEarned = true;
       SFX.win();
-      statusEl.textContent = '🏁 ¡META ALCANZADA!';
+      statusEl.textContent = '🏁 ¡PUNTO EXTRA! Sigue corriendo para mejorar tu récord.';
       statusEl.className = 'cg-status is-win';
       spawnConfetti(wrap, 50);
       ctx.onWin();
@@ -1931,8 +2076,10 @@
     jumpBtn.addEventListener('mouseleave', releaseJump);
     jumpBtn.addEventListener('touchstart', e => { pressJump(); e.preventDefault(); }, { passive: false });
     jumpBtn.addEventListener('touchend', releaseJump);
-    wrap.querySelector('#dino-start').addEventListener('click', () => {
+    const dinoStartButton = wrap.querySelector('#dino-start');
+    dinoStartButton.addEventListener('click', () => {
       reset(); started = true; draw();
+      dinoStartButton.disabled = true;
       clearInterval(loop);
       loop = setInterval(step, TICK_MS);
     });
@@ -1994,17 +2141,89 @@
           font-size: 16px !important;
           border-radius: 10px !important;
         }
+        .hm2-powerups {
+          display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+          margin: 8px 0 12px;
+        }
+        .hm2-powerup {
+          min-height: 42px; padding: 7px 12px;
+          display: inline-flex; align-items: center; gap: 6px;
+          border: 3px solid #1a1a1a; border-radius: 12px;
+          background: #fff; color: #1a1a1a;
+          box-shadow: 3px 3px 0 #1a1a1a;
+          font-family: inherit; font-size: 13px; font-weight: 800; line-height: 1.1;
+          cursor: pointer;
+          transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+        }
+        .hm2-powerup:not(:disabled):active {
+          transform: translate(2px, 2px);
+          box-shadow: 1px 1px 0 #1a1a1a;
+        }
+        .hm2-powerup:disabled { cursor: not-allowed; opacity: 0.42; }
+        .hm2-powerup.is-used { text-decoration: line-through; filter: grayscale(1); }
+        .hm2-powerup-icon { font-size: 19px; text-decoration: none; }
+        .hm2-key-eliminated {
+          opacity: 0.38 !important;
+          background: #e9ecef !important;
+          color: #6c757d !important;
+        }
         @media (max-width: 480px) {
           .cg-hm-key, .cv-hm-key { min-width: 31px !important; height: 42px !important; }
           .hm2-tile { width: 28px; height: 36px; font-size: 18px; }
+          .hm2-powerup { padding: 7px 9px; font-size: 12px; }
         }
       `;
       document.head.appendChild(st);
     }
 
-    const words = (ctx.config && ctx.config.words) || ['ENGLISH', 'TEACHER', 'SCHOOL'];
-    let word, guessed, mistakes, gameOver;
+    function shuffleInPlace(items) {
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+      return items;
+    }
+
+    const configuredWords = (ctx.config && ctx.config.words) || [];
+    const sourceWords = configuredWords.length ? configuredWords : ['CASA', 'ESCUELA', 'APRENDER'];
+    const words = Array.from(new Set(
+      sourceWords.map(item => String(item).trim().toUpperCase()).filter(Boolean)
+    ));
+    shuffleInPlace(words);
+    const thematicWords = new Set(words.map(item => String(item).toUpperCase()));
+    const fallbackWords = Array.isArray(global.COEDUCA_HANGMAN_WORDS)
+      ? global.COEDUCA_HANGMAN_WORDS.filter(item => !thematicWords.has(String(item).toUpperCase()))
+      : [];
+    const winThreshold = (ctx.config && ctx.config.winScore) || 3;
+    const RANKING_MIN_SCORE = 3;
+    let word, guessed, mistakes, gameOver, score, bonusEarned, wordIndex, powerups;
+    let fallbackDeck, fallbackIndex, previousFallbackWord;
     const MAX = 6;
+
+    function shuffleFallbackDeck() {
+      fallbackDeck = fallbackWords.slice();
+      for (let i = fallbackDeck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [fallbackDeck[i], fallbackDeck[j]] = [fallbackDeck[j], fallbackDeck[i]];
+      }
+      // Evita repetir justo en la unión entre dos vueltas completas al banco.
+      if (fallbackDeck.length > 1 && fallbackDeck[0] === previousFallbackWord) {
+        [fallbackDeck[0], fallbackDeck[1]] = [fallbackDeck[1], fallbackDeck[0]];
+      }
+      fallbackIndex = 0;
+    }
+
+    function nextFallbackWord() {
+      if (!fallbackWords.length) {
+        const repeated = String(words[wordIndex % words.length]);
+        wordIndex++;
+        return repeated;
+      }
+      if (!fallbackDeck.length || fallbackIndex >= fallbackDeck.length) shuffleFallbackDeck();
+      const next = fallbackDeck[fallbackIndex++];
+      previousFallbackWord = next;
+      return next;
+    }
 
     // Normaliza letras para comparar: quita acentos (Á -> A) pero conserva la Ñ.
     function normLetter(ch) {
@@ -2017,21 +2236,52 @@
     wrap.className = 'cg-hm-wrap';
     wrap.style.position = 'relative';
     wrap.innerHTML = `
+      <div class="cg-snake-score" style="margin-bottom:12px;">
+        <span>🔤</span>
+        <span>PALABRAS: <span id="hm-score">0</span></span>
+        <span>·</span>
+        <span>BONUS: ${winThreshold}</span>
+      </div>
       <svg id="hm-svg" class="cg-hm-stage" viewBox="0 0 240 240"></svg>
       <div id="hm-hearts" class="cg-hm-hearts"></div>
+      <div id="hm-powerups" class="hm2-powerups" aria-label="Comodines">
+        <button type="button" class="hm2-powerup" data-power="life" title="Recupera una vida perdida">
+          <span class="hm2-powerup-icon">❤️</span><span>Vida extra</span>
+        </button>
+        <button type="button" class="hm2-powerup" data-power="reveal" title="Revela una letra correcta">
+          <span class="hm2-powerup-icon">💡</span><span>Revelar letra</span>
+        </button>
+        <button type="button" class="hm2-powerup" data-power="remove" title="Descarta tres letras incorrectas">
+          <span class="hm2-powerup-icon">✨</span><span>Descartar 3</span>
+        </button>
+      </div>
       <div id="hm-word" class="cg-hm-word"></div>
       <div id="hm-keys" class="cg-hm-keys"></div>
       <div id="hm-status" class="cg-status"></div>
-      <button class="coeduca-btn coeduca-btn-success" id="hm-reset" style="margin-top:10px;">🔄 Nueva palabra</button>
+      <button class="coeduca-btn coeduca-btn-success" id="hm-reset" style="margin-top:10px;">🔄 Reiniciar partida</button>
     `;
     ctx.container.appendChild(wrap);
 
     makeSoundToggle(wrap);
     const svg = wrap.querySelector('#hm-svg');
     const heartsEl = wrap.querySelector('#hm-hearts');
+    const powerupsEl = wrap.querySelector('#hm-powerups');
     const wordEl = wrap.querySelector('#hm-word');
     const keysEl = wrap.querySelector('#hm-keys');
     const statusEl = wrap.querySelector('#hm-status');
+    const scoreEl = wrap.querySelector('#hm-score');
+    const leaderboard = global.COEDUCA_LEADERBOARD
+      ? global.COEDUCA_LEADERBOARD.create(ctx, 'hangman', RANKING_MIN_SCORE)
+      : { submit: () => Promise.resolve(false) };
+
+    function updatePowerups() {
+      powerupsEl.querySelectorAll('[data-power]').forEach(btn => {
+        const type = btn.dataset.power;
+        const used = Boolean(powerups && powerups[type]);
+        btn.classList.toggle('is-used', used);
+        btn.disabled = gameOver || used || (type === 'life' && mistakes === 0);
+      });
+    }
 
     function drawHangman() {
       // Escena alegre + muñeco que se revela con cada error.
@@ -2178,8 +2428,12 @@
       });
     }
 
-    function reset() {
-      word = words[Math.floor(Math.random() * words.length)].toUpperCase();
+    function startWord() {
+      if (wordIndex < words.length) {
+        word = String(words[wordIndex++]).toUpperCase();
+      } else {
+        word = String(nextFallbackWord()).toUpperCase();
+      }
       guessed = new Set();
       mistakes = 0;
       gameOver = false;
@@ -2195,6 +2449,83 @@
       drawHangman();
       renderHearts();
       renderWord();
+      updatePowerups();
+    }
+
+    function reset() {
+      score = 0;
+      bonusEarned = false;
+      wordIndex = 0;
+      powerups = { life: false, reveal: false, remove: false };
+      shuffleInPlace(words);
+      fallbackDeck = [];
+      fallbackIndex = 0;
+      previousFallbackWord = '';
+      scoreEl.textContent = '0';
+      startWord();
+    }
+
+    function completeWord() {
+      if (gameOver) return;
+      gameOver = true;
+      updatePowerups();
+      score++;
+      scoreEl.textContent = score;
+      if (score === RANKING_MIN_SCORE) leaderboard.submit(score);
+      SFX.win();
+      statusEl.textContent = `🎉 ${word} correcta. Preparando la siguiente…`;
+      statusEl.className = 'cg-status is-win';
+      spawnConfetti(wrap, 30);
+      if (!bonusEarned && score >= winThreshold) {
+        bonusEarned = true;
+        ctx.onWin();
+      }
+      setTimeout(() => {
+        if (document.body.contains(wrap)) startWord();
+      }, 1200);
+    }
+
+    function usePowerup(type) {
+      if (gameOver || !powerups || powerups[type]) return;
+
+      if (type === 'life') {
+        if (mistakes === 0) return;
+        powerups.life = true;
+        mistakes--;
+        drawHangman();
+        renderHearts();
+        statusEl.textContent = '❤️ Recuperaste una vida.';
+      } else if (type === 'reveal') {
+        const candidates = Array.from(new Set(word.split('').map(normLetter)))
+          .filter(letter => !guessed.has(letter));
+        if (!candidates.length) return;
+        powerups.reveal = true;
+        const letter = candidates[Math.floor(Math.random() * candidates.length)];
+        guessed.add(letter);
+        const key = keysEl.querySelector(`[data-letter="${letter}"]`);
+        if (key) {
+          key.disabled = true;
+          key.classList.add('is-hit');
+        }
+        SFX.correct();
+        renderWord();
+        statusEl.textContent = `💡 Se reveló la letra ${letter}.`;
+        if (word.split('').every(c => guessed.has(normLetter(c)))) completeWord();
+      } else if (type === 'remove') {
+        const wordLetters = new Set(word.split('').map(normLetter));
+        const candidates = Array.from(keysEl.querySelectorAll('[data-letter]'))
+          .filter(btn => !btn.disabled && !wordLetters.has(btn.dataset.letter));
+        if (!candidates.length) return;
+        powerups.remove = true;
+        shuffleInPlace(candidates).slice(0, 3).forEach(btn => {
+          guessed.add(btn.dataset.letter);
+          btn.disabled = true;
+          btn.classList.add('hm2-key-eliminated');
+        });
+        statusEl.textContent = '✨ Se descartaron tres letras incorrectas.';
+      }
+      statusEl.className = 'cg-status';
+      updatePowerups();
     }
 
     function guess(letter, btn) {
@@ -2206,12 +2537,7 @@
         SFX.correct();
         renderWord();
         if (word.split('').every(c => guessed.has(normLetter(c)))) {
-          gameOver = true;
-          SFX.win();
-          statusEl.textContent = `🎉 ¡Ganaste! La palabra era ${word}`;
-          statusEl.className = 'cg-status is-win';
-          spawnConfetti(wrap, 30);
-          ctx.onWin();
+          completeWord();
         }
       } else {
         btn.classList.add('is-miss');
@@ -2228,8 +2554,10 @@
           renderWord(true);
           statusEl.textContent = `💀 Game Over. La palabra era ${word}`;
           statusEl.className = 'cg-status is-lose';
-          ctx.onLose();
+          leaderboard.submit(score);
+          if (!bonusEarned) ctx.onLose();
         }
+        updatePowerups();
       }
     }
 
@@ -2258,6 +2586,10 @@
       cleanupObserver.observe(document.body, { childList: true, subtree: true });
     }
 
+    powerupsEl.addEventListener('click', event => {
+      const button = event.target.closest('[data-power]');
+      if (button && powerupsEl.contains(button)) usePowerup(button.dataset.power);
+    });
     wrap.querySelector('#hm-reset').addEventListener('click', reset);
     reset();
   });
@@ -2550,12 +2882,13 @@
   // =====================================================================
   // 6. PILLS — puzle de píldoras bicolores (estilo Dr. Mario / Columns).
   //    ESPACIO (o ⟳ / tocar el tablero) gira, las flechas mueven.
-  //    Se borran 3 o más del mismo color EN LÍNEA (horizontal o vertical);
+  //    Se borran 3 o más del mismo color en horizontal, vertical o diagonal;
   //    el resto cae y puede encadenar combos. La caída se acelera con el
   //    tiempo. Se gana al llegar al puntaje meta.
   //    Una vez por partida cae una píldora DORADA "+1" (ambas mitades del
   //    mismo color): si el estudiante la destruye antes de ganar, suma
   //    +1 punto extra real (máximo 2 extra junto con el +1 de ganar).
+  //    Muy rara vez aparece una mitad ARCOÍRIS que destruye su vecindad 3x3.
   // =====================================================================
   reg('pills', function (ctx) {
     const COLS = 9, ROWS = 14, CELL = 24;
@@ -2566,12 +2899,15 @@
     const START_TICK = 600, MIN_TICK = 180, TICK_STEP = 12;
     // Probabilidad de píldora normal con ambas mitades iguales (raras a propósito)
     const SAME_COLOR_CHANCE = 0.1;
+    // Aproximadamente una de cada 67 piezas contiene una mitad arcoíris.
+    const RAINBOW_CHANCE = 0.015;
     // dir: posición de la segunda mitad respecto al pivote (derecha/abajo/izq/arriba)
     const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 
-    let grid, piece, loop, running, gameOver, score, paused;
+    let grid, piece, loop, running, gameOver, score, paused, bonusEarned;
     let bonusSpawned, bonusAwarded, bonusAtScore, clearingSet, floats;
     let tickMs, piecesLocked;
+    let scrollLocked = false, previousBodyTouchAction = '', previousOverscrollBehavior = '';
 
     const wrap = document.createElement('div');
     wrap.className = 'cg-snake-wrap';
@@ -2580,7 +2916,7 @@
         <span>💊</span>
         <span>PUNTOS: <span id="pl-score">0</span></span>
         <span>·</span>
-        <span>META: ${winThreshold}</span>
+        <span>BONUS: ${winThreshold}</span>
       </div>
       <div class="cg-progress-bar" style="max-width:${COLS * CELL}px;">
         <div id="pl-progress" class="cg-progress-fill" style="width:0%"></div>
@@ -2598,8 +2934,8 @@
           <button class="coeduca-btn cg-snake-dir" data-m="right" aria-label="Mover a la derecha">→</button>
         </div>
         <div style="font-size:12px;font-weight:bold;color:var(--coeduca-stroke);max-width:300px;">
-          ESPACIO o ⟳ gira · Flechas mueven · Haz líneas de 3+ del mismo color ·
-          ¡Cada vez cae más rápido! · 💛 Rompe la píldora dorada para +1 extra
+          PC: ESPACIO gira · ← → mueven · ↓ baja · Haz líneas rectas o diagonales de 3+ ·
+          🌈 El arcoíris explota alrededor · 💛 La píldora dorada da +1 extra
         </div>
       </div>
       <div id="pl-status" class="cg-status"></div>
@@ -2612,12 +2948,38 @@
     const scoreEl = wrap.querySelector('#pl-score');
     const progressEl = wrap.querySelector('#pl-progress');
     const statusEl = wrap.querySelector('#pl-status');
+    const leaderboard = global.COEDUCA_LEADERBOARD
+      ? global.COEDUCA_LEADERBOARD.create(ctx, 'pills', winThreshold)
+      : { submit: () => Promise.resolve(false) };
+
+    function preventGameScroll(event) {
+      if (scrollLocked) event.preventDefault();
+    }
+
+    function lockGameScroll() {
+      if (scrollLocked) return;
+      scrollLocked = true;
+      previousBodyTouchAction = document.body.style.touchAction;
+      previousOverscrollBehavior = document.documentElement.style.overscrollBehavior;
+      document.body.style.touchAction = 'none';
+      document.documentElement.style.overscrollBehavior = 'none';
+      document.addEventListener('touchmove', preventGameScroll, { passive: false, capture: true });
+    }
+
+    function unlockGameScroll() {
+      if (!scrollLocked) return;
+      scrollLocked = false;
+      document.body.style.touchAction = previousBodyTouchAction;
+      document.documentElement.style.overscrollBehavior = previousOverscrollBehavior;
+      document.removeEventListener('touchmove', preventGameScroll, true);
+    }
 
     function reset() {
       grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
       piece = null;
       running = false; gameOver = false; paused = false;
       score = 0;
+      bonusEarned = false;
       bonusSpawned = false; bonusAwarded = false;
       // La píldora dorada aparece una vez, entre el 30% y el 60% de la meta
       bonusAtScore = Math.floor(winThreshold * (0.3 + Math.random() * 0.3));
@@ -2634,8 +2996,8 @@
     function cellsOf(p) {
       const d = DIRS[p.dir];
       return [
-        { c: p.x, r: p.y, color: p.colors[0] },
-        { c: p.x + d[0], r: p.y + d[1], color: p.colors[1] }
+        { c: p.x, r: p.y, color: p.colors[0], rainbow: p.rainbowIndex === 0 },
+        { c: p.x + d[0], r: p.y + d[1], color: p.colors[1], rainbow: p.rainbowIndex === 1 }
       ];
     }
 
@@ -2646,6 +3008,7 @@
 
     function spawnPiece() {
       const isBonus = !bonusSpawned && score >= bonusAtScore;
+      const isRainbow = !isBonus && Math.random() < RAINBOW_CHANCE;
       const c1 = Math.floor(Math.random() * COLORS.length);
       let c2;
       if (isBonus || Math.random() < SAME_COLOR_CHANCE) {
@@ -2654,7 +3017,14 @@
         // Forzar mitades de colores distintos (las monocromas son raras)
         c2 = (c1 + 1 + Math.floor(Math.random() * (COLORS.length - 1))) % COLORS.length;
       }
-      const p = { x: Math.floor(COLS / 2) - 1, y: 0, dir: 0, colors: [c1, c2], bonus: isBonus };
+      const p = {
+        x: Math.floor(COLS / 2) - 1,
+        y: 0,
+        dir: 0,
+        colors: [c1, c2],
+        bonus: isBonus,
+        rainbowIndex: isRainbow ? Math.floor(Math.random() * 2) : -1
+      };
       if (isBonus) bonusSpawned = true;
       if (collides(p)) return end();
       piece = p;
@@ -2662,7 +3032,10 @@
 
     function tryMove(dx, dy) {
       if (!piece) return false;
-      const p = { x: piece.x + dx, y: piece.y + dy, dir: piece.dir, colors: piece.colors, bonus: piece.bonus };
+      const p = {
+        x: piece.x + dx, y: piece.y + dy, dir: piece.dir,
+        colors: piece.colors, bonus: piece.bonus, rainbowIndex: piece.rainbowIndex
+      };
       if (collides(p)) return false;
       piece = p;
       draw();
@@ -2676,7 +3049,8 @@
       for (let i = 0; i < kicks.length; i++) {
         const p = {
           x: piece.x + kicks[i][0], y: piece.y + kicks[i][1],
-          dir: (piece.dir + 1) % 4, colors: piece.colors, bonus: piece.bonus
+          dir: (piece.dir + 1) % 4, colors: piece.colors,
+          bonus: piece.bonus, rainbowIndex: piece.rainbowIndex
         };
         if (!collides(p)) { piece = p; SFX.tap(); draw(); return; }
       }
@@ -2690,8 +3064,12 @@
     function lockPiece() {
       if (!piece) return;
       const bonus = piece.bonus;
-      cellsOf(piece).forEach(({ c, r, color }) => {
-        if (r >= 0 && r < ROWS && c >= 0 && c < COLS) grid[r][c] = { color, bonus };
+      const rainbowCells = [];
+      cellsOf(piece).forEach(({ c, r, color, rainbow }) => {
+        if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
+          grid[r][c] = { color, bonus, rainbow };
+          if (rainbow) rainbowCells.push([r, c]);
+        }
       });
       piece = null;
       SFX.place();
@@ -2702,49 +3080,101 @@
         clearInterval(loop);
         loop = setInterval(stepTick, tickMs);
       }
-      resolveBoard();
+      if (rainbowCells.length) resolveRainbow(rainbowCells);
+      else resolveBoard();
     }
 
-    // Líneas de 3+ del mismo color, solo horizontales o verticales
-    // (más difícil que agrupar en cualquier forma)
+    // Líneas rectas de 3+ del mismo color: horizontal, vertical y dos diagonales.
     function findGroups() {
       const mark = {};
-      const flushRow = (r, endC, run) => {
-        if (run >= 3) for (let k = endC - run; k < endC; k++) mark[r * COLS + k] = true;
-      };
-      const flushCol = (c, endR, run) => {
-        if (run >= 3) for (let k = endR - run; k < endR; k++) mark[k * COLS + c] = true;
-      };
+      const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
       for (let r = 0; r < ROWS; r++) {
-        let run = 0;
-        for (let c = 0; c <= COLS; c++) {
-          const cell = c < COLS ? grid[r][c] : null;
-          const prev = c > 0 ? grid[r][c - 1] : null;
-          if (cell && prev && cell.color === prev.color) {
-            run++;
-          } else {
-            flushRow(r, c, run);
-            run = cell ? 1 : 0;
-          }
-        }
-      }
-      for (let c = 0; c < COLS; c++) {
-        let run = 0;
-        for (let r = 0; r <= ROWS; r++) {
-          const cell = r < ROWS ? grid[r][c] : null;
-          const prev = r > 0 ? grid[r - 1][c] : null;
-          if (cell && prev && cell.color === prev.color) {
-            run++;
-          } else {
-            flushCol(c, r, run);
-            run = cell ? 1 : 0;
-          }
+        for (let c = 0; c < COLS; c++) {
+          const cell = grid[r][c];
+          if (!cell || cell.rainbow) continue;
+          directions.forEach(([dr, dc]) => {
+            const previousR = r - dr, previousC = c - dc;
+            const previous = previousR >= 0 && previousR < ROWS &&
+              previousC >= 0 && previousC < COLS ? grid[previousR][previousC] : null;
+            if (previous && !previous.rainbow && previous.color === cell.color) return;
+
+            const run = [];
+            let nextR = r, nextC = c;
+            while (nextR >= 0 && nextR < ROWS && nextC >= 0 && nextC < COLS) {
+              const next = grid[nextR][nextC];
+              if (!next || next.rainbow || next.color !== cell.color) break;
+              run.push([nextR, nextC]);
+              nextR += dr;
+              nextC += dc;
+            }
+            if (run.length >= 3) {
+              run.forEach(([runR, runC]) => { mark[runR * COLS + runC] = true; });
+            }
+          });
         }
       }
       return Object.keys(mark).map(i => {
         const n = +i;
         return [Math.floor(n / COLS), n % COLS];
       });
+    }
+
+    function awardGoldenBonus(bonusHit) {
+      if (!bonusHit || bonusAwarded) return false;
+      bonusAwarded = true;
+      SFX.pop();
+      spawnConfetti(wrap, 15);
+      floats.push({ x: (COLS * CELL) / 2, y: (ROWS * CELL) / 2, life: 55, text: '+1 EXTRA' });
+      // +1 real en la nota (el core lo limita a una vez por sesión)
+      if (C.addBalloonBonus) C.addBalloonBonus();
+      if (global.rigo && global.rigo.say) {
+        global.rigo.say('¡Rompiste la píldora dorada! +1 punto extra 💊', 4000);
+      }
+      return true;
+    }
+
+    function resolveRainbow(centers) {
+      const targets = {};
+      centers.forEach(([centerR, centerC]) => {
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            const r = centerR + dr, c = centerC + dc;
+            if (r >= 0 && r < ROWS && c >= 0 && c < COLS && grid[r][c]) {
+              targets[r * COLS + c] = [r, c];
+            }
+          }
+        }
+      });
+      const toClear = Object.values(targets);
+      clearingSet = {};
+      toClear.forEach(([r, c]) => { clearingSet[r * COLS + c] = true; });
+      draw();
+      setTimeout(() => {
+        if (gameOver) return;
+        let bonusHit = false;
+        toClear.forEach(([r, c]) => {
+          const cell = grid[r][c];
+          if (cell && cell.bonus) bonusHit = true;
+          grid[r][c] = null;
+        });
+        clearingSet = null;
+        score += toClear.length * 10;
+        scoreEl.textContent = score;
+        progressEl.style.width = Math.min(100, (score / winThreshold) * 100) + '%';
+        SFX.pop();
+        spawnConfetti(wrap, 12);
+        awardGoldenBonus(bonusHit);
+        floats.push({
+          x: (centers[0][1] + 0.5) * CELL,
+          y: (centers[0][0] + 0.5) * CELL,
+          life: 45,
+          text: '🌈'
+        });
+        pumpFloats();
+        applyGravity();
+        draw();
+        setTimeout(resolveBoard, 200);
+      }, 180);
     }
 
     function applyGravity() {
@@ -2764,7 +3194,7 @@
       if (gameOver) return;
       const toClear = findGroups();
       if (!toClear.length) {
-        if (score >= winThreshold) return win();
+        if (score >= winThreshold) win();
         spawnPiece();
         draw();
         return;
@@ -2786,18 +3216,7 @@
         scoreEl.textContent = score;
         progressEl.style.width = Math.min(100, (score / winThreshold) * 100) + '%';
         SFX.eat();
-        if (bonusHit && !bonusAwarded) {
-          bonusAwarded = true;
-          SFX.pop();
-          spawnConfetti(wrap, 15);
-          floats.push({ x: (COLS * CELL) / 2, y: (ROWS * CELL) / 2, life: 55, text: '+1 EXTRA' });
-          pumpFloats();
-          // +1 real en la nota (el core lo limita a una vez por sesión)
-          if (C.addBalloonBonus) C.addBalloonBonus();
-          if (global.rigo && global.rigo.say) {
-            global.rigo.say('¡Rompiste la píldora dorada! +1 punto extra 💊', 4000);
-          }
-        }
+        if (awardGoldenBonus(bonusHit)) pumpFloats();
         applyGravity();
         draw();
         setTimeout(resolveBoard, 200);
@@ -2812,11 +3231,26 @@
       setTimeout(pumpFloats, 60);
     }
 
-    function drawCell(c, r, colorIdx, bonus) {
+    function drawCell(c, r, colorIdx, bonus, rainbow) {
       const x = c * CELL, y = r * CELL;
       const clearing = clearingSet && clearingSet[r * COLS + c];
-      cctx.fillStyle = clearing ? '#fff' : COLORS[colorIdx];
-      cctx.strokeStyle = clearing ? '#fff' : DARK[colorIdx];
+      if (clearing) {
+        cctx.fillStyle = '#fff';
+        cctx.strokeStyle = '#fff';
+      } else if (rainbow) {
+        const gradient = cctx.createLinearGradient(x + 2, y + 2, x + CELL - 2, y + CELL - 2);
+        gradient.addColorStop(0, '#E63946');
+        gradient.addColorStop(0.2, '#FF9F1C');
+        gradient.addColorStop(0.4, '#FFD700');
+        gradient.addColorStop(0.6, '#4CAF50');
+        gradient.addColorStop(0.8, '#4FC3F7');
+        gradient.addColorStop(1, '#9B5DE5');
+        cctx.fillStyle = gradient;
+        cctx.strokeStyle = '#fff';
+      } else {
+        cctx.fillStyle = COLORS[colorIdx];
+        cctx.strokeStyle = DARK[colorIdx];
+      }
       cctx.lineWidth = 2;
       cctx.beginPath();
       if (cctx.roundRect) cctx.roundRect(x + 2, y + 2, CELL - 4, CELL - 4, 7);
@@ -2828,6 +3262,12 @@
         cctx.beginPath();
         cctx.ellipse(x + CELL * 0.35, y + CELL * 0.32, CELL * 0.18, CELL * 0.12, -0.6, 0, Math.PI * 2);
         cctx.fill();
+      }
+      if (rainbow && !clearing) {
+        cctx.fillStyle = '#fff';
+        cctx.font = 'bold 13px system-ui';
+        cctx.textAlign = 'center';
+        cctx.fillText('✦', x + CELL / 2, y + CELL / 2 + 5);
       }
       if (bonus) {
         // Anillo dorado + etiqueta "+1"
@@ -2873,11 +3313,11 @@
       // Celdas fijas
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
-          if (grid[r][c]) drawCell(c, r, grid[r][c].color, grid[r][c].bonus);
+          if (grid[r][c]) drawCell(c, r, grid[r][c].color, grid[r][c].bonus, grid[r][c].rainbow);
         }
       }
       // Pieza en caída
-      if (piece) cellsOf(piece).forEach(cl => drawCell(cl.c, cl.r, cl.color, piece.bonus));
+      if (piece) cellsOf(piece).forEach(cl => drawCell(cl.c, cl.r, cl.color, piece.bonus, cl.rainbow));
       // Textos flotantes (+1 EXTRA)
       floats.forEach(f => {
         cctx.save();
@@ -2897,17 +3337,21 @@
 
     function end() {
       gameOver = true; running = false; clearInterval(loop);
+      unlockGameScroll();
+      pillsStartButton.disabled = false;
       SFX.die();
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cg-status is-lose';
-      ctx.onLose();
+      leaderboard.submit(score);
+      if (!bonusEarned) ctx.onLose();
       draw();
     }
 
     function win() {
-      gameOver = true; running = false; clearInterval(loop);
+      if (bonusEarned) return;
+      bonusEarned = true;
       SFX.win();
-      statusEl.textContent = '🎉 ¡GANASTE!';
+      statusEl.textContent = '🎉 ¡PUNTO EXTRA! Sigue jugando para mejorar tu récord.';
       statusEl.className = 'cg-status is-win';
       spawnConfetti(wrap, 40);
       ctx.onWin();
@@ -2919,10 +3363,10 @@
       if (!tryMove(0, 1)) lockPiece();
     }
 
-    // Teclado físico: flechas mueven, ESPACIO (o ↑) gira
+    // Teclado físico: ESPACIO gira; izquierda/derecha mueven y abajo acelera.
     document.addEventListener('keydown', e => {
       if (isTypingTarget(e) || !running || gameOver) return;
-      if (e.code === 'Space' || e.key === 'ArrowUp') { tryRotate(); e.preventDefault(); }
+      if (e.code === 'Space') { tryRotate(); e.preventDefault(); }
       else if (e.key === 'ArrowLeft') { tryMove(-1, 0); e.preventDefault(); }
       else if (e.key === 'ArrowRight') { tryMove(1, 0); e.preventDefault(); }
       else if (e.key === 'ArrowDown') { softDrop(); e.preventDefault(); }
@@ -2965,12 +3409,14 @@
         if (running && !gameOver && loop) {
           clearInterval(loop); loop = null;
           paused = true;
+          unlockGameScroll();
           draw();
         }
       },
       () => {
         if (!paused) return;
         paused = false;
+        lockGameScroll();
         draw();
         setTimeout(() => {
           if (gameOver || !running || paused) return;
@@ -2980,13 +3426,816 @@
       }
     );
 
-    wrap.querySelector('#pl-start').addEventListener('click', () => {
+    if (typeof MutationObserver !== 'undefined') {
+      const cleanupObserver = new MutationObserver(() => {
+        if (!document.body.contains(wrap)) {
+          unlockGameScroll();
+          cleanupObserver.disconnect();
+        }
+      });
+      cleanupObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    const pillsStartButton = wrap.querySelector('#pl-start');
+    pillsStartButton.addEventListener('click', () => {
       reset();
       running = true;
+      pillsStartButton.disabled = true;
+      lockGameScroll();
       spawnPiece();
       draw();
       clearInterval(loop);
       loop = setInterval(stepTick, tickMs);
+    });
+
+    reset();
+    draw();
+  });
+
+  // =====================================================================
+  // 7. TORRE SÁNDWICH — atrapa, centra y equilibra los ingredientes.
+  // =====================================================================
+  reg('sandwich', function (ctx) {
+    const W = 360, H = 470, PLATE_Y = 356, FLOOR_Y = 438;
+    const winThreshold = Math.max(1, (ctx.config && ctx.config.winScore) || 500);
+    const INGREDIENTS = {
+      bottom: { name: 'PAN', width: 104, height: 22 },
+      cheese: { name: 'QUESO', width: 92, height: 14 },
+      meat: { name: 'CARNE', width: 88, height: 19 },
+      tomato: { name: 'TOMATE', width: 82, height: 13 },
+      lettuce: { name: 'LECHUGA', width: 96, height: 16 },
+      bacon: { name: 'TOCINO', width: 82, height: 12 },
+      onion: { name: 'CEBOLLA', width: 76, height: 12 },
+      pickle: { name: 'PEPINILLO', width: 72, height: 11 },
+      egg: { name: 'HUEVO', width: 84, height: 14 },
+      avocado: { name: 'AGUACATE', width: 78, height: 13 },
+      top: { name: 'PAN', width: 104, height: 27 }
+    };
+
+    let stack, order, falling, plateX, score, sandwiches, landedTotal;
+    let running, gameOver, paused, serving, bonusEarned, lastAt, raf;
+    let leftHeld = false, rightHeld = false, pointerActive = false;
+    let scrollLocked = false, previousTouchAction = '', previousOverscroll = '';
+    let wobble = 0, floatText = null;
+    let collapsePieces = [], collapseStartedAt = 0, collapseLastAt = 0, lossAnimating = false;
+    let towerTilt = 0, targetTowerTilt = 0, balanceRatio = 0, imbalanceTime = 0;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'cg-snake-wrap cv-snake-wrap';
+    wrap.innerHTML = `
+      <div class="cg-snake-score cv-snake-score" style="background:#3b2417;color:#ffe06a;">
+        <span>🥪</span>
+        <span>PUNTOS: <span id="sw-score">0</span></span>
+        <span>·</span>
+        <span>SÁNDWICHES: <span id="sw-count">0</span></span>
+      </div>
+      <div class="cg-progress-bar cv-progress-bar" style="max-width:${W - 36}px;">
+        <div id="sw-progress" class="cg-progress-fill cv-progress-fill" style="width:0%"></div>
+      </div>
+      <canvas id="sw-canvas" class="cg-snake-canvas cv-snake-canvas"
+              width="${W}" height="${H}" style="background:#bde8ff;touch-action:none;"></canvas>
+      <div class="cg-snake-controls cv-snake-controls">
+        <button class="coeduca-btn coeduca-btn-success civica-btn civica-btn-success cg-snake-start cv-snake-start"
+                id="sw-start">▶ START</button>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button class="coeduca-btn civica-btn cg-snake-dir cv-snake-dir" data-sw-dir="left" aria-label="Mover a la izquierda">←</button>
+          <button class="coeduca-btn civica-btn cg-snake-dir cv-snake-dir" data-sw-dir="right" aria-label="Mover a la derecha">→</button>
+        </div>
+        <div style="font-size:12px;font-weight:bold;color:#3b2417;max-width:330px;line-height:1.45;">
+          PC: ← → o A/D · Móvil: arrastra el plato · Centra cada ingrediente para que la torre no caiga
+        </div>
+      </div>
+      <div id="sw-status" class="cg-status cv-status"></div>
+    `;
+    ctx.container.appendChild(wrap);
+    makeSoundToggle(wrap);
+
+    const canvas = wrap.querySelector('#sw-canvas');
+    const cctx = canvas.getContext('2d');
+    const scoreEl = wrap.querySelector('#sw-score');
+    const countEl = wrap.querySelector('#sw-count');
+    const progressEl = wrap.querySelector('#sw-progress');
+    const statusEl = wrap.querySelector('#sw-status');
+    const startButton = wrap.querySelector('#sw-start');
+    const leaderboard = global.COEDUCA_LEADERBOARD
+      ? global.COEDUCA_LEADERBOARD.create(ctx, 'sandwich', winThreshold)
+      : { submit: () => Promise.resolve(false) };
+
+    function preventScroll(event) { if (scrollLocked) event.preventDefault(); }
+    function lockScroll() {
+      if (scrollLocked) return;
+      scrollLocked = true;
+      previousTouchAction = document.body.style.touchAction;
+      previousOverscroll = document.documentElement.style.overscrollBehavior;
+      document.body.style.touchAction = 'none';
+      document.documentElement.style.overscrollBehavior = 'none';
+      document.addEventListener('touchmove', preventScroll, { passive: false, capture: true });
+    }
+    function unlockScroll() {
+      if (!scrollLocked) return;
+      scrollLocked = false;
+      document.body.style.touchAction = previousTouchAction;
+      document.documentElement.style.overscrollBehavior = previousOverscroll;
+      document.removeEventListener('touchmove', preventScroll, true);
+    }
+
+    function shuffledMiddle() {
+      const middle = ['cheese', 'meat', 'tomato', 'lettuce', 'bacon', 'onion', 'pickle', 'egg', 'avocado'];
+      for (let i = middle.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = middle[i]; middle[i] = middle[j]; middle[j] = tmp;
+      }
+      return ['bottom'].concat(middle, ['top']);
+    }
+
+    function reset() {
+      cancelAnimationFrame(raf);
+      stack = [];
+      order = shuffledMiddle();
+      falling = null;
+      plateX = W / 2;
+      score = 0;
+      sandwiches = 0;
+      landedTotal = 0;
+      running = false;
+      gameOver = false;
+      paused = false;
+      serving = false;
+      bonusEarned = false;
+      lastAt = 0;
+      wobble = 0;
+      floatText = null;
+      collapsePieces = [];
+      collapseStartedAt = 0;
+      collapseLastAt = 0;
+      lossAnimating = false;
+      towerTilt = 0;
+      targetTowerTilt = 0;
+      balanceRatio = 0;
+      imbalanceTime = 0;
+      leftHeld = false;
+      rightHeld = false;
+      scoreEl.textContent = '0';
+      countEl.textContent = '0';
+      progressEl.style.width = '0%';
+      statusEl.textContent = '';
+      statusEl.className = 'cg-status cv-status';
+    }
+
+    function horizontalOverlap(leftA, rightA, leftB, rightB) {
+      return Math.max(0, Math.min(rightA, rightB) - Math.max(leftA, leftB));
+    }
+
+    function mergedLength(intervals) {
+      if (!intervals.length) return 0;
+      const sorted = intervals.slice().sort((a, b) => a[0] - b[0]);
+      let total = 0, start = sorted[0][0], end = sorted[0][1];
+      for (let i = 1; i < sorted.length; i++) {
+        if (sorted[i][0] <= end) end = Math.max(end, sorted[i][1]);
+        else {
+          total += end - start;
+          start = sorted[i][0];
+          end = sorted[i][1];
+        }
+      }
+      return total + end - start;
+    }
+
+    function worldPose(item) {
+      const cos = Math.cos(towerTilt), sin = Math.sin(towerTilt);
+      const localCenterX = item.offset;
+      const localCenterY = item.y + item.height / 2 - PLATE_Y;
+      const centerX = plateX + localCenterX * cos - localCenterY * sin;
+      const centerY = PLATE_Y + localCenterX * sin + localCenterY * cos;
+      return {
+        centerX,
+        centerY,
+        left: centerX - (Math.abs(cos) * item.width + Math.abs(sin) * item.height) / 2,
+        right: centerX + (Math.abs(cos) * item.width + Math.abs(sin) * item.height) / 2,
+        top: centerY - (Math.abs(cos) * item.height + Math.abs(sin) * item.width) / 2
+      };
+    }
+
+    function worldToLocal(worldX, worldY, height) {
+      const cos = Math.cos(towerTilt), sin = Math.sin(towerTilt);
+      const dx = worldX - plateX;
+      const dy = worldY + height / 2 - PLATE_Y;
+      return {
+        offset: dx * cos + dy * sin,
+        y: PLATE_Y + (-dx * sin + dy * cos) - height / 2
+      };
+    }
+
+    function findLanding(item) {
+      const itemLeft = item.x - item.width / 2;
+      const itemRight = item.x + item.width / 2;
+      const surfaces = stack.map(support => {
+        const pose = worldPose(support);
+        return { top: pose.top, left: pose.left, right: pose.right };
+      });
+      // Solo el primer pan se apoya directamente en el plato.
+      if (item.type === 'bottom') {
+        surfaces.push({ top: PLATE_Y, left: plateX - 52, right: plateX + 52 });
+      }
+      const candidates = surfaces
+        .map(surface => Object.assign({}, surface, {
+          y: surface.top - item.height,
+          overlap: horizontalOverlap(itemLeft, itemRight, surface.left, surface.right)
+        }))
+        .filter(surface =>
+          surface.overlap > 0 &&
+          surface.y >= item.y - 1.5 &&
+          !(item.sliding && Math.abs(surface.y - item.ignoreLandingY) < 3)
+        );
+      if (!candidates.length) {
+        return { floor: true, y: FLOOR_Y - item.height, overlapRatio: 0 };
+      }
+
+      // Colisión continua: se detiene en la primera superficie que toque,
+      // incluso si solo alcanza una esquina.
+      const landingY = Math.min.apply(null, candidates.map(surface => surface.y));
+      const supports = candidates.filter(surface => Math.abs(surface.y - landingY) < 0.75);
+      const intervals = supports.map(surface => [
+        Math.max(itemLeft, surface.left),
+        Math.min(itemRight, surface.right)
+      ]);
+      const supportLeft = Math.min.apply(null, supports.map(surface => surface.left));
+      const supportRight = Math.max.apply(null, supports.map(surface => surface.right));
+      return {
+        floor: false,
+        y: landingY,
+        overlapRatio: mergedLength(intervals) / item.width,
+        left: supportLeft,
+        right: supportRight,
+        center: (supportLeft + supportRight) / 2
+      };
+    }
+
+    function spawnIngredient() {
+      if (!running || gameOver || serving || falling) return;
+      if (!order.length) order = shuffledMiddle();
+      const type = order.shift();
+      const spec = INGREDIENTS[type];
+      const margin = spec.width / 2 + 8;
+      falling = {
+        type,
+        name: spec.name,
+        width: spec.width,
+        height: spec.height,
+        x: margin + Math.random() * (W - margin * 2),
+        y: -spec.height - 8,
+        speed: Math.min(255, 112 + landedTotal * 5.5)
+      };
+    }
+
+    function centerOfMass(items) {
+      let total = 0, weighted = 0;
+      items.forEach(item => {
+        const weight = item.width * item.height;
+        total += weight;
+        weighted += item.offset * weight;
+      });
+      return total ? weighted / total : 0;
+    }
+
+    function calculateBalance() {
+      const base = stack.find(item => item.type === 'bottom');
+      if (!base || !stack.length) return 0;
+      const supportLeft = Math.max(-52, base.offset - base.width / 2);
+      const supportRight = Math.min(52, base.offset + base.width / 2);
+      const supportCenter = (supportLeft + supportRight) / 2;
+      const supportHalf = Math.max(7, (supportRight - supportLeft) / 2);
+      return (centerOfMass(stack) - supportCenter) / (supportHalf * 0.82);
+    }
+
+    function updateTowerBalance(dt) {
+      balanceRatio = calculateBalance();
+      targetTowerTilt = Math.max(-0.32, Math.min(0.32, balanceRatio * 0.16));
+      towerTilt += (targetTowerTilt - towerTilt) * Math.min(1, dt * 4.2);
+      if (Math.abs(balanceRatio) > 1) {
+        imbalanceTime += dt;
+        if (imbalanceTime > 0.18 && !gameOver) {
+          statusEl.textContent = '⚠️ ¡EL PESO ESTÁ VENCIENDO LA TORRE!';
+          statusEl.className = 'cg-status cv-status is-tie';
+        }
+        if (imbalanceTime > 0.72) end('¡EL PESO VOLCÓ EL SÁNDWICH!');
+      } else {
+        imbalanceTime = Math.max(0, imbalanceTime - dt * 1.8);
+        if (statusEl.textContent.indexOf('EL PESO ESTÁ') >= 0) {
+          statusEl.textContent = '';
+          statusEl.className = 'cg-status cv-status';
+        }
+      }
+    }
+
+    function awardBonus() {
+      if (bonusEarned || score < winThreshold) return;
+      bonusEarned = true;
+      SFX.win();
+      statusEl.textContent = '🎉 ¡PUNTO EXTRA! Sigue apilando para mejorar tu récord.';
+      statusEl.className = 'cg-status cv-status is-win';
+      spawnConfetti(wrap, 45);
+      ctx.onWin();
+    }
+
+    function prepareCollapse() {
+      const pieces = [];
+      stack.forEach(item => {
+        const pose = worldPose(item);
+        pieces.push(Object.assign({}, item, {
+          x: pose.centerX,
+          y: pose.centerY - item.height / 2,
+          vx: (pose.centerX - plateX) * 1.8 + (Math.random() - 0.5) * 85,
+          vy: -95 - Math.random() * 95,
+          angle: towerTilt,
+          spin: (Math.random() - 0.5) * 7,
+          bounces: 0
+        }));
+      });
+      if (falling) {
+        pieces.push(Object.assign({}, falling, {
+          vx: (falling.x - plateX) * 1.15 + (Math.random() - 0.5) * 70,
+          vy: -45 - Math.random() * 75,
+          angle: falling.angle || 0,
+          spin: (Math.random() - 0.5) * 8,
+          bounces: 0
+        }));
+      }
+      collapsePieces = pieces;
+      stack = [];
+      falling = null;
+    }
+
+    function collapseFrame(now) {
+      if (!lossAnimating) return;
+      if (!collapseStartedAt) {
+        collapseStartedAt = now;
+        collapseLastAt = now;
+      }
+      const dt = Math.min(0.034, (now - collapseLastAt) / 1000);
+      collapseLastAt = now;
+      collapsePieces.forEach(piece => {
+        piece.vy += 690 * dt;
+        piece.x += piece.vx * dt;
+        piece.y += piece.vy * dt;
+        piece.angle += piece.spin * dt;
+        const floor = FLOOR_Y - piece.height;
+        if (piece.y >= floor) {
+          piece.y = floor;
+          if (Math.abs(piece.vy) > 42 && piece.bounces < 2) {
+            piece.vy *= -0.28;
+            piece.vx *= 0.68;
+            piece.spin *= 0.62;
+            piece.bounces++;
+          } else {
+            piece.vy = 0;
+            piece.vx *= 0.86;
+            piece.spin *= 0.72;
+          }
+        }
+      });
+      draw();
+      if (now - collapseStartedAt < 1800) {
+        raf = requestAnimationFrame(collapseFrame);
+      } else {
+        lossAnimating = false;
+        draw();
+      }
+    }
+
+    function end(reason) {
+      if (gameOver) return;
+      gameOver = true;
+      running = false;
+      serving = false;
+      leftHeld = false;
+      rightHeld = false;
+      cancelAnimationFrame(raf);
+      unlockScroll();
+      startButton.disabled = false;
+      prepareCollapse();
+      lossAnimating = true;
+      collapseStartedAt = 0;
+      collapseLastAt = 0;
+      SFX.die();
+      statusEl.textContent = '💥 ' + (reason || '¡LA TORRE CAYÓ!');
+      statusEl.className = 'cg-status cv-status is-lose';
+      leaderboard.submit(score);
+      if (!bonusEarned) ctx.onLose();
+      draw();
+      raf = requestAnimationFrame(collapseFrame);
+    }
+
+    function landIngredient(landing) {
+      if (!falling || !landing) return;
+      if (landing.floor) {
+        end('¡EL INGREDIENTE NO TUVO APOYO!');
+        return;
+      }
+      const centerSupported = falling.x >= landing.left - 3 && falling.x <= landing.right + 3;
+      if (!centerSupported) {
+        const direction = falling.x < landing.center ? -1 : 1;
+        falling.sliding = true;
+        falling.ignoreLandingY = landing.y;
+        falling.slideLeft = landing.left;
+        falling.slideRight = landing.right;
+        falling.vx = direction * (78 + Math.min(55, landedTotal * 3));
+        falling.angle = direction * 0.08;
+        SFX.tap();
+        return;
+      }
+      const delta = falling.x - landing.center;
+      const tolerance = Math.max(1, falling.width / 2);
+      const local = worldToLocal(falling.x, landing.y, falling.height);
+
+      const placed = {
+        type: falling.type,
+        name: falling.name,
+        width: falling.width,
+        height: falling.height,
+        offset: local.offset,
+        y: local.y
+      };
+
+      const centering = Math.max(0, 1 - Math.abs(delta) / tolerance);
+      const accuracy = Math.min(1, landing.overlapRatio * 0.55 + centering * 0.45);
+      const gained = 25 + Math.round(accuracy * 75);
+      stack.push(placed);
+      landedTotal++;
+      score += gained;
+      scoreEl.textContent = score;
+      progressEl.style.width = Math.min(100, score / winThreshold * 100) + '%';
+      floatText = { text: '+' + gained + (accuracy > 0.86 ? ' ¡PERFECTO!' : ''), life: 65 };
+      wobble = Math.max(wobble, (1 - accuracy) * 13);
+      SFX.place();
+      falling = null;
+      awardBonus();
+
+      if (placed.type === 'top') {
+        serving = true;
+        sandwiches++;
+        score += 225;
+        scoreEl.textContent = score;
+        countEl.textContent = sandwiches;
+        progressEl.style.width = Math.min(100, score / winThreshold * 100) + '%';
+        floatText = { text: '+225 ¡SÁNDWICH LISTO!', life: 85 };
+        SFX.eat();
+        spawnConfetti(wrap, 20);
+        awardBonus();
+        setTimeout(() => {
+          if (gameOver || !running) return;
+          stack = [];
+          order = shuffledMiddle();
+          serving = false;
+          towerTilt = 0;
+          targetTowerTilt = 0;
+          balanceRatio = 0;
+          imbalanceTime = 0;
+          spawnIngredient();
+        }, 950);
+      } else {
+        setTimeout(() => {
+          if (!gameOver && running && !paused) spawnIngredient();
+        }, 230);
+      }
+    }
+
+    function roundedRect(x, y, width, height, radius) {
+      cctx.beginPath();
+      if (cctx.roundRect) cctx.roundRect(x, y, width, height, radius);
+      else cctx.rect(x, y, width, height);
+    }
+
+    function drawIngredient(item, x, y) {
+      const left = x - item.width / 2;
+      cctx.save();
+      cctx.lineWidth = 2.5;
+      cctx.strokeStyle = '#4a2919';
+      if (item.type === 'bottom' || item.type === 'top') {
+        const gradient = cctx.createLinearGradient(0, y, 0, y + item.height);
+        gradient.addColorStop(0, '#ffd88b'); gradient.addColorStop(1, '#d88a3d');
+        cctx.fillStyle = gradient;
+        roundedRect(left, y, item.width, item.height, item.type === 'top' ? 18 : 8);
+        cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#fff1b6';
+        for (let i = 0; i < 5; i++) {
+          cctx.beginPath();
+          cctx.ellipse(left + 18 + i * 20, y + 8 + (i % 2) * 5, 2.5, 1.2, -0.5, 0, Math.PI * 2);
+          cctx.fill();
+        }
+      } else if (item.type === 'cheese') {
+        cctx.fillStyle = '#ffd633';
+        roundedRect(left, y, item.width, item.height, 4); cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#f4b400';
+        [0.24, 0.7].forEach(pos => { cctx.beginPath(); cctx.arc(left + item.width * pos, y + 6, 2.5, 0, Math.PI * 2); cctx.fill(); });
+      } else if (item.type === 'meat') {
+        cctx.fillStyle = '#7a3f24';
+        cctx.beginPath(); cctx.ellipse(x, y + item.height / 2, item.width / 2, item.height / 2, 0, 0, Math.PI * 2); cctx.fill(); cctx.stroke();
+        cctx.strokeStyle = '#b66a3a'; cctx.lineWidth = 2;
+        for (let i = -2; i <= 2; i++) { cctx.beginPath(); cctx.moveTo(x + i * 17 - 7, y + 7); cctx.lineTo(x + i * 17 + 6, y + 14); cctx.stroke(); }
+      } else if (item.type === 'tomato') {
+        cctx.fillStyle = '#f04444';
+        roundedRect(left, y, item.width, item.height, 7); cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#ffd36a';
+        for (let i = 0; i < 4; i++) { cctx.beginPath(); cctx.arc(left + 16 + i * 22, y + 7, 1.8, 0, Math.PI * 2); cctx.fill(); }
+      } else if (item.type === 'lettuce') {
+        const leafGradient = cctx.createLinearGradient(left, y, left + item.width, y + item.height);
+        leafGradient.addColorStop(0, '#9be564');
+        leafGradient.addColorStop(0.5, '#55bd4a');
+        leafGradient.addColorStop(1, '#278c3c');
+        cctx.fillStyle = leafGradient;
+        const segments = 8, step = item.width / segments;
+        cctx.beginPath();
+        cctx.moveTo(left, y + item.height / 2);
+        for (let i = 0; i < segments; i++) {
+          cctx.quadraticCurveTo(
+            left + (i + 0.5) * step,
+            y + (i % 2 ? 1 : 5),
+            left + (i + 1) * step,
+            y + item.height / 2
+          );
+        }
+        for (let i = segments - 1; i >= 0; i--) {
+          cctx.quadraticCurveTo(
+            left + (i + 0.5) * step,
+            y + item.height - (i % 2 ? 1 : 5),
+            left + i * step,
+            y + item.height / 2
+          );
+        }
+        cctx.closePath(); cctx.fill(); cctx.stroke();
+        cctx.strokeStyle = '#247c35'; cctx.lineWidth = 1.4;
+        cctx.beginPath(); cctx.moveTo(left + 8, y + item.height / 2); cctx.lineTo(left + item.width - 8, y + item.height / 2); cctx.stroke();
+        for (let i = 1; i < 6; i++) {
+          const veinX = left + item.width * i / 6;
+          cctx.beginPath(); cctx.moveTo(veinX, y + item.height / 2);
+          cctx.lineTo(veinX + (i % 2 ? 7 : -7), y + (i % 2 ? 3 : item.height - 3)); cctx.stroke();
+        }
+      } else if (item.type === 'bacon') {
+        cctx.fillStyle = '#e56b6f';
+        roundedRect(left, y, item.width, item.height, 5); cctx.fill(); cctx.stroke();
+        cctx.strokeStyle = '#ffe0c2'; cctx.lineWidth = 3;
+        cctx.beginPath(); cctx.moveTo(left + 8, y + 4); cctx.bezierCurveTo(x - 22, y + 12, x + 22, y, left + item.width - 8, y + 9); cctx.stroke();
+      } else if (item.type === 'onion') {
+        cctx.fillStyle = '#ead7f4';
+        roundedRect(left, y, item.width, item.height, 7); cctx.fill(); cctx.stroke();
+        cctx.strokeStyle = '#9b59b6'; cctx.lineWidth = 2;
+        [-0.28, 0, 0.28].forEach(offset => {
+          cctx.beginPath();
+          cctx.ellipse(x + item.width * offset, y + item.height / 2, 10, 4, 0, 0, Math.PI * 2);
+          cctx.stroke();
+        });
+      } else if (item.type === 'pickle') {
+        const pickleGradient = cctx.createLinearGradient(left, y, left + item.width, y);
+        pickleGradient.addColorStop(0, '#2f8f46'); pickleGradient.addColorStop(0.5, '#75c84f'); pickleGradient.addColorStop(1, '#2f8f46');
+        cctx.fillStyle = pickleGradient;
+        roundedRect(left, y, item.width, item.height, 6); cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#d4ec72';
+        for (let i = 0; i < 5; i++) {
+          cctx.beginPath(); cctx.arc(left + 10 + i * 13, y + 5 + (i % 2) * 2, 1.4, 0, Math.PI * 2); cctx.fill();
+        }
+      } else if (item.type === 'egg') {
+        cctx.fillStyle = '#fffdf0';
+        cctx.beginPath();
+        cctx.ellipse(x, y + item.height / 2, item.width / 2, item.height / 2, 0, 0, Math.PI * 2);
+        cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#ffb400';
+        cctx.beginPath(); cctx.ellipse(x + 5, y + item.height / 2, 13, 5, 0, 0, Math.PI * 2); cctx.fill();
+      } else if (item.type === 'avocado') {
+        cctx.fillStyle = '#7fbe42';
+        roundedRect(left, y, item.width, item.height, 7); cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#c7e879';
+        roundedRect(left + 8, y + 3, item.width - 16, item.height - 6, 4); cctx.fill();
+        cctx.fillStyle = '#8a5a2b';
+        cctx.beginPath(); cctx.ellipse(x + 12, y + item.height / 2, 5, 3.5, 0, 0, Math.PI * 2); cctx.fill();
+      }
+      cctx.restore();
+    }
+
+    function drawScene() {
+      const sky = cctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#bde8ff'); sky.addColorStop(0.7, '#f8f3d4'); sky.addColorStop(1, '#f2c879');
+      cctx.fillStyle = sky; cctx.fillRect(0, 0, W, H);
+      cctx.fillStyle = 'rgba(255,255,255,0.75)';
+      [[45,48,32],[270,76,39],[155,112,25]].forEach(cloud => {
+        cctx.beginPath(); cctx.arc(cloud[0], cloud[1], cloud[2] * 0.55, 0, Math.PI * 2); cctx.arc(cloud[0] + 22, cloud[1] + 3, cloud[2] * 0.42, 0, Math.PI * 2); cctx.fill();
+      });
+      cctx.fillStyle = '#d59a50'; cctx.fillRect(0, FLOOR_Y, W, H - FLOOR_Y);
+      cctx.strokeStyle = '#a6672f'; cctx.lineWidth = 3; cctx.beginPath(); cctx.moveTo(0, FLOOR_Y); cctx.lineTo(W, FLOOR_Y); cctx.stroke();
+    }
+
+    function drawCompletedSandwiches() {
+      if (!sandwiches) return;
+      const positions = [18, 45, 72, 99, W - 99, W - 72, W - 45, W - 18];
+      const visible = Math.min(sandwiches, positions.length);
+      cctx.save();
+      cctx.font = '23px system-ui';
+      cctx.textAlign = 'center';
+      cctx.textBaseline = 'middle';
+      for (let i = 0; i < visible; i++) cctx.fillText('🥪', positions[i], 457);
+      if (sandwiches > positions.length) {
+        cctx.font = 'bold 11px Comic Sans MS, system-ui';
+        cctx.fillStyle = '#3b2417';
+        cctx.fillText('+' + (sandwiches - positions.length), W - 18, 444);
+      }
+      cctx.restore();
+    }
+
+    function drawCharacter() {
+      cctx.save();
+      cctx.strokeStyle = '#3b2417'; cctx.lineWidth = 5; cctx.lineCap = 'round';
+      cctx.fillStyle = '#4f86f7'; roundedRect(plateX - 25, 411, 50, 42, 12); cctx.fill(); cctx.stroke();
+      cctx.fillStyle = '#f4b183'; cctx.beginPath(); cctx.arc(plateX, 399, 23, 0, Math.PI * 2); cctx.fill(); cctx.stroke();
+      cctx.fillStyle = '#3b2417'; cctx.beginPath(); cctx.arc(plateX - 7, 397, 2.3, 0, Math.PI * 2); cctx.arc(plateX + 7, 397, 2.3, 0, Math.PI * 2); cctx.fill();
+      cctx.beginPath(); cctx.arc(plateX, 405, 7, 0.2, Math.PI - 0.2); cctx.stroke();
+      cctx.beginPath(); cctx.moveTo(plateX - 21, 421); cctx.lineTo(plateX - 48, 373); cctx.moveTo(plateX + 21, 421); cctx.lineTo(plateX + 48, 373); cctx.stroke();
+      cctx.fillStyle = '#f4b183'; cctx.beginPath(); cctx.arc(plateX - 48, 373, 7, 0, Math.PI * 2); cctx.arc(plateX + 48, 373, 7, 0, Math.PI * 2); cctx.fill();
+      cctx.fillStyle = '#f7f7f7';
+      cctx.beginPath(); cctx.ellipse(plateX, PLATE_Y + 9, 60, 12, 0, 0, Math.PI * 2); cctx.fill(); cctx.strokeStyle = '#64808d'; cctx.lineWidth = 3; cctx.stroke();
+      cctx.fillStyle = '#d8edf2'; cctx.beginPath(); cctx.ellipse(plateX, PLATE_Y + 7, 46, 6, 0, 0, Math.PI * 2); cctx.fill();
+      cctx.restore();
+    }
+
+    function overlay(text) {
+      cctx.fillStyle = 'rgba(59,36,23,0.88)'; roundedRect(W / 2 - 118, 185, 236, 48, 12); cctx.fill();
+      cctx.strokeStyle = '#ffe06a'; cctx.lineWidth = 3; cctx.stroke();
+      cctx.fillStyle = '#ffe06a'; cctx.font = 'bold 18px Comic Sans MS, system-ui'; cctx.textAlign = 'center';
+      cctx.fillText(text, W / 2, 216);
+    }
+
+    function draw() {
+      drawScene();
+      drawCharacter();
+      if (collapsePieces.length) {
+        collapsePieces.forEach(piece => {
+          cctx.save();
+          cctx.translate(piece.x, piece.y + piece.height / 2);
+          cctx.rotate(piece.angle);
+          drawIngredient(piece, 0, -piece.height / 2);
+          cctx.restore();
+        });
+      } else {
+        const sway = wobble ? Math.sin(performance.now() / 65) * wobble : 0;
+        cctx.save();
+        cctx.translate(plateX, PLATE_Y);
+        cctx.rotate(towerTilt);
+        cctx.translate(-plateX, -PLATE_Y);
+        stack.forEach((item, index) => {
+          drawIngredient(
+            item,
+            plateX + item.offset + sway * (index + 1) / Math.max(1, stack.length),
+            item.y
+          );
+        });
+        cctx.restore();
+        if (falling) {
+          cctx.save();
+          cctx.translate(falling.x, falling.y + falling.height / 2);
+          cctx.rotate(falling.angle || 0);
+          drawIngredient(falling, 0, -falling.height / 2);
+          cctx.restore();
+        }
+      }
+      drawCompletedSandwiches();
+      if (floatText && floatText.life > 0) {
+        cctx.save(); cctx.globalAlpha = Math.min(1, floatText.life / 20);
+        cctx.font = 'bold 17px Comic Sans MS, system-ui'; cctx.textAlign = 'center';
+        cctx.strokeStyle = '#3b2417'; cctx.lineWidth = 5; cctx.strokeText(floatText.text, W / 2, 150);
+        cctx.fillStyle = '#ffe06a'; cctx.fillText(floatText.text, W / 2, 150); cctx.restore();
+      }
+      if (!running && !gameOver) overlay('▶ PRESIONA START');
+      if (paused) overlay('⏸ PAUSA');
+    }
+
+    function movePlateTo(x) {
+      plateX = Math.max(58, Math.min(W - 58, x));
+    }
+
+    function frame(now) {
+      if (!running || gameOver || paused) return;
+      const dt = lastAt ? Math.min(0.034, (now - lastAt) / 1000) : 0;
+      lastAt = now;
+      if (leftHeld) movePlateTo(plateX - 245 * dt);
+      if (rightHeld) movePlateTo(plateX + 245 * dt);
+      updateTowerBalance(dt);
+      if (gameOver) return;
+      if (falling) {
+        let heldByEdge = false;
+        if (falling.sliding) {
+          falling.x += falling.vx * dt;
+          falling.angle += Math.sign(falling.vx) * 1.45 * dt;
+          heldByEdge = horizontalOverlap(
+            falling.x - falling.width / 2,
+            falling.x + falling.width / 2,
+            falling.slideLeft,
+            falling.slideRight
+          ) > 0;
+          if (heldByEdge) {
+            falling.y = falling.ignoreLandingY;
+          } else {
+            falling.sliding = false;
+            falling.y += 1.6;
+          }
+        }
+        if (!heldByEdge) {
+          const landing = findLanding(falling);
+          const nextY = falling.y + falling.speed * dt;
+          if (nextY >= landing.y) {
+            falling.y = landing.y;
+            landIngredient(landing);
+          } else {
+            falling.y = nextY;
+          }
+        }
+      }
+      if (gameOver) return;
+      if (wobble > 0.05) wobble *= Math.pow(0.16, dt); else wobble = 0;
+      if (floatText && --floatText.life <= 0) floatText = null;
+      draw();
+      raf = requestAnimationFrame(frame);
+    }
+
+    document.addEventListener('keydown', event => {
+      if (isTypingTarget(event) || !running || gameOver) return;
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') { leftHeld = true; event.preventDefault(); }
+      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') { rightHeld = true; event.preventDefault(); }
+    });
+    document.addEventListener('keyup', event => {
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') leftHeld = false;
+      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') rightHeld = false;
+    });
+
+    function pointerX(event) {
+      const rect = canvas.getBoundingClientRect();
+      return (event.clientX - rect.left) * W / rect.width;
+    }
+    canvas.addEventListener('pointerdown', event => {
+      if (!running || gameOver) return;
+      pointerActive = true;
+      if (canvas.setPointerCapture) canvas.setPointerCapture(event.pointerId);
+      movePlateTo(pointerX(event));
+      event.preventDefault();
+    });
+    canvas.addEventListener('pointermove', event => {
+      if (!pointerActive || !running || gameOver) return;
+      movePlateTo(pointerX(event));
+      event.preventDefault();
+    });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => canvas.addEventListener(type, () => { pointerActive = false; }));
+
+    wrap.querySelectorAll('[data-sw-dir]').forEach(button => {
+      const direction = button.dataset.swDir;
+      const setHeld = value => {
+        if (direction === 'left') leftHeld = value;
+        else rightHeld = value;
+      };
+      button.addEventListener('pointerdown', event => { if (running && !gameOver) { setHeld(true); event.preventDefault(); } });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => button.addEventListener(type, () => setHeld(false)));
+    });
+
+    autoPause(wrap,
+      () => {
+        if (running && !gameOver) {
+          paused = true;
+          cancelAnimationFrame(raf);
+          unlockScroll();
+          draw();
+        }
+      },
+      () => {
+        if (!paused || gameOver) return;
+        paused = false;
+        lastAt = 0;
+        lockScroll();
+        if (!falling && !serving) spawnIngredient();
+        draw();
+        raf = requestAnimationFrame(frame);
+      }
+    );
+
+    if (typeof MutationObserver !== 'undefined') {
+      const cleanupObserver = new MutationObserver(() => {
+        if (!document.body.contains(wrap)) {
+          running = false;
+          gameOver = true;
+          leftHeld = false;
+          rightHeld = false;
+          cancelAnimationFrame(raf);
+          unlockScroll();
+          cleanupObserver.disconnect();
+        }
+      });
+      cleanupObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    startButton.addEventListener('click', () => {
+      reset();
+      running = true;
+      startButton.disabled = true;
+      lockScroll();
+      spawnIngredient();
+      lastAt = 0;
+      raf = requestAnimationFrame(frame);
     });
 
     reset();

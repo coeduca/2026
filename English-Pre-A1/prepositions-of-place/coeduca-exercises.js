@@ -76,24 +76,47 @@
     ];
 
     // Estrategia de colocación:
-    //   1) Ordenar palabras de mayor a menor longitud (las largas son las más
-    //      difíciles de encajar; colocarlas primero deja más libertad luego).
-    //   2) Para cada palabra, evaluar TODAS las posiciones+direcciones válidas
-    //      y puntuarlas por # de letras compartidas con palabras ya colocadas.
-    //      Elegir entre las de mejor puntaje (con desempate aleatorio) para
-    //      MAXIMIZAR el solapamiento de letras y ahorrar espacio en la grilla.
-    //   3) Si una palabra no cabe, agrandar la grilla en +1 y reintentar todo.
-    //      Esto garantiza que nunca se "pierda" silenciosamente una palabra
-    //      como ocurría antes (CRIED quedaba fuera y la grilla no la incluía).
+    //   1) Buscar una pareja con una letra común y colocarla primero para
+    //      garantizar al menos un cruce real.
+    //   2) La primera palabra siempre va en diagonal. Las siguientes alternan
+    //      sus direcciones preferidas para dar variedad al tablero.
+    //   3) Salvo la pareja inicial, sólo permitir un cruce cuando ya no exista
+    //      ninguna posición libre válida para esa palabra.
+    //   4) Si alguna no cabe, agrandar la grilla y reintentar sin descartarla.
 
     const minSize = data.gridSize || Math.max(10, ...words.map(w => w.length + 2));
-    const maxSize = minSize + 8; // techo razonable para evitar bucles
     let size, grid, placements;
 
-    function findBestPlacement(grid, size, word) {
-      const candidates = [];
-      let bestScore = -1;
+    function getPlacementOrder() {
+      const ordered = words.slice().sort((a, b) => b.length - a.length);
+      let pairA = -1;
+      let pairB = -1;
+      let bestPairLength = -1;
+      for (let i = 0; i < ordered.length; i++) {
+        for (let j = i + 1; j < ordered.length; j++) {
+          const sharesLetter = Array.from(ordered[i]).some(letter => ordered[j].includes(letter));
+          const pairLength = ordered[i].length + ordered[j].length;
+          if (sharesLetter && pairLength > bestPairLength) {
+            pairA = i;
+            pairB = j;
+            bestPairLength = pairLength;
+          }
+        }
+      }
+      if (pairA < 0) return { ordered, hasCrossingPair: false };
+      return {
+        ordered: [ordered[pairA], ordered[pairB], ...ordered.filter((_, i) => i !== pairA && i !== pairB)],
+        hasCrossingPair: true
+      };
+    }
+
+    function findBestPlacement(grid, size, word, options) {
+      const freeCandidates = [];
+      const crossingCandidates = [];
+      const allowedDirections = options.allowedDirections || directions.map((_, i) => i);
+      const hasOccupiedCells = grid.some(row => row.some(cell => cell !== ''));
       for (let d = 0; d < directions.length; d++) {
+        if (!allowedDirections.includes(d)) continue;
         const [dr, dc] = directions[d];
         for (let r = 0; r < size; r++) {
           for (let c = 0; c < size; c++) {
@@ -101,6 +124,7 @@
             const endC = c + dc * (word.length - 1);
             if (endR < 0 || endR >= size || endC < 0 || endC >= size) continue;
             let overlap = 0;
+            let nearby = 0;
             let ok = true;
             for (let i = 0; i < word.length; i++) {
               const cell = grid[r + dr * i][c + dc * i];
@@ -109,28 +133,64 @@
               else { ok = false; break; }
             }
             if (!ok) continue;
-            if (overlap > bestScore) {
-              bestScore = overlap;
-              candidates.length = 0;
-              candidates.push({ r, c, dr, dc });
-            } else if (overlap === bestScore) {
-              candidates.push({ r, c, dr, dc });
+
+            // Medir la densidad alrededor de la posición candidata. Las
+            // celdas cercanas pesan más que las que están a dos casillas.
+            for (let i = 0; i < word.length; i++) {
+              const cellR = r + dr * i;
+              const cellC = c + dc * i;
+              for (let rr = Math.max(0, cellR - 2); rr <= Math.min(size - 1, cellR + 2); rr++) {
+                for (let cc = Math.max(0, cellC - 2); cc <= Math.min(size - 1, cellC + 2); cc++) {
+                  if (grid[rr][cc] === '') continue;
+                  const distance = Math.max(Math.abs(rr - cellR), Math.abs(cc - cellC));
+                  nearby += distance === 0 ? 0 : (distance === 1 ? 3 : 1);
+                }
+              }
             }
+
+            // La primera palabra se mantiene cerca del centro para que la
+            // segunda tenga suficientes opciones para cruzarla.
+            const midR = r + dr * (word.length - 1) / 2;
+            const midC = c + dc * (word.length - 1) / 2;
+            const centerPenalty = hasOccupiedCells ? 0
+              : (Math.abs(midR - (size - 1) / 2) + Math.abs(midC - (size - 1) / 2));
+            const directionPenalty = d === options.preferredDirection ? 0 : 0.25;
+            const score = nearby + centerPenalty + directionPenalty + overlap * 100;
+            const candidate = { r, c, dr, dc, score };
+            (overlap > 0 ? crossingCandidates : freeCandidates).push(candidate);
           }
         }
       }
+      // La pareja inicial exige cruce. Después se elige una posición sin
+      // cruce siempre que exista; sólo un tablero lleno habilita otro cruce.
+      const candidates = options.requireOverlap
+        ? crossingCandidates
+        : (freeCandidates.length ? freeCandidates : crossingCandidates);
       if (!candidates.length) return null;
+      const bestScore = Math.min(...candidates.map(candidate => candidate.score));
+      const bestCandidates = candidates.filter(candidate => candidate.score === bestScore);
       // Desempate aleatorio entre las mejores opciones
-      return candidates[Math.floor(Math.random() * candidates.length)];
+      return bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
     }
 
     function attemptLayout(targetSize) {
       const g = Array.from({ length: targetSize }, () => Array(targetSize).fill(''));
       const place = [];
-      // Palabras largas primero; copia para no mutar el array original.
-      const ordered = words.slice().sort((a, b) => b.length - a.length);
-      for (const word of ordered) {
-        const pick = findBestPlacement(g, targetSize, word);
+      const order = getPlacementOrder();
+      for (let index = 0; index < order.ordered.length; index++) {
+        const word = order.ordered[index];
+        const firstDirection = place.length
+          ? directions.findIndex(([dr, dc]) => dr === place[0].dr && dc === place[0].dc)
+          : -1;
+        const pick = findBestPlacement(g, targetSize, word, {
+          requireOverlap: order.hasCrossingPair && index === 1,
+          allowedDirections: index === 0
+            ? [2, 3]
+            : (order.hasCrossingPair && index === 1
+              ? directions.map((_, i) => i).filter(i => i !== firstDirection)
+              : null),
+          preferredDirection: index % directions.length
+        });
         if (!pick) return null; // falla: hay que crecer la grilla
         const { r, c, dr, dc } = pick;
         for (let i = 0; i < word.length; i++) g[r + dr * i][c + dc * i] = word[i];
@@ -144,27 +204,11 @@
     // desempates puede llevar a un callejón sin salida en una corrida concreta.
     size = minSize;
     let layout = null;
-    while (!layout && size <= maxSize) {
-      for (let retry = 0; retry < 6 && !layout; retry++) {
+    while (!layout) {
+      for (let retry = 0; retry < 12 && !layout; retry++) {
         layout = attemptLayout(size);
       }
       if (!layout) size++;
-    }
-    if (!layout) {
-      // Garantía absoluta: en caso patológico, usar el tamaño máximo
-      // y al menos colocar lo que se pueda (mantiene comportamiento previo).
-      size = maxSize;
-      const g = Array.from({ length: size }, () => Array(size).fill(''));
-      const place = [];
-      const ordered = words.slice().sort((a, b) => b.length - a.length);
-      for (const word of ordered) {
-        const pick = findBestPlacement(g, size, word);
-        if (!pick) continue;
-        const { r, c, dr, dc } = pick;
-        for (let i = 0; i < word.length; i++) g[r + dr * i][c + dc * i] = word[i];
-        place.push({ word, r, c, dr, dc });
-      }
-      layout = { g, place };
     }
     grid = layout.g;
     placements = layout.place;
@@ -219,12 +263,12 @@
 
     // Paleta rotativa para los "marcadores" de palabras encontradas
     const highlighterColors = [
-      'rgba(255, 215, 0, 0.55)',   // dorado
-      'rgba(255, 107, 157, 0.50)', // rosa
-      'rgba(79, 195, 247, 0.50)',  // celeste
-      'rgba(155, 93, 229, 0.50)',  // morado
-      'rgba(255, 159, 28, 0.55)',  // naranja
-      'rgba(76, 175, 80, 0.50)'    // verde
+      '#FFD700', // dorado
+      '#FF6B9D', // rosa
+      '#4FC3F7', // celeste
+      '#9B5DE5', // morado
+      '#FF9F1C', // naranja
+      '#4CAF50'  // verde
     ];
     let foundColorIndex = 0;
 
@@ -264,6 +308,10 @@
       line.setAttribute('x2', x2);
       line.setAttribute('y2', y2);
       line.setAttribute('stroke', color);
+      // SVG no interpreta rgba de forma consistente en Android WebView. La
+      // opacidad separada mantiene visibles las letras en todos los navegadores.
+      line.setAttribute('stroke-opacity', '0.40');
+      line.style.strokeOpacity = '0.40';
       line.setAttribute('stroke-width', thickness);
       line.setAttribute('stroke-linecap', 'round');
       line.style.mixBlendMode = 'multiply';
@@ -479,6 +527,8 @@
     function drawLine(a, b, color) {
       const p1 = getConnectionPoint(a, 'L');
       const p2 = getConnectionPoint(b, 'R');
+      const connection = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      connection.setAttribute('class', 'ml-connection');
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       
       const offset = Math.abs(p2.x - p1.x) * 0.5; 
@@ -490,9 +540,30 @@
       path.setAttribute('stroke-width', '4');
       path.setAttribute('fill', 'none');
       path.setAttribute('stroke-linecap', 'round');
-      
-      svg.appendChild(path);
-      return path;
+
+      connection.appendChild(path);
+
+      // Los nodos quedan centrados en el borde de cada tarjeta. En el tema
+      // esqueumorfico se muestran como remaches que sujetan la linea.
+      [p1, p2].forEach(point => {
+        const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        node.setAttribute('class', 'ml-connection-node');
+        node.setAttribute('cx', point.x);
+        node.setAttribute('cy', point.y);
+        node.setAttribute('r', '7');
+        node.setAttribute('fill', color || '#1a1a1a');
+        connection.appendChild(node);
+
+        const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        highlight.setAttribute('class', 'ml-connection-node-highlight');
+        highlight.setAttribute('cx', point.x - 1.5);
+        highlight.setAttribute('cy', point.y - 1.5);
+        highlight.setAttribute('r', '2');
+        connection.appendChild(highlight);
+      });
+
+      svg.appendChild(connection);
+      return connection;
     }
 
     function redrawAll() {

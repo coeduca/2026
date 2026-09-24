@@ -2915,6 +2915,26 @@ html[data-coeduca-ui-theme="Skeuomorphic"] .ml-card-right {
   border-left: 4px solid rgba(255, 255, 255, 0.68) !important;
 }
 
+/* Remaches de las lineas: la mitad queda bajo la tarjeta para que la
+   conexion parezca fisicamente sujeta a ambos extremos. */
+.ml-connection-node,
+.ml-connection-node-highlight {
+  display: none;
+}
+
+html[data-coeduca-ui-theme="Skeuomorphic"] .ml-connection-node {
+  display: inline;
+  stroke: #3f4b55;
+  stroke-width: 2px;
+  filter: drop-shadow(0 1px 1px rgba(25, 34, 42, 0.42));
+}
+
+html[data-coeduca-ui-theme="Skeuomorphic"] .ml-connection-node-highlight {
+  display: inline;
+  fill: rgba(255, 255, 255, 0.78);
+  pointer-events: none;
+}
+
 html[data-coeduca-ui-theme="Skeuomorphic"] .coeduca-choice-card.is-selected {
   background-color: var(--coeduca-primary) !important;
   border-color: #4f5c67 !important;
@@ -3047,6 +3067,14 @@ html[data-coeduca-ui-theme="Skeuomorphic"] .cd-slot {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.85) inset,
     0 2px 4px rgba(25, 34, 42, 0.24) !important;
+}
+
+/* Las fichas del banco conservan volumen sin duplicar visualmente las
+   letras con una sombra negra ni usar un peso excesivo. */
+html[data-coeduca-ui-theme="Skeuomorphic"] .db-word {
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.82) !important;
 }
 
 html[data-coeduca-ui-theme="Skeuomorphic"] .ws-grid {
