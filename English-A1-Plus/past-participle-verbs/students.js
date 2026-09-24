@@ -1,0 +1,51 @@
+// Base de datos de estudiantes (autogenerada por la app)
+const STUDENTS = {
+
+  // PRIMER AÑO
+  "4210278": { name: "Melisa Abigail Barahona Barrera", grade: "Primer Año" },
+  "4210264": { name: "Jasmín Iveth Barahona Chirino", grade: "Primer Año" },
+  "19967144": { name: "Andrea Guadalupe Barrera Rivera", grade: "Primer Año" },
+  "20068438": { name: "Keiry Nineth Bonilla Díaz", grade: "Primer Año" },
+  "19959332": { name: "Érika Maricela Chávez Castellanos", grade: "Primer Año" },
+  "4210262": { name: "María Luz Córdova Garmendia", grade: "Primer Año" },
+  "20062373": { name: "Rosa Andrea Cruz Serrano", grade: "Primer Año" },
+  "19843597": { name: "Bryan Miguel Flores López", grade: "Primer Año" },
+  "4210272": { name: "David Ernesto Fuentes Meléndez", grade: "Primer Año" },
+  "19967158": { name: "Liliana del Carmen Hernández Alfaro", grade: "Primer Año" },
+  "4210284": { name: "Yeferson Alexis Maravilla Esquivel", grade: "Primer Año" },
+  "19934099": { name: "Bryan Wilfredo Martínez Chirino", grade: "Primer Año" },
+  "19967161": { name: "Rocío Azucena Mejía Arévalo", grade: "Primer Año" },
+  "19967151": { name: "Yaquelin Marisol Montano Fuentes", grade: "Primer Año" },
+  "20062496": { name: "Katherinne Yesenia Palma Merino", grade: "Primer Año" },
+  "19788973": { name: "Alexandra Elizabeth Portillo Martínez", grade: "Primer Año" },
+  "3167629": { name: "Keren Lorena Portillo Martínez", grade: "Primer Año" },
+  "19967163": { name: "María José Quezada Alfaro", grade: "Primer Año" },
+  "4210259": { name: "Kennedy Alexander Ramírez Meléndez", grade: "Primer Año" },
+  "4210276": { name: "María Fernanda Rivas Barahona", grade: "Primer Año" },
+  "20062499": { name: "Wilian Alexander Rivera Montano", grade: "Primer Año" },
+  "6954866": { name: "Érika Berenice Rodríguez Majano", grade: "Primer Año" },
+  "4210263": { name: "David Isaías Romero López", grade: "Primer Año" },
+
+  // SEGUNDO AÑO
+  "4210279": { name: "José María Barrera Barahona", grade: "Segundo Año" },
+  "4210254": { name: "Amílcar Abel Barrera Hernández", grade: "Segundo Año" },
+  "2724749": { name: "Maicol Antuan Barrera Rodríguez", grade: "Segundo Año" },
+  "6473557": { name: "Estephany Azucena Berríos Mejía", grade: "Segundo Año" },
+  "6473562": { name: "Amy Daniela Cañas Chávez", grade: "Segundo Año" },
+  "19724473": { name: "Mauricio Edgardo Córdova Ascencio", grade: "Segundo Año" },
+  "6473555": { name: "Óscar Kennedy Cornejo Santana", grade: "Segundo Año" },
+  "4210255": { name: "Carlos Estiven Hernández Chávez", grade: "Segundo Año" },
+  "1964480": { name: "Juan David Hernández Martínez", grade: "Segundo Año" },
+  "4210256": { name: "Yuleyde Guadalupe López Ramos", grade: "Segundo Año" },
+  "5531752": { name: "Cintia Yamileth Martínez Barrera", grade: "Segundo Año" },
+  "4210268": { name: "Wilmer Bladimir Mejía Angulo", grade: "Segundo Año" },
+  "2295119": { name: "Fátima Lisbeth Mejía Guzmán", grade: "Segundo Año" },
+  "5531765": { name: "Kevin Gabriel Monterrosa Méndez", grade: "Segundo Año" },
+  "2294851": { name: "Alfredo José Osorio Reina", grade: "Segundo Año" },
+  "19769235": { name: "Ángel Moisés Quezada Alfaro", grade: "Segundo Año" },
+  "19929938": { name: "Elizabeth Sophia Quinteros Miranda", grade: "Segundo Año" },
+  "4210277": { name: "Josué Leonel Rivera Montano", grade: "Segundo Año" },
+
+  // PRUEBAS
+  "1999": { name: "José Eliseo Martínez", grade: "Maestro" },
+};
