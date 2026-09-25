@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · 5-2 Interculturalidad</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body data-framework="civica">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+          <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+          <span>Volver a la actividad</span>
+        </a>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <div class="gc-hero-label">EL RETO COMIENZA AQUÍ <span aria-hidden="true">✦</span></div>
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+          <div class="gc-hero-tip">Elige un juego · Suma puntos · Supera tu marca</div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-labelledby="gc-catalog-title">
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">TU ZONA DE JUEGOS</span>
+          <h2 id="gc-catalog-title">Juegos con puntuación</h2>
+        </div>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="civica-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "cv_5_2_interculturalidad_1790360462",
+  "container": "#app",
+  "topic": "5-2 Interculturalidad",
+  "unit": "Unidad 5 - Semana 2",
+  "subjectLabel": "Ciudadanía y Valores",
+  "book": {
+    "url": "https://drive.google.com/file/d/1CdSLdJyk4YKnM5ul4xYDjax52dTwPzTd/view?usp=sharing",
+    "label": "Abrir Libro"
+  },
+  "colors": {
+    "primary": "#D4AF37",
+    "accent": "#9B59B6",
+    "bg": "#87CEEB",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "pdfDesign": "Default",
+  "sections": {
+    "explore": [
+      {
+        "type": "note",
+        "title": "Interculturalidad y convivencia",
+        "html": "\u003cp>\u003cstrong>La cultura\u003c/strong> está formada por símbolos, creencias, valores, costumbres, comportamientos y expresiones que aprendemos como miembros de una sociedad.\u003c/p>\u003cp>Cuando en un mismo territorio conviven grupos culturales diferentes hablamos de \u003cstrong>multiculturalidad\u003c/strong>. La \u003cstrong>interculturalidad\u003c/strong> busca que esos grupos se relacionen en un plano de igualdad, respeto y tolerancia, promoviendo el diálogo, la comunicación y la convivencia pacífica.\u003c/p>\u003cp>Valorar las diferencias culturales nos permite aprender de otras personas, evitar la discriminación y construir espacios donde todas las expresiones culturales sean respetadas.\u003c/p>"
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "1. Actividad individual",
+        "instruction": "Observa las imágenes e identifica los espacios de convivencia que promuevan la interculturalidad local y nacional.",
+        "image": "files/espacios_convivencia_intercultural.png",
+        "dataA": [
+          {
+            "q": "Observa las imágenes e identifica los espacios de convivencia que promuevan la interculturalidad local y nacional.",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe lo que observas..."
+          }
+        ]
+      },
+      {
+        "type": "cv_table",
+        "title": "Características de tu localidad",
+        "instruction": "Describe tres características de tu localidad en cuanto a lengua, tradiciones y creencias.",
+        "dataA": {
+          "columns": [
+            "Lengua",
+            "Tradiciones",
+            "Creencias"
+          ],
+          "rows": [
+            [
+              {
+                "type": "input",
+                "placeholder": "Describe tres características relacionadas con la lengua..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Describe tres tradiciones de tu localidad..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Describe tres creencias de tu localidad..."
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "2. Actividad en equipo",
+        "instruction": "Lean la información y reflexionen a partir de las siguientes preguntas.",
+        "dataA": [
+          {
+            "q": "¿Cómo creen que la participación en diferentes manifestaciones culturales enriquece a la sociedad?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu reflexión..."
+          },
+          {
+            "q": "¿Por qué es importante para la convivencia comprender y promover la diversidad cultural?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu reflexión..."
+          },
+          {
+            "q": "¿De qué maneras se puede aprender acerca de otras culturas?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe algunas maneras..."
+          },
+          {
+            "q": "¿Qué acciones podrían implementarse desde el centro educativo para promover el respeto a la diversidad cultural?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe algunas acciones..."
+          }
+        ]
+      }
+    ],
+    "deepen": [
+      {
+        "type": "cv_textanswer",
+        "title": "3. Actividad en pares",
+        "instruction": "Desarrollen la habilidad de convivencia e interacción social. Para ello, resuelvan:",
+        "dataA": [
+          {
+            "q": "a. Investiguen una expresión simbólica y material de la cultura salvadoreña.",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe la información investigada..."
+          },
+          {
+            "q": "b. Diseñen un tríptico de la expresión investigada.",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Describe o planifica aquí el contenido de su tríptico..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "4. Actividad en equipo",
+        "instruction": "Desarrollen la habilidad de toma de decisiones. Respondan:",
+        "dataA": [
+          {
+            "q": "a. ¿Cuáles son las diferencias entre los conceptos de multiculturalidad e interculturalidad?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Explica las diferencias..."
+          },
+          {
+            "q": "b. ¿Qué políticas pondrían en funcionamiento para que en la sociedad salvadoreña los conceptos de pluriculturalidad e interculturalidad se hagan realidad?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe sus propuestas..."
+          }
+        ]
+      }
+    ],
+    "consolidate": [
+      {
+        "type": "cv_table",
+        "title": "5. Actividad individual",
+        "instruction": "Plantea tres propuestas para promover la interculturalidad en tu centro educativo.",
+        "dataA": {
+          "columns": [
+            "Primera propuesta",
+            "Segunda propuesta",
+            "Tercera propuesta"
+          ],
+          "rows": [
+            [
+              {
+                "type": "input",
+                "placeholder": "Escribe tu primera propuesta..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe tu segunda propuesta..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe tu tercera propuesta..."
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_table",
+        "title": "6. Actividad en equipo",
+        "instruction": "Ejemplifiquen cómo se podrían aplicar acciones que promuevan y fomenten la interculturalidad en los diferentes ámbitos de la vida cotidiana.",
+        "dataA": {
+          "columns": [
+            "Acciones para promover la interculturalidad",
+            "Localidad",
+            "Espacios públicos",
+            "Lugares de trabajo"
+          ],
+          "rows": [
+            [
+              {
+                "type": "text",
+                "value": "Respetar a todas las personas considerando y valorando las diferencias culturales."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "Fomentar el diálogo horizontal con personas de diferentes orígenes culturales."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "Practicar actitudes de tolerancia, empatía y respeto, a pesar de las diferencias culturales."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              }
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  "game": {
+    "type": "sandwich",
+    "winScore": 500
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>

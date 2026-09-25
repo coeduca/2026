@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>5-2 Interculturalidad - Octavo</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="civica-exercises.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="civica-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    CIVICA.init({
+  "id": "cv_5_2_interculturalidad_1790360462",
+  "container": "#app",
+  "topic": "5-2 Interculturalidad",
+  "unit": "Unidad 5 - Semana 2",
+  "subjectLabel": "Ciudadanía y Valores",
+  "book": {
+    "url": "https://drive.google.com/file/d/1CdSLdJyk4YKnM5ul4xYDjax52dTwPzTd/view?usp=sharing",
+    "label": "Abrir Libro"
+  },
+  "colors": {
+    "primary": "#D4AF37",
+    "accent": "#9B59B6",
+    "bg": "#87CEEB",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "pdfDesign": "Default",
+  "sections": {
+    "explore": [
+      {
+        "type": "note",
+        "title": "Interculturalidad y convivencia",
+        "html": "<p><strong>La cultura</strong> está formada por símbolos, creencias, valores, costumbres, comportamientos y expresiones que aprendemos como miembros de una sociedad.</p><p>Cuando en un mismo territorio conviven grupos culturales diferentes hablamos de <strong>multiculturalidad</strong>. La <strong>interculturalidad</strong> busca que esos grupos se relacionen en un plano de igualdad, respeto y tolerancia, promoviendo el diálogo, la comunicación y la convivencia pacífica.</p><p>Valorar las diferencias culturales nos permite aprender de otras personas, evitar la discriminación y construir espacios donde todas las expresiones culturales sean respetadas.</p>"
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "1. Actividad individual",
+        "instruction": "Observa las imágenes e identifica los espacios de convivencia que promuevan la interculturalidad local y nacional.",
+        "image": "files/espacios_convivencia_intercultural.png",
+        "dataA": [
+          {
+            "q": "Observa las imágenes e identifica los espacios de convivencia que promuevan la interculturalidad local y nacional.",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe lo que observas..."
+          }
+        ]
+      },
+      {
+        "type": "cv_table",
+        "title": "Características de tu localidad",
+        "instruction": "Describe tres características de tu localidad en cuanto a lengua, tradiciones y creencias.",
+        "dataA": {
+          "columns": [
+            "Lengua",
+            "Tradiciones",
+            "Creencias"
+          ],
+          "rows": [
+            [
+              {
+                "type": "input",
+                "placeholder": "Describe tres características relacionadas con la lengua..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Describe tres tradiciones de tu localidad..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Describe tres creencias de tu localidad..."
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "2. Actividad en equipo",
+        "instruction": "Lean la información y reflexionen a partir de las siguientes preguntas.",
+        "dataA": [
+          {
+            "q": "¿Cómo creen que la participación en diferentes manifestaciones culturales enriquece a la sociedad?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu reflexión..."
+          },
+          {
+            "q": "¿Por qué es importante para la convivencia comprender y promover la diversidad cultural?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu reflexión..."
+          },
+          {
+            "q": "¿De qué maneras se puede aprender acerca de otras culturas?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe algunas maneras..."
+          },
+          {
+            "q": "¿Qué acciones podrían implementarse desde el centro educativo para promover el respeto a la diversidad cultural?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe algunas acciones..."
+          }
+        ]
+      }
+    ],
+    "deepen": [
+      {
+        "type": "cv_textanswer",
+        "title": "3. Actividad en pares",
+        "instruction": "Desarrollen la habilidad de convivencia e interacción social. Para ello, resuelvan:",
+        "dataA": [
+          {
+            "q": "a. Investiguen una expresión simbólica y material de la cultura salvadoreña.",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe la información investigada..."
+          },
+          {
+            "q": "b. Diseñen un tríptico de la expresión investigada.",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Describe o planifica aquí el contenido de su tríptico..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "4. Actividad en equipo",
+        "instruction": "Desarrollen la habilidad de toma de decisiones. Respondan:",
+        "dataA": [
+          {
+            "q": "a. ¿Cuáles son las diferencias entre los conceptos de multiculturalidad e interculturalidad?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Explica las diferencias..."
+          },
+          {
+            "q": "b. ¿Qué políticas pondrían en funcionamiento para que en la sociedad salvadoreña los conceptos de pluriculturalidad e interculturalidad se hagan realidad?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe sus propuestas..."
+          }
+        ]
+      }
+    ],
+    "consolidate": [
+      {
+        "type": "cv_table",
+        "title": "5. Actividad individual",
+        "instruction": "Plantea tres propuestas para promover la interculturalidad en tu centro educativo.",
+        "dataA": {
+          "columns": [
+            "Primera propuesta",
+            "Segunda propuesta",
+            "Tercera propuesta"
+          ],
+          "rows": [
+            [
+              {
+                "type": "input",
+                "placeholder": "Escribe tu primera propuesta..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe tu segunda propuesta..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe tu tercera propuesta..."
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_table",
+        "title": "6. Actividad en equipo",
+        "instruction": "Ejemplifiquen cómo se podrían aplicar acciones que promuevan y fomenten la interculturalidad en los diferentes ámbitos de la vida cotidiana.",
+        "dataA": {
+          "columns": [
+            "Acciones para promover la interculturalidad",
+            "Localidad",
+            "Espacios públicos",
+            "Lugares de trabajo"
+          ],
+          "rows": [
+            [
+              {
+                "type": "text",
+                "value": "Respetar a todas las personas considerando y valorando las diferencias culturales."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "Fomentar el diálogo horizontal con personas de diferentes orígenes culturales."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "Practicar actitudes de tolerancia, empatía y respeto, a pesar de las diferencias culturales."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe un ejemplo..."
+              }
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  "game": {
+    "type": "sandwich",
+    "winScore": 500
+  }
+});
+  </script>
+</body>
+</html>
