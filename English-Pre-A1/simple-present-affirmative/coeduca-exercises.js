@@ -527,6 +527,8 @@
     function drawLine(a, b, color) {
       const p1 = getConnectionPoint(a, 'L');
       const p2 = getConnectionPoint(b, 'R');
+      const connection = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      connection.setAttribute('class', 'ml-connection');
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       
       const offset = Math.abs(p2.x - p1.x) * 0.5; 
@@ -538,9 +540,30 @@
       path.setAttribute('stroke-width', '4');
       path.setAttribute('fill', 'none');
       path.setAttribute('stroke-linecap', 'round');
-      
-      svg.appendChild(path);
-      return path;
+
+      connection.appendChild(path);
+
+      // Los nodos quedan centrados en el borde de cada tarjeta. En el tema
+      // esqueumorfico se muestran como remaches que sujetan la linea.
+      [p1, p2].forEach(point => {
+        const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        node.setAttribute('class', 'ml-connection-node');
+        node.setAttribute('cx', point.x);
+        node.setAttribute('cy', point.y);
+        node.setAttribute('r', '7');
+        node.setAttribute('fill', color || '#1a1a1a');
+        connection.appendChild(node);
+
+        const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        highlight.setAttribute('class', 'ml-connection-node-highlight');
+        highlight.setAttribute('cx', point.x - 1.5);
+        highlight.setAttribute('cy', point.y - 1.5);
+        highlight.setAttribute('r', '2');
+        connection.appendChild(highlight);
+      });
+
+      svg.appendChild(connection);
+      return connection;
     }
 
     function redrawAll() {

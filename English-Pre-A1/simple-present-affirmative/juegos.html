@@ -2,29 +2,93 @@
 <html translate="no" lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google" content="notranslate">
-  <meta http-equiv="Content-Language" content="es">
-  <title>Simple Present: Affirmative - Octavo, Séptimo</title>
+  <title>Centro de juegos · Simple Present: Affirmative</title>
   <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
   <link rel="icon" href="favicon.png" type="image/png">
 </head>
-<body>
-  <div id="app"></div>
-  <script src="jspdf.umd.min.js"></script>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+          <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+          <span>Volver a la actividad</span>
+        </a>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <div class="gc-hero-label">EL RETO COMIENZA AQUÍ <span aria-hidden="true">✦</span></div>
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+          <div class="gc-hero-tip">Elige un juego · Suma puntos · Supera tu marca</div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-labelledby="gc-catalog-title">
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">TU ZONA DE JUEGOS</span>
+          <h2 id="gc-catalog-title">Juegos con puntuación</h2>
+        </div>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
   <script src="students.js"></script>
   <script src="rigo.js"></script>
   <script src="coeduca-core.js"></script>
   <script src="coeduca-leaderboard.js"></script>
   <script src="coeduca-hangman-bank.js"></script>
-  <script src="coeduca-exercises.js"></script>
   <script src="matter.min.js"></script>
   <script src="coeduca-games.js"></script>
   <script src="coeduca-flappy.js"></script>
   <script src="coeduca-doodle.js"></script>
   <rigo-mascot></rigo-mascot>
-  <script>
-    COEDUCA.init({
+  <script>window.GAME_CENTER_CONFIG = {
   "container": "#app",
   "topic": "Simple Present: Affirmative",
   "level": "Octavo, Séptimo",
@@ -42,7 +106,7 @@
     {
       "type": "note",
       "title": "Simple Present: Affirmative",
-      "html": "<div style=\"padding:18px;border:3px solid #1A1A1A;border-radius:18px;background:#FFF7E8;\"><h2 style=\"margin-top:0;\">☀️ My Daily Routine</h2><p>Usamos el <strong>Simple Present</strong> para hablar de rutinas, hábitos y actividades que hacemos regularmente.</p><div style=\"padding:12px;margin:12px 0;background:#FFFFFF;border:2px solid #1A1A1A;border-radius:12px;\"><strong>👥 I / You / We / They</strong><p>Usamos el verbo en su forma base.</p><p><strong>I play soccer every day.</strong><br><strong>They watch TV at night.</strong></p></div><div style=\"padding:12px;margin:12px 0;background:#FFFFFF;border:2px solid #1A1A1A;border-radius:12px;\"><strong>👤 He / She / It</strong><p>Normalmente agregamos <strong>-s</strong> o <strong>-es</strong> al verbo.</p><p><strong>He plays soccer every day.</strong><br><strong>She watches TV at night.</strong></p></div><div style=\"padding:12px;margin:12px 0;background:#FFFFFF;border:2px dashed #43B069;border-radius:12px;\"><strong>🧠 Personal Pronouns</strong><p>I = yo · You = tú/ustedes · He = él · She = ella · It = eso · We = nosotros · They = ellos</p></div><div style=\"padding:12px;margin-top:12px;background:#FFF1F8;border:2px solid #BB8200;border-radius:12px;\"><strong>⏰ Useful expressions</strong><p><strong>in the morning</strong> = por la mañana<br><strong>at night</strong> = por la noche<br><strong>every day</strong> = todos los días</p><strong>🏃 Daily activities</strong><p><strong>take a shower</strong> = bañarse<br><strong>watch TV</strong> = ver televisión<br><strong>play soccer</strong> = jugar fútbol<br><strong>go to school</strong> = ir a la escuela</p></div><p style=\"margin-bottom:0;\"><strong>⭐ Remember:</strong> He, She, It → verb + s/es.</p></div>"
+      "html": "\u003cdiv style=\"padding:18px;border:3px solid #1A1A1A;border-radius:18px;background:#FFF7E8;\">\u003ch2 style=\"margin-top:0;\">☀️ My Daily Routine\u003c/h2>\u003cp>Usamos el \u003cstrong>Simple Present\u003c/strong> para hablar de rutinas, hábitos y actividades que hacemos regularmente.\u003c/p>\u003cdiv style=\"padding:12px;margin:12px 0;background:#FFFFFF;border:2px solid #1A1A1A;border-radius:12px;\">\u003cstrong>👥 I / You / We / They\u003c/strong>\u003cp>Usamos el verbo en su forma base.\u003c/p>\u003cp>\u003cstrong>I play soccer every day.\u003c/strong>\u003cbr>\u003cstrong>They watch TV at night.\u003c/strong>\u003c/p>\u003c/div>\u003cdiv style=\"padding:12px;margin:12px 0;background:#FFFFFF;border:2px solid #1A1A1A;border-radius:12px;\">\u003cstrong>👤 He / She / It\u003c/strong>\u003cp>Normalmente agregamos \u003cstrong>-s\u003c/strong> o \u003cstrong>-es\u003c/strong> al verbo.\u003c/p>\u003cp>\u003cstrong>He plays soccer every day.\u003c/strong>\u003cbr>\u003cstrong>She watches TV at night.\u003c/strong>\u003c/p>\u003c/div>\u003cdiv style=\"padding:12px;margin:12px 0;background:#FFFFFF;border:2px dashed #43B069;border-radius:12px;\">\u003cstrong>🧠 Personal Pronouns\u003c/strong>\u003cp>I = yo · You = tú/ustedes · He = él · She = ella · It = eso · We = nosotros · They = ellos\u003c/p>\u003c/div>\u003cdiv style=\"padding:12px;margin-top:12px;background:#FFF1F8;border:2px solid #BB8200;border-radius:12px;\">\u003cstrong>⏰ Useful expressions\u003c/strong>\u003cp>\u003cstrong>in the morning\u003c/strong> = por la mañana\u003cbr>\u003cstrong>at night\u003c/strong> = por la noche\u003cbr>\u003cstrong>every day\u003c/strong> = todos los días\u003c/p>\u003cstrong>🏃 Daily activities\u003c/strong>\u003cp>\u003cstrong>take a shower\u003c/strong> = bañarse\u003cbr>\u003cstrong>watch TV\u003c/strong> = ver televisión\u003cbr>\u003cstrong>play soccer\u003c/strong> = jugar fútbol\u003cbr>\u003cstrong>go to school\u003c/strong> = ir a la escuela\u003c/p>\u003c/div>\u003cp style=\"margin-bottom:0;\">\u003cstrong>⭐ Remember:\u003c/strong> He, She, It → verb + s/es.\u003c/p>\u003c/div>"
     },
     {
       "type": "multiplechoice",
@@ -821,7 +885,7 @@
   "game": {
     "type": "snake"
   }
-});
-  </script>
+};</script>
+  <script src="game-center.js"></script>
 </body>
 </html>
