@@ -8,6 +8,7 @@
   --coeduca-accent: #FF6B9D;
   --coeduca-bg: #FFF8E7;
   --coeduca-surface: #FFFFFF;
+  --coeduca-item-bg: #C9DBE9;
   --coeduca-stroke: #1a1a1a;
   --coeduca-text: #1a1a1a;
   --coeduca-success: #4CAF50;
@@ -19,6 +20,10 @@
   --coeduca-shadow-sm: 3px 3px 0 #1a1a1a;
   --coeduca-shadow-lg: 8px 8px 0 #1a1a1a;
   --coeduca-radius: 16px;
+}
+
+.coeduca-item-card {
+  background-color: var(--coeduca-item-bg) !important;
 }
 
 * {
@@ -1893,7 +1898,7 @@ html[data-coeduca-ui-theme="HollyHobbie"] .coeduca-feedback {
 /* Componentes internos que normalmente traen bordes y sombras Pop Art. */
 html[data-coeduca-ui-theme="HollyHobbie"] .coeduca-item-card {
   color: var(--coeduca-text) !important;
-  background: var(--coeduca-theme-cream) !important;
+  background: var(--coeduca-item-bg) !important;
   border: 1px solid var(--coeduca-primary) !important;
   border-radius: 18px !important;
   box-shadow: var(--coeduca-shadow-sm) !important;
@@ -2295,7 +2300,7 @@ html[data-coeduca-ui-theme="Skeuomorphic"] {
   --coeduca-error: #b64040;
   --coeduca-theme-cream: #eee7d6;
   --coeduca-theme-cream-deep: #ddd3bd;
-  --coeduca-theme-control: #faf7ee;
+  --coeduca-theme-control: #fffdf8;
   --coeduca-state-correct-bg: #9fc9a0;
   --coeduca-state-wrong-bg: #d99b9b;
   --coeduca-state-muted-bg: #d2cbbb;
@@ -2869,10 +2874,10 @@ html[data-coeduca-ui-theme="Skeuomorphic"] .coeduca-feedback {
 /* Controles internos: mismo tratamiento de plástico, metal y profundidad. */
 html[data-coeduca-ui-theme="Skeuomorphic"] .coeduca-item-card {
   color: var(--coeduca-text) !important;
-  background-color: var(--coeduca-theme-cream) !important;
+  background-color: var(--coeduca-item-bg) !important;
   background-image:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.28) 48%, rgba(0, 0, 0, 0.07) 52%, rgba(0, 0, 0, 0.12)) !important;
-  border: 1px solid #65717c !important;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.06) 48%, rgba(0, 0, 0, 0.07) 52%, rgba(0, 0, 0, 0.16)) !important;
+  border: 1px solid #4d6171 !important;
   border-radius: 14px !important;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.9) inset,
@@ -2896,8 +2901,8 @@ html[data-coeduca-ui-theme="Skeuomorphic"] .coeduca-chip {
   color: var(--coeduca-text) !important;
   background-color: var(--coeduca-theme-control) !important;
   background-image:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.25) 48%, rgba(0, 0, 0, 0.08) 52%, rgba(0, 0, 0, 0.14)) !important;
-  border: 1px solid #65717c !important;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.08) 48%, rgba(0, 0, 0, 0.08) 52%, rgba(0, 0, 0, 0.13)) !important;
+  border: 1px solid #405463 !important;
   border-radius: 9px !important;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.92) inset,
@@ -2937,6 +2942,7 @@ html[data-coeduca-ui-theme="Skeuomorphic"] .ml-connection-node-highlight {
 
 html[data-coeduca-ui-theme="Skeuomorphic"] .coeduca-choice-card.is-selected {
   background-color: var(--coeduca-primary) !important;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(0, 0, 0, 0.12)) !important;
   border-color: #4f5c67 !important;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.82) inset,
@@ -2947,17 +2953,19 @@ html[data-coeduca-ui-theme="Skeuomorphic"] .coeduca-choice-card.is-selected {
 
 html[data-coeduca-ui-theme="Skeuomorphic"] .coeduca-choice-card.is-correct {
   background-color: #a8d6aa !important;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1)) !important;
   border-color: #527d55 !important;
 }
 
 html[data-coeduca-ui-theme="Skeuomorphic"] .coeduca-choice-card.is-wrong {
   background-color: #e4a2a2 !important;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1)) !important;
   border-color: #985555 !important;
 }
 
 html[data-coeduca-ui-theme="Skeuomorphic"] .coeduca-choice-card.is-muted {
   background-color: #d8d9da !important;
-  opacity: 0.64;
+  opacity: 0.78;
 }
 
 html[data-coeduca-ui-theme="Skeuomorphic"] .mc-option input[type="radio"] {
