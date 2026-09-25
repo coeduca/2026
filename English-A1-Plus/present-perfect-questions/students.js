@@ -75,3 +75,4 @@ const STUDENTS = {
   // PRUEBAS
   "1999": { name: "José Eliseo Martínez", grade: "Maestro" },
 };
+const COEDUCA_AVAILABLE_GRADES = ["Noveno", "Octavo", "Primer Año", "Segundo Año", "Séptimo"];

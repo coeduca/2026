@@ -8,7 +8,7 @@
 
   const SUPABASE_URL = 'https://pxoxmcyyhjpjggbseqcr.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_uBmOVK8akx2H73wpKDxT-w_vtTTcPr9';
-  const SUPPORTED_GAMES = new Set(['snake', 'dino', 'pills', 'hangman', 'sandwich']);
+  const SUPPORTED_GAMES = new Set(['snake', 'dino', 'pills', 'hangman', 'sandwich', 'flappy', 'doodle']);
 
   function ensureStyles() {
     if (document.getElementById('coeduca-leaderboard-styles')) return;
@@ -23,9 +23,20 @@
         border-radius: 14px;
         box-shadow: 4px 4px 0 var(--coeduca-stroke, #1a1a1a);
       }
+      .game-center-link + .cg-leaderboard { margin-top: 10px; }
       .cg-leaderboard-title { margin: 0 0 4px; font-size: 18px; font-weight: 900; text-align: center; }
-      .cg-leaderboard-note { margin: 0 0 12px; font-size: 12px; text-align: center; opacity: .72; }
-      .cg-leaderboard-status { min-height: 18px; margin: 4px 0 10px; font-size: 12px; text-align: center; opacity: .72; }
+      .cg-leaderboard-note { margin: 0 0 6px; font-size: 12px; text-align: center; opacity: .72; }
+      .cg-leaderboard-status { margin: 2px 0 6px; font-size: 12px; text-align: center; opacity: .72; }
+      .cg-leaderboard-status:empty { display: none; }
+      .cg-leaderboard-grades { display: flex; justify-content: center; flex-wrap: wrap; gap: 7px; padding: 2px 2px 8px; }
+      .cg-leaderboard-chip {
+        flex: none; padding: 6px 11px; color: var(--coeduca-text, #1a1a1a);
+        background: var(--coeduca-surface, #fff);
+        border: 2px solid var(--coeduca-stroke, #1a1a1a); border-radius: 999px;
+        font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+      }
+      .cg-leaderboard-chip[aria-pressed="true"] { background: var(--coeduca-primary, #ffd700); }
+      .cg-leaderboard-chip:focus-visible { outline: 3px solid var(--coeduca-primary, #ffd700); outline-offset: 2px; }
       .cg-leaderboard-grids { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
       .cg-leaderboard-board {
         min-width: 0; padding: 10px;
@@ -171,6 +182,19 @@
     return response.status === 204 ? null : response.json();
   }
 
+  function configuredGrades() {
+    const grades = [];
+    if (typeof COEDUCA_AVAILABLE_GRADES !== 'undefined' && Array.isArray(COEDUCA_AVAILABLE_GRADES)) {
+      grades.push(...COEDUCA_AVAILABLE_GRADES);
+    }
+    // Los paquetes anteriores no incluyen la lista de aulas; sus alumnos
+    // siguen aportando los grados disponibles en ese proyecto.
+    if (typeof STUDENTS !== 'undefined' && STUDENTS) {
+      grades.push(...Object.values(STUDENTS).map(student => student && student.grade));
+    }
+    return grades;
+  }
+
   function createList(title, rows, limit, onRefresh) {
     const board = document.createElement('section');
     board.className = 'cg-leaderboard-board';
@@ -242,13 +266,20 @@
     title.textContent = '🏆 Ranking de puntuaciones';
     const note = document.createElement('p');
     note.className = 'cg-leaderboard-note';
-    const scoreUnit = game === 'hangman' ? 'palabras' : 'puntos';
-    note.textContent = `Tu marca se guarda desde ${minimumScore} ${scoreUnit} y solo si mejora la anterior.`;
+    const scoreUnit = game === 'hangman' ? 'palabras' : game === 'flappy' ? 'tubos' : game === 'doodle' ? 'unidades de altura' : 'puntos';
+    const singularUnit = game === 'hangman' ? 'palabra' : game === 'flappy' ? 'tubo' : game === 'doodle' ? 'unidad de altura' : 'punto';
+    note.textContent = `Tu marca se guarda desde ${minimumScore} ${minimumScore === 1 ? singularUnit : scoreUnit} y solo si mejora la anterior.`;
     const status = document.createElement('div');
     status.className = 'cg-leaderboard-status';
+    const gradeChips = document.createElement('div');
+    gradeChips.className = 'cg-leaderboard-grades';
+    gradeChips.setAttribute('aria-label', 'Grados del ranking');
     const grids = document.createElement('div');
     grids.className = 'cg-leaderboard-grids';
-    root.append(title, note, status, grids);
+    root.append(title, note, status);
+    const isTeacher = String(student.grade || '').trim().toLowerCase() === 'maestro';
+    if (isTeacher) root.appendChild(gradeChips);
+    root.appendChild(grids);
     ctx.container.appendChild(root);
 
     let studentKeyPromise = null;
@@ -256,6 +287,32 @@
     // rechazada por el servidor nunca debe impedir un reintento posterior.
     let bestSent = 0;
     let requestRunning = false;
+    let selectedGrade = student.grade || '';
+    let availableGrades = configuredGrades();
+    let refreshNumber = 0;
+
+    function renderGradeChips() {
+      if (!isTeacher) return;
+      const grades = [...new Set([selectedGrade, ...availableGrades]
+        .filter(grade => typeof grade === 'string' && grade.trim())
+        .map(grade => grade.trim()))].sort((a, b) => a.localeCompare(b, 'es'));
+      gradeChips.replaceChildren(...grades.map(grade => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'cg-leaderboard-chip';
+        chip.textContent = grade;
+        chip.setAttribute('aria-pressed', String(grade === selectedGrade));
+        chip.addEventListener('click', () => {
+          if (grade === selectedGrade) return;
+          selectedGrade = grade;
+          renderGradeChips();
+          refresh();
+        });
+        return chip;
+      }));
+    }
+
+    renderGradeChips();
 
     const getStudentKey = () => {
       if (!studentKeyPromise) studentKeyPromise = hashStudentId(student.nie);
@@ -263,20 +320,28 @@
     };
 
     async function refresh() {
+      const currentRefresh = ++refreshNumber;
+      const gradeToLoad = selectedGrade;
       try {
         status.textContent = 'Actualizando ranking…';
         const key = await getStudentKey();
         const data = await rpc('get_game_leaderboards', {
           p_game: game,
-          p_grade: student.grade || '',
+          p_grade: gradeToLoad,
           p_student_key: key
         });
+        if (currentRefresh !== refreshNumber) return;
+        if (isTeacher && Array.isArray(data && data.grades)) {
+          availableGrades = [...availableGrades, ...data.grades];
+          renderGradeChips();
+        }
         grids.replaceChildren(
           createList('🌎 Top 10 global', data && data.global, 10, refresh),
-          createList(`🎓 Top 5 · ${student.grade || 'mi grado'}`, data && data.grade, 5, refresh)
+          createList(`🎓 Top 10 · ${gradeToLoad || 'mi grado'}`, data && data.grade, 10, refresh)
         );
         status.textContent = '';
       } catch (error) {
+        if (currentRefresh !== refreshNumber) return;
         console.warn('No se pudo cargar el ranking', error);
         status.textContent = 'Ranking no disponible temporalmente.';
       }

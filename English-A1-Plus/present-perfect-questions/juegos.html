@@ -2,29 +2,93 @@
 <html translate="no" lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google" content="notranslate">
-  <meta http-equiv="Content-Language" content="es">
-  <title>Present Perfect Questions - Noveno, Primer Año, Segundo Año</title>
+  <title>Centro de juegos · Present Perfect Questions</title>
   <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
   <link rel="icon" href="favicon.png" type="image/png">
 </head>
-<body>
-  <div id="app"></div>
-  <script src="jspdf.umd.min.js"></script>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+          <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+          <span>Volver a la actividad</span>
+        </a>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <div class="gc-hero-label">EL RETO COMIENZA AQUÍ <span aria-hidden="true">✦</span></div>
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+          <div class="gc-hero-tip">Elige un juego · Suma puntos · Supera tu marca</div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-labelledby="gc-catalog-title">
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">TU ZONA DE JUEGOS</span>
+          <h2 id="gc-catalog-title">Juegos con puntuación</h2>
+        </div>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
   <script src="students.js"></script>
   <script src="rigo.js"></script>
   <script src="coeduca-core.js"></script>
   <script src="coeduca-leaderboard.js"></script>
   <script src="coeduca-hangman-bank.js"></script>
-  <script src="coeduca-exercises.js"></script>
   <script src="matter.min.js"></script>
   <script src="coeduca-games.js"></script>
   <script src="coeduca-flappy.js"></script>
   <script src="coeduca-doodle.js"></script>
   <rigo-mascot></rigo-mascot>
-  <script>
-    COEDUCA.init({
+  <script>window.GAME_CENTER_CONFIG = {
   "container": "#app",
   "topic": "Present Perfect Questions",
   "level": "Noveno, Primer Año, Segundo Año",
@@ -42,7 +106,7 @@
     {
       "type": "note",
       "title": "Present Perfect Questions with 'Ever'",
-      "html": "<h3>Have you ever...?</h3><p>Usamos el <strong>Present Perfect</strong> para preguntar sobre experiencias de vida cuando no decimos exactamente cuándo ocurrieron.</p><p>La estructura principal es: <strong>Have/Has + subject + ever + past participle + complement?</strong></p><p><strong>Have you ever visited a volcano?</strong> — ¿Alguna vez has visitado un volcán?</p><p><strong>Has she ever ridden a horse?</strong> — ¿Alguna vez ella ha montado a caballo?</p><p>Usamos <strong>have</strong> con I, you, we y they. Usamos <strong>has</strong> con he, she e it. La palabra <strong>ever</strong> significa «alguna vez» y normalmente aparece antes del participio pasado.</p><p>Para respuestas cortas podemos decir: <strong>Yes, I have.</strong> / <strong>No, I haven't.</strong> / <strong>Yes, she has.</strong> / <strong>No, she hasn't.</strong></p><p>Vocabulario útil de experiencias: visit a volcano, travel by plane, ride a horse, see a horror film, break a bone, win a competition, meet a famous person, sleep in a tent, try unusual food y climb a mountain.</p>"
+      "html": "\u003ch3>Have you ever...?\u003c/h3>\u003cp>Usamos el \u003cstrong>Present Perfect\u003c/strong> para preguntar sobre experiencias de vida cuando no decimos exactamente cuándo ocurrieron.\u003c/p>\u003cp>La estructura principal es: \u003cstrong>Have/Has + subject + ever + past participle + complement?\u003c/strong>\u003c/p>\u003cp>\u003cstrong>Have you ever visited a volcano?\u003c/strong> — ¿Alguna vez has visitado un volcán?\u003c/p>\u003cp>\u003cstrong>Has she ever ridden a horse?\u003c/strong> — ¿Alguna vez ella ha montado a caballo?\u003c/p>\u003cp>Usamos \u003cstrong>have\u003c/strong> con I, you, we y they. Usamos \u003cstrong>has\u003c/strong> con he, she e it. La palabra \u003cstrong>ever\u003c/strong> significa «alguna vez» y normalmente aparece antes del participio pasado.\u003c/p>\u003cp>Para respuestas cortas podemos decir: \u003cstrong>Yes, I have.\u003c/strong> / \u003cstrong>No, I haven't.\u003c/strong> / \u003cstrong>Yes, she has.\u003c/strong> / \u003cstrong>No, she hasn't.\u003c/strong>\u003c/p>\u003cp>Vocabulario útil de experiencias: visit a volcano, travel by plane, ride a horse, see a horror film, break a bone, win a competition, meet a famous person, sleep in a tent, try unusual food y climb a mountain.\u003c/p>"
     },
     {
       "type": "multiplechoice",
@@ -1012,7 +1076,7 @@
   "game": {
     "type": "dino"
   }
-});
-  </script>
+};</script>
+  <script src="game-center.js"></script>
 </body>
 </html>
