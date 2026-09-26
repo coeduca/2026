@@ -2,10 +2,160 @@
 (function (global) {
   'use strict';
 
+  // Iconos compartidos por los juegos y por sus pantallas de resultados.
+  const playIcon = '<svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960" fill="currentColor"><path d="M320-200v-560l440 280-440 280Z"/></svg>';
+  const retryIcon = '<svg aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="currentColor"><path d="M15,6V1.76l-1.7,1.7A7,7,0,1,0,14.92,9H13.51a5.63,5.63,0,1,1-1.2-4.55L10.76,6Z"/></svg>';
+  const jumpIcon = '<svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960" fill="currentColor"><path d="M360-160v-120H160l320-360 320 360H600v120H360ZM160-480l320-360 320 360H693L480-720 267-480H160Z"/></svg>';
+  const centerIcon = '<svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960" fill="currentColor"><path d="M367-367q-47-47-47-113t47-113q47-47 113-47t113 47q47 47 47 113t-47 113q-47 47-113 47t-113-47Zm169.5-56.5Q560-447 560-480t-23.5-56.5Q513-560 480-560t-56.5 23.5Q400-513 400-480t23.5 56.5Q447-400 480-400t56.5-23.5ZM480-480ZM200-120q-33 0-56.5-23.5T120-200v-160h80v160h160v80H200Zm400 0v-80h160v-160h80v160q0 33-23.5 56.5T760-120H600ZM120-600v-160q0-33 23.5-56.5T200-840h160v80H200v160h-80Zm640 0v-160H600v-80h160q33 0 56.5 23.5T840-760v160h-80Z"/></svg>';
+  const infoIcon = '<svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960" fill="currentColor"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>';
+  const arrowIcons = {
+    up: '<svg class="coeduca-control-icon" aria-hidden="true" focusable="false" viewBox="0 -960 960 960" fill="currentColor"><path d="M480-528 296-344l-56-56 240-240 240 240-56 56-184-184Z"/></svg>',
+    down: '<svg class="coeduca-control-icon" aria-hidden="true" focusable="false" viewBox="0 -960 960 960" fill="currentColor"><path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/></svg>',
+    left: '<svg class="coeduca-control-icon" aria-hidden="true" focusable="false" viewBox="0 -960 960 960" fill="currentColor"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/></svg>',
+    right: '<svg class="coeduca-control-icon" aria-hidden="true" focusable="false" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>'
+  };
+  const iconFor = kind => kind === 'retry' ? retryIcon : kind === 'play' ? playIcon
+    : kind === 'jump' ? jumpIcon : kind === 'center' ? centerIcon
+    : kind === 'info' ? infoIcon : arrowIcons[kind];
+  global.COEDUCA_GAME_ICONS = {
+    arrow(direction) { return arrowIcons[direction]; },
+    icon: iconFor,
+    button(kind, label) {
+      return `<span class="coeduca-button-label">${iconFor(kind)}<span>${label}</span></span>`;
+    }
+  };
+
+  const gameHelp = {
+    tictactoe: [
+      'Toca una casilla vacía para colocar tu X. Forma una línea de tres antes que Rigo. Un empate concede medio punto extra.'
+    ],
+    snake: [
+      'Recoge las manzanas para sumar puntos. Dirige la serpiente con las flechas del teclado o los botones de la pantalla.',
+      'Evita chocar contra los bordes o tu propio cuerpo. Alcanza la meta indicada para ganar el punto extra.'
+    ],
+    dino: [
+      'Pulsa START para correr. Toca el juego o usa ESPACIO o SALTAR para evitar los obstáculos.',
+      'Mantén pulsado para saltar alto y suelta pronto para un salto corto. Atrapa el globo para conseguir otro punto extra.'
+    ],
+    hangman: [
+      'Elige letras en pantalla o usa el teclado para completar la palabra antes de agotar las vidas.',
+      'Los comodines permiten recuperar una vida, revelar una letra o descartar letras incorrectas. Cada uno se usa una vez por partida.'
+    ],
+    trivia: [
+      'Lee cada pregunta y elige una respuesta. Suma aciertos para conseguir el punto extra.',
+      'Puedes usar los comodines disponibles para eliminar opciones, pedir ayuda a Rigo o duplicar una respuesta.'
+    ],
+    pills: [
+      'Mueve la píldora con ← y →; bájala con ↓. Gírala con ESPACIO o con el botón de giro.',
+      'Une tres o más mitades del mismo color en línea recta o diagonal. La mitad arcoíris explota alrededor y la píldora dorada da un punto extra.'
+    ],
+    sandwich: [
+      'Mueve el plato con ← y →, A y D, los botones laterales o arrastrándolo para atrapar y apilar ingredientes.',
+      'Puedes dejar caer tres ingredientes. El cuarto termina la partida; sigue apilando para mejorar tu puntuación.'
+    ],
+    flappy: [
+      'Supera diez tubos sin chocar para ganar un punto extra. Pulsa Empezar para iniciar.',
+      'Durante la partida, toca el juego o usa ↑, ESPACIO o el botón Aletear para mantener el vuelo.'
+    ],
+    doodle: [
+      'Salta automáticamente entre plataformas. En PC usa A/D o ← y →; en móvil inclina el teléfono o usa los botones laterales.',
+      'Evita las plataformas rotas. Las azules se mueven y las moradas desaparecen al tocarlas. Resortes, hélices y cohetes te impulsan. Llega a 1000 de altura para ganar un punto extra.'
+    ]
+  };
+  let helpDialogNumber = 0;
+
+  function showGameHelp(button, wrap, game, title) {
+    if (document.querySelector('.coeduca-game-info-overlay')) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'coeduca-game-info-overlay';
+    const dialog = document.createElement('section');
+    dialog.className = 'coeduca-game-info-card';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    const heading = document.createElement('h2');
+    heading.id = `coeduca-game-info-title-${++helpDialogNumber}`;
+    heading.textContent = `Cómo jugar: ${title}`;
+    dialog.setAttribute('aria-labelledby', heading.id);
+    dialog.appendChild(heading);
+    for (const explanation of gameHelp[game] || []) {
+      const paragraph = document.createElement('p');
+      paragraph.textContent = explanation;
+      dialog.appendChild(paragraph);
+    }
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'coeduca-game-info-close';
+    close.textContent = 'Cerrar';
+    const fullscreenHost = document.fullscreenElement;
+    const dismiss = () => {
+      if (!overlay.isConnected) return;
+      document.removeEventListener('fullscreenchange', onFullscreenChange);
+      overlay.remove();
+      wrap.dispatchEvent(new Event('coeduca-game-help-close'));
+      if (button.isConnected) button.focus();
+    };
+    const onFullscreenChange = () => {
+      if (fullscreenHost && document.fullscreenElement !== fullscreenHost) dismiss();
+    };
+    close.addEventListener('click', dismiss);
+    overlay.addEventListener('pointerdown', event => event.stopPropagation());
+    overlay.addEventListener('click', event => { if (event.target === overlay) dismiss(); });
+    overlay.addEventListener('keydown', event => {
+      if (event.key === 'Escape') dismiss();
+      if (event.key === 'Tab') { event.preventDefault(); close.focus(); }
+    });
+    dialog.appendChild(close);
+    overlay.appendChild(dialog);
+    (fullscreenHost || document.body).appendChild(overlay);
+    if (fullscreenHost) document.addEventListener('fullscreenchange', onFullscreenChange);
+    wrap.dispatchEvent(new Event('coeduca-game-help-open'));
+    close.focus();
+  }
+
+  function attachGameHelp(wrap, game, title, headingSelector) {
+    const heading = headingSelector ? wrap.querySelector(headingSelector) : null;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'coeduca-game-info-button';
+    button.innerHTML = infoIcon;
+    button.title = `Cómo jugar ${title}`;
+    button.setAttribute('aria-label', button.title);
+    button.setAttribute('aria-haspopup', 'dialog');
+    button.addEventListener('click', () => showGameHelp(button, wrap, game, title));
+    if (heading) {
+      heading.classList.add('coeduca-game-title-with-info');
+      heading.appendChild(button);
+    } else {
+      const row = document.createElement('div');
+      row.className = 'coeduca-game-title-row';
+      const name = document.createElement('h3');
+      name.textContent = title;
+      row.append(name, button);
+      wrap.prepend(row);
+    }
+  }
+
+  global.COEDUCA_GAME_HELP = { attach: attachGameHelp };
+
   if (!document.getElementById('coeduca-game-viewport-styles')) {
     const style = document.createElement('style');
     style.id = 'coeduca-game-viewport-styles';
     style.textContent = `
+      .coeduca-button-label { display:inline-flex; align-items:center; justify-content:center; gap:6px; vertical-align:middle; }
+      .coeduca-button-label svg { width:24px; height:24px; flex:none; }
+      .coeduca-control-icon { display:inline-block; width:24px; height:24px; vertical-align:middle; }
+      .coeduca-game-title-row { display:flex; align-items:center; justify-content:center; gap:8px; margin:0 0 10px; }
+      .coeduca-game-title-row h3 { margin:0; font:900 22px system-ui,sans-serif; }
+      .coeduca-game-title-with-info { display:inline-flex; align-items:center; gap:8px; }
+      .coeduca-game-info-button { display:inline-grid; place-items:center; flex:none; width:30px; height:30px; padding:3px; border:2px solid currentColor; border-radius:8px; background:#fff; color:#23334d; cursor:pointer; vertical-align:middle; }
+      .coeduca-game-info-button svg { display:block; width:20px; height:20px; }
+      .coeduca-game-info-button:focus-visible, .coeduca-game-info-close:focus-visible { outline:3px solid #158b79; outline-offset:2px; }
+      .coeduca-game-info-overlay { position:fixed; inset:0; z-index:2147483647; display:grid; place-items:center; padding:16px; background:rgba(20,31,51,.72); }
+      .coeduca-game-info-card { width:min(100%,430px); max-height:min(90vh,600px); overflow:auto; padding:20px; border:3px solid #23334d; border-radius:18px; background:#fffaf0; color:#23334d; box-shadow:4px 4px 0 #23334d; font:15px/1.5 system-ui,sans-serif; text-align:left; }
+      .coeduca-game-info-card h2 { margin:0 0 12px; font-size:21px; line-height:1.2; }
+      .coeduca-game-info-card p { margin:0 0 12px; }
+      .coeduca-game-info-close { display:block; min-height:42px; margin:16px 0 0 auto; padding:8px 18px; border:2px solid #23334d; border-radius:10px; background:#ffe071; color:#23334d; font:800 14px system-ui,sans-serif; cursor:pointer; }
+      #hm-reset:disabled { opacity:.5; cursor:not-allowed; }
       html.coeduca-viewport-open, body.coeduca-viewport-open { overflow:hidden !important; overscroll-behavior:none; }
       .coeduca-game-viewport { position:fixed; inset:0; z-index:2147483647; display:flex; flex-direction:column; width:100vw; height:100vh; height:100dvh; padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); background:#eaf7ff; color:#22324a; font-family:system-ui,sans-serif; box-sizing:border-box; }
       .coeduca-game-viewport * { box-sizing:border-box; }
@@ -42,7 +192,6 @@
       .coeduca-game-viewport[data-game="dino"] #dino-canvas { width:100%; height:auto; }
       .coeduca-game-viewport[data-game="sandwich"] { --viewport-game-width:620px; }
       .coeduca-game-viewport[data-game="sandwich"] #sw-canvas { display:block; max-width:100%; height:auto; margin-inline:auto; }
-      .coeduca-game-viewport[data-game="sandwich"] .sw-help { display:none; }
       .coeduca-game-viewport[data-game="sandwich"] .sw-heading { margin-bottom:6px; }
       .coeduca-game-viewport[data-game="sandwich"] .sw-goal { margin-top:6px; }
       .coeduca-game-viewport[data-game="sandwich"] .sw-progress { margin-bottom:6px; }
@@ -167,7 +316,7 @@
     }
 
     function onKeyDown(event) {
-      if (event.key === 'Escape' && placeholder) leave();
+      if (event.key === 'Escape' && placeholder && !document.querySelector('.coeduca-game-info-overlay')) leave();
     }
 
     function onFullscreenChange() {
@@ -423,7 +572,7 @@
         const again = document.createElement('button');
         again.type = 'button';
         again.className = 'coeduca-result-replay';
-        again.textContent = '↻ Jugar otra vez';
+        again.innerHTML = global.COEDUCA_GAME_ICONS.button('retry', 'Jugar otra vez');
         again.addEventListener('click', () => { hide(); afterGameRestores(replay); });
         actions.appendChild(again);
       }

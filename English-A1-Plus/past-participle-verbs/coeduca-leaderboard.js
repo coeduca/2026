@@ -9,7 +9,39 @@
   const SUPABASE_URL = 'https://pxoxmcyyhjpjggbseqcr.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_uBmOVK8akx2H73wpKDxT-w_vtTTcPr9';
   const SUPPORTED_GAMES = new Set(['snake', 'dino', 'pills', 'hangman', 'sandwich', 'flappy', 'doodle']);
-  const AVATAR_EMOJIS = ['🐱', '🐶', '🦊', '🐼', '🐸', '🐯', '🦄', '🐧', '🐙', '🚀', '⭐', '⚡', '🐻', '🦋'];
+  // Conservamos los valores emoji del servidor para respetar las elecciones anteriores.
+  const AVATAR_IMAGES = [
+    { kind:'rigo', emoji:null, name:'Rigo', file:'avatar-rigo.webp' },
+    { kind:'emoji', emoji:'🐱', name:'Gato', file:'avatar-gato.webp' },
+    { kind:'emoji', emoji:'🐶', name:'Perro', file:'avatar-perro.webp' },
+    { kind:'emoji', emoji:'🦊', name:'Loro', file:'avatar-loro.webp' },
+    { kind:'emoji', emoji:'🐼', name:'Caracol', file:'avatar-caracol.webp' },
+    { kind:'emoji', emoji:'🐸', name:'Oruga', file:'avatar-oruga.webp' },
+    { kind:'emoji', emoji:'🐯', name:'León', file:'avatar-leon.webp' },
+    { kind:'emoji', emoji:'🦄', name:'Caballo', file:'avatar-caballo.webp' },
+    { kind:'emoji', emoji:'🐧', name:'Pingüino', file:'avatar-pinguino.webp' },
+    { kind:'emoji', emoji:'🐙', name:'Medusa', file:'avatar-medusa.webp' },
+    { kind:'emoji', emoji:'🚀', name:'Delfín', file:'avatar-delfin.webp' },
+    { kind:'emoji', emoji:'⭐', name:'Pollo', file:'avatar-pollo.webp' },
+    { kind:'emoji', emoji:'⚡', name:'Murciélago', file:'avatar-murcielago.webp' },
+    { kind:'emoji', emoji:'🐻', name:'Camello', file:'avatar-camello.webp' },
+    { kind:'emoji', emoji:'🦋', name:'Mariposa', file:'avatar-mariposa.webp' }
+  ];
+  const AVATAR_COLORS = [
+    ['Cielo', '#EAF7FF'], ['Blanco', '#FFFFFF'], ['Crema', '#FFF3D6'],
+    ['Amarillo', '#FFE27A'], ['Naranja', '#FFC078'], ['Durazno', '#FFD4B8'],
+    ['Coral', '#FFA69E'], ['Rosa', '#FFC8DD'], ['Frambuesa', '#F5A3D7'],
+    ['Lila', '#EBD6FF'], ['Lavanda', '#D2C0F5'], ['Azul claro', '#C8E5FF'],
+    ['Azul', '#A9D6FF'], ['Aguamarina', '#A6ECF1'], ['Turquesa', '#9DE6E0'],
+    ['Menta', '#BDF3D2'], ['Lima', '#E5F28C'], ['Verde', '#CBEF9A'],
+    ['Arena', '#E9D3B3'], ['Gris', '#D9E1E8'],
+    ['Rojo intenso', '#F44336'], ['Fucsia intenso', '#D81B60'],
+    ['Morado intenso', '#8E24AA'], ['Violeta intenso', '#673AB7'],
+    ['Azul intenso', '#1E88E5'], ['Azul rey', '#1565C0'],
+    ['Turquesa intenso', '#00ACC1'], ['Verde esmeralda', '#00897B'],
+    ['Verde vivo', '#43A047'], ['Naranja intenso', '#F57C00']
+  ];
+  const DEFAULT_AVATAR_BG = '#EAF7FF';
   const AVATAR_BUCKET = 'game-avatars';
   let activeAvatarDialog = null;
 
@@ -53,7 +85,8 @@
       .cg-leaderboard-board h4 { margin: 0 0 8px; text-align: center; font-size: 14px; }
       .cg-leaderboard-board-heading { display:flex; align-items:center; justify-content:center; gap:7px; margin-bottom:8px; }
       .cg-leaderboard-board-heading h4 { margin:0; }
-      .cg-leaderboard-board-heading button { border:0; background:transparent; font:800 16px system-ui,sans-serif; cursor:pointer; }
+      .cg-leaderboard-board-heading button { display:inline-grid; place-items:center; width:24px; height:24px; padding:2px; border:0; background:transparent; color:inherit; cursor:pointer; }
+      .cg-leaderboard-board-heading button svg { display:block; width:18px; height:18px; }
       .cg-leaderboard-list { list-style: none; margin: 0; padding: 0; }
       .cg-leaderboard-row {
         display: grid; grid-template-columns: 28px 34px minmax(0, 1fr) auto;
@@ -136,10 +169,11 @@
       }
       .cg-leaderboard-student { min-width: 0; }
       .cg-leaderboard-avatar { display:grid; place-items:center; width:34px; height:34px; padding:0; overflow:hidden; border:2px solid #22324a; border-radius:50%; background:#fff; font:20px system-ui,sans-serif; line-height:1; }
-      .cg-leaderboard-placeholder { display:block; font-size:26px; line-height:1; transform:translate(1px, 5px) scale(1.02); }
+      .cg-leaderboard-placeholder { display:block; font-size:26px; line-height:1; transform:translate(0px, 5px) scale(1.02); }
       button.cg-leaderboard-avatar { cursor:pointer; }
       button.cg-leaderboard-avatar:hover { transform:scale(1.08); }
-      .cg-leaderboard-avatar img { display:block; width:100%; height:100%; object-fit:cover; }
+      .cg-leaderboard-avatar img { display:block; width:100%; height:100%; object-fit:contain; }
+      .cg-leaderboard-avatar[data-kind="photo"] img { object-fit:cover; }
       .cg-leaderboard-avatar:focus-visible, .cg-leaderboard-own-avatar:focus-visible { outline:3px solid #147b69; outline-offset:2px; }
       .cg-leaderboard-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
       .cg-leaderboard-grade { display: block; opacity: .66; font-size: 10px; }
@@ -150,17 +184,24 @@
       .is-podium .cg-leaderboard-score { background: rgba(255,255,255,.72); }
       .cg-leaderboard-empty { padding: 12px 4px; text-align: center; font-size: 12px; opacity: .62; }
       .cg-avatar-dialog-backdrop { position:fixed; inset:0; z-index:2147483647; display:grid; place-items:center; padding:16px; background:#16293cbb; }
-      .cg-avatar-dialog { width:min(100%,420px); max-height:min(90dvh,650px); overflow:auto; padding:20px; border:3px solid #22324a; border-radius:20px; background:#fff9ed; color:#22324a; box-shadow:6px 6px 0 #22324a; font-family:system-ui,sans-serif; text-align:center; }
+      .cg-avatar-dialog { width:min(100%,420px); max-height:min(94dvh,780px); overflow:auto; padding:20px; border:3px solid #22324a; border-radius:20px; background:#fff9ed; color:#22324a; box-shadow:6px 6px 0 #22324a; font-family:system-ui,sans-serif; text-align:center; }
       .cg-avatar-dialog h3 { margin:0 0 5px; font-size:24px; }
       .cg-avatar-dialog p { margin:4px 0 12px; font-size:13px; }
+      .cg-avatar-dialog-preview { display:grid; place-items:center; width:76px; height:76px; margin:4px auto 8px; border:2px solid #22324a; border-radius:50%; overflow:hidden; background:#eaf7ff; }
+      .cg-avatar-dialog-preview img { display:block; width:100%; height:100%; object-fit:contain; }
       .cg-avatar-dialog-options { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin:12px 0; }
-      .cg-avatar-dialog-options button { display:grid; place-items:center; aspect-ratio:1; padding:5px; border:2px solid #22324a; border-radius:12px; background:#fff; font-size:27px; cursor:pointer; }
-      .cg-avatar-dialog-options button[aria-pressed="true"] { background:#ffe27a; outline:2px solid #22324a; }
-      .cg-avatar-dialog-options[hidden], .cg-avatar-dialog-upload[hidden], .cg-avatar-dialog-actions button[hidden] { display:none; }
-      .cg-avatar-dialog-options img { width:36px; height:36px; object-fit:contain; }
+      .cg-avatar-dialog-options button { display:grid; place-items:center; aspect-ratio:1; padding:0; overflow:hidden; border:2px solid #22324a; border-radius:50%; background:#fff; cursor:pointer; }
+      .cg-avatar-dialog-options button[aria-pressed="true"] { outline:2px solid #22324a; outline-offset:2px; }
+      .cg-avatar-dialog-preview[hidden], .cg-avatar-dialog-color-label[hidden], .cg-avatar-dialog-options[hidden], .cg-avatar-dialog-colors[hidden], .cg-avatar-dialog-upload[hidden], .cg-avatar-dialog-actions button[hidden] { display:none; }
+      .cg-avatar-dialog-options img { display:block; width:100%; height:100%; object-fit:contain; }
+      .cg-avatar-dialog-colors { display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:7px; margin:8px 0 12px; }
+      .cg-avatar-dialog-colors button { width:100%; aspect-ratio:1; border:2px solid #22324a; border-radius:50%; cursor:pointer; }
+      .cg-avatar-dialog-colors button[aria-pressed="true"] { outline:3px solid #147b69; outline-offset:2px; }
+      .cg-avatar-dialog-colors button:focus-visible, .cg-avatar-dialog-options button:focus-visible { outline:3px solid #147b69; outline-offset:2px; }
       .cg-avatar-dialog-upload { display:block; width:100%; min-height:42px; padding:9px; border:2px solid #22324a; border-radius:10px; background:#d9f3ff; color:#22324a; font:800 13px system-ui,sans-serif; cursor:pointer; }
-      .cg-avatar-dialog-actions { display:flex; justify-content:center; gap:8px; margin-top:10px; }
+      .cg-avatar-dialog-actions { position:sticky; bottom:-20px; z-index:1; display:flex; justify-content:center; gap:8px; margin-top:10px; padding:8px 0 4px; background:#fff9ed; }
       .cg-avatar-dialog-actions button { min-height:38px; padding:7px 12px; border:2px solid #22324a; border-radius:9px; background:#fff; color:#22324a; font:800 12px system-ui,sans-serif; cursor:pointer; }
+      .cg-avatar-dialog-actions .cg-avatar-dialog-save { background:#ffe27a; }
       .cg-avatar-dialog-status { min-height:18px; font-size:12px; font-weight:700; }
       .cg-avatar-dialog button:disabled { opacity:.55; cursor:wait; }
       @keyframes cgLeaderboardRankFloat {
@@ -183,7 +224,7 @@
         .cg-leaderboard-row.rank-1 .cg-leaderboard-avatar-wrap { animation: none; }
       }
       @media (max-width: 620px) { .cg-leaderboard-grids { grid-template-columns: 1fr; } }
-      @media (max-width: 360px) { .cg-avatar-dialog-options { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+      @media (max-width: 360px) { .cg-avatar-dialog { padding:14px; } .cg-avatar-dialog-options { grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; margin:8px 0; } .cg-avatar-dialog-colors { grid-template-columns:repeat(8,minmax(0,1fr)); gap:5px; } .cg-avatar-dialog-actions { bottom:-14px; } }
     `;
     document.head.appendChild(style);
   }
@@ -265,8 +306,21 @@
     }
   }
 
+  function avatarBackground(profile) {
+    const color = profile && profile.avatar_bg;
+    return typeof color === 'string' && /^#[0-9a-f]{6}$/i.test(color)
+      ? color : DEFAULT_AVATAR_BG;
+  }
+
+  function avatarImage(profile) {
+    return AVATAR_IMAGES.find(choice => choice.kind === profile?.avatar_kind &&
+      (choice.kind !== 'emoji' || choice.emoji === profile.avatar_emoji));
+  }
+
   function fillAvatar(element, profile) {
     element.replaceChildren();
+    element.dataset.kind = profile?.avatar_kind || 'none';
+    element.style.backgroundColor = avatarBackground(profile);
     function placeholder() {
       const icon = document.createElement('span');
       icon.className = 'cg-leaderboard-placeholder';
@@ -281,16 +335,14 @@
       img.loading = 'lazy';
       img.onerror = () => { if (img.parentNode === element) placeholder(); };
       element.appendChild(img);
-    } else if (kind === 'rigo') {
+    } else if (avatarImage(profile)) {
       const img = document.createElement('img');
-      img.src = 'favicon.webp';
+      img.src = avatarImage(profile).file;
       img.alt = '';
       img.onerror = () => { if (img.parentNode === element) placeholder(); };
       element.appendChild(img);
     } else {
-      if (kind === 'emoji' && AVATAR_EMOJIS.includes(profile.avatar_emoji))
-        element.textContent = profile.avatar_emoji;
-      else placeholder();
+      placeholder();
     }
   }
 
@@ -341,7 +393,7 @@
     if (typeof onRefresh === 'function') {
       const reload = document.createElement('button');
       reload.type = 'button';
-      reload.textContent = '⟳';
+      reload.innerHTML = global.COEDUCA_GAME_ICONS.icon('retry');
       reload.title = 'Actualizar rankings';
       reload.setAttribute('aria-label', 'Actualizar rankings de puntuaciones');
       reload.addEventListener('click', onRefresh);
@@ -498,9 +550,19 @@
       const heading = document.createElement('h3');
       heading.textContent = 'Elige tu avatar';
       const hint = document.createElement('p');
-      hint.textContent = 'Puedes cambiarlo mientras lideres algún Top 1 global. La foto se guarda como WebP pequeño.';
+      hint.textContent = 'Elige un animal y un color de fondo. También puedes subir una foto.';
+      const preview = document.createElement('div');
+      preview.className = 'cg-avatar-dialog-preview';
+      preview.setAttribute('aria-label', 'Vista previa del avatar');
       const options = document.createElement('div');
       options.className = 'cg-avatar-dialog-options';
+      options.setAttribute('aria-label', 'Animales disponibles');
+      const colorLabel = document.createElement('p');
+      colorLabel.className = 'cg-avatar-dialog-color-label';
+      colorLabel.textContent = 'Color de fondo';
+      const colors = document.createElement('div');
+      colors.className = 'cg-avatar-dialog-colors';
+      colors.setAttribute('aria-label', 'Colores de fondo');
       const statusLine = document.createElement('div');
       statusLine.className = 'cg-avatar-dialog-status';
       statusLine.setAttribute('role', 'status');
@@ -514,14 +576,18 @@
       input.hidden = true;
       const actions = document.createElement('div');
       actions.className = 'cg-avatar-dialog-actions';
+      const saveButton = document.createElement('button');
+      saveButton.type = 'button';
+      saveButton.className = 'cg-avatar-dialog-save';
+      saveButton.textContent = 'Guardar avatar';
       const clear = document.createElement('button');
       clear.type = 'button';
       clear.textContent = 'Eliminar avatar';
       const closeButton = document.createElement('button');
       closeButton.type = 'button';
       closeButton.textContent = 'Cerrar';
-      actions.append(clear, closeButton);
-      dialog.append(heading, hint, options, upload, input, statusLine, actions);
+      actions.append(saveButton, clear, closeButton);
+      dialog.append(heading, hint, preview, options, colorLabel, colors, upload, input, statusLine, actions);
       backdrop.appendChild(dialog);
       document.body.appendChild(backdrop);
 
@@ -529,6 +595,8 @@
       let unlocked = false;
       let canDelete = hasAvatar(ownProfile);
       let studentKey = null;
+      let selectedChoice = avatarImage(ownProfile) || null;
+      let selectedColor = avatarBackground(ownProfile);
       function close() {
         backdrop.remove();
         document.removeEventListener('keydown', onKeyDown, true);
@@ -543,30 +611,47 @@
         options.hidden = upload.hidden = !unlocked;
         clear.hidden = !canDelete;
         options.querySelectorAll('button').forEach(button => { button.disabled = value || !unlocked; });
+        colors.querySelectorAll('button').forEach(button => { button.disabled = value || !unlocked; });
         upload.disabled = value || !unlocked;
         clear.disabled = value || !canDelete;
+        renderSelection();
         statusLine.textContent = message || '';
       }
-      function markSelected(kind, emoji) {
-        options.querySelectorAll('button').forEach(button => {
-          button.setAttribute('aria-pressed', String(button.dataset.kind === kind &&
-            (kind !== 'emoji' || button.dataset.emoji === emoji)));
+      function renderSelection() {
+        preview.hidden = !selectedChoice;
+        colorLabel.hidden = colors.hidden = !unlocked || !selectedChoice;
+        saveButton.hidden = !unlocked;
+        saveButton.disabled = busy || !unlocked || !selectedChoice;
+        if (selectedChoice) fillAvatar(preview, {
+          avatar_kind:selectedChoice.kind, avatar_emoji:selectedChoice.emoji, avatar_bg:selectedColor
         });
+        options.querySelectorAll('button').forEach(button => {
+          button.setAttribute('aria-pressed', String(selectedChoice &&
+            button.dataset.kind === selectedChoice.kind &&
+            (selectedChoice.kind !== 'emoji' || button.dataset.emoji === selectedChoice.emoji)));
+          button.style.backgroundColor = selectedColor;
+        });
+        colors.querySelectorAll('button').forEach(button =>
+          button.setAttribute('aria-pressed', String(button.dataset.color === selectedColor)));
       }
       async function save(kind, emoji) {
         if (busy || (kind === 'none' ? !canDelete : !unlocked)) return;
         setBusy(true, 'Guardando avatar…');
         try {
           const hadPhoto = ownProfile && ownProfile.avatar_kind === 'photo';
-          const saved = await rpc('set_game_avatar', {
-            p_student_key:studentKey, p_kind:kind, p_emoji:emoji || null
-          });
+          const saved = kind === 'none'
+            ? await rpc('set_game_avatar', {
+              p_student_key:studentKey, p_kind:kind, p_emoji:null
+            })
+            : await rpc('set_game_avatar_with_color', {
+              p_student_key:studentKey, p_kind:kind, p_emoji:emoji || null, p_bg:selectedColor
+            });
           if (saved !== true) throw new Error(kind === 'none'
             ? 'No se pudo eliminar el avatar.'
             : 'Ya no estás en el Top 1 global o no se pudo guardar el avatar.');
-          ownProfile = { avatar_kind:kind, avatar_emoji:emoji || null, avatar_path:null };
+          ownProfile = { avatar_kind:kind, avatar_emoji:emoji || null,
+            avatar_bg:selectedColor, avatar_path:null };
           fillAvatar(ownAvatarImage, ownProfile);
-          markSelected(kind, emoji);
           if (hadPhoto) {
             try {
               await storageRequest('DELETE', '', JSON.stringify({ prefixes:[avatarPath(studentKey)] }),
@@ -582,25 +667,41 @@
           setBusy(false, error.message || 'No se pudo cambiar el avatar.');
         }
       }
-      function addChoice(kind, emoji, label) {
+      function addChoice(choice) {
         const button = document.createElement('button');
         button.type = 'button';
-        button.dataset.kind = kind;
-        if (emoji) button.dataset.emoji = emoji;
-        button.setAttribute('aria-label', label);
-        button.title = label;
-        if (kind === 'rigo') {
-          const img = document.createElement('img');
-          img.src = 'favicon.webp';
-          img.alt = '';
-          button.appendChild(img);
-        } else button.textContent = emoji;
-        button.addEventListener('click', () => save(kind, emoji));
+        button.dataset.kind = choice.kind;
+        if (choice.emoji) button.dataset.emoji = choice.emoji;
+        button.setAttribute('aria-label', choice.name);
+        button.title = choice.name;
+        const img = document.createElement('img');
+        img.src = choice.file;
+        img.alt = '';
+        button.appendChild(img);
+        button.addEventListener('click', () => {
+          selectedChoice = choice;
+          renderSelection();
+        });
         options.appendChild(button);
       }
-      addChoice('rigo', null, 'Rigo');
-      AVATAR_EMOJIS.forEach(emoji => addChoice('emoji', emoji, `Avatar ${emoji}`));
-      markSelected(ownProfile && ownProfile.avatar_kind, ownProfile && ownProfile.avatar_emoji);
+      AVATAR_IMAGES.forEach(addChoice);
+      AVATAR_COLORS.forEach(([label, color]) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.color = color;
+        button.style.backgroundColor = color;
+        button.setAttribute('aria-label', label);
+        button.title = label;
+        button.addEventListener('click', () => {
+          selectedColor = color;
+          renderSelection();
+        });
+        colors.appendChild(button);
+      });
+      renderSelection();
+      saveButton.addEventListener('click', () => {
+        if (selectedChoice) save(selectedChoice.kind, selectedChoice.emoji);
+      });
       upload.addEventListener('click', () => { if (!busy && unlocked) input.click(); });
       input.addEventListener('change', async () => {
         const file = input.files && input.files[0];
@@ -639,7 +740,7 @@
           canDelete = hasAvatar(ownProfile);
           if (unlocked) {
             heading.textContent = 'Elige tu avatar';
-            hint.textContent = 'Puedes cambiarlo mientras lideres algún Top 1 global. La foto se guarda como WebP pequeño.';
+            hint.textContent = 'Elige un animal y uno de los 30 colores de fondo. También puedes subir una foto.';
             setBusy(false, '');
           } else if (canDelete) {
             heading.textContent = 'Tu avatar';
