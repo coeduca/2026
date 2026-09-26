@@ -16,6 +16,8 @@
   }
   const C = global.CIVICA;
   const reg = (type, fn) => C.registerGame(type, fn);
+  const iconButton = global.COEDUCA_GAME_ICONS.button;
+  const arrowIcon = global.COEDUCA_GAME_ICONS.arrow;
   function gameViewport(wrap, game, title, soundToggle, options = {}) {
     return global.COEDUCA_GAME_VIEWPORT
       ? global.COEDUCA_GAME_VIEWPORT.create(wrap, { game, title, soundToggle, ...options })
@@ -473,14 +475,21 @@
   // Pausa automatica: llama a onHide cuando la pestana se oculta y a onShow al
   // volver. Se auto-limpia cuando el juego sale del DOM.
   function autoPause(wrap, onHide, onShow) {
+    let helpOpen = false;
     const handler = () => {
       if (!document.body.contains(wrap)) {
         document.removeEventListener('visibilitychange', handler);
+        wrap.removeEventListener('coeduca-game-help-open', onHelpOpen);
+        wrap.removeEventListener('coeduca-game-help-close', onHelpClose);
         return;
       }
-      if (document.hidden) onHide(); else onShow();
+      if (document.hidden || helpOpen) onHide(); else onShow();
     };
+    const onHelpOpen = () => { helpOpen = true; wrap.classList.add('coeduca-game-help-open'); handler(); };
+    const onHelpClose = () => { helpOpen = false; wrap.classList.remove('coeduca-game-help-open'); handler(); };
     document.addEventListener('visibilitychange', handler);
+    wrap.addEventListener('coeduca-game-help-open', onHelpOpen);
+    wrap.addEventListener('coeduca-game-help-close', onHelpClose);
   }
 
   function avatarHTML(name, emoji, bgColor, opts = {}) {
@@ -540,10 +549,11 @@
 
         <div id="ttt-status" class="cv-status"></div>
         <button class="civica-btn civica-btn-success" id="ttt-reset"
-                style="margin-top:14px;display:none;">🔄 Volver a jugar</button>
+                style="margin-top:14px;display:none;">${iconButton('retry', 'Volver a jugar')}</button>
       </div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'tictactoe', 'Tres en raya');
 
     makeSoundToggle(wrap);
     const results = gameResults(ctx, 'tictactoe', wrap);
@@ -749,19 +759,20 @@
               width="${SIZE * CELL}" height="${SIZE * CELL}"></canvas>
 
       <div class="cv-snake-controls">
-        <button class="civica-btn civica-btn-success cv-snake-start" id="snake-start">▶ START</button>
+        <button class="civica-btn civica-btn-success cv-snake-start" id="snake-start">${iconButton('play', 'START')}</button>
         <div class="cv-snake-dpad">
           <span></span>
-          <button class="civica-btn cv-snake-dir" data-d="up">↑</button>
+          <button class="civica-btn cv-snake-dir" data-d="up" aria-label="Arriba">${arrowIcon('up')}</button>
           <span></span>
-          <button class="civica-btn cv-snake-dir" data-d="left">←</button>
-          <button class="civica-btn cv-snake-dir" data-d="down">↓</button>
-          <button class="civica-btn cv-snake-dir" data-d="right">→</button>
+          <button class="civica-btn cv-snake-dir" data-d="left" aria-label="Izquierda">${arrowIcon('left')}</button>
+          <button class="civica-btn cv-snake-dir" data-d="down" aria-label="Abajo">${arrowIcon('down')}</button>
+          <button class="civica-btn cv-snake-dir" data-d="right" aria-label="Derecha">${arrowIcon('right')}</button>
         </div>
       </div>
       <div id="snake-status" class="cv-status"></div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'snake', 'Snake');
 
     const viewport = gameViewport(wrap, 'snake', 'Snake', makeSoundToggle(wrap));
     const results = gameResults(ctx, 'snake', wrap);
@@ -998,6 +1009,7 @@
       draw(1);
       unlockTouchControls();
       snakeStartButton.disabled = false;
+      snakeStartButton.innerHTML = iconButton('retry', 'Volver a jugar');
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cv-status is-lose';
       leaderboard.submit(score);
@@ -1048,7 +1060,7 @@
         if (!paused) return;
         paused = false;
         setTimeout(() => {
-          if (gameOver || paused) return;
+          if (gameOver || paused || document.hidden || wrap.classList.contains('coeduca-game-help-open')) return;
           clearInterval(loop);
           loop = setInterval(step, stepMs);
           startSmoothRendering();
@@ -1061,6 +1073,7 @@
       stopSmoothRendering();
       reset(); draw();
       viewport.enter();
+      snakeStartButton.innerHTML = iconButton('play', 'START');
       snakeStartButton.disabled = true;
       clearInterval(loop);
       loop = setInterval(step, stepMs);
@@ -1122,25 +1135,19 @@
         <div style="position:relative;display:inline-block;max-width:100%;">
           <canvas class="cv-dino-canvas" id="dino-canvas" width="${W}" height="${H}"></canvas>
         </div>
-        <div style="margin-top:10px;font-size:13px;font-weight:bold;color:var(--civica-stroke);">
-          Mantén pulsado para saltar alto, suelta pronto para saltos cortos.
-          Toca el área de juego o presiona <kbd style="background:#fff;border:2px solid var(--civica-stroke);border-radius:4px;padding:1px 6px;font-family:inherit;">ESPACIO</kbd>
-          · 🎈 ¡Atrapa el globo para +1 extra!
-        </div>
         <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
           <button class="civica-btn civica-btn-success" id="dino-start" style="display:inline-flex;align-items:center;gap:6px;">
-            <svg aria-hidden="true" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M320-200v-560l440 280-440 280Z"/></svg>
-            <span>START</span>
+            ${iconButton('play', 'START')}
           </button>
           <button class="civica-btn civica-btn-accent" id="dino-jump-btn" style="display:inline-flex;align-items:center;gap:6px;">
-            <svg aria-hidden="true" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M360-160v-120H160l320-360 320 360H600v120H360ZM160-480l320-360 320 360H693L480-720 267-480H160Z"/></svg>
-            <span>SALTAR</span>
+            ${iconButton('jump', 'SALTAR')}
           </button>
         </div>
         <div id="dino-status" class="cv-status"></div>
       </div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'dino', 'Dino Runner');
     const viewport = gameViewport(wrap, 'dino', 'Dino Runner', makeSoundToggle(wrap), {
       onBackgroundPress() {
         if (!started || gameOver || paused) return false;
@@ -2057,6 +2064,7 @@
     function end() {
       gameOver = true; clearInterval(loop);
       dinoStartButton.disabled = false;
+      dinoStartButton.innerHTML = iconButton('retry', 'Volver a jugar');
       SFX.die();
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cv-status is-lose';
@@ -2106,7 +2114,7 @@
         draw();
         drawOverlayBox('LISTO...');
         setTimeout(() => {
-          if (gameOver || !started || paused) return;
+          if (gameOver || !started || paused || document.hidden || wrap.classList.contains('coeduca-game-help-open')) return;
           clearInterval(loop);
           loop = setInterval(step, TICK_MS);
         }, 900);
@@ -2139,6 +2147,7 @@
     dinoStartButton.addEventListener('click', () => {
       reset(); started = true; draw();
       viewport.enter();
+      dinoStartButton.innerHTML = iconButton('play', 'START');
       dinoStartButton.disabled = true;
       clearInterval(loop);
       loop = setInterval(step, TICK_MS);
@@ -2334,9 +2343,10 @@
       <div id="hm-hint" style="text-align:center;font-style:italic;margin:6px 0;color:var(--civica-stroke);font-weight:600;display:none;"></div>
       <div id="hm-keys" class="cv-hm-keys"></div>
       <div id="hm-status" class="cv-status"></div>
-      <button class="civica-btn civica-btn-success" id="hm-reset" style="margin-top:10px;">🔄 Reiniciar partida</button>
+      <button class="civica-btn civica-btn-success" id="hm-reset" style="margin-top:10px;">${iconButton('retry', 'Reiniciar partida')}</button>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'hangman', 'Ahorcado');
 
     makeSoundToggle(wrap);
     const results = gameResults(ctx, 'hangman', wrap);
@@ -2347,6 +2357,7 @@
     const hintEl = wrap.querySelector('#hm-hint');
     const keysEl = wrap.querySelector('#hm-keys');
     const statusEl = wrap.querySelector('#hm-status');
+    const resetButton = wrap.querySelector('#hm-reset');
     const scoreEl = wrap.querySelector('#hm-score');
     const leaderboard = global.COEDUCA_LEADERBOARD
       ? global.COEDUCA_LEADERBOARD.create(ctx, 'hangman', RANKING_MIN_SCORE)
@@ -2518,6 +2529,7 @@
       guessed = new Set();
       mistakes = 0;
       gameOver = false;
+      resetButton.disabled = true;
       statusEl.textContent = '';
       statusEl.className = 'cv-status';
       // Defensa contra restauración de DOM (bfcache / iOS): limpiar cualquier
@@ -2638,6 +2650,7 @@
         renderHearts();
         if (mistakes >= MAX) {
           gameOver = true;
+          resetButton.disabled = false;
           SFX.lose();
           renderWord(true);
           statusEl.textContent = `💀 Game Over. La palabra era ${word}`;
@@ -2647,7 +2660,7 @@
           results.show({
             score, points: bonusEarned ? 1 : 0, unit: 'palabras',
             outcome: '💀 Se acabaron los intentos · La palabra era ' + word,
-            replay: () => wrap.querySelector('#hm-reset').click()
+            replay: () => resetButton.click()
           });
         }
         updatePowerups();
@@ -2683,7 +2696,7 @@
       const button = event.target.closest('[data-power]');
       if (button && powerupsEl.contains(button)) usePowerup(button.dataset.power);
     });
-    wrap.querySelector('#hm-reset').addEventListener('click', reset);
+    resetButton.addEventListener('click', reset);
     reset();
   });
 
@@ -2739,6 +2752,7 @@
       </div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'trivia', 'Trivia');
 
     makeSoundToggle(wrap);
     const results = gameResults(ctx, 'trivia', wrap);
@@ -3042,23 +3056,20 @@
       <canvas class="cv-snake-canvas" id="pl-canvas" width="${COLS * CELL}" height="${ROWS * CELL}"
               style="background:#221a3a;"></canvas>
       <div class="cv-snake-controls">
-        <button class="civica-btn civica-btn-success cv-snake-start" id="pl-start">▶ START</button>
+        <button class="civica-btn civica-btn-success cv-snake-start" id="pl-start">${iconButton('play', 'START')}</button>
         <div class="cv-snake-dpad">
           <span></span>
           <button class="civica-btn cv-snake-dir" id="pl-rot" title="Girar" aria-label="Girar">⟳</button>
           <span></span>
-          <button class="civica-btn cv-snake-dir" data-m="left" aria-label="Mover a la izquierda">←</button>
-          <button class="civica-btn cv-snake-dir" data-m="down" aria-label="Bajar">↓</button>
-          <button class="civica-btn cv-snake-dir" data-m="right" aria-label="Mover a la derecha">→</button>
-        </div>
-        <div style="font-size:12px;font-weight:bold;color:var(--civica-stroke);max-width:300px;">
-          PC: ESPACIO gira · ← → mueven · ↓ baja · Haz líneas rectas o diagonales de 3+ ·
-          🌈 El arcoíris explota alrededor · 💛 La píldora dorada da +1 extra
+          <button class="civica-btn cv-snake-dir" data-m="left" aria-label="Mover a la izquierda">${arrowIcon('left')}</button>
+          <button class="civica-btn cv-snake-dir" data-m="down" aria-label="Bajar">${arrowIcon('down')}</button>
+          <button class="civica-btn cv-snake-dir" data-m="right" aria-label="Mover a la derecha">${arrowIcon('right')}</button>
         </div>
       </div>
       <div id="pl-status" class="cv-status"></div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'pills', 'Píldoras');
     const viewport = gameViewport(wrap, 'pills', 'Píldoras', makeSoundToggle(wrap));
     const results = gameResults(ctx, 'pills', wrap);
 
@@ -3456,6 +3467,7 @@
       gameOver = true; running = false; clearInterval(loop);
       unlockGameScroll();
       pillsStartButton.disabled = false;
+      pillsStartButton.innerHTML = iconButton('retry', 'Volver a jugar');
       SFX.die();
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cv-status is-lose';
@@ -3542,7 +3554,7 @@
         lockGameScroll();
         draw();
         setTimeout(() => {
-          if (gameOver || !running || paused) return;
+          if (gameOver || !running || paused || document.hidden || wrap.classList.contains('coeduca-game-help-open')) return;
           clearInterval(loop);
           loop = setInterval(stepTick, tickMs);
         }, 600);
@@ -3564,6 +3576,7 @@
       reset();
       running = true;
       viewport.enter();
+      pillsStartButton.innerHTML = iconButton('play', 'START');
       pillsStartButton.disabled = true;
       lockGameScroll();
       spawnPiece();
@@ -3651,7 +3664,6 @@
         .sw-game .sw-button:focus-visible { outline:3px solid #24856c; outline-offset:4px; }
         .sw-game .sw-primary { background:#2d8567; color:#fff; }
         .sw-game .sw-direction { font-size:24px; }
-        .sw-help { margin:12px 0 0; font-size:11px; line-height:1.6; color:#765b49; }
         .sw-game .sw-status { min-height:24px; margin:8px 0; font-size:12px; font-weight:750; line-height:1.5; }
         .sw-game .coeduca-game-sound-toggle { position:static !important; margin:8px auto 0; }
         @media (prefers-reduced-motion:reduce) { .sw-progress > div { transition:none; } }
@@ -3676,14 +3688,14 @@
         aria-label="Atrapa los ingredientes moviendo el plato con las flechas, A y D o arrastrando."></canvas>
       <div class="sw-balance"><span>EQUILIBRIO</span><div class="sw-balance-track"><span id="sw-balance-marker" class="sw-balance-marker"></span></div><span id="sw-balance-label" class="sw-balance-label">ESTABLE</span></div>
       <div class="sw-controls">
-        <button type="button" class="sw-button sw-direction" data-sw-dir="left" aria-label="Mover a la izquierda">←</button>
-        <button type="button" class="sw-button sw-primary" id="sw-start">▶ Jugar</button>
-        <button type="button" class="sw-button sw-direction" data-sw-dir="right" aria-label="Mover a la derecha">→</button>
+        <button type="button" class="sw-button sw-direction" data-sw-dir="left" aria-label="Mover a la izquierda">${arrowIcon('left')}</button>
+        <button type="button" class="sw-button sw-primary" id="sw-start">${iconButton('play', 'Jugar')}</button>
+        <button type="button" class="sw-button sw-direction" data-sw-dir="right" aria-label="Mover a la derecha">${arrowIcon('right')}</button>
       </div>
-      <p class="sw-help">← → o A / D · Arrastra para mover el plato<br>Puedes dejar caer 3 ingredientes; el cuarto termina la partida.</p>
       <div id="sw-status" class="sw-status" role="status" aria-live="polite"></div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'sandwich', 'Torre sándwich', '.sw-title');
     const viewport = gameViewport(wrap, 'sandwich', 'Torre sándwich', makeSoundToggle(wrap));
     const results = gameResults(ctx, 'sandwich', wrap);
 
@@ -3959,7 +3971,7 @@
       rightHeld = false;
       cancelAnimationFrame(raf);
       startButton.disabled = false;
-      startButton.textContent = '↻ Volver a jugar';
+      startButton.innerHTML = iconButton('retry', 'Volver a jugar');
       pointerActive = false;
       pointerId = null;
       // El plato desaparece y los mismos cuerpos físicos forman la caída final.
