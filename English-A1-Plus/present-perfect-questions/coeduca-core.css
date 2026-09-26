@@ -197,6 +197,26 @@ body::after {
   cursor: not-allowed;
   pointer-events: none;
 }
+.coeduca-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin-top: 12px;
+  position: relative;
+  z-index: 1;
+}
+.coeduca-header-actions .coeduca-add-member-btn { margin-top: 0; }
+.coeduca-header-actions .coeduca-switch-account-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 36px;
+  padding: 4px !important;
+  box-sizing: border-box;
+}
+.coeduca-switch-account-btn img { display: block; width: 25px; height: 25px; }
 
 /* ===== EXERCISE CARD ===== */
 .coeduca-exercise {
