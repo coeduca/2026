@@ -183,6 +183,24 @@ body::before {
   pointer-events: none;
   opacity: 0.5;
 }
+.civica-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+.civica-header-actions .civica-add-member-btn { margin-top: 0; }
+.civica-header-actions .civica-switch-account-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 36px;
+  padding: 4px !important;
+  box-sizing: border-box;
+}
+.civica-switch-account-btn img { display: block; width: 25px; height: 25px; }
 
 /* ===== SECCIONES (Exploración, Profundización, Consolidación) ===== */
 .civica-section {

@@ -237,6 +237,34 @@
     } catch (e) { return null; }
   }
 
+  function accountStateKey(nie) {
+    return state.storageKey + 'account_' + String(nie) + '_state';
+  }
+
+  function archiveAccountState(snapshot) {
+    if (!snapshot || !snapshot.student || !snapshot.student.nie) return;
+    try {
+      localStorage.setItem(accountStateKey(snapshot.student.nie), JSON.stringify(snapshot));
+    } catch (e) {}
+  }
+
+  function loadAccountState(nie) {
+    try {
+      const raw = localStorage.getItem(accountStateKey(nie));
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function clearAccountStates() {
+    try {
+      const prefix = state.storageKey + 'account_';
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(prefix) && key.endsWith('_state')) localStorage.removeItem(key);
+      }
+    } catch (e) {}
+  }
+
   function syncGameBonus() {
     const latest = loadState();
     if (!latest || !latest.student || !state.student || latest.student.nie !== state.student.nie) return false;
@@ -410,7 +438,7 @@
   // =====================================================================
   // LOGIN MODAL
   // =====================================================================
-  function showLoginModal() {
+  function showLoginModal(fresh = false) {
     return new Promise((resolve) => {
       const MAX_PARTNERS = 4;
       try { localStorage.removeItem('rigo_pos'); } catch (e) {}
@@ -614,8 +642,14 @@
       const finish = () => {
         if (!mainStudent) return;
         const prev = loadState();
-        if (prev && prev.student && prev.student.nie !== mainStudent.nie) {
-          state.answers = {}; state.extraPoints = 0; state.balloonBonus = 0; state.gameResult = null;
+        if (!prev || !prev.student || String(prev.student.nie) !== String(mainStudent.nie)) {
+          archiveAccountState(prev);
+          const savedAccount = loadAccountState(mainStudent.nie);
+          state.answers = savedAccount && savedAccount.answers || {};
+          state.extraPoints = Number(savedAccount && savedAccount.extraPoints) || 0;
+          state.balloonBonus = Number(savedAccount && savedAccount.balloonBonus) || 0;
+          state.gameResult = savedAccount && savedAccount.gameResult || null;
+          if (savedAccount && savedAccount.poolVersion) state.poolVersion = savedAccount.poolVersion;
         }
         state.student = mainStudent;
         state.partners = partners.filter(p => p.student).map(p => p.student);
@@ -641,7 +675,7 @@
       });
 
       const prev = loadState();
-      if (prev && prev.student) {
+      if (!fresh && prev && prev.student) {
         nieInput.value = prev.student.nie;
         validateMain();
         const prevPartners = prev.partners || (prev.partner ? [prev.partner] : []);
@@ -698,6 +732,25 @@
     state.flatExercises = out;
   }
 
+  function switchAccount() {
+    archiveAccountState(loadState());
+    try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}
+    try { sessionStorage.removeItem(state.storageKey + 'resumeAfterHistory'); } catch (e) {}
+    state.student = null;
+    state.partner = null;
+    state.partners = [];
+    state.answers = {};
+    state.extraPoints = 0;
+    state.balloonBonus = 0;
+    state.gameResult = null;
+    if (state.appRoot) state.appRoot.style.display = 'none';
+    showLoginModal(true).then(() => {
+      if (state.appRoot) state.appRoot.style.display = '';
+      renderLayout();
+      updateScoreDisplay();
+    });
+  }
+
   function renderLayout() {
     const cfg = state.config;
     const containerSel = cfg.container || '#app';
@@ -715,9 +768,15 @@
         <h1>${escapeHTML(cfg.topic || 'Sesión de Ciudadanía y Valores')}</h1>
         <p>${escapeHTML(cfg.unit || 'Octavo Grado')} · CIVICA · Prof. José Eliseo Martínez</p>
         <div class="civica-header-students" id="civica-header-students"></div>
-        <button class="civica-btn civica-btn-info civica-add-member-btn" id="civica-add-member-btn" type="button">
-          + Agregar miembro
-        </button>
+        <div class="civica-header-actions">
+          <button class="civica-btn civica-btn-info civica-add-member-btn" id="civica-add-member-btn" type="button">
+            + Agregar miembro
+          </button>
+          <button class="civica-btn civica-btn-info civica-switch-account-btn" id="civica-switch-account-btn"
+                  type="button" aria-label="Cambiar de cuenta" title="Cambiar de cuenta">
+            <img src="switch-account.svg" alt="" aria-hidden="true">
+          </button>
+        </div>
       </header>
       <div id="civica-sections"></div>
       <div id="civica-game-section"></div>
@@ -747,6 +806,7 @@
     }
 
     document.getElementById('civica-add-member-btn').addEventListener('click', showAddMemberModal);
+    document.getElementById('civica-switch-account-btn').addEventListener('click', switchAccount);
     document.getElementById('civica-pdf-btn').addEventListener('click', function () {
       generatePDF({ download: true });
     });
@@ -2296,6 +2356,7 @@
     reset() {
       try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}
       try { localStorage.removeItem(state.storageKey + 'pool'); } catch (e) {}
+      clearAccountStates();
       location.reload();
     },
 
