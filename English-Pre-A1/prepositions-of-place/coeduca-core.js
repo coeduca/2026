@@ -179,6 +179,7 @@
     window.addEventListener('pageshow', function (e) {
       if (e.persisted) {
         // La página viene del bfcache: recargar para reconstruir UI desde state.
+        try { sessionStorage.setItem(state.storageKey + 'resumeAfterHistory', '1'); } catch (err) {}
         location.reload();
       }
     });
@@ -211,6 +212,7 @@
   // =====================================================================
   function saveState() {
     try {
+      syncGameBonus();
       const snapshot = {
         student: state.student,
         partner: state.partner,
@@ -231,6 +233,45 @@
       if (!raw) return null;
       return JSON.parse(raw);
     } catch (e) { return null; }
+  }
+
+  function accountStateKey(nie) {
+    return state.storageKey + 'account_' + String(nie) + '_state';
+  }
+
+  function archiveAccountState(snapshot) {
+    if (!snapshot || !snapshot.student || !snapshot.student.nie) return;
+    try {
+      localStorage.setItem(accountStateKey(snapshot.student.nie), JSON.stringify(snapshot));
+    } catch (e) {}
+  }
+
+  function loadAccountState(nie) {
+    try {
+      const raw = localStorage.getItem(accountStateKey(nie));
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function clearAccountStates() {
+    try {
+      const prefix = state.storageKey + 'account_';
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(prefix) && key.endsWith('_state')) localStorage.removeItem(key);
+      }
+    } catch (e) {}
+  }
+
+  function syncGameBonus() {
+    const latest = loadState();
+    if (!latest || !latest.student || !state.student || latest.student.nie !== state.student.nie) return false;
+    if ((Number(latest.extraPoints) || 0) > state.extraPoints) {
+      state.extraPoints = Number(latest.extraPoints);
+      state.gameResult = latest.gameResult || state.gameResult;
+    }
+    state.balloonBonus = Math.max(state.balloonBonus, Number(latest.balloonBonus) || 0);
+    return true;
   }
 
   function recordAnswer(exerciseId, score, total, details, userAnswer) {
@@ -386,10 +427,36 @@
     return '';
   }
 
+  function resumeStudentIfReturning() {
+    let historyReload = false;
+    try {
+      const key = state.storageKey + 'resumeAfterHistory';
+      historyReload = sessionStorage.getItem(key) === '1';
+      sessionStorage.removeItem(key);
+    } catch (e) {}
+    const navigation = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    const reloaded = navigation ? navigation.type === 'reload' : performance.navigation && performance.navigation.type === 1;
+    if (reloaded && !historyReload) return false;
+    const saved = loadState();
+    if (!saved || !saved.student || !saved.student.nie) return false;
+    let db = null;
+    try { db = global.STUDENTS; } catch (e) {}
+    if (!db) { try { db = STUDENTS; } catch (e) {} }
+    const nie = String(saved.student.nie);
+    if (!db || !db[nie]) return false;
+    const found = { nie, ...db[nie] };
+    if (!isAllowedAtLevel(found)) return false;
+    state.student = found;
+    state.partners = saved.partners || (saved.partner ? [saved.partner] : []);
+    state.partner = state.partners[0] || null;
+    if (global.rigo && global.rigo.setGrade) global.rigo.setGrade(found.grade);
+    return true;
+  }
+
   // =====================================================================
   // 7. LOGIN MODAL
   // =====================================================================
-  function showLoginModal() {
+  function showLoginModal(fresh = false) {
     return new Promise((resolve) => {
       const MAX_PARTNERS = 4;
 
@@ -635,11 +702,14 @@
         if (!mainStudent) return;
         
         const prev = loadState();
-        if (prev && prev.student && prev.student.nie !== mainStudent.nie) {
-          // Si hay un cambio de estudiante principal, limpiamos el progreso
-          state.answers = {};
-          state.extraPoints = 0; state.balloonBonus = 0;
-          state.gameResult = null;
+        if (!prev || !prev.student || String(prev.student.nie) !== String(mainStudent.nie)) {
+          archiveAccountState(prev);
+          const savedAccount = loadAccountState(mainStudent.nie);
+          state.answers = savedAccount && savedAccount.answers || {};
+          state.extraPoints = Number(savedAccount && savedAccount.extraPoints) || 0;
+          state.balloonBonus = Number(savedAccount && savedAccount.balloonBonus) || 0;
+          state.gameResult = savedAccount && savedAccount.gameResult || null;
+          if (savedAccount && savedAccount.poolVersion) state.poolVersion = savedAccount.poolVersion;
         }
 
         state.student = mainStudent;
@@ -677,7 +747,7 @@
 
       // Restaurar sesión si existe
       const prev = loadState();
-      if (prev && prev.student) {
+      if (!fresh && prev && prev.student) {
         nieInput.value = prev.student.nie;
         validateMain();
         // Restaurar compañeros (soporta state.partners[] nuevo o state.partner viejo)
@@ -708,6 +778,7 @@
     if (colors.bg) root.style.setProperty('--coeduca-bg', colors.bg);
     // Nuevos colores: surface = fondo de tarjetas, text = color de texto.
     if (colors.cardBg) root.style.setProperty('--coeduca-surface', colors.cardBg);
+    if (colors.itemBg) root.style.setProperty('--coeduca-item-bg', colors.itemBg);
     if (colors.text) root.style.setProperty('--coeduca-text', colors.text);
   }
 
@@ -719,6 +790,25 @@
         ? 'Skeuomorphic'
         : 'PopArt';
     document.documentElement.setAttribute('data-coeduca-ui-theme', selected);
+  }
+
+  function switchAccount() {
+    archiveAccountState(loadState());
+    try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}
+    try { sessionStorage.removeItem(state.storageKey + 'resumeAfterHistory'); } catch (e) {}
+    state.student = null;
+    state.partner = null;
+    state.partners = [];
+    state.answers = {};
+    state.extraPoints = 0;
+    state.balloonBonus = 0;
+    state.gameResult = null;
+    if (state.appRoot) state.appRoot.style.display = 'none';
+    showLoginModal(true).then(() => {
+      if (state.appRoot) state.appRoot.style.display = '';
+      renderLayout();
+      updateScoreDisplay();
+    });
   }
 
   function renderLayout() {
@@ -737,9 +827,15 @@
         <h1>${escapeHTML(cfg.topic || 'Ejercicio de Inglés')}</h1>
         <p>${escapeHTML(cfg.level || '')} - COEDUCA - Prof. José Eliseo Martínez</p>
         <div class="coeduca-header-students" id="coeduca-header-students"></div>
-        <button class="coeduca-btn coeduca-btn-info coeduca-add-member-btn" id="coeduca-add-member-btn" type="button">
-          + Agregar miembro
-        </button>
+        <div class="coeduca-header-actions">
+          <button class="coeduca-btn coeduca-btn-info coeduca-add-member-btn" id="coeduca-add-member-btn" type="button">
+            + Agregar miembro
+          </button>
+          <button class="coeduca-btn coeduca-btn-info coeduca-switch-account-btn" id="coeduca-switch-account-btn"
+                  type="button" aria-label="Cambiar de cuenta" title="Cambiar de cuenta">
+            <img src="switch-account.svg" alt="" aria-hidden="true">
+          </button>
+        </div>
       </header>
       <div id="coeduca-exercises"></div>
       <div id="coeduca-game-section"></div>
@@ -767,6 +863,7 @@
 
     // Botón de agregar miembro durante el ejercicio
     document.getElementById('coeduca-add-member-btn').addEventListener('click', showAddMemberModal);
+    document.getElementById('coeduca-switch-account-btn').addEventListener('click', switchAccount);
 
     // Botón de PDF
     document.getElementById('coeduca-pdf-btn').addEventListener('click', function () {
@@ -820,6 +917,11 @@
     // Renderizar juego
     if (cfg.game) {
       renderGame(cfg.game);
+    } else {
+      document.getElementById('coeduca-game-section').innerHTML =
+        '<div class="coeduca-exercise"><div class="coeduca-exercise-title">Centro de juegos</div>' +
+        '<a class="coeduca-btn coeduca-btn-info" href="juegos.html" target="_blank" rel="noopener" ' +
+        'style="display:inline-flex;align-items:center;text-decoration:none;">🎮 Ir a centro de juegos</a></div>';
     }
   }
 
@@ -1117,7 +1219,9 @@
     const section = document.getElementById('coeduca-game-section');
     section.innerHTML = `
       <div class="coeduca-exercise">
-        <div class="coeduca-exercise-title">Juego final</div>
+        <div class="coeduca-exercise-title">Juego del día</div>
+        <a class="coeduca-btn coeduca-btn-info game-center-link" href="juegos.html" target="_blank" rel="noopener"
+           style="display:flex;align-items:center;justify-content:center;width:max-content;max-width:100%;margin:16px auto 0;text-decoration:none;">🎮 Ir a centro de juegos</a>
         <div id="coeduca-game-body"></div>
       </div>
     `;
@@ -1162,6 +1266,11 @@
           '<p style="color:red">Error: juego "' + gameCfg.type + '" no disponible</p>';
       }
     }
+    const gameBody = document.getElementById('coeduca-game-body');
+    const ranking = gameBody.querySelector('.cg-leaderboard');
+    const centerLink = section.querySelector('.game-center-link');
+    if (ranking) ranking.before(centerLink);
+    else gameBody.appendChild(centerLink);
   }
 
   // =====================================================================
@@ -2529,11 +2638,21 @@
     registerGame(type, renderer) {
       state.gameRegistry[type] = renderer;
     },
+    getGameRenderer(type) {
+      return state.gameRegistry[type] || null;
+    },
 
     init(config) {
       state.config = config;
       state.storageKey = STORAGE_KEY_PREFIX +
         (config.id || (config.topic || 'page').replace(/\W+/g, '_').toLowerCase()) + '_';
+
+      global.addEventListener('storage', event => {
+        if (event.key === state.storageKey + 'state' && syncGameBonus()) updateScoreDisplay();
+      });
+      global.addEventListener('focus', () => {
+        if (syncGameBonus()) updateScoreDisplay();
+      });
 
       ensureNoTranslate();
       setupBfCacheGuard();
@@ -2553,7 +2672,8 @@
 
       // Esperar DOM
       const start = () => {
-        showLoginModal().then(() => {
+        const login = resumeStudentIfReturning() ? Promise.resolve() : showLoginModal();
+        login.then(() => {
           renderLayout();
           setupAudioButtons();
           updateScoreDisplay();
@@ -2569,6 +2689,7 @@
     reset() {
       try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}
       try { localStorage.removeItem(state.storageKey + 'pool'); } catch (e) {}
+      clearAccountStates();
       location.reload();
     },
 

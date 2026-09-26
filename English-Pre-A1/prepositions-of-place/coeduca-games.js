@@ -16,6 +16,18 @@
   }
   const C = global.COEDUCA;
   const reg = (type, fn) => C.registerGame(type, fn);
+  const iconButton = global.COEDUCA_GAME_ICONS.button;
+  const arrowIcon = global.COEDUCA_GAME_ICONS.arrow;
+  function gameViewport(wrap, game, title, soundToggle, options = {}) {
+    return global.COEDUCA_GAME_VIEWPORT
+      ? global.COEDUCA_GAME_VIEWPORT.create(wrap, { game, title, soundToggle, ...options })
+      : { enter() {}, leave() {}, destroy() {} };
+  }
+  function gameResults(ctx, game, wrap) {
+    return global.COEDUCA_GAME_RESULTS
+      ? global.COEDUCA_GAME_RESULTS.create(ctx, game, wrap)
+      : { show() {}, hide() {} };
+  }
 
   // ---------- Estilos compartidos por los juegos (inyectados una sola vez) ----------
   if (!document.getElementById('coeduca-games-styles')) {
@@ -361,7 +373,7 @@
 
   // Cara real de Rigo: el favicon que viaja dentro de cada paquete.
   // Si la imagen no carga (paquete viejo sin favicon), cae al emoji.
-  const RIGO_IMG = '<img src="favicon.png" alt="Rigo" ' +
+  const RIGO_IMG = '<img src="favicon.webp" alt="Rigo" ' +
     'style="width:100%;height:100%;object-fit:cover;border-radius:50%;" ' +
     'onerror="this.outerHTML=\'' + RIGO_EMOJI + '\'">';
 
@@ -463,14 +475,21 @@
   // Pausa automatica: llama a onHide cuando la pestana se oculta y a onShow al
   // volver. Se auto-limpia cuando el juego sale del DOM.
   function autoPause(wrap, onHide, onShow) {
+    let helpOpen = false;
     const handler = () => {
       if (!document.body.contains(wrap)) {
         document.removeEventListener('visibilitychange', handler);
+        wrap.removeEventListener('coeduca-game-help-open', onHelpOpen);
+        wrap.removeEventListener('coeduca-game-help-close', onHelpClose);
         return;
       }
-      if (document.hidden) onHide(); else onShow();
+      if (document.hidden || helpOpen) onHide(); else onShow();
     };
+    const onHelpOpen = () => { helpOpen = true; wrap.classList.add('coeduca-game-help-open'); handler(); };
+    const onHelpClose = () => { helpOpen = false; wrap.classList.remove('coeduca-game-help-open'); handler(); };
     document.addEventListener('visibilitychange', handler);
+    wrap.addEventListener('coeduca-game-help-open', onHelpOpen);
+    wrap.addEventListener('coeduca-game-help-close', onHelpClose);
   }
 
   function avatarHTML(name, emoji, bgColor, opts = {}) {
@@ -530,12 +549,14 @@
 
         <div id="ttt-status" class="cg-status"></div>
         <button class="coeduca-btn coeduca-btn-success" id="ttt-reset"
-                style="margin-top:14px;display:none;">🔄 Volver a jugar</button>
+                style="margin-top:14px;display:none;">${iconButton('retry', 'Volver a jugar')}</button>
       </div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'tictactoe', 'Tres en raya');
 
     makeSoundToggle(wrap);
+    const results = gameResults(ctx, 'tictactoe', wrap);
     const grid = wrap.querySelector('#ttt-grid');
     const lineSvg = wrap.querySelector('#ttt-line');
     const statusEl = wrap.querySelector('#ttt-status');
@@ -686,6 +707,12 @@
         statusEl.className = 'cg-status is-tie';
         ctx.onTie();
       }
+      const points = winner === 'X' ? 1 : winner === 'O' ? 0 : 0.5;
+      results.show({
+        score: points, points, unit: 'puntos',
+        outcome: winner === 'X' ? '🎉 ¡Ganaste a Rigo!' : winner === 'O' ? 'Rigo ganó esta vez' : '🤝 ¡Empate!',
+        replay: () => resetBtn.click()
+      });
     }
 
     resetBtn.addEventListener('click', () => {
@@ -732,21 +759,23 @@
               width="${SIZE * CELL}" height="${SIZE * CELL}"></canvas>
 
       <div class="cg-snake-controls">
-        <button class="coeduca-btn coeduca-btn-success cg-snake-start" id="snake-start">▶ START</button>
+        <button class="coeduca-btn coeduca-btn-success cg-snake-start" id="snake-start">${iconButton('play', 'START')}</button>
         <div class="cg-snake-dpad">
           <span></span>
-          <button class="coeduca-btn cg-snake-dir" data-d="up">↑</button>
+          <button class="coeduca-btn cg-snake-dir" data-d="up" aria-label="Arriba">${arrowIcon('up')}</button>
           <span></span>
-          <button class="coeduca-btn cg-snake-dir" data-d="left">←</button>
-          <button class="coeduca-btn cg-snake-dir" data-d="down">↓</button>
-          <button class="coeduca-btn cg-snake-dir" data-d="right">→</button>
+          <button class="coeduca-btn cg-snake-dir" data-d="left" aria-label="Izquierda">${arrowIcon('left')}</button>
+          <button class="coeduca-btn cg-snake-dir" data-d="down" aria-label="Abajo">${arrowIcon('down')}</button>
+          <button class="coeduca-btn cg-snake-dir" data-d="right" aria-label="Derecha">${arrowIcon('right')}</button>
         </div>
       </div>
       <div id="snake-status" class="cg-status"></div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'snake', 'Snake');
 
-    makeSoundToggle(wrap);
+    const viewport = gameViewport(wrap, 'snake', 'Snake', makeSoundToggle(wrap));
+    const results = gameResults(ctx, 'snake', wrap);
     const canvas = wrap.querySelector('#snake-canvas');
     const cctx = canvas.getContext('2d');
     const scoreVal = wrap.querySelector('#snake-score-val');
@@ -760,12 +789,14 @@
     const touchCapable = 'ontouchstart' in global || (navigator.maxTouchPoints || 0) > 0;
     let touchControlsActive = false;
     let touchStart = null;
-    let previousBodyTouchAction = '';
     let previousOverscrollBehavior = '';
 
     function handleGameTouchStart(event) {
       if (!touchControlsActive) return;
       if (!document.body.contains(wrap)) { unlockTouchControls(); return; }
+      const expandedGame = event.target.closest('.coeduca-game-viewport[data-game="snake"]');
+      if (!expandedGame && event.target !== canvas) return;
+      if (event.target.closest('.coeduca-viewport-actions, button, a, input, select, textarea')) return;
       const touch = event.touches[0];
       if (!touch) return;
       touchStart = { x: touch.clientX, y: touch.clientY };
@@ -773,9 +804,8 @@
     }
 
     function handleGameTouchMove(event) {
-      if (!touchControlsActive) return;
+      if (!touchControlsActive || !touchStart) return;
       event.preventDefault();
-      if (!touchStart) return;
       const touch = event.touches[0];
       if (!touch) return;
       const dx = touch.clientX - touchStart.x;
@@ -789,7 +819,7 @@
     }
 
     function handleGameTouchEnd(event) {
-      if (!touchControlsActive) return;
+      if (!touchControlsActive || !touchStart) return;
       event.preventDefault();
       touchStart = null;
     }
@@ -797,9 +827,7 @@
     function lockTouchControls() {
       if (!touchCapable || touchControlsActive) return false;
       touchControlsActive = true;
-      previousBodyTouchAction = document.body.style.touchAction;
       previousOverscrollBehavior = document.documentElement.style.overscrollBehavior;
-      document.body.style.touchAction = 'none';
       document.documentElement.style.overscrollBehavior = 'none';
       document.addEventListener('touchstart', handleGameTouchStart, { passive: false, capture: true });
       document.addEventListener('touchmove', handleGameTouchMove, { passive: false, capture: true });
@@ -812,7 +840,6 @@
       if (!touchControlsActive) return;
       touchControlsActive = false;
       touchStart = null;
-      document.body.style.touchAction = previousBodyTouchAction;
       document.documentElement.style.overscrollBehavior = previousOverscrollBehavior;
       document.removeEventListener('touchstart', handleGameTouchStart, true);
       document.removeEventListener('touchmove', handleGameTouchMove, true);
@@ -982,10 +1009,17 @@
       draw(1);
       unlockTouchControls();
       snakeStartButton.disabled = false;
+      snakeStartButton.innerHTML = iconButton('retry', 'Volver a jugar');
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cg-status is-lose';
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
+      viewport.leave();
+      results.show({
+        score, points: bonusEarned ? 1 : 0, unit: 'puntos',
+        outcome: '💥 La serpiente chocó',
+        replay: () => snakeStartButton.click()
+      });
     }
     function awardBonus() {
       if (bonusEarned) return;
@@ -1026,7 +1060,7 @@
         if (!paused) return;
         paused = false;
         setTimeout(() => {
-          if (gameOver || paused) return;
+          if (gameOver || paused || document.hidden || wrap.classList.contains('coeduca-game-help-open')) return;
           clearInterval(loop);
           loop = setInterval(step, stepMs);
           startSmoothRendering();
@@ -1038,13 +1072,15 @@
     snakeStartButton.addEventListener('click', () => {
       stopSmoothRendering();
       reset(); draw();
+      viewport.enter();
+      snakeStartButton.innerHTML = iconButton('play', 'START');
       snakeStartButton.disabled = true;
       clearInterval(loop);
       loop = setInterval(step, stepMs);
       startSmoothRendering();
       lockTouchControls();
       if (touchControlsActive) {
-        statusEl.textContent = '📱 Desliza en cualquier dirección para controlar la serpiente.';
+        statusEl.textContent = '📱 Desliza en cualquier área libre para controlar la serpiente.';
       }
     });
     reset(); draw();
@@ -1078,54 +1114,76 @@
     let distance, finishDist, gate, jumpBuffer, jumpHeld;
     let balloon, balloonSpawned, balloonFx, plusOne;
     let bonusEarned = false;
+    let balloonBonusEarned = false;
 
     const wrap = document.createElement('div');
     wrap.style.position = 'relative';
     wrap.innerHTML = `
       <div style="text-align:center;">
-        <div id="dino-score" style="font-weight:900;margin-bottom:8px;font-size:18px;
+        <div id="dino-score" style="font-weight:900;margin:0 auto 8px;font-size:clamp(11px,3vw,18px);
              background:var(--coeduca-stroke);color:var(--coeduca-primary);
-             display:inline-block;padding:6px 18px;border-radius:50px;letter-spacing:1.5px;
+             display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,18px);
+             width:min(100%,560px);min-height:46px;padding:6px 10px;white-space:nowrap;box-sizing:border-box;
+             border-radius:50px;letter-spacing:clamp(0px,.15vw,1.5px);font-variant-numeric:tabular-nums;
              box-shadow:3px 3px 0 var(--coeduca-stroke);">
-          🏃 PUNTOS: <span id="dino-score-val">0</span> &nbsp;·&nbsp; ⭐ BONUS: ${winThreshold}
+          <span>🏃 PUNTOS: <strong id="dino-score-val">0</strong></span>
+          <span>⭐ BONUS: ${winThreshold}</span>
         </div>
         <div class="cg-progress-bar" style="max-width:${W - 40}px;">
-          <div id="dino-progress" class="cg-progress-fill" style="width:0%"></div>
+          <div id="dino-progress" class="cg-progress-fill" style="width:100%;transform:scaleX(0);transform-origin:left;transition:transform .12s linear;"></div>
         </div>
         <div style="position:relative;display:inline-block;max-width:100%;">
           <canvas class="cg-dino-canvas" id="dino-canvas" width="${W}" height="${H}"></canvas>
         </div>
-        <div style="margin-top:10px;font-size:13px;font-weight:bold;color:var(--coeduca-stroke);">
-          Mantén pulsado para saltar alto, suelta pronto para saltos cortos.
-          Toca el área de juego o presiona <kbd style="background:#fff;border:2px solid var(--coeduca-stroke);border-radius:4px;padding:1px 6px;font-family:inherit;">ESPACIO</kbd>
-          · 🎈 ¡Atrapa el globo para +1 extra!
-        </div>
         <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
           <button class="coeduca-btn coeduca-btn-success" id="dino-start" style="display:inline-flex;align-items:center;gap:6px;">
-            <svg aria-hidden="true" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M320-200v-560l440 280-440 280Z"/></svg>
-            <span>START</span>
+            ${iconButton('play', 'START')}
           </button>
           <button class="coeduca-btn coeduca-btn-accent" id="dino-jump-btn" style="display:inline-flex;align-items:center;gap:6px;">
-            <svg aria-hidden="true" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M360-160v-120H160l320-360 320 360H600v120H360ZM160-480l320-360 320 360H693L480-720 267-480H160Z"/></svg>
-            <span>SALTAR</span>
+            ${iconButton('jump', 'SALTAR')}
           </button>
         </div>
         <div id="dino-status" class="cg-status"></div>
       </div>
     `;
     ctx.container.appendChild(wrap);
-    makeSoundToggle(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'dino', 'Dino Runner');
+    const viewport = gameViewport(wrap, 'dino', 'Dino Runner', makeSoundToggle(wrap), {
+      onBackgroundPress() {
+        if (!started || gameOver || paused) return false;
+        pressJump();
+      },
+      onBackgroundRelease() {
+        releaseJump();
+      }
+    });
+    const results = gameResults(ctx, 'dino', wrap);
 
     const canvas = wrap.querySelector('#dino-canvas');
     const cctx = canvas.getContext('2d');
+    const skyGradient = cctx.createLinearGradient(0, 0, 0, H);
+    skyGradient.addColorStop(0, '#87CEEB');
+    skyGradient.addColorStop(0.6, '#B3E5FC');
+    skyGradient.addColorStop(1, '#FFE4B5');
     const scoreVal = wrap.querySelector('#dino-score-val');
     const progressEl = wrap.querySelector('#dino-progress');
     const statusEl = wrap.querySelector('#dino-status');
     const leaderboard = global.COEDUCA_LEADERBOARD
       ? global.COEDUCA_LEADERBOARD.create(ctx, 'dino', winThreshold)
       : { submit: () => Promise.resolve(false) };
+    let paintRequest = null;
+
+    function scheduleDraw() {
+      if (paintRequest !== null) return;
+      paintRequest = global.requestAnimationFrame(() => {
+        paintRequest = null;
+        if (!gameOver && !paused) draw();
+      });
+    }
 
     function reset() {
+      if (paintRequest !== null) global.cancelAnimationFrame(paintRequest);
+      paintRequest = null;
       dino = { x: 50, y: H - 42 - GROUND_H, w: 36, h: 42 };
       obstacles = [];
       clouds = [
@@ -1142,6 +1200,7 @@
       vy = 0; onGround = true;
       gameOver = false; speed = START_SPEED;
       bonusEarned = false;
+      balloonBonusEarned = false;
       frames = 0;
       sunX = W - 60;
       groundOffset = 0;
@@ -1153,7 +1212,7 @@
       jumpBuffer = 0; jumpHeld = false;
       balloon = null; balloonSpawned = false; balloonFx = []; plusOne = null;
       scoreVal.textContent = '0';
-      progressEl.style.width = '0%';
+      progressEl.style.transform = 'scaleX(0)';
       statusEl.textContent = '';
       statusEl.className = 'cg-status';
     }
@@ -1202,6 +1261,7 @@
     // (el core lo limita a una vez por sesión y lo mete en la nota web y PDF).
     function popBalloon(bx, by) {
       balloon = null;
+      balloonBonusEarned = true;
       const colors = ['#FF6B9D', '#FFD700', '#4FC3F7', '#E63946', '#fff'];
       for (let i = 0; i < 14; i++) {
         const ang = (i / 14) * Math.PI * 2;
@@ -1217,7 +1277,8 @@
       }
       plusOne = { x: bx, y: by - 6, life: 55 };
       SFX.pop();
-      if (C.addBalloonBonus) C.addBalloonBonus();
+      if (ctx.onBalloonBonus) ctx.onBalloonBonus();
+      else if (C.addBalloonBonus) C.addBalloonBonus();
       if (global.rigo && global.rigo.say) {
         global.rigo.say('¡Atrapaste el globo! +1 punto extra 🎈', 4000);
       }
@@ -1267,9 +1328,12 @@
 
       // --- Avance y puntaje por distancia recorrida ---
       distance += speed;
-      scoreVal.textContent = displayedScore();
-      progressEl.style.width = Math.min(100, (distance / finishDist) * 100) + '%';
-      if (displayedScore() >= winThreshold) awardBonus();
+      const shownScore = displayedScore();
+      if (scoreVal.textContent !== String(shownScore)) scoreVal.textContent = shownScore;
+      if (frames % 4 === 0 || (shownScore >= winThreshold && !bonusEarned)) {
+        progressEl.style.transform = 'scaleX(' + Math.min(1, distance / finishDist) + ')';
+      }
+      if (shownScore >= winThreshold) awardBonus();
 
       // --- Obstáculos ---
       obstacles.forEach(o => {
@@ -1365,7 +1429,7 @@
       // aumentando hasta una velocidad realmente desafiante.
       speed = Math.min(MAX_SPEED, START_SPEED + frames * SPEED_GAIN_PER_FRAME);
 
-      draw();
+      scheduleDraw();
     }
 
     function drawCloud(c) {
@@ -1841,11 +1905,7 @@
 
     function draw() {
       // Cielo gradiente
-      const sky = cctx.createLinearGradient(0, 0, 0, H);
-      sky.addColorStop(0, '#87CEEB');
-      sky.addColorStop(0.6, '#B3E5FC');
-      sky.addColorStop(1, '#FFE4B5');
-      cctx.fillStyle = sky;
+      cctx.fillStyle = skyGradient;
       cctx.fillRect(0, 0, W, H);
 
       // Sol: halo, rayos giratorios y carita feliz con cachetes
@@ -2004,11 +2064,18 @@
     function end() {
       gameOver = true; clearInterval(loop);
       dinoStartButton.disabled = false;
+      dinoStartButton.innerHTML = iconButton('retry', 'Volver a jugar');
       SFX.die();
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cg-status is-lose';
       leaderboard.submit(displayedScore());
       if (!bonusEarned) ctx.onLose();
+      viewport.leave();
+      results.show({
+        score: displayedScore(), points: (bonusEarned ? 1 : 0) + (balloonBonusEarned ? 1 : 0),
+        unit: 'puntos', outcome: '💥 El dinosaurio chocó',
+        replay: () => dinoStartButton.click()
+      });
     }
     function awardBonus() {
       if (bonusEarned) return;
@@ -2047,7 +2114,7 @@
         draw();
         drawOverlayBox('LISTO...');
         setTimeout(() => {
-          if (gameOver || !started || paused) return;
+          if (gameOver || !started || paused || document.hidden || wrap.classList.contains('coeduca-game-help-open')) return;
           clearInterval(loop);
           loop = setInterval(step, TICK_MS);
         }, 900);
@@ -2079,6 +2146,8 @@
     const dinoStartButton = wrap.querySelector('#dino-start');
     dinoStartButton.addEventListener('click', () => {
       reset(); started = true; draw();
+      viewport.enter();
+      dinoStartButton.innerHTML = iconButton('play', 'START');
       dinoStartButton.disabled = true;
       clearInterval(loop);
       loop = setInterval(step, TICK_MS);
@@ -2113,6 +2182,18 @@
           gap: 6px;
           flex-wrap: wrap;
           justify-content: center;
+          max-width: 100% !important;
+        }
+        .cg-hm-wrap, .cv-hm-wrap { max-width: 100%; min-width: 0; }
+        .cg-hm-wrap > .cg-snake-score, .cv-hm-wrap > .cv-snake-score {
+          max-width: 100%; flex-wrap: wrap; justify-content: center; gap: 4px 8px;
+        }
+        #hm-keys { width: 100%; max-width: 420px; min-width: 0; }
+        .cg-hm-keys-row, .cv-hm-keys-row { width: 100%; gap: 4px; }
+        #hm-keys .cg-hm-key, #hm-keys .cv-hm-key {
+          flex: 0 0 calc(10% - 3.6px); width: calc(10% - 3.6px);
+          min-width: 0 !important; padding: 0 !important;
+          font-size: clamp(10px, 3vw, 16px) !important;
         }
         .hm2-tile {
           width: 34px; height: 42px;
@@ -2258,17 +2339,20 @@
       <div id="hm-word" class="cg-hm-word"></div>
       <div id="hm-keys" class="cg-hm-keys"></div>
       <div id="hm-status" class="cg-status"></div>
-      <button class="coeduca-btn coeduca-btn-success" id="hm-reset" style="margin-top:10px;">🔄 Reiniciar partida</button>
+      <button class="coeduca-btn coeduca-btn-success" id="hm-reset" style="margin-top:10px;">${iconButton('retry', 'Reiniciar partida')}</button>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'hangman', 'Ahorcado');
 
     makeSoundToggle(wrap);
+    const results = gameResults(ctx, 'hangman', wrap);
     const svg = wrap.querySelector('#hm-svg');
     const heartsEl = wrap.querySelector('#hm-hearts');
     const powerupsEl = wrap.querySelector('#hm-powerups');
     const wordEl = wrap.querySelector('#hm-word');
     const keysEl = wrap.querySelector('#hm-keys');
     const statusEl = wrap.querySelector('#hm-status');
+    const resetButton = wrap.querySelector('#hm-reset');
     const scoreEl = wrap.querySelector('#hm-score');
     const leaderboard = global.COEDUCA_LEADERBOARD
       ? global.COEDUCA_LEADERBOARD.create(ctx, 'hangman', RANKING_MIN_SCORE)
@@ -2437,6 +2521,7 @@
       guessed = new Set();
       mistakes = 0;
       gameOver = false;
+      resetButton.disabled = true;
       statusEl.textContent = '';
       statusEl.className = 'cg-status';
       // Defensa contra restauración de DOM (bfcache / iOS): limpiar cualquier
@@ -2550,12 +2635,18 @@
         renderHearts();
         if (mistakes >= MAX) {
           gameOver = true;
+          resetButton.disabled = false;
           SFX.lose();
           renderWord(true);
           statusEl.textContent = `💀 Game Over. La palabra era ${word}`;
           statusEl.className = 'cg-status is-lose';
           leaderboard.submit(score);
           if (!bonusEarned) ctx.onLose();
+          results.show({
+            score, points: bonusEarned ? 1 : 0, unit: 'palabras',
+            outcome: '💀 Se acabaron los intentos · La palabra era ' + word,
+            replay: () => resetButton.click()
+          });
         }
         updatePowerups();
       }
@@ -2590,7 +2681,7 @@
       const button = event.target.closest('[data-power]');
       if (button && powerupsEl.contains(button)) usePowerup(button.dataset.power);
     });
-    wrap.querySelector('#hm-reset').addEventListener('click', reset);
+    resetButton.addEventListener('click', reset);
     reset();
   });
 
@@ -2601,14 +2692,17 @@
     // Barajar preguntas y opciones: repetir la trivia sirve para aprender,
     // no para memorizar posiciones.
     const rawQuestions = (ctx.config && ctx.config.questions) || [];
-    const questions = C.shuffle(rawQuestions.slice()).map(q => {
-      const order = C.shuffle((q.options || []).map((_, j) => j));
-      return {
-        q: q.q,
-        options: order.map(j => q.options[j]),
-        answer: order.indexOf(q.answer)
-      };
-    });
+    function shuffledQuestions() {
+      return C.shuffle(rawQuestions.slice()).map(q => {
+        const order = C.shuffle((q.options || []).map((_, j) => j));
+        return {
+          q: q.q,
+          options: order.map(j => q.options[j]),
+          answer: order.indexOf(q.answer)
+        };
+      });
+    }
+    const questions = shuffledQuestions();
     const winThreshold = Math.ceil(questions.length * 0.7);
     const tieThreshold = Math.floor(questions.length / 2);
     let idx = 0, correct = 0, wrong = 0, finished = false, transitioning = false;
@@ -2643,8 +2737,10 @@
       </div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'trivia', 'Trivia');
 
     makeSoundToggle(wrap);
+    const results = gameResults(ctx, 'trivia', wrap);
     const cardContainer = wrap.querySelector('#tr-card-container');
     const opts = wrap.querySelector('#tr-options');
     const progText = wrap.querySelector('#tr-progress-text');
@@ -2869,7 +2965,29 @@
         ctx.onLose();
       }
       statusEl.innerHTML = `${icon} ${correct} / ${questions.length} (${pct}%)`;
+      results.show({
+        score: correct, points: msgClass === 'is-win' ? 1 : msgClass === 'is-tie' ? 0.5 : 0,
+        unit: 'aciertos', outcome: `${icon} ${correct} de ${questions.length} respuestas correctas`,
+        replay: resetTrivia
+      });
       statusEl.className = 'cg-status ' + msgClass;
+    }
+
+    function resetTrivia() {
+      questions.splice(0, questions.length, ...shuffledQuestions());
+      idx = 0; correct = 0; wrong = 0; finished = false; transitioning = false;
+      doubleActive = false; doublePick = null;
+      used5050 = false; usedDouble = false; usedRigo = false;
+      [btn5050, btnDouble, btnRigo].forEach(button => {
+        button.disabled = false;
+        button.style.opacity = '';
+        button.style.boxShadow = '';
+        button.style.cursor = '';
+      });
+      statusEl.textContent = '';
+      statusEl.classList.remove('is-win', 'is-tie', 'is-lose');
+      progFill.style.width = '0%';
+      render();
     }
 
     if (questions.length === 0) {
@@ -2907,7 +3025,7 @@
     let grid, piece, loop, running, gameOver, score, paused, bonusEarned;
     let bonusSpawned, bonusAwarded, bonusAtScore, clearingSet, floats;
     let tickMs, piecesLocked;
-    let scrollLocked = false, previousBodyTouchAction = '', previousOverscrollBehavior = '';
+    let scrollLocked = false, previousOverscrollBehavior = '';
 
     const wrap = document.createElement('div');
     wrap.className = 'cg-snake-wrap';
@@ -2924,24 +3042,22 @@
       <canvas class="cg-snake-canvas" id="pl-canvas" width="${COLS * CELL}" height="${ROWS * CELL}"
               style="background:#221a3a;"></canvas>
       <div class="cg-snake-controls">
-        <button class="coeduca-btn coeduca-btn-success cg-snake-start" id="pl-start">▶ START</button>
+        <button class="coeduca-btn coeduca-btn-success cg-snake-start" id="pl-start">${iconButton('play', 'START')}</button>
         <div class="cg-snake-dpad">
           <span></span>
           <button class="coeduca-btn cg-snake-dir" id="pl-rot" title="Girar" aria-label="Girar">⟳</button>
           <span></span>
-          <button class="coeduca-btn cg-snake-dir" data-m="left" aria-label="Mover a la izquierda">←</button>
-          <button class="coeduca-btn cg-snake-dir" data-m="down" aria-label="Bajar">↓</button>
-          <button class="coeduca-btn cg-snake-dir" data-m="right" aria-label="Mover a la derecha">→</button>
-        </div>
-        <div style="font-size:12px;font-weight:bold;color:var(--coeduca-stroke);max-width:300px;">
-          PC: ESPACIO gira · ← → mueven · ↓ baja · Haz líneas rectas o diagonales de 3+ ·
-          🌈 El arcoíris explota alrededor · 💛 La píldora dorada da +1 extra
+          <button class="coeduca-btn cg-snake-dir" data-m="left" aria-label="Mover a la izquierda">${arrowIcon('left')}</button>
+          <button class="coeduca-btn cg-snake-dir" data-m="down" aria-label="Bajar">${arrowIcon('down')}</button>
+          <button class="coeduca-btn cg-snake-dir" data-m="right" aria-label="Mover a la derecha">${arrowIcon('right')}</button>
         </div>
       </div>
       <div id="pl-status" class="cg-status"></div>
     `;
     ctx.container.appendChild(wrap);
-    makeSoundToggle(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'pills', 'Píldoras');
+    const viewport = gameViewport(wrap, 'pills', 'Píldoras', makeSoundToggle(wrap));
+    const results = gameResults(ctx, 'pills', wrap);
 
     const canvas = wrap.querySelector('#pl-canvas');
     const cctx = canvas.getContext('2d');
@@ -2953,15 +3069,13 @@
       : { submit: () => Promise.resolve(false) };
 
     function preventGameScroll(event) {
-      if (scrollLocked) event.preventDefault();
+      if (scrollLocked && event.target === canvas) event.preventDefault();
     }
 
     function lockGameScroll() {
       if (scrollLocked) return;
       scrollLocked = true;
-      previousBodyTouchAction = document.body.style.touchAction;
       previousOverscrollBehavior = document.documentElement.style.overscrollBehavior;
-      document.body.style.touchAction = 'none';
       document.documentElement.style.overscrollBehavior = 'none';
       document.addEventListener('touchmove', preventGameScroll, { passive: false, capture: true });
     }
@@ -2969,7 +3083,6 @@
     function unlockGameScroll() {
       if (!scrollLocked) return;
       scrollLocked = false;
-      document.body.style.touchAction = previousBodyTouchAction;
       document.documentElement.style.overscrollBehavior = previousOverscrollBehavior;
       document.removeEventListener('touchmove', preventGameScroll, true);
     }
@@ -3126,7 +3239,8 @@
       spawnConfetti(wrap, 15);
       floats.push({ x: (COLS * CELL) / 2, y: (ROWS * CELL) / 2, life: 55, text: '+1 EXTRA' });
       // +1 real en la nota (el core lo limita a una vez por sesión)
-      if (C.addBalloonBonus) C.addBalloonBonus();
+      if (ctx.onBalloonBonus) ctx.onBalloonBonus();
+      else if (C.addBalloonBonus) C.addBalloonBonus();
       if (global.rigo && global.rigo.say) {
         global.rigo.say('¡Rompiste la píldora dorada! +1 punto extra 💊', 4000);
       }
@@ -3339,12 +3453,19 @@
       gameOver = true; running = false; clearInterval(loop);
       unlockGameScroll();
       pillsStartButton.disabled = false;
+      pillsStartButton.innerHTML = iconButton('retry', 'Volver a jugar');
       SFX.die();
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cg-status is-lose';
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
       draw();
+      viewport.leave();
+      results.show({
+        score, points: (bonusEarned ? 1 : 0) + (bonusAwarded ? 1 : 0),
+        unit: 'puntos', outcome: '💥 El tablero se llenó',
+        replay: () => pillsStartButton.click()
+      });
     }
 
     function win() {
@@ -3419,7 +3540,7 @@
         lockGameScroll();
         draw();
         setTimeout(() => {
-          if (gameOver || !running || paused) return;
+          if (gameOver || !running || paused || document.hidden || wrap.classList.contains('coeduca-game-help-open')) return;
           clearInterval(loop);
           loop = setInterval(stepTick, tickMs);
         }, 600);
@@ -3440,6 +3561,8 @@
     pillsStartButton.addEventListener('click', () => {
       reset();
       running = true;
+      viewport.enter();
+      pillsStartButton.innerHTML = iconButton('play', 'START');
       pillsStartButton.disabled = true;
       lockGameScroll();
       spawnPiece();
@@ -3456,59 +3579,111 @@
   // 7. TORRE SÁNDWICH — atrapa, centra y equilibra los ingredientes.
   // =====================================================================
   reg('sandwich', function (ctx) {
-    const W = 360, H = 470, PLATE_Y = 356, FLOOR_Y = 438;
+    const W = 360, H = 470, PLATE_Y = 356, FLOOR_Y = 438, CAMERA_FOLLOW_Y = 172;
     const winThreshold = Math.max(1, (ctx.config && ctx.config.winScore) || 500);
     const INGREDIENTS = {
-      bottom: { name: 'PAN', width: 104, height: 22 },
-      cheese: { name: 'QUESO', width: 92, height: 14 },
-      meat: { name: 'CARNE', width: 88, height: 19 },
-      tomato: { name: 'TOMATE', width: 82, height: 13 },
-      lettuce: { name: 'LECHUGA', width: 96, height: 16 },
-      bacon: { name: 'TOCINO', width: 82, height: 12 },
-      onion: { name: 'CEBOLLA', width: 76, height: 12 },
-      pickle: { name: 'PEPINILLO', width: 72, height: 11 },
-      egg: { name: 'HUEVO', width: 84, height: 14 },
-      avocado: { name: 'AGUACATE', width: 78, height: 13 },
-      top: { name: 'PAN', width: 104, height: 27 }
+      // Masas relativas para el juego: el tamaño del dibujo no equivale al peso.
+      bottom: { name: 'PAN', width: 104, height: 22, mass: 32 },
+      cheese: { name: 'QUESO', width: 92, height: 14, mass: 22 },
+      meat: { name: 'CARNE', width: 88, height: 19, mass: 85 },
+      tomato: { name: 'TOMATE', width: 82, height: 13, mass: 28 },
+      lettuce: { name: 'LECHUGA', width: 96, height: 16, mass: 6 },
+      bacon: { name: 'TOCINO', width: 82, height: 12, mass: 18 },
+      onion: { name: 'CEBOLLA', width: 76, height: 12, mass: 12 },
+      pickle: { name: 'PEPINILLO', width: 72, height: 11, mass: 14 },
+      egg: { name: 'HUEVO', width: 84, height: 14, mass: 48 },
+      avocado: { name: 'AGUACATE', width: 78, height: 13, mass: 36 },
+      top: { name: 'PAN', width: 104, height: 27, mass: 36 }
     };
+    const FILLING_TYPES = ['cheese', 'meat', 'tomato', 'lettuce', 'bacon', 'onion', 'pickle', 'egg', 'avocado'];
 
-    let stack, order, falling, plateX, score, sandwiches, landedTotal;
+    let stack, order, falling, plateX, score, layers, landedTotal, misses;
     let running, gameOver, paused, serving, bonusEarned, lastAt, raf;
     let leftHeld = false, rightHeld = false, pointerActive = false;
-    let scrollLocked = false, previousTouchAction = '', previousOverscroll = '';
-    let wobble = 0, floatText = null;
-    let collapsePieces = [], collapseStartedAt = 0, collapseLastAt = 0, lossAnimating = false;
-    let towerTilt = 0, targetTowerTilt = 0, balanceRatio = 0, imbalanceTime = 0;
+    let floatText = null;
+    let brokenHearts = [];
+    let collapseStartedAt = 0, collapseLastAt = 0, lossAnimating = false;
+    let balanceRatio = 0, cameraOffset = 0, targetCameraOffset = 0;
+    let physics, plateBody, floorBody;
+    let plateTarget = W / 2, pointerId = null, pointerOffset = 0;
+    let accumulator = 0, spawnDelay = 0;
+    let inputMode = 'target';
+    // Mismos pasos físicos en móviles de 30 Hz y pantallas de 60/120 Hz.
+    const FIXED_DT = 1 / 120;
+    const MAX_MISSES = 3;
+    const PLATE_SPEED = 185, POINTER_SPEED = 205;
+    const FALL_ACCELERATION = 300;
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const Matter = global.Matter;
+    if (!Matter) { ctx.container.textContent = 'No se pudo cargar la física de Sandwich Stack.'; return; }
+
+    if (!document.getElementById('sandwich-stack-styles')) {
+      const style = document.createElement('style');
+      style.id = 'sandwich-stack-styles';
+      style.textContent = `
+        .sw-game { max-width:380px; margin:0 auto; color:#3d3028; font-family:system-ui,sans-serif; text-align:center; }
+        .sw-game * { box-sizing:border-box; }
+        .sw-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; text-align:left; margin-bottom:12px; }
+        .sw-kicker { color:#7c5845; font-size:10px; font-weight:800; letter-spacing:2px; }
+        .sw-title { margin:2px 0 0; font-size:23px; font-weight:900; letter-spacing:-1px; }
+        .sw-badge { border:1px solid #dfcbb4; border-radius:24px; padding:6px 10px; background:#fff7e9; font-size:10px; font-weight:800; }
+        .sw-lives { color:#bb4150; font-size:16px; letter-spacing:2px; white-space:nowrap; }
+        .sw-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .sw-stat { background:#fff8eb; border:2px solid #48372c; border-radius:14px; padding:8px 12px; text-align:left; }
+        .sw-stat:first-child { background:#ffda79; }
+        .sw-stat small { display:block; font-size:10px; font-weight:800; letter-spacing:1px; }
+        .sw-stat strong { font-size:26px; font-variant-numeric:tabular-nums; line-height:1.2; }
+        .sw-goal { display:flex; justify-content:space-between; gap:8px; margin:12px 0 5px; font-size:11px; font-weight:700; }
+        .sw-progress { height:7px; overflow:hidden; border-radius:8px; background:#e9dfcf; margin-bottom:12px; }
+        .sw-progress > div { height:100%; border-radius:8px; background:#2d8567; transition:width .2s; }
+        .sw-game .sw-canvas { display:block; width:100%; height:auto; border:2px solid #48372c; border-radius:18px; background:#fff6df; touch-action:pan-y; box-shadow:0 5px 0 #e3d2b7; }
+        .sw-game.is-playing .sw-canvas { touch-action:none; }
+        .sw-balance { display:flex; align-items:center; gap:9px; margin:13px 2px; font-size:10px; font-weight:800; }
+        .sw-balance-track { position:relative; flex:1; height:9px; border-radius:9px; background:linear-gradient(90deg,#d76b50,#f3cd6e 22%,#82b69b 38%,#82b69b 62%,#f3cd6e 78%,#d76b50); }
+        .sw-balance-track::after { content:''; position:absolute; left:50%; top:-2px; height:13px; border-left:1px solid #3d302866; }
+        .sw-balance-marker { position:absolute; top:-3px; left:50%; width:5px; height:15px; border-radius:3px; background:#3d3028; transform:translateX(-50%); }
+        .sw-balance-label { min-width:65px; text-align:right; }
+        .sw-controls { display:grid; grid-template-columns:56px 1fr 56px; gap:10px; }
+        .sw-game .sw-button { min-height:48px; border:2px solid #48372c; border-radius:13px; background:#fff8eb; color:#3d3028; font:800 14px system-ui,sans-serif; cursor:pointer; touch-action:manipulation; box-shadow:0 3px 0 #48372c; }
+        .sw-game.is-playing .sw-direction { touch-action:none; }
+        .sw-game .sw-button:active { transform:translateY(2px); box-shadow:0 1px 0 #48372c; }
+        .sw-game .sw-button:focus-visible { outline:3px solid #24856c; outline-offset:4px; }
+        .sw-game .sw-primary { background:#2d8567; color:#fff; }
+        .sw-game .sw-direction { font-size:24px; }
+        .sw-game .sw-status { min-height:24px; margin:8px 0; font-size:12px; font-weight:750; line-height:1.5; }
+        .sw-game .coeduca-game-sound-toggle { position:static !important; margin:8px auto 0; }
+        @media (prefers-reduced-motion:reduce) { .sw-progress > div { transition:none; } }
+      `;
+      document.head.appendChild(style);
+    }
 
     const wrap = document.createElement('div');
-    wrap.className = 'cg-snake-wrap cv-snake-wrap';
+    wrap.className = 'sw-game';
     wrap.innerHTML = `
-      <div class="cg-snake-score cv-snake-score" style="background:#3b2417;color:#ffe06a;">
-        <span>🥪</span>
-        <span>PUNTOS: <span id="sw-score">0</span></span>
-        <span>·</span>
-        <span>SÁNDWICHES: <span id="sw-count">0</span></span>
+      <div class="sw-heading">
+        <div><div class="sw-kicker">ATRAPA · APILA · EQUILIBRA</div><h3 class="sw-title">Sandwich Stack</h3></div>
+        <span class="sw-badge sw-lives" id="sw-lives" aria-label="3 oportunidades disponibles">♥♥♥</span>
       </div>
-      <div class="cg-progress-bar cv-progress-bar" style="max-width:${W - 36}px;">
-        <div id="sw-progress" class="cg-progress-fill cv-progress-fill" style="width:0%"></div>
+      <div class="sw-stats">
+        <div class="sw-stat"><small>PUNTOS</small><strong id="sw-score">0</strong></div>
+        <div class="sw-stat"><small>CAPAS</small><strong id="sw-count">0</strong></div>
       </div>
-      <canvas id="sw-canvas" class="cg-snake-canvas cv-snake-canvas"
-              width="${W}" height="${H}" style="background:#bde8ff;touch-action:none;"></canvas>
-      <div class="cg-snake-controls cv-snake-controls">
-        <button class="coeduca-btn coeduca-btn-success civica-btn civica-btn-success cg-snake-start cv-snake-start"
-                id="sw-start">▶ START</button>
-        <div style="display:flex;gap:10px;justify-content:center;">
-          <button class="coeduca-btn civica-btn cg-snake-dir cv-snake-dir" data-sw-dir="left" aria-label="Mover a la izquierda">←</button>
-          <button class="coeduca-btn civica-btn cg-snake-dir cv-snake-dir" data-sw-dir="right" aria-label="Mover a la derecha">→</button>
-        </div>
-        <div style="font-size:12px;font-weight:bold;color:#3b2417;max-width:330px;line-height:1.45;">
-          PC: ← → o A/D · Móvil: arrastra el plato · Centra cada ingrediente para que la torre no caiga
-        </div>
+      <div class="sw-goal"><span id="sw-goal-label">Meta para el punto extra</span><span>${winThreshold} pts</span></div>
+      <div class="sw-progress"><div id="sw-progress" style="width:0%"></div></div>
+      <canvas id="sw-canvas" class="sw-canvas" width="${W}" height="${H}"
+        aria-label="Atrapa los ingredientes moviendo el plato con las flechas, A y D o arrastrando."></canvas>
+      <div class="sw-balance"><span>EQUILIBRIO</span><div class="sw-balance-track"><span id="sw-balance-marker" class="sw-balance-marker"></span></div><span id="sw-balance-label" class="sw-balance-label">ESTABLE</span></div>
+      <div class="sw-controls">
+        <button type="button" class="sw-button sw-direction" data-sw-dir="left" aria-label="Mover a la izquierda">${arrowIcon('left')}</button>
+        <button type="button" class="sw-button sw-primary" id="sw-start">${iconButton('play', 'Jugar')}</button>
+        <button type="button" class="sw-button sw-direction" data-sw-dir="right" aria-label="Mover a la derecha">${arrowIcon('right')}</button>
       </div>
-      <div id="sw-status" class="cg-status cv-status"></div>
+      <div id="sw-status" class="sw-status" role="status" aria-live="polite"></div>
     `;
     ctx.container.appendChild(wrap);
-    makeSoundToggle(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'sandwich', 'Torre sándwich', '.sw-title');
+    const viewport = gameViewport(wrap, 'sandwich', 'Torre sándwich', makeSoundToggle(wrap));
+    const results = gameResults(ctx, 'sandwich', wrap);
 
     const canvas = wrap.querySelector('#sw-canvas');
     const cctx = canvas.getContext('2d');
@@ -3517,214 +3692,227 @@
     const progressEl = wrap.querySelector('#sw-progress');
     const statusEl = wrap.querySelector('#sw-status');
     const startButton = wrap.querySelector('#sw-start');
+    const balanceMarker = wrap.querySelector('#sw-balance-marker');
+    const balanceLabel = wrap.querySelector('#sw-balance-label');
+    const goalLabel = wrap.querySelector('#sw-goal-label');
+    const livesEl = wrap.querySelector('#sw-lives');
+    const pixelRatio = Math.min(2, global.devicePixelRatio || 1);
+    canvas.width = W * pixelRatio;
+    canvas.height = H * pixelRatio;
+    cctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     const leaderboard = global.COEDUCA_LEADERBOARD
       ? global.COEDUCA_LEADERBOARD.create(ctx, 'sandwich', winThreshold)
       : { submit: () => Promise.resolve(false) };
 
-    function preventScroll(event) { if (scrollLocked) event.preventDefault(); }
-    function lockScroll() {
-      if (scrollLocked) return;
-      scrollLocked = true;
-      previousTouchAction = document.body.style.touchAction;
-      previousOverscroll = document.documentElement.style.overscrollBehavior;
-      document.body.style.touchAction = 'none';
-      document.documentElement.style.overscrollBehavior = 'none';
-      document.addEventListener('touchmove', preventScroll, { passive: false, capture: true });
-    }
-    function unlockScroll() {
-      if (!scrollLocked) return;
-      scrollLocked = false;
-      document.body.style.touchAction = previousTouchAction;
-      document.documentElement.style.overscrollBehavior = previousOverscroll;
-      document.removeEventListener('touchmove', preventScroll, true);
-    }
-
-    function shuffledMiddle() {
-      const middle = ['cheese', 'meat', 'tomato', 'lettuce', 'bacon', 'onion', 'pickle', 'egg', 'avocado'];
+    function refillIngredientBag() {
+      const middle = FILLING_TYPES.slice();
       for (let i = middle.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         const tmp = middle[i]; middle[i] = middle[j]; middle[j] = tmp;
       }
-      return ['bottom'].concat(middle, ['top']);
+      return middle;
     }
 
     function reset() {
       cancelAnimationFrame(raf);
       stack = [];
-      order = shuffledMiddle();
+      order = [];
       falling = null;
       plateX = W / 2;
       score = 0;
-      sandwiches = 0;
+      layers = 0;
       landedTotal = 0;
+      misses = 0;
       running = false;
       gameOver = false;
       paused = false;
       serving = false;
+      wrap.classList.remove('is-playing');
       bonusEarned = false;
       lastAt = 0;
-      wobble = 0;
       floatText = null;
-      collapsePieces = [];
+      brokenHearts = [];
       collapseStartedAt = 0;
       collapseLastAt = 0;
       lossAnimating = false;
-      towerTilt = 0;
-      targetTowerTilt = 0;
       balanceRatio = 0;
-      imbalanceTime = 0;
+      inputMode = 'target';
+      cameraOffset = 0;
+      targetCameraOffset = 0;
+      plateTarget = W / 2;
+      accumulator = 0;
+      spawnDelay = 0;
+      pointerId = null;
+      pointerActive = false;
       leftHeld = false;
       rightHeld = false;
       scoreEl.textContent = '0';
       countEl.textContent = '0';
       progressEl.style.width = '0%';
       statusEl.textContent = '';
-      statusEl.className = 'cg-status cv-status';
+      statusEl.className = 'sw-status';
+      goalLabel.textContent = 'Meta para el punto extra';
+      balanceMarker.style.left = '50%';
+      balanceLabel.textContent = 'ESTABLE';
+      updateLives();
+      initPhysics();
     }
 
-    function horizontalOverlap(leftA, rightA, leftB, rightB) {
-      return Math.max(0, Math.min(rightA, rightB) - Math.max(leftA, leftB));
+    function updateLives() {
+      const remaining = Math.max(0, MAX_MISSES - misses);
+      livesEl.textContent = '♥'.repeat(remaining) + '♡'.repeat(MAX_MISSES - remaining);
+      livesEl.setAttribute('aria-label', remaining + ' oportunidades disponibles');
     }
 
-    function mergedLength(intervals) {
-      if (!intervals.length) return 0;
-      const sorted = intervals.slice().sort((a, b) => a[0] - b[0]);
-      let total = 0, start = sorted[0][0], end = sorted[0][1];
-      for (let i = 1; i < sorted.length; i++) {
-        if (sorted[i][0] <= end) end = Math.max(end, sorted[i][1]);
-        else {
-          total += end - start;
-          start = sorted[i][0];
-          end = sorted[i][1];
-        }
+    function registerMiss() {
+      misses++;
+      updateLives();
+      brokenHearts.push({ life: 0.9 });
+      if (brokenHearts.length > 3) brokenHearts.shift();
+      if (misses > MAX_MISSES) {
+        end('¡SE AGOTARON LAS VIDAS!');
+        return;
       }
-      return total + end - start;
+      SFX.tap();
+      const remaining = MAX_MISSES - misses;
+      statusEl.textContent = remaining
+        ? 'Ingrediente perdido. Te quedan ' + remaining + ' oportunidades.'
+        : 'Ingrediente perdido. La próxima caída termina la partida.';
+      statusEl.className = 'sw-status is-tie';
     }
 
-    function worldPose(item) {
-      const cos = Math.cos(towerTilt), sin = Math.sin(towerTilt);
-      const localCenterX = item.offset;
-      const localCenterY = item.y + item.height / 2 - PLATE_Y;
-      const centerX = plateX + localCenterX * cos - localCenterY * sin;
-      const centerY = PLATE_Y + localCenterX * sin + localCenterY * cos;
-      return {
-        centerX,
-        centerY,
-        left: centerX - (Math.abs(cos) * item.width + Math.abs(sin) * item.height) / 2,
-        right: centerX + (Math.abs(cos) * item.width + Math.abs(sin) * item.height) / 2,
-        top: centerY - (Math.abs(cos) * item.height + Math.abs(sin) * item.width) / 2
-      };
+    function missFallingIngredient() {
+      if (!falling) return;
+      Matter.Composite.remove(physics.world, falling.body);
+      falling = null;
+      spawnDelay = 0.35;
+      registerMiss();
     }
 
-    function worldToLocal(worldX, worldY, height) {
-      const cos = Math.cos(towerTilt), sin = Math.sin(towerTilt);
-      const dx = worldX - plateX;
-      const dy = worldY + height / 2 - PLATE_Y;
-      return {
-        offset: dx * cos + dy * sin,
-        y: PLATE_Y + (-dx * sin + dy * cos) - height / 2
-      };
+    function updateBrokenHearts(dt) {
+      brokenHearts = brokenHearts.filter(heart => (heart.life -= dt) > 0);
     }
 
-    function findLanding(item) {
-      const itemLeft = item.x - item.width / 2;
-      const itemRight = item.x + item.width / 2;
-      const surfaces = stack.map(support => {
-        const pose = worldPose(support);
-        return { top: pose.top, left: pose.left, right: pose.right };
+    function initPhysics() {
+      physics = Matter.Engine.create({
+        enableSleeping: true,
+        positionIterations: 8,
+        velocityIterations: 8
       });
-      // Solo el primer pan se apoya directamente en el plato.
-      if (item.type === 'bottom') {
-        surfaces.push({ top: PLATE_Y, left: plateX - 52, right: plateX + 52 });
-      }
-      const candidates = surfaces
-        .map(surface => Object.assign({}, surface, {
-          y: surface.top - item.height,
-          overlap: horizontalOverlap(itemLeft, itemRight, surface.left, surface.right)
-        }))
-        .filter(surface =>
-          surface.overlap > 0 &&
-          surface.y >= item.y - 1.5 &&
-          !(item.sliding && Math.abs(surface.y - item.ignoreLandingY) < 3)
-        );
-      if (!candidates.length) {
-        return { floor: true, y: FLOOR_Y - item.height, overlapRatio: 0 };
-      }
+      physics.world.gravity.y = 1;
+      physics.world.gravity.scale = 0.00030;
+      plateBody = Matter.Bodies.rectangle(plateX, PLATE_Y + 7, 104, 14, {
+        isStatic: true, friction: 1, frictionStatic: 3, label: 'plate'
+      });
+      floorBody = Matter.Bodies.rectangle(W / 2, FLOOR_Y + 20, W * 3, 40, {
+        isStatic: true, label: 'floor'
+      });
+      Matter.Composite.add(physics.world, [plateBody, floorBody]);
+      Matter.Events.on(physics, 'collisionActive', event => {
+        if (!falling) return;
+        event.pairs.forEach(pair => {
+          const other = pair.bodyA === falling.body ? pair.bodyB
+            : pair.bodyB === falling.body ? pair.bodyA : null;
+          if (!other) return;
+          if (other === plateBody && falling.type !== 'bottom') {
+            falling.invalidContact = true;
+            falling.support = null;
+            falling.touching = false;
+            falling.body.collisionFilter.mask = 0;
+            return;
+          }
+          const support = other === plateBody ? plateBody
+            : stack.find(item => item.body === other);
+          if (!support || falling.body.position.y >= other.position.y) return;
+          falling.touching = true;
+          falling.support = support;
+        });
+      });
+    }
 
-      // Colisión continua: se detiene en la primera superficie que toque,
-      // incluso si solo alcanza una esquina.
-      const landingY = Math.min.apply(null, candidates.map(surface => surface.y));
-      const supports = candidates.filter(surface => Math.abs(surface.y - landingY) < 0.75);
-      const intervals = supports.map(surface => [
-        Math.max(itemLeft, surface.left),
-        Math.min(itemRight, surface.right)
-      ]);
-      const supportLeft = Math.min.apply(null, supports.map(surface => surface.left));
-      const supportRight = Math.max.apply(null, supports.map(surface => surface.right));
-      return {
-        floor: false,
-        y: landingY,
-        overlapRatio: mergedLength(intervals) / item.width,
-        left: supportLeft,
-        right: supportRight,
-        center: (supportLeft + supportRight) / 2
-      };
+    function towerTopLocalY() {
+      return stack.length
+        ? Math.min.apply(null, stack.map(item => item.body.bounds.min.y))
+        : PLATE_Y;
     }
 
     function spawnIngredient() {
       if (!running || gameOver || serving || falling) return;
-      if (!order.length) order = shuffledMiddle();
-      const type = order.shift();
+      if (!order.length) order = refillIngredientBag();
+      const type = stack.length ? order.pop() : 'bottom';
       const spec = INGREDIENTS[type];
       const margin = spec.width / 2 + 8;
-      falling = {
-        type,
-        name: spec.name,
-        width: spec.width,
-        height: spec.height,
-        x: margin + Math.random() * (W - margin * 2),
-        y: -spec.height - 8,
-        speed: Math.min(255, 112 + landedTotal * 5.5)
-      };
-    }
-
-    function centerOfMass(items) {
-      let total = 0, weighted = 0;
-      items.forEach(item => {
-        const weight = item.width * item.height;
-        total += weight;
-        weighted += item.offset * weight;
+      const difficulty = Math.min(1, landedTotal / 18);
+      const speed = 25 + difficulty * 155;
+      let minX = margin, maxX = W - margin;
+      if (stack.length) {
+        const top = stack.reduce((a, b) =>
+          a.body.bounds.min.y < b.body.bounds.min.y ? a : b);
+        const distance = Math.max(0, top.body.bounds.min.y + cameraOffset + 8);
+        const fallTime = (Math.sqrt(speed * speed + 2 * FALL_ACCELERATION * distance) - speed)
+          / FALL_ACCELERATION;
+        const travel = PLATE_SPEED * Math.max(0, fallTime - 0.25);
+        const left = Math.max(margin, top.body.position.x - travel);
+        const right = Math.min(W - margin, top.body.position.x + travel);
+        if (left <= right) { minX = left; maxX = right; }
+      }
+      const x = minX + Math.random() * (maxX - minX);
+      const y = -cameraOffset - spec.height / 2 - 8;
+      const body = Matter.Bodies.rectangle(x, y, spec.width, spec.height, {
+        chamfer: { radius: Math.min(5, spec.height * 0.3) },
+        friction: type === 'lettuce' ? 0.9 : 1,
+        frictionStatic: 3,
+        frictionAir: 0.004,
+        restitution: 0.025,
+        slop: 0.01,
+        sleepThreshold: 90,
+        label: 'ingredient'
       });
-      return total ? weighted / total : 0;
+      Matter.Body.setMass(body, spec.mass / 32);
+      Matter.Body.setVelocity(body, { x: 0, y: speed * FIXED_DT });
+      falling = {
+        type, name: spec.name, width: spec.width, height: spec.height,
+        body, support: null, touching: false, invalidContact: false, settledFor: 0
+      };
+      Matter.Composite.add(physics.world, body);
     }
 
     function calculateBalance() {
-      const base = stack.find(item => item.type === 'bottom');
-      if (!base || !stack.length) return 0;
-      const supportLeft = Math.max(-52, base.offset - base.width / 2);
-      const supportRight = Math.min(52, base.offset + base.width / 2);
-      const supportCenter = (supportLeft + supportRight) / 2;
-      const supportHalf = Math.max(7, (supportRight - supportLeft) / 2);
-      return (centerOfMass(stack) - supportCenter) / (supportHalf * 0.82);
+      if (!stack.length) return 0;
+      let totalMass = 0, weightedX = 0;
+      stack.forEach(item => {
+        const mass = item.body.mass;
+        totalMass += mass;
+        weightedX += mass * item.body.position.x;
+      });
+      return totalMass ? (weightedX / totalMass - plateX) / 52 : 0;
     }
 
-    function updateTowerBalance(dt) {
+    function carryStackWithPlate(dx) {
+      // Los ingredientes colocados comparten el desplazamiento del plato.
+      // Su velocidad relativa, rotación y caída siguen a cargo de Matter.js.
+      stack.forEach(item => {
+        const body = item.body;
+        if (body.position.y > PLATE_Y + 15) return;
+        Matter.Body.setPosition(body, { x: body.position.x + dx, y: body.position.y });
+      });
+    }
+
+    function updateCamera(dt) {
+      if (stack.length) {
+        targetCameraOffset = Math.max(targetCameraOffset, CAMERA_FOLLOW_Y - towerTopLocalY());
+      }
+      cameraOffset += (targetCameraOffset - cameraOffset) * Math.min(1, dt * 3.4);
+    }
+
+    function updateTowerBalance() {
       balanceRatio = calculateBalance();
-      targetTowerTilt = Math.max(-0.32, Math.min(0.32, balanceRatio * 0.16));
-      towerTilt += (targetTowerTilt - towerTilt) * Math.min(1, dt * 4.2);
-      if (Math.abs(balanceRatio) > 1) {
-        imbalanceTime += dt;
-        if (imbalanceTime > 0.18 && !gameOver) {
-          statusEl.textContent = '⚠️ ¡EL PESO ESTÁ VENCIENDO LA TORRE!';
-          statusEl.className = 'cg-status cv-status is-tie';
-        }
-        if (imbalanceTime > 0.72) end('¡EL PESO VOLCÓ EL SÁNDWICH!');
-      } else {
-        imbalanceTime = Math.max(0, imbalanceTime - dt * 1.8);
-        if (statusEl.textContent.indexOf('EL PESO ESTÁ') >= 0) {
-          statusEl.textContent = '';
-          statusEl.className = 'cg-status cv-status';
-        }
+      if (Math.abs(balanceRatio) > 0.85 && !gameOver) {
+        statusEl.textContent = '⚠️ ¡La torre pierde apoyo! Mueve el plato con cuidado.';
+        statusEl.className = 'sw-status is-tie';
+      } else if (statusEl.textContent.indexOf('La torre pierde apoyo') >= 0) {
+        statusEl.textContent = '';
+        statusEl.className = 'sw-status';
       }
     }
 
@@ -3733,37 +3921,10 @@
       bonusEarned = true;
       SFX.win();
       statusEl.textContent = '🎉 ¡PUNTO EXTRA! Sigue apilando para mejorar tu récord.';
-      statusEl.className = 'cg-status cv-status is-win';
+      statusEl.className = 'sw-status is-win';
+      goalLabel.textContent = '✓ Punto extra conseguido';
       spawnConfetti(wrap, 45);
       ctx.onWin();
-    }
-
-    function prepareCollapse() {
-      const pieces = [];
-      stack.forEach(item => {
-        const pose = worldPose(item);
-        pieces.push(Object.assign({}, item, {
-          x: pose.centerX,
-          y: pose.centerY - item.height / 2,
-          vx: (pose.centerX - plateX) * 1.8 + (Math.random() - 0.5) * 85,
-          vy: -95 - Math.random() * 95,
-          angle: towerTilt,
-          spin: (Math.random() - 0.5) * 7,
-          bounces: 0
-        }));
-      });
-      if (falling) {
-        pieces.push(Object.assign({}, falling, {
-          vx: (falling.x - plateX) * 1.15 + (Math.random() - 0.5) * 70,
-          vy: -45 - Math.random() * 75,
-          angle: falling.angle || 0,
-          spin: (Math.random() - 0.5) * 8,
-          bounces: 0
-        }));
-      }
-      collapsePieces = pieces;
-      stack = [];
-      falling = null;
     }
 
     function collapseFrame(now) {
@@ -3772,35 +3933,17 @@
         collapseStartedAt = now;
         collapseLastAt = now;
       }
-      const dt = Math.min(0.034, (now - collapseLastAt) / 1000);
+      const dt = Math.min(0.05, (now - collapseLastAt) / 1000);
       collapseLastAt = now;
-      collapsePieces.forEach(piece => {
-        piece.vy += 690 * dt;
-        piece.x += piece.vx * dt;
-        piece.y += piece.vy * dt;
-        piece.angle += piece.spin * dt;
-        const floor = FLOOR_Y - piece.height;
-        if (piece.y >= floor) {
-          piece.y = floor;
-          if (Math.abs(piece.vy) > 42 && piece.bounces < 2) {
-            piece.vy *= -0.28;
-            piece.vx *= 0.68;
-            piece.spin *= 0.62;
-            piece.bounces++;
-          } else {
-            piece.vy = 0;
-            piece.vx *= 0.86;
-            piece.spin *= 0.72;
-          }
-        }
-      });
-      draw();
-      if (now - collapseStartedAt < 1800) {
-        raf = requestAnimationFrame(collapseFrame);
-      } else {
-        lossAnimating = false;
-        draw();
+      accumulator += dt;
+      while (accumulator >= FIXED_DT) {
+        Matter.Engine.update(physics, FIXED_DT * 1000);
+        accumulator -= FIXED_DT;
       }
+      updateBrokenHearts(dt);
+      draw();
+      if (now - collapseStartedAt < 1800) raf = requestAnimationFrame(collapseFrame);
+      else { lossAnimating = false; draw(); }
     }
 
     function end(reason) {
@@ -3808,96 +3951,62 @@
       gameOver = true;
       running = false;
       serving = false;
+      wrap.classList.remove('is-playing');
+      viewport.leave();
       leftHeld = false;
       rightHeld = false;
       cancelAnimationFrame(raf);
-      unlockScroll();
       startButton.disabled = false;
-      prepareCollapse();
+      startButton.innerHTML = iconButton('retry', 'Volver a jugar');
+      pointerActive = false;
+      pointerId = null;
+      // El plato desaparece y los mismos cuerpos físicos forman la caída final.
+      Matter.Composite.remove(physics.world, plateBody);
+      stack.forEach(item => Matter.Sleeping.set(item.body, false));
+      if (falling) Matter.Sleeping.set(falling.body, false);
       lossAnimating = true;
       collapseStartedAt = 0;
       collapseLastAt = 0;
+      accumulator = 0;
       SFX.die();
       statusEl.textContent = '💥 ' + (reason || '¡LA TORRE CAYÓ!');
-      statusEl.className = 'cg-status cv-status is-lose';
+      statusEl.className = 'sw-status is-lose';
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
       draw();
       raf = requestAnimationFrame(collapseFrame);
+      results.show({
+        score, points: bonusEarned ? 1 : 0, unit: 'puntos',
+        outcome: '💥 ' + (reason || '¡La torre cayó!'),
+        replay: () => startButton.click()
+      });
     }
 
-    function landIngredient(landing) {
-      if (!falling || !landing) return;
-      if (landing.floor) {
-        end('¡EL INGREDIENTE NO TUVO APOYO!');
-        return;
-      }
-      const centerSupported = falling.x >= landing.left - 3 && falling.x <= landing.right + 3;
-      if (!centerSupported) {
-        const direction = falling.x < landing.center ? -1 : 1;
-        falling.sliding = true;
-        falling.ignoreLandingY = landing.y;
-        falling.slideLeft = landing.left;
-        falling.slideRight = landing.right;
-        falling.vx = direction * (78 + Math.min(55, landedTotal * 3));
-        falling.angle = direction * 0.08;
-        SFX.tap();
-        return;
-      }
-      const delta = falling.x - landing.center;
-      const tolerance = Math.max(1, falling.width / 2);
-      const local = worldToLocal(falling.x, landing.y, falling.height);
-
-      const placed = {
-        type: falling.type,
-        name: falling.name,
-        width: falling.width,
-        height: falling.height,
-        offset: local.offset,
-        y: local.y
-      };
-
-      const centering = Math.max(0, 1 - Math.abs(delta) / tolerance);
-      const accuracy = Math.min(1, landing.overlapRatio * 0.55 + centering * 0.45);
+    function landIngredient() {
+      if (!falling || !falling.support) return;
+      const support = falling.support === plateBody ? plateBody : falling.support.body;
+      const delta = falling.body.position.x - support.position.x;
+      const overlap = Math.max(0, Math.min(falling.body.bounds.max.x, support.bounds.max.x)
+        - Math.max(falling.body.bounds.min.x, support.bounds.min.x));
+      const accuracy = clamp(0.55 * overlap / falling.width
+        + 0.45 * (1 - Math.abs(delta) / (falling.width / 2)), 0, 1);
       const gained = 25 + Math.round(accuracy * 75);
-      stack.push(placed);
+      stack.push(falling);
       landedTotal++;
+      layers = landedTotal;
       score += gained;
       scoreEl.textContent = score;
+      countEl.textContent = layers;
       progressEl.style.width = Math.min(100, score / winThreshold * 100) + '%';
-      floatText = { text: '+' + gained + (accuracy > 0.86 ? ' ¡PERFECTO!' : ''), life: 65 };
-      wobble = Math.max(wobble, (1 - accuracy) * 13);
+      floatText = { text: '+' + gained + (accuracy > 0.86 ? ' ¡PERFECTO!' : ''), life: 1.1 };
       SFX.place();
       falling = null;
-      awardBonus();
-
-      if (placed.type === 'top') {
-        serving = true;
-        sandwiches++;
-        score += 225;
-        scoreEl.textContent = score;
-        countEl.textContent = sandwiches;
-        progressEl.style.width = Math.min(100, score / winThreshold * 100) + '%';
-        floatText = { text: '+225 ¡SÁNDWICH LISTO!', life: 85 };
-        SFX.eat();
-        spawnConfetti(wrap, 20);
-        awardBonus();
-        setTimeout(() => {
-          if (gameOver || !running) return;
-          stack = [];
-          order = shuffledMiddle();
-          serving = false;
-          towerTilt = 0;
-          targetTowerTilt = 0;
-          balanceRatio = 0;
-          imbalanceTime = 0;
-          spawnIngredient();
-        }, 950);
-      } else {
-        setTimeout(() => {
-          if (!gameOver && running && !paused) spawnIngredient();
-        }, 230);
+      if (statusEl.textContent.indexOf('Ingrediente perdido') >= 0) {
+        statusEl.textContent = '';
+        statusEl.className = 'sw-status';
       }
+      awardBonus();
+      spawnDelay = Math.max(0.22, 0.42 - landedTotal * 0.003);
     }
 
     function roundedRect(x, y, width, height, radius) {
@@ -3939,38 +4048,45 @@
         cctx.fillStyle = '#ffd36a';
         for (let i = 0; i < 4; i++) { cctx.beginPath(); cctx.arc(left + 16 + i * 22, y + 7, 1.8, 0, Math.PI * 2); cctx.fill(); }
       } else if (item.type === 'lettuce') {
-        const leafGradient = cctx.createLinearGradient(left, y, left + item.width, y + item.height);
-        leafGradient.addColorStop(0, '#9be564');
-        leafGradient.addColorStop(0.5, '#55bd4a');
-        leafGradient.addColorStop(1, '#278c3c');
+        // Hoja continua, con borde rizado y pliegues superpuestos. El contorno
+        // ocupa toda la altura física, sin los huecos de la antigua tira de ondas.
+        cctx.translate(left, y);
+        cctx.scale(item.width / 96, item.height / 16);
+        const leafGradient = cctx.createLinearGradient(0, 0, 0, 16);
+        leafGradient.addColorStop(0, '#b9ed6b');
+        leafGradient.addColorStop(0.45, '#70c84b');
+        leafGradient.addColorStop(1, '#2f923e');
         cctx.fillStyle = leafGradient;
-        const segments = 8, step = item.width / segments;
+        cctx.strokeStyle = '#286c32'; cctx.lineWidth = 1.5;
         cctx.beginPath();
-        cctx.moveTo(left, y + item.height / 2);
-        for (let i = 0; i < segments; i++) {
-          cctx.quadraticCurveTo(
-            left + (i + 0.5) * step,
-            y + (i % 2 ? 1 : 5),
-            left + (i + 1) * step,
-            y + item.height / 2
-          );
-        }
-        for (let i = segments - 1; i >= 0; i--) {
-          cctx.quadraticCurveTo(
-            left + (i + 0.5) * step,
-            y + item.height - (i % 2 ? 1 : 5),
-            left + i * step,
-            y + item.height / 2
-          );
-        }
+        cctx.moveTo(1, 8);
+        cctx.bezierCurveTo(0, 4, 4, 2, 10, 4);
+        cctx.bezierCurveTo(13, 0, 20, 0, 24, 4);
+        cctx.bezierCurveTo(28, 5, 28, 0, 35, 1);
+        cctx.bezierCurveTo(41, 0, 43, 5, 48, 3);
+        cctx.bezierCurveTo(53, 0, 59, 0, 63, 4);
+        cctx.bezierCurveTo(69, 5, 71, 0, 77, 2);
+        cctx.bezierCurveTo(82, 1, 84, 5, 88, 4);
+        cctx.bezierCurveTo(94, 2, 96, 6, 94, 9);
+        cctx.bezierCurveTo(96, 13, 88, 16, 82, 13);
+        cctx.bezierCurveTo(77, 12, 77, 17, 70, 15);
+        cctx.bezierCurveTo(65, 16, 63, 12, 57, 14);
+        cctx.bezierCurveTo(50, 17, 46, 13, 41, 14);
+        cctx.bezierCurveTo(35, 16, 30, 16, 26, 13);
+        cctx.bezierCurveTo(20, 12, 18, 17, 12, 14);
+        cctx.bezierCurveTo(7, 15, 0, 13, 1, 8);
         cctx.closePath(); cctx.fill(); cctx.stroke();
-        cctx.strokeStyle = '#247c35'; cctx.lineWidth = 1.4;
-        cctx.beginPath(); cctx.moveTo(left + 8, y + item.height / 2); cctx.lineTo(left + item.width - 8, y + item.height / 2); cctx.stroke();
-        for (let i = 1; i < 6; i++) {
-          const veinX = left + item.width * i / 6;
-          cctx.beginPath(); cctx.moveTo(veinX, y + item.height / 2);
-          cctx.lineTo(veinX + (i % 2 ? 7 : -7), y + (i % 2 ? 3 : item.height - 3)); cctx.stroke();
-        }
+        cctx.strokeStyle = '#c9ef8d'; cctx.lineWidth = 1.2; cctx.lineCap = 'round';
+        cctx.beginPath(); cctx.moveTo(7, 8);
+        cctx.bezierCurveTo(29, 5, 54, 12, 89, 7); cctx.stroke();
+        [16, 32, 49, 66, 82].forEach((vx, index) => {
+          cctx.beginPath(); cctx.moveTo(vx - 3, 8);
+          cctx.quadraticCurveTo(vx + 2, 7, vx + (index % 2 ? 4 : 1), 3); cctx.stroke();
+          cctx.strokeStyle = '#3c9d40';
+          cctx.beginPath(); cctx.moveTo(vx, 9);
+          cctx.quadraticCurveTo(vx + 3, 10, vx + 5, 13); cctx.stroke();
+          cctx.strokeStyle = '#c9ef8d';
+        });
       } else if (item.type === 'bacon') {
         cctx.fillStyle = '#e56b6f';
         roundedRect(left, y, item.width, item.height, 5); cctx.fill(); cctx.stroke();
@@ -4014,191 +4130,265 @@
 
     function drawScene() {
       const sky = cctx.createLinearGradient(0, 0, 0, H);
-      sky.addColorStop(0, '#bde8ff'); sky.addColorStop(0.7, '#f8f3d4'); sky.addColorStop(1, '#f2c879');
+      sky.addColorStop(0, '#fffbef'); sky.addColorStop(1, '#f5e6cb');
       cctx.fillStyle = sky; cctx.fillRect(0, 0, W, H);
-      cctx.fillStyle = 'rgba(255,255,255,0.75)';
-      [[45,48,32],[270,76,39],[155,112,25]].forEach(cloud => {
-        cctx.beginPath(); cctx.arc(cloud[0], cloud[1], cloud[2] * 0.55, 0, Math.PI * 2); cctx.arc(cloud[0] + 22, cloud[1] + 3, cloud[2] * 0.42, 0, Math.PI * 2); cctx.fill();
-      });
-      cctx.fillStyle = '#d59a50'; cctx.fillRect(0, FLOOR_Y, W, H - FLOOR_Y);
-      cctx.strokeStyle = '#a6672f'; cctx.lineWidth = 3; cctx.beginPath(); cctx.moveTo(0, FLOOR_Y); cctx.lineTo(W, FLOOR_Y); cctx.stroke();
-    }
-
-    function drawCompletedSandwiches() {
-      if (!sandwiches) return;
-      const positions = [18, 45, 72, 99, W - 99, W - 72, W - 45, W - 18];
-      const visible = Math.min(sandwiches, positions.length);
-      cctx.save();
-      cctx.font = '23px system-ui';
-      cctx.textAlign = 'center';
-      cctx.textBaseline = 'middle';
-      for (let i = 0; i < visible; i++) cctx.fillText('🥪', positions[i], 457);
-      if (sandwiches > positions.length) {
-        cctx.font = 'bold 11px Comic Sans MS, system-ui';
-        cctx.fillStyle = '#3b2417';
-        cctx.fillText('+' + (sandwiches - positions.length), W - 18, 444);
+      // Azulejos discretos y toldo de cocina; el contraste queda en la comida.
+      cctx.strokeStyle = '#e7d8be'; cctx.lineWidth = 1;
+      for (let y = (cameraOffset * 0.25) % 40; y < H; y += 40) {
+        cctx.beginPath(); cctx.moveTo(0, y); cctx.lineTo(W, y); cctx.stroke();
       }
-      cctx.restore();
+      for (let x = 0; x < W; x += 40) {
+        cctx.beginPath(); cctx.moveTo(x, 0); cctx.lineTo(x, H); cctx.stroke();
+      }
+      for (let x = 0; x < W; x += 30) {
+        cctx.fillStyle = (x / 30) % 2 ? '#f7e6c7' : '#458b72';
+        roundedRect(x, -10, 30, 30, 7); cctx.fill();
+      }
+      const groundY = FLOOR_Y + cameraOffset;
+      if (groundY < H) {
+        cctx.fillStyle = '#c99662'; cctx.fillRect(0, groundY, W, H - groundY);
+        cctx.fillStyle = '#ead0a9'; cctx.fillRect(0, groundY, W, 7);
+      }
+      // El plato puede salir de cámara en torres altas; esta guía lo localiza.
+      if (PLATE_Y + cameraOffset > H - 20 && running) {
+        cctx.fillStyle = '#3b6e59';
+        roundedRect(plateX - 26, H - 22, 52, 6, 3); cctx.fill();
+        cctx.font = '700 9px system-ui'; cctx.textAlign = 'center';
+        cctx.fillText('PLATO', plateX, H - 5);
+      }
     }
 
     function drawCharacter() {
       cctx.save();
+      cctx.translate(0, cameraOffset);
       cctx.strokeStyle = '#3b2417'; cctx.lineWidth = 5; cctx.lineCap = 'round';
-      cctx.fillStyle = '#4f86f7'; roundedRect(plateX - 25, 411, 50, 42, 12); cctx.fill(); cctx.stroke();
+      cctx.fillStyle = '#458b72'; roundedRect(plateX - 25, 411, 50, 42, 12); cctx.fill(); cctx.stroke();
+      cctx.fillStyle = '#fff8e9'; roundedRect(plateX - 14, 416, 28, 34, 6); cctx.fill();
       cctx.fillStyle = '#f4b183'; cctx.beginPath(); cctx.arc(plateX, 399, 23, 0, Math.PI * 2); cctx.fill(); cctx.stroke();
+      cctx.fillStyle = '#fffdf5';
+      roundedRect(plateX - 23, 372, 46, 15, 7); cctx.fill(); cctx.stroke();
       cctx.fillStyle = '#3b2417'; cctx.beginPath(); cctx.arc(plateX - 7, 397, 2.3, 0, Math.PI * 2); cctx.arc(plateX + 7, 397, 2.3, 0, Math.PI * 2); cctx.fill();
       cctx.beginPath(); cctx.arc(plateX, 405, 7, 0.2, Math.PI - 0.2); cctx.stroke();
       cctx.beginPath(); cctx.moveTo(plateX - 21, 421); cctx.lineTo(plateX - 48, 373); cctx.moveTo(plateX + 21, 421); cctx.lineTo(plateX + 48, 373); cctx.stroke();
       cctx.fillStyle = '#f4b183'; cctx.beginPath(); cctx.arc(plateX - 48, 373, 7, 0, Math.PI * 2); cctx.arc(plateX + 48, 373, 7, 0, Math.PI * 2); cctx.fill();
-      cctx.fillStyle = '#f7f7f7';
-      cctx.beginPath(); cctx.ellipse(plateX, PLATE_Y + 9, 60, 12, 0, 0, Math.PI * 2); cctx.fill(); cctx.strokeStyle = '#64808d'; cctx.lineWidth = 3; cctx.stroke();
-      cctx.fillStyle = '#d8edf2'; cctx.beginPath(); cctx.ellipse(plateX, PLATE_Y + 7, 46, 6, 0, 0, Math.PI * 2); cctx.fill();
+      if (!gameOver) {
+        cctx.fillStyle = '#f7f7f7';
+        cctx.beginPath(); cctx.ellipse(plateX, PLATE_Y + 9, 60, 12, 0, 0, Math.PI * 2); cctx.fill(); cctx.strokeStyle = '#64808d'; cctx.lineWidth = 3; cctx.stroke();
+        cctx.fillStyle = '#d8edf2'; cctx.beginPath(); cctx.ellipse(plateX, PLATE_Y + 7, 46, 6, 0, 0, Math.PI * 2); cctx.fill();
+      }
       cctx.restore();
     }
 
-    function overlay(text) {
-      cctx.fillStyle = 'rgba(59,36,23,0.88)'; roundedRect(W / 2 - 118, 185, 236, 48, 12); cctx.fill();
-      cctx.strokeStyle = '#ffe06a'; cctx.lineWidth = 3; cctx.stroke();
-      cctx.fillStyle = '#ffe06a'; cctx.font = 'bold 18px Comic Sans MS, system-ui'; cctx.textAlign = 'center';
-      cctx.fillText(text, W / 2, 216);
+    function overlay(text, subtitle) {
+      cctx.fillStyle = 'rgba(255,250,239,0.96)'; roundedRect(30, 166, 300, 100, 18); cctx.fill();
+      cctx.strokeStyle = '#48372c'; cctx.lineWidth = 2; cctx.stroke();
+      cctx.fillStyle = '#3d3028'; cctx.font = '800 21px system-ui'; cctx.textAlign = 'center';
+      cctx.fillText(text, W / 2, 206);
+      cctx.fillStyle = '#765b49'; cctx.font = '12px system-ui';
+      cctx.fillText(subtitle || '', W / 2, 234);
     }
 
     function draw() {
       drawScene();
       drawCharacter();
-      if (collapsePieces.length) {
-        collapsePieces.forEach(piece => {
-          cctx.save();
-          cctx.translate(piece.x, piece.y + piece.height / 2);
-          cctx.rotate(piece.angle);
-          drawIngredient(piece, 0, -piece.height / 2);
-          cctx.restore();
-        });
-      } else {
-        const sway = wobble ? Math.sin(performance.now() / 65) * wobble : 0;
+      stack.concat(falling ? [falling] : []).forEach(item => {
+        const body = item.body;
         cctx.save();
-        cctx.translate(plateX, PLATE_Y);
-        cctx.rotate(towerTilt);
-        cctx.translate(-plateX, -PLATE_Y);
-        stack.forEach((item, index) => {
-          drawIngredient(
-            item,
-            plateX + item.offset + sway * (index + 1) / Math.max(1, stack.length),
-            item.y
-          );
-        });
+        cctx.translate(body.position.x, body.position.y + cameraOffset);
+        cctx.rotate(body.angle);
+        drawIngredient(item, 0, -item.height / 2);
         cctx.restore();
-        if (falling) {
-          cctx.save();
-          cctx.translate(falling.x, falling.y + falling.height / 2);
-          cctx.rotate(falling.angle || 0);
-          drawIngredient(falling, 0, -falling.height / 2);
-          cctx.restore();
-        }
-      }
-      drawCompletedSandwiches();
+      });
       if (floatText && floatText.life > 0) {
-        cctx.save(); cctx.globalAlpha = Math.min(1, floatText.life / 20);
-        cctx.font = 'bold 17px Comic Sans MS, system-ui'; cctx.textAlign = 'center';
-        cctx.strokeStyle = '#3b2417'; cctx.lineWidth = 5; cctx.strokeText(floatText.text, W / 2, 150);
-        cctx.fillStyle = '#ffe06a'; cctx.fillText(floatText.text, W / 2, 150); cctx.restore();
+        const textY = 100 - (1.1 - floatText.life) * 18;
+        cctx.save(); cctx.globalAlpha = Math.min(1, floatText.life / 0.3);
+        cctx.font = '800 17px system-ui'; cctx.textAlign = 'center';
+        cctx.strokeStyle = '#fffaf0'; cctx.lineWidth = 5; cctx.strokeText(floatText.text, W / 2, textY);
+        cctx.fillStyle = '#2c7257'; cctx.fillText(floatText.text, W / 2, textY); cctx.restore();
       }
-      if (!running && !gameOver) overlay('▶ PRESIONA START');
-      if (paused) overlay('⏸ PAUSA');
+      brokenHearts.forEach((heart, index) => {
+        cctx.save();
+        cctx.globalAlpha = Math.min(0.75, heart.life / 0.3);
+        cctx.font = '16px system-ui';
+        cctx.textAlign = 'center';
+        cctx.fillText('💔', W - 24 - index * 19, 76 - (0.9 - heart.life) * 9);
+        cctx.restore();
+      });
+      if (falling && running) {
+        cctx.fillStyle = '#6a5544'; cctx.font = '800 10px system-ui'; cctx.textAlign = 'center';
+        cctx.fillText(falling.name, W / 2, 43);
+      }
+      balanceMarker.style.left = (50 + clamp(balanceRatio, -1.2, 1.2) / 1.2 * 46) + '%';
+      balanceLabel.textContent = Math.abs(balanceRatio) > 1 ? '¡CUIDADO!' : Math.abs(balanceRatio) > 0.7 ? 'INCLINADA' : 'ESTABLE';
+      if (!running && !gameOver) {
+        drawIngredient({ type:'bottom', width:104, height:22 }, W / 2, 130);
+        overlay('¿Qué tan alto llegas?', 'Pulsa Jugar y atrapa el primer pan');
+      }
+      if (paused) overlay('Pausa', 'Tu torre te espera');
+      if (gameOver && !lossAnimating) overlay(score + ' puntos · ' + layers + ' capas', 'Vuelve a jugar y supera tu torre');
     }
 
     function movePlateTo(x) {
-      plateX = Math.max(58, Math.min(W - 58, x));
+      plateTarget = clamp(x, 58, W - 58);
+      inputMode = 'target';
+    }
+
+    function stopPlate() {
+      plateTarget = plateX;
+    }
+
+    function simulate(dt) {
+      const direction = Number(rightHeld) - Number(leftHeld);
+      const previousX = plateX;
+      if (leftHeld || rightHeld) {
+        plateX = clamp(plateX + direction * PLATE_SPEED * dt, 58, W - 58);
+        plateTarget = plateX;
+        inputMode = 'keys';
+      } else if (inputMode === 'keys') {
+        stopPlate();
+      } else {
+        const distance = plateTarget - plateX;
+        const step = clamp(distance, -POINTER_SPEED * dt, POINTER_SPEED * dt);
+        plateX += Math.abs(distance) < 0.1 ? distance : step;
+      }
+      if (plateX !== previousX) {
+        carryStackWithPlate(plateX - previousX);
+        Matter.Body.setPosition(plateBody, { x: plateX, y: PLATE_Y + 7 });
+      }
+      // Evita que el solver añada un segundo empujón lateral al desplazamiento compartido.
+      Matter.Body.setVelocity(plateBody, { x: 0, y: 0 });
+
+      if (falling) falling.touching = false;
+      Matter.Engine.update(physics, FIXED_DT * 1000);
+      if (falling) {
+        const body = falling.body;
+        if (!falling.invalidContact && falling.touching
+          && body.speed < 1.5 && body.angularSpeed < 0.045) {
+          falling.settledFor += dt;
+          if (falling.settledFor >= 0.12) landIngredient();
+        } else {
+          falling.settledFor = Math.max(0, falling.settledFor - dt * 2);
+        }
+      }
+      if (gameOver) return;
+      const lost = stack.filter(item => item.body.position.y > PLATE_Y + 45
+        || item.body.bounds.max.x < 0 || item.body.bounds.min.x > W);
+      if (lost.length >= 4 || (stack.length >= 4 && lost.some(item => item.type === 'bottom'))) {
+        end('¡SE DERRUMBÓ TODO EL SÁNDWICH!');
+        return;
+      }
+      for (const item of lost) {
+        Matter.Composite.remove(physics.world, item.body);
+        stack.splice(stack.indexOf(item), 1);
+        registerMiss();
+        if (gameOver) return;
+      }
+      if (!stack.length && falling && falling.type !== 'bottom') {
+        Matter.Composite.remove(physics.world, falling.body);
+        falling = null;
+        spawnDelay = 0.35;
+      }
+      if (falling && falling.body.position.y > PLATE_Y + 48) missFallingIngredient();
+      if (gameOver) return;
+      if (!falling) {
+        spawnDelay -= dt;
+        if (spawnDelay <= 0) spawnIngredient();
+      }
+      updateTowerBalance();
+      updateCamera(dt);
+      if (floatText) { floatText.life -= dt; if (floatText.life <= 0) floatText = null; }
+      updateBrokenHearts(dt);
     }
 
     function frame(now) {
       if (!running || gameOver || paused) return;
-      const dt = lastAt ? Math.min(0.034, (now - lastAt) / 1000) : 0;
+      accumulator += lastAt ? Math.min(0.1, (now - lastAt) / 1000) : 0;
       lastAt = now;
-      if (leftHeld) movePlateTo(plateX - 245 * dt);
-      if (rightHeld) movePlateTo(plateX + 245 * dt);
-      updateTowerBalance(dt);
-      if (gameOver) return;
-      if (falling) {
-        let heldByEdge = false;
-        if (falling.sliding) {
-          falling.x += falling.vx * dt;
-          falling.angle += Math.sign(falling.vx) * 1.45 * dt;
-          heldByEdge = horizontalOverlap(
-            falling.x - falling.width / 2,
-            falling.x + falling.width / 2,
-            falling.slideLeft,
-            falling.slideRight
-          ) > 0;
-          if (heldByEdge) {
-            falling.y = falling.ignoreLandingY;
-          } else {
-            falling.sliding = false;
-            falling.y += 1.6;
-          }
-        }
-        if (!heldByEdge) {
-          const landing = findLanding(falling);
-          const nextY = falling.y + falling.speed * dt;
-          if (nextY >= landing.y) {
-            falling.y = landing.y;
-            landIngredient(landing);
-          } else {
-            falling.y = nextY;
-          }
-        }
+      while (accumulator >= FIXED_DT && running && !gameOver) {
+        simulate(FIXED_DT);
+        accumulator -= FIXED_DT;
       }
       if (gameOver) return;
-      if (wobble > 0.05) wobble *= Math.pow(0.16, dt); else wobble = 0;
-      if (floatText && --floatText.life <= 0) floatText = null;
       draw();
       raf = requestAnimationFrame(frame);
     }
 
-    document.addEventListener('keydown', event => {
-      if (isTypingTarget(event) || !running || gameOver) return;
+    function onKeyDown(event) {
+      if (isTypingTarget(event) || !running || gameOver || paused) return;
       if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') { leftHeld = true; event.preventDefault(); }
       if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') { rightHeld = true; event.preventDefault(); }
-    });
-    document.addEventListener('keyup', event => {
+    }
+    function onKeyUp(event) {
       if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') leftHeld = false;
       if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') rightHeld = false;
-    });
+      if (!leftHeld && !rightHeld && inputMode === 'keys') stopPlate();
+    }
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+
+    function clearInput() {
+      leftHeld = false;
+      rightHeld = false;
+      pointerActive = false;
+      pointerId = null;
+      stopPlate();
+    }
+    global.addEventListener('blur', clearInput);
 
     function pointerX(event) {
       const rect = canvas.getBoundingClientRect();
       return (event.clientX - rect.left) * W / rect.width;
     }
     canvas.addEventListener('pointerdown', event => {
-      if (!running || gameOver) return;
+      if (!running || gameOver || paused || pointerActive || (event.button != null && event.button !== 0)) return;
       pointerActive = true;
+      pointerId = event.pointerId;
+      leftHeld = false;
+      rightHeld = false;
+      stopPlate();
+      inputMode = 'target';
+      // Arrastre relativo: tocar lejos del plato no teletransporta la torre.
+      pointerOffset = pointerX(event) - plateX;
       if (canvas.setPointerCapture) canvas.setPointerCapture(event.pointerId);
-      movePlateTo(pointerX(event));
       event.preventDefault();
     });
     canvas.addEventListener('pointermove', event => {
-      if (!pointerActive || !running || gameOver) return;
-      movePlateTo(pointerX(event));
+      if (!pointerActive || event.pointerId !== pointerId || !running || gameOver || paused) return;
+      movePlateTo(pointerX(event) - pointerOffset);
       event.preventDefault();
     });
-    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => canvas.addEventListener(type, () => { pointerActive = false; }));
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => canvas.addEventListener(type, event => {
+      if (event.pointerId === pointerId) { pointerActive = false; pointerId = null; stopPlate(); }
+    }));
 
     wrap.querySelectorAll('[data-sw-dir]').forEach(button => {
       const direction = button.dataset.swDir;
       const setHeld = value => {
         if (direction === 'left') leftHeld = value;
         else rightHeld = value;
+        if (!leftHeld && !rightHeld) stopPlate();
       };
-      button.addEventListener('pointerdown', event => { if (running && !gameOver) { setHeld(true); event.preventDefault(); } });
-      ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => button.addEventListener(type, () => setHeld(false)));
+      button.addEventListener('pointerdown', event => {
+        if (running && !gameOver && !paused) {
+          setHeld(true);
+          if (button.setPointerCapture) button.setPointerCapture(event.pointerId);
+          event.preventDefault();
+        }
+      });
+      ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => button.addEventListener(type, () => setHeld(false)));
+      // También permite activar las flechas con teclado o tecnología de apoyo.
+      button.addEventListener('click', event => {
+        if (event.detail === 0 && running && !gameOver && !paused) movePlateTo(plateTarget + (direction === 'left' ? -28 : 28));
+      });
     });
 
     autoPause(wrap,
       () => {
         if (running && !gameOver) {
           paused = true;
+          clearInput();
+          accumulator = 0;
           cancelAnimationFrame(raf);
-          unlockScroll();
           draw();
         }
       },
@@ -4206,8 +4396,6 @@
         if (!paused || gameOver) return;
         paused = false;
         lastAt = 0;
-        lockScroll();
-        if (!falling && !serving) spawnIngredient();
         draw();
         raf = requestAnimationFrame(frame);
       }
@@ -4221,7 +4409,11 @@
           leftHeld = false;
           rightHeld = false;
           cancelAnimationFrame(raf);
-          unlockScroll();
+          lossAnimating = false;
+          clearInput();
+          document.removeEventListener('keydown', onKeyDown);
+          document.removeEventListener('keyup', onKeyUp);
+          global.removeEventListener('blur', clearInput);
           cleanupObserver.disconnect();
         }
       });
@@ -4231,8 +4423,10 @@
     startButton.addEventListener('click', () => {
       reset();
       running = true;
+      wrap.classList.add('is-playing');
+      viewport.enter();
       startButton.disabled = true;
-      lockScroll();
+      startButton.textContent = 'Apilando…';
       spawnIngredient();
       lastAt = 0;
       raf = requestAnimationFrame(frame);

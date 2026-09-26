@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Prepositions Of Place</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+          <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+          <span>Volver a la actividad</span>
+        </a>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <div class="gc-hero-label">EL RETO COMIENZA AQUÍ <span aria-hidden="true">✦</span></div>
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+          <div class="gc-hero-tip">Elige un juego · Suma puntos · Supera tu marca</div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-labelledby="gc-catalog-title">
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">TU ZONA DE JUEGOS</span>
+          <h2 id="gc-catalog-title">Juegos con puntuación</h2>
+        </div>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "container": "#app",
+  "topic": "Prepositions Of Place",
+  "level": "Octavo, Séptimo",
+  "pdfDesign": "PopArt",
+  "uiTheme": "HollyHobbie",
+  "colors": {
+    "primary": "#81F0F7",
+    "accent": "#43A3B0",
+    "bg": "#FFF1F8",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Nota / texto libre",
+      "instruction": "Instrucción: ",
+      "image": "files/pixybay_20260723_191912.png",
+      "html": "\u003c!-- Copiar desde aquí -->\n\u003cdiv class=\"card-container\">\n  \u003cp class=\"intro-text\">\n    Las \u003cstrong>preposiciones\u003c/strong> son palabras que usamos para indicar la posición de un objeto, por ejemplo:\n  \u003c/p>\n\n  \u003cdiv class=\"example-box\">\n    \u003cdiv class=\"example-item\">\n      \u003cspan class=\"lang-tag en\">EN\u003c/span>\n      \u003cspan class=\"sentence\">The book is in the box.\u003c/span>\n    \u003c/div>\n    \u003cdiv class=\"example-item\">\n      \u003cspan class=\"lang-tag es\">ES\u003c/span>\n      \u003cspan class=\"sentence translation\">El libro está en la caja.\u003c/span>\n    \u003c/div>\n  \u003c/div>\n\n  \u003cdiv class=\"prepositions-grid\">\n    \u003cdiv class=\"prep-card\">\n      \u003cspan class=\"prep-badge\">In\u003c/span>\n      \u003cspan class=\"prep-meaning\">Adentro\u003c/span>\n    \u003c/div>\n    \u003cdiv class=\"prep-card\">\n      \u003cspan class=\"prep-badge\">On\u003c/span>\n      \u003cspan class=\"prep-meaning\">Sobre / Encima\u003c/span>\n    \u003c/div>\n    \u003cdiv class=\"prep-card\">\n      \u003cspan class=\"prep-badge\">Under\u003c/span>\n      \u003cspan class=\"prep-meaning\">Debajo\u003c/span>\n    \u003c/div>\n    \u003cdiv class=\"prep-card\">\n      \u003cspan class=\"prep-badge\">Next to\u003c/span>\n      \u003cspan class=\"prep-meaning\">Al lado de\u003c/span>\n    \u003c/div>\n    \u003cdiv class=\"prep-card\">\n      \u003cspan class=\"prep-badge\">Between\u003c/span>\n      \u003cspan class=\"prep-meaning\">En medio\u003c/span>\n    \u003c/div>\n  \u003c/div>\n\u003c/div>\n\n\u003cstyle>\n  .card-container {\n    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n    max-width: 520px;\n    margin: 20px auto;\n    padding: 24px;\n    background: #ffffff;\n    border-radius: 16px;\n    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);\n    border: 1px solid #e2e8f0;\n    color: #1a202c;\n  }\n\n  .intro-text {\n    font-size: 1.05rem;\n    line-height: 1.5;\n    color: #4a5568;\n    margin-top: 0;\n    margin-bottom: 20px;\n  }\n\n  .intro-text strong {\n    color: #2b6cb0;\n  }\n\n  .example-box {\n    background-color: #f7fafc;\n    border-left: 4px solid #3182ce;\n    border-radius: 4px 12px 12px 4px;\n    padding: 14px 16px;\n    margin-bottom: 24px;\n  }\n\n  .example-item {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    margin-bottom: 6px;\n  }\n\n  .example-item:last-child {\n    margin-bottom: 0;\n  }\n\n  .lang-tag {\n    font-size: 0.7rem;\n    font-weight: 700;\n    padding: 2px 6px;\n    border-radius: 4px;\n    letter-spacing: 0.5px;\n  }\n\n  .lang-tag.en {\n    background-color: #ebf8ff;\n    color: #2b6cb0;\n  }\n\n  .lang-tag.es {\n    background-color: #feebc8;\n    color: #c05621;\n  }\n\n  .sentence {\n    font-size: 0.95rem;\n    font-weight: 500;\n    color: #2d3748;\n  }\n\n  .sentence.translation {\n    color: #718096;\n    font-style: italic;\n  }\n\n  .prepositions-grid {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n  }\n\n  .prep-card {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    padding: 10px 16px;\n    background-color: #ffffff;\n    border: 1px solid #edf2f7;\n    border-radius: 10px;\n    transition: transform 0.1s ease, border-color 0.1s ease;\n  }\n\n  .prep-card:hover {\n    border-color: #cbd5e0;\n    transform: translateY(-1px);\n  }\n\n  .prep-badge {\n    font-weight: 700;\n    color: #2b6cb0;\n    background-color: #ebf8ff;\n    padding: 4px 12px;\n    border-radius: 20px;\n    font-size: 0.9rem;\n  }\n\n  .prep-meaning {\n    color: #4a5568;\n    font-weight: 500;\n    font-size: 0.95rem;\n  }\n\u003c/style>\n\u003c!-- Hasta aquí -->"
+    },
+    {
+      "type": "dragbank",
+      "title": "Banco de palabras",
+      "instruction": "Instrucción: arrastra la palabra correcta al espacio en blanco.",
+      "image": "files/pixybay_20260723_192721.png",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "There is one orange ___ the refrigerator.",
+            "answer": "in"
+          }
+        ],
+        "bank": [
+          "on",
+          "behind",
+          "below"
+        ]
+      }
+    },
+    {
+      "type": "dragbank",
+      "image": "files/pixybay_20260723_192734.png",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "There is one pot ___ the table.",
+            "answer": "on"
+          }
+        ],
+        "bank": [
+          "in",
+          "in front of",
+          "next to"
+        ]
+      }
+    },
+    {
+      "type": "dragbank",
+      "image": "files/pixybay_20260723_192727.png",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "There is one TV ___ the armchairs.",
+            "answer": "between"
+          }
+        ],
+        "bank": [
+          "in",
+          "on",
+          "behind"
+        ]
+      }
+    },
+    {
+      "type": "dragbank",
+      "image": "files/pixybay_20260723_192737.png",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "There is one picture ___ the window.",
+            "answer": "next to"
+          }
+        ],
+        "bank": [
+          "above",
+          "in front of",
+          "at"
+        ]
+      }
+    },
+    {
+      "type": "wordsearch",
+      "title": "Sopa de letras",
+      "instruction": "Instrucción: Encuentra las 4 palabras.",
+      "dataA": {
+        "words": [
+          "BETWEEN",
+          "BEHIND",
+          "ABOVE",
+          "BELOW"
+        ],
+        "gridSize": 12
+      }
+    },
+    {
+      "type": "wordselect",
+      "title": "Seleccionar palabras",
+      "instruction": "Instrucción: selecciona la preposición en cada oración.",
+      "dataA": [
+        {
+          "text": "There is one apple [on] the table."
+        },
+        {
+          "text": "There are two chairs [under] the table."
+        },
+        {
+          "text": "There are four glasses [in] the china cabinets."
+        },
+        {
+          "text": "There is one pillow [on] the bed."
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Unir con imagen",
+      "instruction": "Instrucción: arrastra la palabra a la imagen correcta.",
+      "dataA": [
+        {
+          "word": "Between",
+          "image": "files/edited_1784857906940_pixybay_20260723_194750.png"
+        },
+        {
+          "word": "In",
+          "image": "files/edited_1784857915799_pixybay_20260723_194758.png"
+        },
+        {
+          "word": "On",
+          "image": "files/edited_1784857926123_pixybay_20260723_194806.png"
+        },
+        {
+          "word": "Under",
+          "image": "files/edited_1784857935087_pixybay_20260723_194818.png"
+        },
+        {
+          "word": "Behind",
+          "image": "files/edited_1784857945545_pixybay_20260723_194827.png"
+        },
+        {
+          "word": "In front of",
+          "image": "files/edited_1784857958534_pixybay_20260723_194844.png"
+        },
+        {
+          "word": "Next to",
+          "image": "files/edited_1784857969645_pixybay_20260723_194853.png"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "dino",
+    "winScore": 500
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
