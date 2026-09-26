@@ -5,6 +5,7 @@
  */
 (function (global) {
   'use strict';
+  const iconButton = global.COEDUCA_GAME_ICONS.button;
 
   const core = global.COEDUCA || global.CIVICA;
   if (!core || typeof core.registerGame !== 'function') return;
@@ -13,7 +14,7 @@
     const style = document.createElement('style');
     style.id = 'coeduca-flappy-styles';
     style.textContent = `
-      .cf-game { max-width: 390px; margin: 0 auto; color: #22324a; font-family: system-ui, sans-serif; text-align: center; }
+      .cf-game { position: relative; max-width: 390px; margin: 0 auto; color: #22324a; font-family: system-ui, sans-serif; text-align: center; }
       .cf-game * { box-sizing: border-box; }
       html.cf-page-locked, body.cf-page-locked { overflow: hidden !important; overscroll-behavior: none; }
       .cf-stage { width: 100%; }
@@ -27,9 +28,9 @@
       .cf-controls { display: flex; gap: 10px; margin-top: 14px; }
       .cf-button { flex: 1; min-height: 50px; padding: 8px 12px; border: 2px solid #22324a; border-radius: 13px; background: #fff; color: #22324a; font: 800 15px system-ui, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #22324a; touch-action: manipulation; }
       .cf-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #22324a; }
+      .cf-start:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
       .cf-button:focus-visible, .cf-canvas:focus-visible { outline: 3px solid #147b69; outline-offset: 3px; }
       .cf-primary { background: #ffe066; }
-      .cf-help { margin: 12px 0 4px; font-size: 12px; line-height: 1.5; }
       .cf-status { min-height: 22px; margin: 5px 0; font-size: 13px; font-weight: 700; }
       .cf-game.is-expanded { position: fixed; inset: 0; z-index: 2147483647; display: flex; flex-direction: column; width: 100vw; height: 100vh; height: 100dvh; max-width: none; margin: 0; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); background: #e8f7ff; overflow: hidden; }
       .cf-game.is-expanded .cf-hud { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: min(100%, 920px); margin: 0 auto 10px; }
@@ -41,9 +42,8 @@
       .cf-game.is-expanded .cf-stage { display: grid; place-items: center; flex: 1; min-height: 0; }
       .cf-game.is-expanded .cf-canvas { width: auto; height: auto; max-width: 100%; max-height: 100%; touch-action: none; box-shadow: 0 7px 25px #43677855; }
       .cf-game.is-expanded .cf-controls { flex: none; width: min(100%, 560px); margin: 12px auto 0; }
-      .cf-game.is-expanded .cf-help { display: none; }
       .cf-game.is-expanded .cf-status { flex: none; width: min(100%, 700px); margin: 8px auto 0; }
-      @media (max-width: 480px) { .cf-game.is-expanded .cf-heading { display: none; } .cf-game.is-expanded .cf-hud { gap: 8px; } .cf-game.is-expanded .cf-stat small { font-size: 9px; } }
+      @media (max-width: 480px) { .cf-game.is-expanded .cf-hud { flex-wrap:wrap; gap:6px; } .cf-game.is-expanded .cf-heading { font-size:18px; } .cf-game.is-expanded .cf-stats { order:2; flex-basis:100%; max-width:none; } .cf-game.is-expanded .cf-stat small { font-size:9px; } }
     `;
     document.head.appendChild(style);
   }
@@ -71,13 +71,13 @@
           role="button" aria-label="Aletear durante la partida. Usa Empezar para iniciar o reiniciar."></canvas>
       </div>
       <div class="cf-controls">
-        <button class="cf-button cf-primary cf-start" type="button">▶ Empezar</button>
-        <button class="cf-button cf-flap" type="button">↑ Aletear</button>
+        <button class="cf-button cf-primary cf-start" type="button">${iconButton('play', 'Empezar')}</button>
+        <button class="cf-button cf-flap" type="button">${iconButton('jump', 'Aletear')}</button>
       </div>
-      <p class="cf-help">Supera 10 tubos para ganar un punto extra en tu nota final. Pulsa Empezar para iniciar. Durante la partida, toca el juego, usa ↑, ESPACIO o Aletear.</p>
       <div class="cf-status" aria-live="polite">Pulsa Empezar para jugar.</div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'flappy', 'Flappy', '.cf-heading');
 
     const canvas = wrap.querySelector('.cf-canvas');
     const stage = wrap.querySelector('.cf-stage');
@@ -104,8 +104,9 @@
     let birdY = H * 0.45, birdVelocity = 0;
     let pipes = [], spawnClock = 0, score = 0, bonusEarned = false;
     let phase = 'ready', previousFrame = 0, frameId = null, scenery = 0;
+    let helpOpen = false, helpPaused = false;
     let placeholder = null, soundParent = null, fullscreenRequest = null;
-    let expandAnimation = null, collapseAnimation = null, collapsing = false;
+    let collapseAnimation = null, collapsing = false;
     let soundNextSibling = null;
     const soundKey = 'coeduca_snd_muted';
     let soundContext = null;
@@ -141,7 +142,7 @@
         tone(frequency, frequency, 0.13, 'triangle', 0.1, index * 0.1))
     };
     const soundHost = wrap.closest('.coeduca-exercise, .civica-section--consolidate') || wrap;
-    soundHost.style.position = 'relative';
+    if (soundHost !== wrap) soundHost.style.position = 'relative';
     const soundToggle = document.createElement('button');
     soundToggle.type = 'button';
     soundToggle.className = 'coeduca-game-sound-toggle';
@@ -173,7 +174,6 @@
 
     function restorePage() {
       if (!placeholder) return;
-      if (expandAnimation) { expandAnimation.cancel(); expandAnimation = null; }
       if (collapseAnimation) { collapseAnimation.cancel(); collapseAnimation = null; }
       wrap.classList.remove('is-expanded');
       canvas.style.width = '';
@@ -209,15 +209,11 @@
       document.documentElement.classList.add('cf-page-locked');
       document.body.classList.add('cf-page-locked');
       sizeExpandedCanvas();
-      if (wrap.animate && !(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
-        const endRect = wrap.getBoundingClientRect();
-        expandAnimation = wrap.animate([
-          { transform: `translate(${startRect.left - endRect.left}px, ${startRect.top - endRect.top}px) scale(${startRect.width / endRect.width}, ${startRect.height / endRect.height})`, opacity: 0.8 },
-          { transform: 'none', opacity: 1 }
-        ], { duration: 320, easing: 'ease-out' });
-        expandAnimation.onfinish = () => { expandAnimation = null; };
-      }
-      if (wrap.requestFullscreen) {
+      global.requestAnimationFrame(sizeExpandedCanvas);
+      // Android WebView no presenta la vista nativa si WebChromeClient no maneja onShowCustomView.
+      // La vista fija anterior ya ocupa todo el WebView.
+      const isAndroidWebView = /; wv\)/.test(global.navigator.userAgent);
+      if (!isAndroidWebView && wrap.requestFullscreen) {
         try {
           fullscreenRequest = Promise.resolve(wrap.requestFullscreen({ navigationUI: 'hide' }))
             .catch(() => {})
@@ -234,7 +230,6 @@
         if (document.fullscreenElement === wrap) return document.exitFullscreen().catch(() => {});
       }).finally(() => {
         if (!placeholder) return;
-        if (expandAnimation) { expandAnimation.cancel(); expandAnimation = null; }
         if (!wrap.animate || (global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches) || !placeholder.isConnected) {
           restorePage();
           return;
@@ -270,7 +265,7 @@
     }
 
     function start() {
-      if (collapsing) return;
+      if (helpOpen || collapsing || phase === 'playing') return;
       if (frameId !== null) global.cancelAnimationFrame(frameId);
       reset();
       phase = 'playing';
@@ -278,16 +273,19 @@
       expandGame();
       sound.flap();
       spawnClock = 0.9;
-      startButton.textContent = '↻ Reiniciar';
+      startButton.innerHTML = iconButton('retry', 'Reiniciar');
+      startButton.disabled = true;
       statusEl.textContent = '¡Aletea para pasar entre los tubos!';
       wrap.focus();
       frameId = global.requestAnimationFrame(tick);
     }
 
     function flap() {
+      if (helpOpen) return;
       if (phase === 'ready' || phase === 'over') return;
       if (phase === 'paused') {
         phase = 'playing';
+        startButton.disabled = true;
         previousFrame = 0;
         statusEl.textContent = '¡Sigue volando!';
         frameId = global.requestAnimationFrame(tick);
@@ -313,7 +311,7 @@
       phase = 'over';
       sound.hit();
       frameId = null;
-      startButton.textContent = '↻ Reintentar';
+      startButton.innerHTML = iconButton('retry', 'Reintentar');
       statusEl.textContent = score ? `Fin de la partida: ${score} tubos superados.` : 'Fin de la partida. ¡Inténtalo otra vez!';
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
@@ -545,8 +543,33 @@
         if (frameId !== null) global.cancelAnimationFrame(frameId);
         frameId = null;
         phase = 'paused';
+        startButton.disabled = false;
         statusEl.textContent = 'Partida en pausa. Aletea para continuar.';
       }
+    }
+
+    function onHelpOpen() {
+      helpOpen = true;
+      helpPaused = phase === 'playing';
+      if (!helpPaused) return;
+      if (frameId !== null) global.cancelAnimationFrame(frameId);
+      frameId = null;
+      phase = 'paused';
+      statusEl.textContent = 'Partida en pausa.';
+    }
+
+    function onHelpClose() {
+      helpOpen = false;
+      if (helpPaused && phase === 'paused' && !document.hidden) {
+        phase = 'playing';
+        previousFrame = 0;
+        statusEl.textContent = '¡Sigue volando!';
+        frameId = global.requestAnimationFrame(tick);
+      } else if (helpPaused && document.hidden) {
+        startButton.disabled = false;
+        statusEl.textContent = 'Partida en pausa. Aletea para continuar.';
+      }
+      helpPaused = false;
     }
 
     let observer = null;
@@ -559,6 +582,8 @@
       restorePage();
       wrap.removeEventListener('keydown', onKey);
       document.removeEventListener('visibilitychange', onVisibility);
+      wrap.removeEventListener('coeduca-game-help-open', onHelpOpen);
+      wrap.removeEventListener('coeduca-game-help-close', onHelpClose);
       global.removeEventListener('resize', sizeExpandedCanvas);
       if (observer) observer.disconnect();
       if (soundContext) { soundContext.close().catch(() => {}); soundContext = null; }
@@ -577,6 +602,8 @@
       flap();
     });
     document.addEventListener('visibilitychange', onVisibility);
+    wrap.addEventListener('coeduca-game-help-open', onHelpOpen);
+    wrap.addEventListener('coeduca-game-help-close', onHelpClose);
     global.addEventListener('resize', sizeExpandedCanvas);
     if (typeof MutationObserver !== 'undefined') {
       observer = new MutationObserver(() => {

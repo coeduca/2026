@@ -5,6 +5,8 @@
  */
 (function (global) {
   'use strict';
+  const iconButton = global.COEDUCA_GAME_ICONS.button;
+  const arrowIcon = global.COEDUCA_GAME_ICONS.arrow;
 
   const core = global.COEDUCA || global.CIVICA;
   if (!core || typeof core.registerGame !== 'function') return;
@@ -26,9 +28,9 @@
       .cj-controls { display: flex; gap: 8px; margin-top: 13px; }
       .cj-button { flex: 1; min-height: 48px; padding: 8px; border: 2px solid #23334d; border-radius: 12px; background: #fff; color: #23334d; font: 800 14px system-ui, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #23334d; touch-action: manipulation; user-select: none; }
       .cj-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #23334d; }
+      .cj-start:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
       .cj-button:focus-visible, .cj-game:focus-visible { outline: 3px solid #158b79; outline-offset: 3px; }
       .cj-primary { flex: 1.5; background: #ffe071; }
-      .cj-help { margin: 11px 0 4px; font-size: 12px; line-height: 1.5; }
       .cj-status { min-height: 22px; margin: 5px 0; font-size: 13px; font-weight: 700; }
     `;
     document.head.appendChild(style);
@@ -42,6 +44,7 @@
     const RELEASE_GRAVITY = 260, RELEASE_DURATION = 1.05, RELEASE_LIFT = 115;
     const SINGLE_PATH_HEIGHT = 8000;
     const MOVING_PATH_HEIGHT = 16000, FAST_MOVING_HEIGHT = 24000;
+    const NIGHT_START_HEIGHT = 16000, NIGHT_TRANSITION_HEIGHT = 4000;
     const goal = 1000;
 
     const wrap = document.createElement('div');
@@ -55,15 +58,15 @@
       </div>
       <canvas class="cj-canvas" width="720" height="1000" aria-label="Juego de plataformas. Muévete con A, D o las flechas; en móvil, inclina el teléfono."></canvas>
       <div class="cj-controls">
-        <button class="cj-button cj-left" type="button" aria-label="Mover a la izquierda">◀</button>
-        <button class="cj-button cj-primary cj-start" type="button">▶ Empezar</button>
-        <button class="cj-button cj-right" type="button" aria-label="Mover a la derecha">▶</button>
+        <button class="cj-button cj-left" type="button" aria-label="Mover a la izquierda">${arrowIcon('left')}</button>
+        <button class="cj-button cj-primary cj-start" type="button">${iconButton('play', 'Empezar')}</button>
+        <button class="cj-button cj-right" type="button" aria-label="Mover a la derecha">${arrowIcon('right')}</button>
       </div>
-      <button class="cj-button cj-center" type="button" style="margin-top:8px;width:100%">◎ Recentrar inclinación</button>
-      <p class="cj-help">En PC usa A/D o ←/→. En móvil inclina el teléfono; los botones laterales sirven de alternativa. Evita las plataformas rotas; las azules se mueven y las moradas desaparecen al tocarlas. Los resortes, hélices y cohetes te impulsan. Llega a 1000 de altura para ganar +1 punto en la nota final.</p>
+      <button class="cj-button cj-center" type="button" style="margin-top:8px;width:100%">${iconButton('center', 'Recentrar inclinación')}</button>
       <div class="cj-status" aria-live="polite">Pulsa Empezar para jugar.</div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'doodle', 'Salto infinito', '.cj-heading');
 
     const soundKey = 'coeduca_snd_muted';
     const soundFiles = {
@@ -73,7 +76,7 @@
       rocket: 'doodle-rocket.aac',
       broken: 'doodle-break.aac'
     };
-    const soundVolumes = { jump: .35, spring: .65, hat: .45, rocket: .5, broken: .55 };
+    const soundVolumes = { jump: .35, spring: 1, hat: .45, rocket: .5, broken: .3 };
     const sounds = {};
     for (const [kind, file] of Object.entries(soundFiles)) {
       const audio = new Audio(file);
@@ -166,6 +169,7 @@
       : { show() {} };
 
     let phase = 'ready', frameId = null, previousFrame = 0, startToken = 0;
+    let helpOpen = false, helpPaused = false;
     let playerX = W / 2, playerY = BASE_Y, velocityY = 0;
     let cameraY = 0, highestY = BASE_Y, score = 0, bonusEarned = false;
     let platforms = [], lastPlatformY = BASE_Y, lastPlatformX = 132, platformCount = 0;
@@ -183,6 +187,13 @@
 
     const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
     const screenY = worldY => H - (worldY - cameraY);
+    const stars = [
+      [21, 38, 1], [56, 123, 1.5], [89, 62, 1], [118, 194, 1.2],
+      [145, 34, 1.3], [172, 137, 1], [205, 79, 1.5], [239, 207, 1],
+      [263, 29, 1.2], [335, 122, 1], [27, 260, 1.3], [75, 347, 1],
+      [126, 284, 1.4], [183, 374, 1], [226, 318, 1.2], [326, 277, 1.4],
+      [44, 432, 1], [154, 462, 1.2], [275, 420, 1], [341, 470, 1.3]
+    ];
 
     function loadRigoSprite() {
       const mascot = document.createElement('rigo-mascot');
@@ -223,9 +234,9 @@
         lastPlatformX = clamp(nextX, 12, W - width - 12);
         platformCount++;
         const typeRoll = Math.random();
-        // Desde 16 000, el 90 % de la ruta es móvil; las otras dos clases siguen apareciendo.
+        // Desde 16 000, móviles y fugaces tienen la misma probabilidad.
         const type = progress >= MOVING_PATH_HEIGHT
-          ? (typeRoll < .90 ? 'moving' : typeRoll < .94 ? 'normal' : 'vanishing')
+          ? (typeRoll < .45 ? 'moving' : typeRoll < .90 ? 'vanishing' : 'normal')
           : singlePath ? (typeRoll < .07 ? 'moving' : typeRoll < .25 ? 'normal' : 'vanishing')
           : progress < 350 ? 'normal'
           : typeRoll < .23 ? 'moving'
@@ -250,7 +261,7 @@
         platforms.push(platform);
 
         // Las rotas rellenan los lados como señuelos; nunca sustituyen al único apoyo real.
-        const decoyCount = progress >= MOVING_PATH_HEIGHT ? Number(Math.random() < .18)
+        const decoyCount = progress >= MOVING_PATH_HEIGHT ? 1 + Number(Math.random() < .2)
           : singlePath ? 1 + Number(Math.random() < .45)
           : Number(progress > 500 && platformCount % 3 === 0 && Math.random() < .8);
         for (let i = 0; i < decoyCount; i++) {
@@ -327,10 +338,13 @@
     }
 
     async function start() {
+      if (helpOpen || phase === 'playing') return;
       if (phase === 'paused') {
         viewport.enter();
         phase = 'playing';
         wrap.classList.add('is-playing');
+        startButton.innerHTML = iconButton('retry', 'Reiniciar');
+        startButton.disabled = true;
         previousFrame = 0;
         statusEl.textContent = '¡Sigue subiendo!';
         if (flightKind && flightTimer > 0) startFlightSound(flightKind);
@@ -338,13 +352,13 @@
         return;
       }
       const token = ++startToken;
-      if (phase === 'playing' && score > 0) leaderboard.submit(score);
       if (frameId !== null) global.cancelAnimationFrame(frameId);
       reset();
       phase = 'playing';
       wrap.classList.add('is-playing');
       viewport.enter();
-      startButton.textContent = '↻ Reiniciar';
+      startButton.innerHTML = iconButton('retry', 'Reiniciar');
+      startButton.disabled = true;
       statusEl.textContent = 'Salta automáticamente. ¡Sube tan alto como puedas!';
       wrap.focus();
       playSound('jump');
@@ -376,7 +390,8 @@
       stopFlightSound();
       dizzyTimeLeft = 0;
       frameId = null;
-      startButton.textContent = '↻ Reintentar';
+      startButton.innerHTML = iconButton('retry', 'Reintentar');
+      startButton.disabled = false;
       statusEl.textContent = `Fin de la partida: ${score} de altura. ${bonusEarned ? '¡Conservas tu +1!' : '¡Inténtalo otra vez!'}`;
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
@@ -838,17 +853,47 @@
     }
 
     function draw() {
+      const nightProgress = clamp((score - NIGHT_START_HEIGHT) / NIGHT_TRANSITION_HEIGHT, 0, 1);
+      const night = nightProgress * nightProgress * (3 - 2 * nightProgress);
       const sky = paint.createLinearGradient(0, 0, 0, H);
       sky.addColorStop(0, '#8bcefa');
       sky.addColorStop(1, '#e4f9ff');
       paint.fillStyle = sky;
       paint.fillRect(0, 0, W, H);
-      paint.fillStyle = '#fff2ab';
-      paint.beginPath(); paint.arc(292, 64, 28, 0, Math.PI * 2); paint.fill();
+      if (night > 0) {
+        const nightSky = paint.createLinearGradient(0, 0, 0, H);
+        nightSky.addColorStop(0, '#0c1739');
+        nightSky.addColorStop(1, '#304b78');
+        paint.save();
+        paint.globalAlpha = night;
+        paint.fillStyle = nightSky;
+        paint.fillRect(0, 0, W, H);
+        for (const [index, star] of stars.entries()) {
+          paint.globalAlpha = night * (.7 + index % 3 * .12);
+          paint.fillStyle = '#f5f6d9';
+          paint.beginPath(); paint.arc(star[0], star[1], star[2], 0, Math.PI * 2); paint.fill();
+        }
+        paint.globalAlpha = night;
+        paint.fillStyle = '#f6f1d4';
+        paint.beginPath(); paint.arc(292, 64, 24, 0, Math.PI * 2); paint.fill();
+        paint.fillStyle = '#ddd9c4';
+        paint.beginPath(); paint.arc(284, 58, 3, 0, Math.PI * 2); paint.fill();
+        paint.beginPath(); paint.arc(302, 68, 4, 0, Math.PI * 2); paint.fill();
+        paint.restore();
+      }
+      if (night < 1) {
+        paint.save();
+        paint.globalAlpha = 1 - night;
+        paint.fillStyle = '#fff2ab';
+        paint.beginPath(); paint.arc(292, 64, 28, 0, Math.PI * 2); paint.fill();
+        paint.restore();
+      }
       const drift = cameraY * .12;
-      cloud(34 - drift % 430, 92, 20, .8);
-      cloud(225 - drift * .6 % 460, 175, 15, .65);
-      cloud(380 - drift * .8 % 470, 320, 24, .7);
+      if (night < 1) {
+        cloud(34 - drift % 430, 92, 20, .8 * (1 - night));
+        cloud(225 - drift * .6 % 460, 175, 15, .65 * (1 - night));
+        cloud(380 - drift * .8 % 470, 320, 24, .7 * (1 - night));
+      }
 
       for (const platform of platforms) drawPlatform(platform);
       for (const booster of fallingBoosters) drawFallingBooster(booster);
@@ -913,10 +958,39 @@
         frameId = null;
         phase = 'paused';
         wrap.classList.remove('is-playing');
-        startButton.textContent = '▶ Continuar';
+        startButton.innerHTML = iconButton('play', 'Continuar');
+        startButton.disabled = false;
         statusEl.textContent = 'Partida en pausa. Pulsa Continuar.';
         draw();
       }
+    }
+
+    function onHelpOpen() {
+      helpOpen = true;
+      helpPaused = phase === 'playing';
+      if (!helpPaused) return;
+      stopFlightSound();
+      if (frameId !== null) global.cancelAnimationFrame(frameId);
+      frameId = null;
+      phase = 'paused';
+      statusEl.textContent = 'Partida en pausa.';
+    }
+
+    function onHelpClose() {
+      helpOpen = false;
+      if (helpPaused && phase === 'paused' && !document.hidden) {
+        phase = 'playing';
+        previousFrame = 0;
+        statusEl.textContent = '¡Sigue subiendo!';
+        if (flightKind && flightTimer > 0) startFlightSound(flightKind);
+        frameId = global.requestAnimationFrame(tick);
+      } else if (helpPaused && document.hidden) {
+        wrap.classList.remove('is-playing');
+        startButton.innerHTML = iconButton('play', 'Continuar');
+        startButton.disabled = false;
+        statusEl.textContent = 'Partida en pausa. Pulsa Continuar.';
+      }
+      helpPaused = false;
     }
 
     function onSoundStorage(event) {
@@ -938,6 +1012,8 @@
       global.removeEventListener('keyup', onKeyUp);
       global.removeEventListener('storage', onSoundStorage);
       document.removeEventListener('visibilitychange', onVisibility);
+      wrap.removeEventListener('coeduca-game-help-open', onHelpOpen);
+      wrap.removeEventListener('coeduca-game-help-close', onHelpClose);
       if (observer) observer.disconnect();
     }
 
@@ -955,6 +1031,8 @@
     global.addEventListener('keyup', onKeyUp);
     global.addEventListener('storage', onSoundStorage);
     document.addEventListener('visibilitychange', onVisibility);
+    wrap.addEventListener('coeduca-game-help-open', onHelpOpen);
+    wrap.addEventListener('coeduca-game-help-close', onHelpClose);
     if (typeof MutationObserver !== 'undefined') {
       observer = new MutationObserver(() => {
         if (!document.body.contains(wrap)) cleanup();
