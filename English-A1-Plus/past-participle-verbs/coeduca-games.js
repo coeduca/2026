@@ -16,6 +16,16 @@
   }
   const C = global.COEDUCA;
   const reg = (type, fn) => C.registerGame(type, fn);
+  function gameViewport(wrap, game, title, soundToggle, options = {}) {
+    return global.COEDUCA_GAME_VIEWPORT
+      ? global.COEDUCA_GAME_VIEWPORT.create(wrap, { game, title, soundToggle, ...options })
+      : { enter() {}, leave() {}, destroy() {} };
+  }
+  function gameResults(ctx, game, wrap) {
+    return global.COEDUCA_GAME_RESULTS
+      ? global.COEDUCA_GAME_RESULTS.create(ctx, game, wrap)
+      : { show() {}, hide() {} };
+  }
 
   // ---------- Estilos compartidos por los juegos (inyectados una sola vez) ----------
   if (!document.getElementById('coeduca-games-styles')) {
@@ -361,7 +371,7 @@
 
   // Cara real de Rigo: el favicon que viaja dentro de cada paquete.
   // Si la imagen no carga (paquete viejo sin favicon), cae al emoji.
-  const RIGO_IMG = '<img src="favicon.png" alt="Rigo" ' +
+  const RIGO_IMG = '<img src="favicon.webp" alt="Rigo" ' +
     'style="width:100%;height:100%;object-fit:cover;border-radius:50%;" ' +
     'onerror="this.outerHTML=\'' + RIGO_EMOJI + '\'">';
 
@@ -536,6 +546,7 @@
     ctx.container.appendChild(wrap);
 
     makeSoundToggle(wrap);
+    const results = gameResults(ctx, 'tictactoe', wrap);
     const grid = wrap.querySelector('#ttt-grid');
     const lineSvg = wrap.querySelector('#ttt-line');
     const statusEl = wrap.querySelector('#ttt-status');
@@ -686,6 +697,12 @@
         statusEl.className = 'cg-status is-tie';
         ctx.onTie();
       }
+      const points = winner === 'X' ? 1 : winner === 'O' ? 0 : 0.5;
+      results.show({
+        score: points, points, unit: 'puntos',
+        outcome: winner === 'X' ? '🎉 ¡Ganaste a Rigo!' : winner === 'O' ? 'Rigo ganó esta vez' : '🤝 ¡Empate!',
+        replay: () => resetBtn.click()
+      });
     }
 
     resetBtn.addEventListener('click', () => {
@@ -746,7 +763,8 @@
     `;
     ctx.container.appendChild(wrap);
 
-    makeSoundToggle(wrap);
+    const viewport = gameViewport(wrap, 'snake', 'Snake', makeSoundToggle(wrap));
+    const results = gameResults(ctx, 'snake', wrap);
     const canvas = wrap.querySelector('#snake-canvas');
     const cctx = canvas.getContext('2d');
     const scoreVal = wrap.querySelector('#snake-score-val');
@@ -760,12 +778,14 @@
     const touchCapable = 'ontouchstart' in global || (navigator.maxTouchPoints || 0) > 0;
     let touchControlsActive = false;
     let touchStart = null;
-    let previousBodyTouchAction = '';
     let previousOverscrollBehavior = '';
 
     function handleGameTouchStart(event) {
       if (!touchControlsActive) return;
       if (!document.body.contains(wrap)) { unlockTouchControls(); return; }
+      const expandedGame = event.target.closest('.coeduca-game-viewport[data-game="snake"]');
+      if (!expandedGame && event.target !== canvas) return;
+      if (event.target.closest('.coeduca-viewport-actions, button, a, input, select, textarea')) return;
       const touch = event.touches[0];
       if (!touch) return;
       touchStart = { x: touch.clientX, y: touch.clientY };
@@ -773,9 +793,8 @@
     }
 
     function handleGameTouchMove(event) {
-      if (!touchControlsActive) return;
+      if (!touchControlsActive || !touchStart) return;
       event.preventDefault();
-      if (!touchStart) return;
       const touch = event.touches[0];
       if (!touch) return;
       const dx = touch.clientX - touchStart.x;
@@ -789,7 +808,7 @@
     }
 
     function handleGameTouchEnd(event) {
-      if (!touchControlsActive) return;
+      if (!touchControlsActive || !touchStart) return;
       event.preventDefault();
       touchStart = null;
     }
@@ -797,9 +816,7 @@
     function lockTouchControls() {
       if (!touchCapable || touchControlsActive) return false;
       touchControlsActive = true;
-      previousBodyTouchAction = document.body.style.touchAction;
       previousOverscrollBehavior = document.documentElement.style.overscrollBehavior;
-      document.body.style.touchAction = 'none';
       document.documentElement.style.overscrollBehavior = 'none';
       document.addEventListener('touchstart', handleGameTouchStart, { passive: false, capture: true });
       document.addEventListener('touchmove', handleGameTouchMove, { passive: false, capture: true });
@@ -812,7 +829,6 @@
       if (!touchControlsActive) return;
       touchControlsActive = false;
       touchStart = null;
-      document.body.style.touchAction = previousBodyTouchAction;
       document.documentElement.style.overscrollBehavior = previousOverscrollBehavior;
       document.removeEventListener('touchstart', handleGameTouchStart, true);
       document.removeEventListener('touchmove', handleGameTouchMove, true);
@@ -986,6 +1002,12 @@
       statusEl.className = 'cg-status is-lose';
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
+      viewport.leave();
+      results.show({
+        score, points: bonusEarned ? 1 : 0, unit: 'puntos',
+        outcome: '💥 La serpiente chocó',
+        replay: () => snakeStartButton.click()
+      });
     }
     function awardBonus() {
       if (bonusEarned) return;
@@ -1038,13 +1060,14 @@
     snakeStartButton.addEventListener('click', () => {
       stopSmoothRendering();
       reset(); draw();
+      viewport.enter();
       snakeStartButton.disabled = true;
       clearInterval(loop);
       loop = setInterval(step, stepMs);
       startSmoothRendering();
       lockTouchControls();
       if (touchControlsActive) {
-        statusEl.textContent = '📱 Desliza en cualquier dirección para controlar la serpiente.';
+        statusEl.textContent = '📱 Desliza en cualquier área libre para controlar la serpiente.';
       }
     });
     reset(); draw();
@@ -1078,19 +1101,23 @@
     let distance, finishDist, gate, jumpBuffer, jumpHeld;
     let balloon, balloonSpawned, balloonFx, plusOne;
     let bonusEarned = false;
+    let balloonBonusEarned = false;
 
     const wrap = document.createElement('div');
     wrap.style.position = 'relative';
     wrap.innerHTML = `
       <div style="text-align:center;">
-        <div id="dino-score" style="font-weight:900;margin-bottom:8px;font-size:18px;
+        <div id="dino-score" style="font-weight:900;margin:0 auto 8px;font-size:clamp(11px,3vw,18px);
              background:var(--coeduca-stroke);color:var(--coeduca-primary);
-             display:inline-block;padding:6px 18px;border-radius:50px;letter-spacing:1.5px;
+             display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,18px);
+             width:min(100%,560px);min-height:46px;padding:6px 10px;white-space:nowrap;box-sizing:border-box;
+             border-radius:50px;letter-spacing:clamp(0px,.15vw,1.5px);font-variant-numeric:tabular-nums;
              box-shadow:3px 3px 0 var(--coeduca-stroke);">
-          🏃 PUNTOS: <span id="dino-score-val">0</span> &nbsp;·&nbsp; ⭐ BONUS: ${winThreshold}
+          <span>🏃 PUNTOS: <strong id="dino-score-val">0</strong></span>
+          <span>⭐ BONUS: ${winThreshold}</span>
         </div>
         <div class="cg-progress-bar" style="max-width:${W - 40}px;">
-          <div id="dino-progress" class="cg-progress-fill" style="width:0%"></div>
+          <div id="dino-progress" class="cg-progress-fill" style="width:100%;transform:scaleX(0);transform-origin:left;transition:transform .12s linear;"></div>
         </div>
         <div style="position:relative;display:inline-block;max-width:100%;">
           <canvas class="cg-dino-canvas" id="dino-canvas" width="${W}" height="${H}"></canvas>
@@ -1114,18 +1141,42 @@
       </div>
     `;
     ctx.container.appendChild(wrap);
-    makeSoundToggle(wrap);
+    const viewport = gameViewport(wrap, 'dino', 'Dino Runner', makeSoundToggle(wrap), {
+      onBackgroundPress() {
+        if (!started || gameOver || paused) return false;
+        pressJump();
+      },
+      onBackgroundRelease() {
+        releaseJump();
+      }
+    });
+    const results = gameResults(ctx, 'dino', wrap);
 
     const canvas = wrap.querySelector('#dino-canvas');
     const cctx = canvas.getContext('2d');
+    const skyGradient = cctx.createLinearGradient(0, 0, 0, H);
+    skyGradient.addColorStop(0, '#87CEEB');
+    skyGradient.addColorStop(0.6, '#B3E5FC');
+    skyGradient.addColorStop(1, '#FFE4B5');
     const scoreVal = wrap.querySelector('#dino-score-val');
     const progressEl = wrap.querySelector('#dino-progress');
     const statusEl = wrap.querySelector('#dino-status');
     const leaderboard = global.COEDUCA_LEADERBOARD
       ? global.COEDUCA_LEADERBOARD.create(ctx, 'dino', winThreshold)
       : { submit: () => Promise.resolve(false) };
+    let paintRequest = null;
+
+    function scheduleDraw() {
+      if (paintRequest !== null) return;
+      paintRequest = global.requestAnimationFrame(() => {
+        paintRequest = null;
+        if (!gameOver && !paused) draw();
+      });
+    }
 
     function reset() {
+      if (paintRequest !== null) global.cancelAnimationFrame(paintRequest);
+      paintRequest = null;
       dino = { x: 50, y: H - 42 - GROUND_H, w: 36, h: 42 };
       obstacles = [];
       clouds = [
@@ -1142,6 +1193,7 @@
       vy = 0; onGround = true;
       gameOver = false; speed = START_SPEED;
       bonusEarned = false;
+      balloonBonusEarned = false;
       frames = 0;
       sunX = W - 60;
       groundOffset = 0;
@@ -1153,7 +1205,7 @@
       jumpBuffer = 0; jumpHeld = false;
       balloon = null; balloonSpawned = false; balloonFx = []; plusOne = null;
       scoreVal.textContent = '0';
-      progressEl.style.width = '0%';
+      progressEl.style.transform = 'scaleX(0)';
       statusEl.textContent = '';
       statusEl.className = 'cg-status';
     }
@@ -1202,6 +1254,7 @@
     // (el core lo limita a una vez por sesión y lo mete en la nota web y PDF).
     function popBalloon(bx, by) {
       balloon = null;
+      balloonBonusEarned = true;
       const colors = ['#FF6B9D', '#FFD700', '#4FC3F7', '#E63946', '#fff'];
       for (let i = 0; i < 14; i++) {
         const ang = (i / 14) * Math.PI * 2;
@@ -1268,9 +1321,12 @@
 
       // --- Avance y puntaje por distancia recorrida ---
       distance += speed;
-      scoreVal.textContent = displayedScore();
-      progressEl.style.width = Math.min(100, (distance / finishDist) * 100) + '%';
-      if (displayedScore() >= winThreshold) awardBonus();
+      const shownScore = displayedScore();
+      if (scoreVal.textContent !== String(shownScore)) scoreVal.textContent = shownScore;
+      if (frames % 4 === 0 || (shownScore >= winThreshold && !bonusEarned)) {
+        progressEl.style.transform = 'scaleX(' + Math.min(1, distance / finishDist) + ')';
+      }
+      if (shownScore >= winThreshold) awardBonus();
 
       // --- Obstáculos ---
       obstacles.forEach(o => {
@@ -1366,7 +1422,7 @@
       // aumentando hasta una velocidad realmente desafiante.
       speed = Math.min(MAX_SPEED, START_SPEED + frames * SPEED_GAIN_PER_FRAME);
 
-      draw();
+      scheduleDraw();
     }
 
     function drawCloud(c) {
@@ -1842,11 +1898,7 @@
 
     function draw() {
       // Cielo gradiente
-      const sky = cctx.createLinearGradient(0, 0, 0, H);
-      sky.addColorStop(0, '#87CEEB');
-      sky.addColorStop(0.6, '#B3E5FC');
-      sky.addColorStop(1, '#FFE4B5');
-      cctx.fillStyle = sky;
+      cctx.fillStyle = skyGradient;
       cctx.fillRect(0, 0, W, H);
 
       // Sol: halo, rayos giratorios y carita feliz con cachetes
@@ -2010,6 +2062,12 @@
       statusEl.className = 'cg-status is-lose';
       leaderboard.submit(displayedScore());
       if (!bonusEarned) ctx.onLose();
+      viewport.leave();
+      results.show({
+        score: displayedScore(), points: (bonusEarned ? 1 : 0) + (balloonBonusEarned ? 1 : 0),
+        unit: 'puntos', outcome: '💥 El dinosaurio chocó',
+        replay: () => dinoStartButton.click()
+      });
     }
     function awardBonus() {
       if (bonusEarned) return;
@@ -2080,6 +2138,7 @@
     const dinoStartButton = wrap.querySelector('#dino-start');
     dinoStartButton.addEventListener('click', () => {
       reset(); started = true; draw();
+      viewport.enter();
       dinoStartButton.disabled = true;
       clearInterval(loop);
       loop = setInterval(step, TICK_MS);
@@ -2114,6 +2173,18 @@
           gap: 6px;
           flex-wrap: wrap;
           justify-content: center;
+          max-width: 100% !important;
+        }
+        .cg-hm-wrap, .cv-hm-wrap { max-width: 100%; min-width: 0; }
+        .cg-hm-wrap > .cg-snake-score, .cv-hm-wrap > .cv-snake-score {
+          max-width: 100%; flex-wrap: wrap; justify-content: center; gap: 4px 8px;
+        }
+        #hm-keys { width: 100%; max-width: 420px; min-width: 0; }
+        .cg-hm-keys-row, .cv-hm-keys-row { width: 100%; gap: 4px; }
+        #hm-keys .cg-hm-key, #hm-keys .cv-hm-key {
+          flex: 0 0 calc(10% - 3.6px); width: calc(10% - 3.6px);
+          min-width: 0 !important; padding: 0 !important;
+          font-size: clamp(10px, 3vw, 16px) !important;
         }
         .hm2-tile {
           width: 34px; height: 42px;
@@ -2264,6 +2335,7 @@
     ctx.container.appendChild(wrap);
 
     makeSoundToggle(wrap);
+    const results = gameResults(ctx, 'hangman', wrap);
     const svg = wrap.querySelector('#hm-svg');
     const heartsEl = wrap.querySelector('#hm-hearts');
     const powerupsEl = wrap.querySelector('#hm-powerups');
@@ -2557,6 +2629,11 @@
           statusEl.className = 'cg-status is-lose';
           leaderboard.submit(score);
           if (!bonusEarned) ctx.onLose();
+          results.show({
+            score, points: bonusEarned ? 1 : 0, unit: 'palabras',
+            outcome: '💀 Se acabaron los intentos · La palabra era ' + word,
+            replay: () => wrap.querySelector('#hm-reset').click()
+          });
         }
         updatePowerups();
       }
@@ -2602,14 +2679,17 @@
     // Barajar preguntas y opciones: repetir la trivia sirve para aprender,
     // no para memorizar posiciones.
     const rawQuestions = (ctx.config && ctx.config.questions) || [];
-    const questions = C.shuffle(rawQuestions.slice()).map(q => {
-      const order = C.shuffle((q.options || []).map((_, j) => j));
-      return {
-        q: q.q,
-        options: order.map(j => q.options[j]),
-        answer: order.indexOf(q.answer)
-      };
-    });
+    function shuffledQuestions() {
+      return C.shuffle(rawQuestions.slice()).map(q => {
+        const order = C.shuffle((q.options || []).map((_, j) => j));
+        return {
+          q: q.q,
+          options: order.map(j => q.options[j]),
+          answer: order.indexOf(q.answer)
+        };
+      });
+    }
+    const questions = shuffledQuestions();
     const winThreshold = Math.ceil(questions.length * 0.7);
     const tieThreshold = Math.floor(questions.length / 2);
     let idx = 0, correct = 0, wrong = 0, finished = false, transitioning = false;
@@ -2646,6 +2726,7 @@
     ctx.container.appendChild(wrap);
 
     makeSoundToggle(wrap);
+    const results = gameResults(ctx, 'trivia', wrap);
     const cardContainer = wrap.querySelector('#tr-card-container');
     const opts = wrap.querySelector('#tr-options');
     const progText = wrap.querySelector('#tr-progress-text');
@@ -2870,7 +2951,29 @@
         ctx.onLose();
       }
       statusEl.innerHTML = `${icon} ${correct} / ${questions.length} (${pct}%)`;
+      results.show({
+        score: correct, points: msgClass === 'is-win' ? 1 : msgClass === 'is-tie' ? 0.5 : 0,
+        unit: 'aciertos', outcome: `${icon} ${correct} de ${questions.length} respuestas correctas`,
+        replay: resetTrivia
+      });
       statusEl.className = 'cg-status ' + msgClass;
+    }
+
+    function resetTrivia() {
+      questions.splice(0, questions.length, ...shuffledQuestions());
+      idx = 0; correct = 0; wrong = 0; finished = false; transitioning = false;
+      doubleActive = false; doublePick = null;
+      used5050 = false; usedDouble = false; usedRigo = false;
+      [btn5050, btnDouble, btnRigo].forEach(button => {
+        button.disabled = false;
+        button.style.opacity = '';
+        button.style.boxShadow = '';
+        button.style.cursor = '';
+      });
+      statusEl.textContent = '';
+      statusEl.classList.remove('is-win', 'is-tie', 'is-lose');
+      progFill.style.width = '0%';
+      render();
     }
 
     if (questions.length === 0) {
@@ -2908,7 +3011,7 @@
     let grid, piece, loop, running, gameOver, score, paused, bonusEarned;
     let bonusSpawned, bonusAwarded, bonusAtScore, clearingSet, floats;
     let tickMs, piecesLocked;
-    let scrollLocked = false, previousBodyTouchAction = '', previousOverscrollBehavior = '';
+    let scrollLocked = false, previousOverscrollBehavior = '';
 
     const wrap = document.createElement('div');
     wrap.className = 'cg-snake-wrap';
@@ -2942,7 +3045,8 @@
       <div id="pl-status" class="cg-status"></div>
     `;
     ctx.container.appendChild(wrap);
-    makeSoundToggle(wrap);
+    const viewport = gameViewport(wrap, 'pills', 'Píldoras', makeSoundToggle(wrap));
+    const results = gameResults(ctx, 'pills', wrap);
 
     const canvas = wrap.querySelector('#pl-canvas');
     const cctx = canvas.getContext('2d');
@@ -2954,15 +3058,13 @@
       : { submit: () => Promise.resolve(false) };
 
     function preventGameScroll(event) {
-      if (scrollLocked) event.preventDefault();
+      if (scrollLocked && event.target === canvas) event.preventDefault();
     }
 
     function lockGameScroll() {
       if (scrollLocked) return;
       scrollLocked = true;
-      previousBodyTouchAction = document.body.style.touchAction;
       previousOverscrollBehavior = document.documentElement.style.overscrollBehavior;
-      document.body.style.touchAction = 'none';
       document.documentElement.style.overscrollBehavior = 'none';
       document.addEventListener('touchmove', preventGameScroll, { passive: false, capture: true });
     }
@@ -2970,7 +3072,6 @@
     function unlockGameScroll() {
       if (!scrollLocked) return;
       scrollLocked = false;
-      document.body.style.touchAction = previousBodyTouchAction;
       document.documentElement.style.overscrollBehavior = previousOverscrollBehavior;
       document.removeEventListener('touchmove', preventGameScroll, true);
     }
@@ -3347,6 +3448,12 @@
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
       draw();
+      viewport.leave();
+      results.show({
+        score, points: (bonusEarned ? 1 : 0) + (bonusAwarded ? 1 : 0),
+        unit: 'puntos', outcome: '💥 El tablero se llenó',
+        replay: () => pillsStartButton.click()
+      });
     }
 
     function win() {
@@ -3442,6 +3549,7 @@
     pillsStartButton.addEventListener('click', () => {
       reset();
       running = true;
+      viewport.enter();
       pillsStartButton.disabled = true;
       lockGameScroll();
       spawnPiece();
@@ -3515,14 +3623,16 @@
         .sw-goal { display:flex; justify-content:space-between; gap:8px; margin:12px 0 5px; font-size:11px; font-weight:700; }
         .sw-progress { height:7px; overflow:hidden; border-radius:8px; background:#e9dfcf; margin-bottom:12px; }
         .sw-progress > div { height:100%; border-radius:8px; background:#2d8567; transition:width .2s; }
-        .sw-game .sw-canvas { display:block; width:100%; height:auto; border:2px solid #48372c; border-radius:18px; background:#fff6df; touch-action:none; box-shadow:0 5px 0 #e3d2b7; }
+        .sw-game .sw-canvas { display:block; width:100%; height:auto; border:2px solid #48372c; border-radius:18px; background:#fff6df; touch-action:pan-y; box-shadow:0 5px 0 #e3d2b7; }
+        .sw-game.is-playing .sw-canvas { touch-action:none; }
         .sw-balance { display:flex; align-items:center; gap:9px; margin:13px 2px; font-size:10px; font-weight:800; }
         .sw-balance-track { position:relative; flex:1; height:9px; border-radius:9px; background:linear-gradient(90deg,#d76b50,#f3cd6e 22%,#82b69b 38%,#82b69b 62%,#f3cd6e 78%,#d76b50); }
         .sw-balance-track::after { content:''; position:absolute; left:50%; top:-2px; height:13px; border-left:1px solid #3d302866; }
         .sw-balance-marker { position:absolute; top:-3px; left:50%; width:5px; height:15px; border-radius:3px; background:#3d3028; transform:translateX(-50%); }
         .sw-balance-label { min-width:65px; text-align:right; }
         .sw-controls { display:grid; grid-template-columns:56px 1fr 56px; gap:10px; }
-        .sw-game .sw-button { min-height:48px; border:2px solid #48372c; border-radius:13px; background:#fff8eb; color:#3d3028; font:800 14px system-ui,sans-serif; cursor:pointer; touch-action:none; box-shadow:0 3px 0 #48372c; }
+        .sw-game .sw-button { min-height:48px; border:2px solid #48372c; border-radius:13px; background:#fff8eb; color:#3d3028; font:800 14px system-ui,sans-serif; cursor:pointer; touch-action:manipulation; box-shadow:0 3px 0 #48372c; }
+        .sw-game.is-playing .sw-direction { touch-action:none; }
         .sw-game .sw-button:active { transform:translateY(2px); box-shadow:0 1px 0 #48372c; }
         .sw-game .sw-button:focus-visible { outline:3px solid #24856c; outline-offset:4px; }
         .sw-game .sw-primary { background:#2d8567; color:#fff; }
@@ -3560,7 +3670,8 @@
       <div id="sw-status" class="sw-status" role="status" aria-live="polite"></div>
     `;
     ctx.container.appendChild(wrap);
-    makeSoundToggle(wrap);
+    const viewport = gameViewport(wrap, 'sandwich', 'Torre sándwich', makeSoundToggle(wrap));
+    const results = gameResults(ctx, 'sandwich', wrap);
 
     const canvas = wrap.querySelector('#sw-canvas');
     const cctx = canvas.getContext('2d');
@@ -3604,6 +3715,7 @@
       gameOver = false;
       paused = false;
       serving = false;
+      wrap.classList.remove('is-playing');
       bonusEarned = false;
       lastAt = 0;
       floatText = null;
@@ -3827,6 +3939,8 @@
       gameOver = true;
       running = false;
       serving = false;
+      wrap.classList.remove('is-playing');
+      viewport.leave();
       leftHeld = false;
       rightHeld = false;
       cancelAnimationFrame(raf);
@@ -3849,6 +3963,11 @@
       if (!bonusEarned) ctx.onLose();
       draw();
       raf = requestAnimationFrame(collapseFrame);
+      results.show({
+        score, points: bonusEarned ? 1 : 0, unit: 'puntos',
+        outcome: '💥 ' + (reason || '¡La torre cayó!'),
+        replay: () => startButton.click()
+      });
     }
 
     function landIngredient() {
@@ -4292,10 +4411,10 @@
     startButton.addEventListener('click', () => {
       reset();
       running = true;
+      wrap.classList.add('is-playing');
+      viewport.enter();
       startButton.disabled = true;
       startButton.textContent = 'Apilando…';
-      // Solo canvas y botones bloquean gestos; el resto de la ficha sigue desplazándose.
-      if (canvas.scrollIntoView) canvas.scrollIntoView({ block: 'center', behavior: 'smooth' });
       spawnIngredient();
       lastAt = 0;
       raf = requestAnimationFrame(frame);

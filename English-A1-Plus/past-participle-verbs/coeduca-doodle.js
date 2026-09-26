@@ -21,9 +21,10 @@
       .cj-stat:first-child { background: #fff0a8; }
       .cj-stat small { display: block; font-size: 10px; font-weight: 800; letter-spacing: .7px; }
       .cj-stat strong { display: block; font-size: 24px; line-height: 1.15; font-variant-numeric: tabular-nums; }
-      .cj-canvas { display: block; width: 100%; height: auto; border: 3px solid #23334d; border-radius: 18px; background: #bceeff; box-shadow: 0 5px 0 #a9bfca; touch-action: none; }
+      .cj-canvas { display: block; width: 100%; height: auto; border: 3px solid #23334d; border-radius: 18px; background: #bceeff; box-shadow: 0 5px 0 #a9bfca; touch-action: auto; }
+      .cj-game.is-playing .cj-canvas, .cj-game.is-playing .cj-left, .cj-game.is-playing .cj-right { touch-action: none; }
       .cj-controls { display: flex; gap: 8px; margin-top: 13px; }
-      .cj-button { flex: 1; min-height: 48px; padding: 8px; border: 2px solid #23334d; border-radius: 12px; background: #fff; color: #23334d; font: 800 14px system-ui, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #23334d; touch-action: none; user-select: none; }
+      .cj-button { flex: 1; min-height: 48px; padding: 8px; border: 2px solid #23334d; border-radius: 12px; background: #fff; color: #23334d; font: 800 14px system-ui, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #23334d; touch-action: manipulation; user-select: none; }
       .cj-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #23334d; }
       .cj-button:focus-visible, .cj-game:focus-visible { outline: 3px solid #158b79; outline-offset: 3px; }
       .cj-primary { flex: 1.5; background: #ffe071; }
@@ -142,6 +143,9 @@
     });
     renderSoundToggle();
     soundHost.appendChild(soundToggle);
+    const viewport = global.COEDUCA_GAME_VIEWPORT
+      ? global.COEDUCA_GAME_VIEWPORT.create(wrap, { game: 'doodle', title: 'Salto infinito', soundToggle })
+      : { enter() {}, leave() {}, destroy() {} };
 
     const canvas = wrap.querySelector('.cj-canvas');
     const paint = canvas.getContext('2d');
@@ -157,6 +161,9 @@
     const leaderboard = global.COEDUCA_LEADERBOARD
       ? global.COEDUCA_LEADERBOARD.create(ctx, 'doodle', 1)
       : { submit: () => Promise.resolve(false) };
+    const results = global.COEDUCA_GAME_RESULTS
+      ? global.COEDUCA_GAME_RESULTS.create(ctx, 'doodle', wrap)
+      : { show() {} };
 
     let phase = 'ready', frameId = null, previousFrame = 0, startToken = 0;
     let playerX = W / 2, playerY = BASE_Y, velocityY = 0;
@@ -321,7 +328,9 @@
 
     async function start() {
       if (phase === 'paused') {
+        viewport.enter();
         phase = 'playing';
+        wrap.classList.add('is-playing');
         previousFrame = 0;
         statusEl.textContent = '¡Sigue subiendo!';
         if (flightKind && flightTimer > 0) startFlightSound(flightKind);
@@ -333,6 +342,8 @@
       if (frameId !== null) global.cancelAnimationFrame(frameId);
       reset();
       phase = 'playing';
+      wrap.classList.add('is-playing');
+      viewport.enter();
       startButton.textContent = '↻ Reiniciar';
       statusEl.textContent = 'Salta automáticamente. ¡Sube tan alto como puedas!';
       wrap.focus();
@@ -360,6 +371,8 @@
     function finish() {
       if (phase !== 'playing') return;
       phase = 'over';
+      wrap.classList.remove('is-playing');
+      viewport.leave();
       stopFlightSound();
       dizzyTimeLeft = 0;
       frameId = null;
@@ -368,6 +381,11 @@
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
       draw();
+      results.show({
+        score, points: bonusEarned ? 1 : 0, unit: 'de altura',
+        outcome: '🚀 Alcanzaste ' + score + ' de altura',
+        replay: () => startButton.click()
+      });
     }
 
     function wrappedDistance(x, target) {
@@ -861,6 +879,7 @@
     }
 
     function onKeyDown(event) {
+      if (phase !== 'playing') return;
       if (!wrap.contains(document.activeElement) && document.activeElement !== wrap) return;
       if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
         leftDown = true; event.preventDefault();
@@ -876,6 +895,7 @@
 
     function bindDirection(button, direction) {
       button.addEventListener('pointerdown', event => {
+        if (phase !== 'playing') return;
         event.preventDefault();
         button.setPointerCapture(event.pointerId);
         touchDirection = direction;
@@ -892,6 +912,7 @@
         if (frameId !== null) global.cancelAnimationFrame(frameId);
         frameId = null;
         phase = 'paused';
+        wrap.classList.remove('is-playing');
         startButton.textContent = '▶ Continuar';
         statusEl.textContent = 'Partida en pausa. Pulsa Continuar.';
         draw();
@@ -907,7 +928,9 @@
 
     function cleanup() {
       startToken++;
+      wrap.classList.remove('is-playing');
       stopAllSounds();
+      viewport.destroy();
       if (frameId !== null) global.cancelAnimationFrame(frameId);
       if (sensorTimer !== null) global.clearTimeout(sensorTimer);
       if (sensorListening) global.removeEventListener('deviceorientation', onOrientation);
