@@ -15,13 +15,15 @@
     style.textContent = `
       .cf-game { max-width: 390px; margin: 0 auto; color: #22324a; font-family: system-ui, sans-serif; text-align: center; }
       .cf-game * { box-sizing: border-box; }
+      html.cf-page-locked, body.cf-page-locked { overflow: hidden !important; overscroll-behavior: none; }
+      .cf-stage { width: 100%; }
       .cf-heading { margin: 0 0 10px; font-size: 25px; font-weight: 900; }
       .cf-stats { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
       .cf-stat { flex: 1; padding: 8px 10px; border: 2px solid #22324a; border-radius: 13px; background: #fff; text-align: left; }
       .cf-stat:first-child { background: #ffe58b; }
       .cf-stat small { display: block; font-size: 10px; font-weight: 800; letter-spacing: 1px; }
       .cf-stat strong { display: block; font-size: 25px; line-height: 1.1; font-variant-numeric: tabular-nums; }
-      .cf-canvas { display: block; width: 100%; height: auto; border: 3px solid #22324a; border-radius: 18px; background: #8eddf5; touch-action: none; box-shadow: 0 5px 0 #9fb5ba; cursor: pointer; }
+      .cf-canvas { display: block; width: 100%; height: auto; border: 3px solid #22324a; border-radius: 18px; background: #8eddf5; touch-action: pan-y; box-shadow: 0 5px 0 #9fb5ba; cursor: pointer; }
       .cf-controls { display: flex; gap: 10px; margin-top: 14px; }
       .cf-button { flex: 1; min-height: 50px; padding: 8px 12px; border: 2px solid #22324a; border-radius: 13px; background: #fff; color: #22324a; font: 800 15px system-ui, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #22324a; touch-action: manipulation; }
       .cf-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #22324a; }
@@ -29,6 +31,19 @@
       .cf-primary { background: #ffe066; }
       .cf-help { margin: 12px 0 4px; font-size: 12px; line-height: 1.5; }
       .cf-status { min-height: 22px; margin: 5px 0; font-size: 13px; font-weight: 700; }
+      .cf-game.is-expanded { position: fixed; inset: 0; z-index: 2147483647; display: flex; flex-direction: column; width: 100vw; height: 100vh; height: 100dvh; max-width: none; margin: 0; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); background: #e8f7ff; overflow: hidden; }
+      .cf-game.is-expanded .cf-hud { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: min(100%, 920px); margin: 0 auto 10px; }
+      .cf-game.is-expanded .cf-heading { margin: 0; font-size: clamp(18px, 3vw, 25px); white-space: nowrap; }
+      .cf-game.is-expanded .cf-stats { flex: 1; max-width: 440px; margin: 0; }
+      .cf-game.is-expanded .cf-stat { padding: 5px 9px; }
+      .cf-game.is-expanded .cf-stat strong { font-size: clamp(17px, 3vw, 25px); }
+      .cf-game.is-expanded .cf-sound-slot { display: flex; flex: none; }
+      .cf-game.is-expanded .cf-stage { display: grid; place-items: center; flex: 1; min-height: 0; }
+      .cf-game.is-expanded .cf-canvas { width: auto; height: auto; max-width: 100%; max-height: 100%; touch-action: none; box-shadow: 0 7px 25px #43677855; }
+      .cf-game.is-expanded .cf-controls { flex: none; width: min(100%, 560px); margin: 12px auto 0; }
+      .cf-game.is-expanded .cf-help { display: none; }
+      .cf-game.is-expanded .cf-status { flex: none; width: min(100%, 700px); margin: 8px auto 0; }
+      @media (max-width: 480px) { .cf-game.is-expanded .cf-heading { display: none; } .cf-game.is-expanded .cf-hud { gap: 8px; } .cf-game.is-expanded .cf-stat small { font-size: 9px; } }
     `;
     document.head.appendChild(style);
   }
@@ -43,23 +58,30 @@
     wrap.className = 'cf-game';
     wrap.tabIndex = 0;
     wrap.innerHTML = `
-      <h3 class="cf-heading">🐦 Flappy</h3>
-      <div class="cf-stats">
-        <div class="cf-stat"><small>TUBOS SUPERADOS</small><strong class="cf-score" aria-live="polite">0</strong></div>
-        <div class="cf-stat"><small>BONUS +1 EN NOTA</small><strong class="cf-goal"></strong></div>
+      <div class="cf-hud">
+        <h3 class="cf-heading">🐦 Flappy</h3>
+        <div class="cf-stats">
+          <div class="cf-stat"><small>TUBOS SUPERADOS</small><strong class="cf-score" aria-live="polite">0</strong></div>
+          <div class="cf-stat"><small>BONUS +1 EN NOTA</small><strong class="cf-goal"></strong></div>
+        </div>
+        <div class="cf-sound-slot"></div>
       </div>
-      <canvas class="cf-canvas" width="720" height="1000" tabindex="0"
-        role="button" aria-label="Jugar Flappy. Toca o presiona espacio para aletear."></canvas>
+      <div class="cf-stage">
+        <canvas class="cf-canvas" width="720" height="1000" tabindex="0"
+          role="button" aria-label="Aletear durante la partida. Usa Empezar para iniciar o reiniciar."></canvas>
+      </div>
       <div class="cf-controls">
         <button class="cf-button cf-primary cf-start" type="button">▶ Empezar</button>
         <button class="cf-button cf-flap" type="button">↑ Aletear</button>
       </div>
-      <p class="cf-help">Supera 10 tubos para ganar un punto extra en tu nota final. Toca la pantalla, usa ↑, ESPACIO o Aletear.</p>
+      <p class="cf-help">Supera 10 tubos para ganar un punto extra en tu nota final. Pulsa Empezar para iniciar. Durante la partida, toca el juego, usa ↑, ESPACIO o Aletear.</p>
       <div class="cf-status" aria-live="polite">Pulsa Empezar para jugar.</div>
     `;
     ctx.container.appendChild(wrap);
 
     const canvas = wrap.querySelector('.cf-canvas');
+    const stage = wrap.querySelector('.cf-stage');
+    const soundSlot = wrap.querySelector('.cf-sound-slot');
     const paint = canvas.getContext('2d');
     if (!paint) {
       wrap.querySelector('.cf-status').textContent = 'Canvas no está disponible.';
@@ -75,10 +97,157 @@
     const leaderboard = global.COEDUCA_LEADERBOARD
       ? global.COEDUCA_LEADERBOARD.create(ctx, 'flappy', 1)
       : { submit: () => Promise.resolve(false) };
+    const results = global.COEDUCA_GAME_RESULTS
+      ? global.COEDUCA_GAME_RESULTS.create(ctx, 'flappy', wrap)
+      : { show() {} };
 
     let birdY = H * 0.45, birdVelocity = 0;
     let pipes = [], spawnClock = 0, score = 0, bonusEarned = false;
     let phase = 'ready', previousFrame = 0, frameId = null, scenery = 0;
+    let placeholder = null, soundParent = null, fullscreenRequest = null;
+    let expandAnimation = null, collapseAnimation = null, collapsing = false;
+    let soundNextSibling = null;
+    const soundKey = 'coeduca_snd_muted';
+    let soundContext = null;
+    const isMuted = () => {
+      try { return localStorage.getItem(soundKey) === '1'; } catch (_) { return false; }
+    };
+    function tone(from, to, duration, type, volume, delay = 0) {
+      if (isMuted()) return;
+      try {
+        const AudioContextClass = global.AudioContext || global.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!soundContext) soundContext = new AudioContextClass();
+        if (soundContext.state === 'suspended') soundContext.resume().catch(() => {});
+        const when = soundContext.currentTime + delay;
+        const oscillator = soundContext.createOscillator();
+        const gain = soundContext.createGain();
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(from, when);
+        oscillator.frequency.exponentialRampToValueAtTime(to, when + duration);
+        gain.gain.setValueAtTime(0.0001, when);
+        gain.gain.exponentialRampToValueAtTime(volume, when + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+        oscillator.connect(gain);
+        gain.connect(soundContext.destination);
+        oscillator.start(when);
+        oscillator.stop(when + duration + 0.02);
+      } catch (_) { /* El navegador puede no ofrecer audio. */ }
+    }
+    const sound = {
+      flap: () => tone(320, 650, 0.12, 'triangle', 0.08),
+      hit: () => tone(260, 85, 0.3, 'sawtooth', 0.09),
+      win: () => [523, 659, 784, 1047].forEach((frequency, index) =>
+        tone(frequency, frequency, 0.13, 'triangle', 0.1, index * 0.1))
+    };
+    const soundHost = wrap.closest('.coeduca-exercise, .civica-section--consolidate') || wrap;
+    soundHost.style.position = 'relative';
+    const soundToggle = document.createElement('button');
+    soundToggle.type = 'button';
+    soundToggle.className = 'coeduca-game-sound-toggle';
+    soundToggle.style.cssText = 'position:absolute;top:12px;right:12px;z-index:10;width:42px;height:42px;' +
+      'display:grid;place-items:center;color:#1a1a1a;border:3px solid #1a1a1a;' +
+      'border-radius:12px;background:#fff;cursor:pointer;box-shadow:2px 2px 0 #1a1a1a;padding:0;';
+    const soundOnIcon = '<svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M640-440v-80h160v80H640Zm48 280-128-96 48-64 128 96-48 64Zm-80-480-48-64 128-96 48 64-128 96ZM120-360v-240h160l200-200v640L280-360H120Z"/></svg>';
+    const soundOffIcon = '<svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="m616-320-56-56 104-104-104-104 56-56 104 104 104-104 56 56-104-104-104 104Zm-496-40v-240h160l200-200v640L280-360H120Z"/></svg>';
+    function renderSoundToggle() {
+      const muted = isMuted();
+      soundToggle.innerHTML = muted ? soundOffIcon : soundOnIcon;
+      soundToggle.title = muted ? 'Activar sonido' : 'Desactivar sonido';
+      soundToggle.setAttribute('aria-label', soundToggle.title);
+      soundToggle.setAttribute('aria-pressed', String(muted));
+    }
+    soundToggle.addEventListener('click', () => {
+      try { localStorage.setItem(soundKey, isMuted() ? '0' : '1'); } catch (_) {}
+      renderSoundToggle();
+    });
+    renderSoundToggle();
+    soundHost.appendChild(soundToggle);
+
+    function sizeExpandedCanvas() {
+      if (!wrap.classList.contains('is-expanded')) return;
+      const width = Math.min(stage.clientWidth, stage.clientHeight * W / H);
+      canvas.style.width = Math.max(1, width) + 'px';
+      canvas.style.height = Math.max(1, width * H / W) + 'px';
+    }
+
+    function restorePage() {
+      if (!placeholder) return;
+      if (expandAnimation) { expandAnimation.cancel(); expandAnimation = null; }
+      if (collapseAnimation) { collapseAnimation.cancel(); collapseAnimation = null; }
+      wrap.classList.remove('is-expanded');
+      canvas.style.width = '';
+      canvas.style.height = '';
+      if (placeholder.parentNode) placeholder.parentNode.insertBefore(wrap, placeholder);
+      else wrap.remove();
+      placeholder.remove();
+      placeholder = null;
+      soundToggle.style.position = 'absolute';
+      if (soundParent && soundParent.isConnected) soundParent.insertBefore(soundToggle,
+        soundNextSibling && soundNextSibling.parentNode === soundParent ? soundNextSibling : null);
+      soundParent = null;
+      soundNextSibling = null;
+      document.documentElement.classList.remove('cf-page-locked');
+      document.body.classList.remove('cf-page-locked');
+      fullscreenRequest = null;
+      collapsing = false;
+      startButton.disabled = false;
+    }
+
+    function expandGame() {
+      if (placeholder) return;
+      const startRect = wrap.getBoundingClientRect();
+      placeholder = document.createElement('div');
+      placeholder.style.cssText = `width:${startRect.width}px;height:${startRect.height}px;margin:0 auto;`;
+      wrap.parentNode.insertBefore(placeholder, wrap);
+      soundParent = soundToggle.parentNode;
+      soundNextSibling = soundToggle.nextSibling;
+      soundSlot.appendChild(soundToggle);
+      soundToggle.style.position = 'static';
+      document.body.appendChild(wrap);
+      wrap.classList.add('is-expanded');
+      document.documentElement.classList.add('cf-page-locked');
+      document.body.classList.add('cf-page-locked');
+      sizeExpandedCanvas();
+      if (wrap.animate && !(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+        const endRect = wrap.getBoundingClientRect();
+        expandAnimation = wrap.animate([
+          { transform: `translate(${startRect.left - endRect.left}px, ${startRect.top - endRect.top}px) scale(${startRect.width / endRect.width}, ${startRect.height / endRect.height})`, opacity: 0.8 },
+          { transform: 'none', opacity: 1 }
+        ], { duration: 320, easing: 'ease-out' });
+        expandAnimation.onfinish = () => { expandAnimation = null; };
+      }
+      if (wrap.requestFullscreen) {
+        try {
+          fullscreenRequest = Promise.resolve(wrap.requestFullscreen({ navigationUI: 'hide' }))
+            .catch(() => {})
+            .then(() => { if (phase === 'over' && document.fullscreenElement === wrap) return document.exitFullscreen(); });
+        } catch (_) { /* La vista fija sigue disponible. */ }
+      }
+    }
+
+    function collapseGame() {
+      if (!placeholder || collapsing) return;
+      collapsing = true;
+      startButton.disabled = true;
+      Promise.resolve(fullscreenRequest).catch(() => {}).then(() => {
+        if (document.fullscreenElement === wrap) return document.exitFullscreen().catch(() => {});
+      }).finally(() => {
+        if (!placeholder) return;
+        if (expandAnimation) { expandAnimation.cancel(); expandAnimation = null; }
+        if (!wrap.animate || (global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches) || !placeholder.isConnected) {
+          restorePage();
+          return;
+        }
+        const from = wrap.getBoundingClientRect();
+        const to = placeholder.getBoundingClientRect();
+        collapseAnimation = wrap.animate([
+          { transform: 'none', opacity: 1 },
+          { transform: `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${to.width / from.width}, ${to.height / from.height})`, opacity: 0.85 }
+        ], { duration: 380, easing: 'ease-in-out' });
+        collapseAnimation.onfinish = restorePage;
+      });
+    }
 
     function reset() {
       birdY = H * 0.45;
@@ -101,10 +270,13 @@
     }
 
     function start() {
+      if (collapsing) return;
       if (frameId !== null) global.cancelAnimationFrame(frameId);
       reset();
       phase = 'playing';
       birdVelocity = FLAP;
+      expandGame();
+      sound.flap();
       spawnClock = 0.9;
       startButton.textContent = '↻ Reiniciar';
       statusEl.textContent = '¡Aletea para pasar entre los tubos!';
@@ -113,7 +285,7 @@
     }
 
     function flap() {
-      if (phase === 'ready' || phase === 'over') { start(); return; }
+      if (phase === 'ready' || phase === 'over') return;
       if (phase === 'paused') {
         phase = 'playing';
         previousFrame = 0;
@@ -122,6 +294,7 @@
       }
       if (phase !== 'playing') return;
       birdVelocity = FLAP;
+      sound.flap();
     }
 
     function overlapsPipe(pipe) {
@@ -138,12 +311,19 @@
     function finish() {
       if (phase !== 'playing') return;
       phase = 'over';
+      sound.hit();
       frameId = null;
       startButton.textContent = '↻ Reintentar';
       statusEl.textContent = score ? `Fin de la partida: ${score} tubos superados.` : 'Fin de la partida. ¡Inténtalo otra vez!';
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
       draw();
+      collapseGame();
+      results.show({
+        score, points: bonusEarned ? 1 : 0, unit: 'tubos',
+        outcome: score ? '🐦 Superaste ' + score + ' tubos' : '🐦 ¡Inténtalo otra vez!',
+        replay: () => startButton.click()
+      });
     }
 
     function step(dt) {
@@ -164,6 +344,7 @@
           scoreEl.textContent = String(score);
           if (!bonusEarned && score >= goal) {
             bonusEarned = true;
+            sound.win();
             statusEl.textContent = '¡Ganaste +1 punto en tu nota final! Sigue para subir en el ranking.';
             ctx.onWin();
           }
@@ -337,13 +518,13 @@
         paint.font = '900 23px system-ui';
         paint.fillText(phase === 'ready' ? '¡A volar!' : 'Fin de la partida', W / 2, 219);
         paint.font = '700 14px system-ui';
-        paint.fillText(phase === 'ready' ? 'Toca o pulsa Empezar' : 'Toca o pulsa Reintentar', W / 2, 247);
+        paint.fillText(phase === 'ready' ? 'Pulsa Empezar' : 'Pulsa Reintentar', W / 2, 247);
       }
     }
 
     function tick(now) {
       if (phase !== 'playing') return;
-      if (!document.body.contains(wrap)) { cleanup(); return; }
+      if (!document.body.contains(wrap) || (placeholder && !placeholder.isConnected)) { cleanup(); return; }
       const dt = previousFrame ? Math.min((now - previousFrame) / 1000, 0.033) : 0;
       previousFrame = now;
       if (dt) step(dt);
@@ -353,6 +534,8 @@
 
     function onKey(event) {
       if (event.key !== ' ' && event.key !== 'ArrowUp') return;
+      if (event.target.closest('button')) return;
+      if (phase === 'ready' || phase === 'over') return;
       event.preventDefault();
       flap();
     }
@@ -362,7 +545,7 @@
         if (frameId !== null) global.cancelAnimationFrame(frameId);
         frameId = null;
         phase = 'paused';
-        statusEl.textContent = 'Partida en pausa. Toca para continuar.';
+        statusEl.textContent = 'Partida en pausa. Aletea para continuar.';
       }
     }
 
@@ -371,9 +554,14 @@
     function cleanup() {
       if (frameId !== null) global.cancelAnimationFrame(frameId);
       frameId = null;
+      phase = 'over';
+      if (document.fullscreenElement === wrap && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+      restorePage();
       wrap.removeEventListener('keydown', onKey);
       document.removeEventListener('visibilitychange', onVisibility);
+      global.removeEventListener('resize', sizeExpandedCanvas);
       if (observer) observer.disconnect();
+      if (soundContext) { soundContext.close().catch(() => {}); soundContext = null; }
     }
 
     wrap.addEventListener('keydown', onKey);
@@ -383,11 +571,13 @@
       flap();
     });
     canvas.addEventListener('pointerdown', event => {
+      if (phase === 'ready' || phase === 'over') return;
       event.preventDefault();
       wrap.focus();
       flap();
     });
     document.addEventListener('visibilitychange', onVisibility);
+    global.addEventListener('resize', sizeExpandedCanvas);
     if (typeof MutationObserver !== 'undefined') {
       observer = new MutationObserver(() => {
         if (!document.body.contains(wrap)) cleanup();
