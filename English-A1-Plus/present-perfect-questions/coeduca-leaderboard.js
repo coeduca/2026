@@ -44,6 +44,14 @@
   const DEFAULT_AVATAR_BG = '#EAF7FF';
   const AVATAR_BUCKET = 'game-avatars';
   let activeAvatarDialog = null;
+  const visibleRankings = new Set();
+
+  function refreshVisibleRankings(except) {
+    visibleRankings.forEach(board => {
+      if (board.root.isConnected) { if (board.refresh !== except) board.refresh(); }
+      else visibleRankings.delete(board);
+    });
+  }
 
   function ensureStyles() {
     if (document.getElementById('coeduca-leaderboard-styles')) return;
@@ -169,7 +177,7 @@
       }
       .cg-leaderboard-student { min-width: 0; }
       .cg-leaderboard-avatar { display:grid; place-items:center; width:34px; height:34px; padding:0; overflow:hidden; border:2px solid #22324a; border-radius:50%; background:#fff; font:20px system-ui,sans-serif; line-height:1; }
-      .cg-leaderboard-placeholder { display:block; font-size:26px; line-height:1; transform:translate(0px, 5px) scale(1.02); }
+      .cg-leaderboard-avatar img.cg-leaderboard-placeholder, .cg-avatar-dialog-preview img.cg-leaderboard-placeholder { display:block; width:86%; height:86%; object-fit:contain; transform:translateY(10%); }
       button.cg-leaderboard-avatar { cursor:pointer; }
       button.cg-leaderboard-avatar:hover { transform:scale(1.08); }
       .cg-leaderboard-avatar img { display:block; width:100%; height:100%; object-fit:contain; }
@@ -322,9 +330,10 @@
     element.dataset.kind = profile?.avatar_kind || 'none';
     element.style.backgroundColor = avatarBackground(profile);
     function placeholder() {
-      const icon = document.createElement('span');
+      const icon = document.createElement('img');
       icon.className = 'cg-leaderboard-placeholder';
-      icon.textContent = '👤';
+      icon.src = 'avatar-placeholder.svg';
+      icon.alt = '';
       element.replaceChildren(icon);
     }
     const kind = profile && profile.avatar_kind;
@@ -480,7 +489,8 @@
     ownAvatarImage.className = 'cg-leaderboard-avatar';
     ownAvatarButton.append(ownAvatarImage, document.createTextNode('Mi avatar'));
     ownAvatarButton.addEventListener('click', openAvatarDialog);
-    heading.append(title, ownAvatarButton);
+    heading.appendChild(title);
+    if (!ctx.hideAvatarButton) heading.appendChild(ownAvatarButton);
     const note = document.createElement('p');
     note.className = 'cg-leaderboard-note';
     const scoreUnit = game === 'hangman' ? 'palabras' : game === 'flappy' ? 'tubos' : game === 'doodle' ? 'unidades de altura' : 'puntos';
@@ -662,6 +672,7 @@
           }
           close();
           refresh();
+          refreshVisibleRankings(refresh);
         } catch (error) {
           console.warn('No se pudo cambiar el avatar', error);
           setBusy(false, error.message || 'No se pudo cambiar el avatar.');
@@ -721,6 +732,7 @@
           fillAvatar(ownAvatarImage, ownProfile);
           close();
           refresh();
+          refreshVisibleRankings(refresh);
         } catch (error) {
           console.warn('No se pudo subir el avatar', error);
           setBusy(false, error.message || 'No se pudo subir la foto.');
@@ -820,9 +832,18 @@
       }
     }
 
-    refresh();
-    return { submit, refresh };
+    if (root.isConnected) visibleRankings.add({ root, refresh });
+    const ready = refresh();
+    return { submit, refresh, openAvatarDialog, ready };
   }
 
-  global.COEDUCA_LEADERBOARD = { create, getPersonalBest };
+  async function openAvatar(student) {
+    if (!student || !student.nie) return;
+    const detached = document.createElement('div');
+    const controller = create({ container:detached, student, hideAvatarButton:true }, 'dino', Number.MAX_SAFE_INTEGER);
+    await controller.ready;
+    await controller.openAvatarDialog();
+  }
+
+  global.COEDUCA_LEADERBOARD = { create, getPersonalBest, fillAvatar, openAvatar };
 })(window);

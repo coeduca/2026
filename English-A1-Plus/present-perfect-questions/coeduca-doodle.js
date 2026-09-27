@@ -53,7 +53,7 @@
     wrap.innerHTML = `
       <h3 class="cj-heading">☁️ Salto infinito</h3>
       <div class="cj-stats">
-        <div class="cj-stat"><small>ALTURA MÁXIMA</small><strong class="cj-score" aria-live="polite">0</strong></div>
+        <div class="cj-stat"><small>PUNTOS</small><strong class="cj-score" aria-live="polite">0</strong></div>
         <div class="cj-stat"><small>BONUS +1 EN NOTA</small><strong class="cj-goal">1000</strong></div>
       </div>
       <canvas class="cj-canvas" width="720" height="1000" aria-label="Juego de plataformas. Muévete con A, D o las flechas; en móvil, inclina el teléfono."></canvas>
@@ -171,8 +171,10 @@
     let phase = 'ready', frameId = null, previousFrame = 0, startToken = 0;
     let helpOpen = false, helpPaused = false;
     let playerX = W / 2, playerY = BASE_Y, velocityY = 0;
-    let cameraY = 0, highestY = BASE_Y, score = 0, bonusEarned = false;
+    let cameraY = 0, highestY = BASE_Y, heightScore = 0, balloonPoints = 0;
+    let score = 0, bonusEarned = false;
     let platforms = [], lastPlatformY = BASE_Y, lastPlatformX = 132, platformCount = 0;
+    let balloons = [], balloonFx = [], balloonText = null;
     let flightKind = null, flightTimer = 0, flightSpeed = 0, springEffect = 0;
     let springPlatform = null, springPush = 0, springBoostActive = false;
     let releaseTimer = 0, fallingBoosters = [];
@@ -259,6 +261,11 @@
           speed: progress >= FAST_MOVING_HEIGHT ? 135 + Math.random() * 25 : 45 + challenge * 35
         };
         platforms.push(platform);
+        // Un globo ocasional queda sobre una plataforma real, al alcance del salto.
+        if (progress >= 350 && !booster && Math.random() < .025) {
+          balloons.push({ x: platform.x + width / 2, y: platform.y + 54,
+            r: 14, bob: Math.random() * Math.PI * 2 });
+        }
 
         // Las rotas rellenan los lados como señuelos; nunca sustituyen al único apoyo real.
         const decoyCount = progress >= MOVING_PATH_HEIGHT ? 1 + Number(Math.random() < .2)
@@ -287,9 +294,14 @@
       velocityY = BOUNCE;
       cameraY = 0;
       highestY = BASE_Y;
+      heightScore = 0;
+      balloonPoints = 0;
       score = 0;
       bonusEarned = false;
       platforms = [{ x: 132, y: BASE_Y, width: 96 }];
+      balloons = [];
+      balloonFx = [];
+      balloonText = null;
       lastPlatformY = BASE_Y;
       lastPlatformX = 132;
       platformCount = 0;
@@ -392,13 +404,13 @@
       frameId = null;
       startButton.innerHTML = iconButton('retry', 'Reintentar');
       startButton.disabled = false;
-      statusEl.textContent = `Fin de la partida: ${score} de altura. ${bonusEarned ? '¡Conservas tu +1!' : '¡Inténtalo otra vez!'}`;
+      statusEl.textContent = `Fin de la partida: ${score} puntos (${heightScore} de altura). ${bonusEarned ? '¡Conservas tu +1!' : '¡Inténtalo otra vez!'}`;
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
       draw();
       results.show({
-        score, points: bonusEarned ? 1 : 0, unit: 'de altura',
-        outcome: '🚀 Alcanzaste ' + score + ' de altura',
+        score, points: bonusEarned ? 1 : 0, unit: 'puntos',
+        outcome: '🚀 Alcanzaste ' + heightScore + ' de altura',
         replay: () => startButton.click()
       });
     }
@@ -472,6 +484,19 @@
 
     function step(dt) {
       updatePlatforms(dt);
+      for (const balloon of balloons) balloon.bob += dt * 2.4;
+      for (const particle of balloonFx) {
+        particle.x += particle.vx * dt;
+        particle.y += particle.vy * dt;
+        particle.vy -= 130 * dt;
+        particle.life -= dt;
+      }
+      balloonFx = balloonFx.filter(particle => particle.life > 0);
+      if (balloonText) {
+        balloonText.y += 35 * dt;
+        balloonText.life -= dt;
+        if (balloonText.life <= 0) balloonText = null;
+      }
       if (dizzyTimeLeft > 0) {
         dizzyTimeLeft = Math.max(0, dizzyTimeLeft - dt);
       } else if (rigoDizzyReady) {
@@ -574,8 +599,28 @@
         beginRecovery();
       }
 
+      for (const balloon of balloons) {
+        const by = balloon.y + Math.sin(balloon.bob) * 4;
+        if (playerY <= by + balloon.r && playerY + PLAYER_H >= by - balloon.r &&
+            wrappedDistance(playerX, balloon.x) < PLAYER_W / 2 + balloon.r * .7) {
+          balloon.collected = true;
+          balloonPoints += 50;
+          balloonText = { x: balloon.x, y: by + 18, life: .9 };
+          const colors = ['#ff6687', '#ffd861', '#fff6dc', '#74d9f1'];
+          for (let i = 0; i < 12; i++) {
+            const angle = i * Math.PI / 6;
+            const speed = 65 + Math.random() * 45;
+            balloonFx.push({ x:balloon.x, y:by,
+              vx:Math.cos(angle) * speed, vy:Math.sin(angle) * speed,
+              life:.45 + Math.random() * .2, color:colors[i % colors.length] });
+          }
+          statusEl.textContent = '🎈 ¡Globo! +50 puntos.';
+        }
+      }
+
       highestY = Math.max(highestY, playerY);
-      const newScore = Math.floor(highestY - BASE_Y);
+      heightScore = Math.floor(highestY - BASE_Y);
+      const newScore = heightScore + balloonPoints;
       if (newScore !== score) {
         score = newScore;
         scoreEl.textContent = String(score);
@@ -587,6 +632,7 @@
       }
       cameraY = Math.max(cameraY, highestY - H * .57);
       addPlatforms();
+      balloons = balloons.filter(balloon => !balloon.collected && balloon.y > cameraY - 60);
       platforms = platforms.filter(platform =>
         platform.y > cameraY - 45 && platform.fading !== 0 &&
         (!platform.broken || platform.breakAge < .7));
@@ -600,6 +646,39 @@
       paint.arc(x + size * .55, y - size * .25, size * .72, 0, Math.PI * 2);
       paint.arc(x + size * 1.2, y, size * .55, 0, Math.PI * 2);
       paint.fill();
+    }
+
+    function drawBalloon(balloon) {
+      const y = screenY(balloon.y + Math.sin(balloon.bob) * 4);
+      if (y < -45 || y > H + 45) return;
+      paint.save();
+      paint.translate(balloon.x, y);
+      paint.strokeStyle = '#23334d';
+      paint.lineWidth = 1.5;
+      paint.beginPath();
+      paint.moveTo(0, balloon.r + 4);
+      paint.quadraticCurveTo(5, balloon.r + 16, -2, balloon.r + 27);
+      paint.stroke();
+      const red = paint.createRadialGradient(-4, -5, 2, 0, 0, balloon.r + 2);
+      red.addColorStop(0, '#ff9cba');
+      red.addColorStop(1, '#e63946');
+      paint.fillStyle = red;
+      paint.lineWidth = 2;
+      paint.beginPath();
+      paint.ellipse(0, 0, balloon.r - 1, balloon.r + 1, 0, 0, Math.PI * 2);
+      paint.fill(); paint.stroke();
+      paint.fillStyle = '#e63946';
+      paint.beginPath();
+      paint.moveTo(-3, balloon.r); paint.lineTo(3, balloon.r);
+      paint.lineTo(0, balloon.r + 4); paint.closePath();
+      paint.fill(); paint.stroke();
+      paint.fillStyle = 'rgba(255,255,255,.8)';
+      paint.beginPath(); paint.ellipse(-4, -5, 3, 4, -.5, 0, Math.PI * 2); paint.fill();
+      paint.fillStyle = '#fff';
+      paint.font = '800 9px system-ui';
+      paint.textAlign = 'center';
+      paint.fillText('+50', 0, 4);
+      paint.restore();
     }
 
     function paintBoosterIcon(kind, springHeight = 25, active = true) {
@@ -726,6 +805,18 @@
       paint.restore();
     }
 
+    function fillRoundedRect(x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      paint.beginPath();
+      paint.moveTo(x + r, y);
+      paint.arcTo(x + width, y, x + width, y + height, r);
+      paint.arcTo(x + width, y + height, x, y + height, r);
+      paint.arcTo(x, y + height, x, y, r);
+      paint.arcTo(x, y, x + width, y, r);
+      paint.closePath();
+      paint.fill();
+    }
+
     function drawPlatform(platform) {
       const y = screenY(platform.y - (platform.broken ? platform.fall : 0));
       if (y < -60 || y > H + 60) return;
@@ -741,7 +832,7 @@
             paint.translate(x + (left ? half / 2 - age * 13 : width - half / 2 + age * 13), y + 7 + age * 8);
             paint.rotate((left ? -1 : 1) * (.12 + age * .85));
             paint.fillStyle = '#754957';
-            paint.fillRect(-half / 2, -4, half, 14);
+            fillRoundedRect(-half / 2, -4, half, 14, 3);
             paint.fillStyle = '#df9c67';
             paint.beginPath();
             if (left) {
@@ -762,11 +853,11 @@
           }
         } else {
           paint.fillStyle = '#754957';
-          paint.fillRect(x, y + 3, width, 14);
+          fillRoundedRect(x, y + 3, width, 14, 6);
           paint.fillStyle = '#df9c67';
-          paint.fillRect(x + 1, y, width - 2, 12);
+          fillRoundedRect(x + 1, y, width - 2, 12, 5);
           paint.fillStyle = '#fbd193';
-          paint.fillRect(x + 5, y + 2, width - 10, 3);
+          fillRoundedRect(x + 5, y + 2, width - 10, 3, 1.5);
           paint.fillStyle = '#674859';
           paint.beginPath(); paint.arc(x + 10, y + 8, 2, 0, Math.PI * 2); paint.fill();
           paint.beginPath(); paint.arc(x + width - 10, y + 8, 2, 0, Math.PI * 2); paint.fill();
@@ -786,12 +877,12 @@
           paint.globalAlpha = Math.max(.1, platform.fading / .35);
         }
         paint.fillStyle = '#365f73';
-        paint.fillRect(platform.x, y + 3, platform.width, 13);
+        fillRoundedRect(platform.x, y + 3, platform.width, 13, 6);
         paint.fillStyle = platform.type === 'moving' ? '#66b8f2'
           : platform.type === 'vanishing' ? '#b58be7' : '#5ed1a0';
-        paint.fillRect(platform.x, y, platform.width, 10);
+        fillRoundedRect(platform.x, y, platform.width, 10, 5);
         paint.fillStyle = 'rgba(255,255,255,.55)';
-        paint.fillRect(platform.x + 9, y + 2, Math.max(12, platform.width - 22), 2);
+        fillRoundedRect(platform.x + 9, y + 2, Math.max(12, platform.width - 22), 2, 1);
         if (platform.type === 'moving') {
           paint.fillStyle = '#244e79';
           paint.font = '900 14px system-ui';
@@ -897,9 +988,28 @@
 
       for (const platform of platforms) drawPlatform(platform);
       for (const booster of fallingBoosters) drawFallingBooster(booster);
+      for (const balloon of balloons) drawBalloon(balloon);
       drawPlayer(playerX);
       if (playerX < PLAYER_DRAW_RADIUS) drawPlayer(playerX + W);
       if (playerX > W - PLAYER_DRAW_RADIUS) drawPlayer(playerX - W);
+      for (const particle of balloonFx) {
+        paint.globalAlpha = Math.min(1, particle.life / .4);
+        paint.fillStyle = particle.color;
+        paint.beginPath(); paint.arc(particle.x, screenY(particle.y), 3, 0, Math.PI * 2); paint.fill();
+      }
+      paint.globalAlpha = 1;
+      if (balloonText) {
+        paint.save();
+        paint.globalAlpha = Math.min(1, balloonText.life / .25);
+        paint.font = '900 22px system-ui';
+        paint.textAlign = 'center';
+        paint.lineWidth = 4;
+        paint.strokeStyle = '#23334d';
+        paint.strokeText('+50', balloonText.x, screenY(balloonText.y));
+        paint.fillStyle = '#ffe071';
+        paint.fillText('+50', balloonText.x, screenY(balloonText.y));
+        paint.restore();
+      }
 
       if (phase === 'ready' || phase === 'over' || phase === 'paused') {
         paint.fillStyle = 'rgba(29,48,73,.68)';

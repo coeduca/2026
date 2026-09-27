@@ -35,7 +35,7 @@
     ],
     dino: [
       'Pulsa START para correr. Toca el juego o usa ESPACIO o SALTAR para evitar los obstáculos.',
-      'Mantén pulsado para saltar alto y suelta pronto para un salto corto. Atrapa el globo para conseguir otro punto extra.'
+      'Mantén pulsado para saltar alto y suelta pronto para un salto corto. Atrapa el globo para sumar 100 puntos y conseguir otro punto extra.'
     ],
     hangman: [
       'Elige letras en pantalla o usa el teclado para completar la palabra antes de agotar las vidas.',
@@ -59,7 +59,7 @@
     ],
     doodle: [
       'Salta automáticamente entre plataformas. En PC usa A/D o ← y →; en móvil inclina el teléfono o usa los botones laterales.',
-      'Evita las plataformas rotas. Las azules se mueven y las moradas desaparecen al tocarlas. Resortes, hélices y cohetes te impulsan. Llega a 1000 de altura para ganar un punto extra.'
+      'Evita las plataformas rotas. Las azules se mueven y las moradas desaparecen al tocarlas. Resortes, hélices y cohetes te impulsan. Los globos aparecen rara vez y dan 50 puntos. Llega a 1000 puntos para ganar un punto extra.'
     ]
   };
   let helpDialogNumber = 0;

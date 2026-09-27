@@ -342,8 +342,8 @@
   function updateScoreDisplay() {
     const badge = document.getElementById('coeduca-extra-badge');
     if (badge) {
-      badge.textContent = '+' + (state.extraPoints + state.balloonBonus).toFixed(1) + ' pts extra';
-      badge.style.display = (state.extraPoints + state.balloonBonus) > 0 ? 'block' : 'none';
+      badge.querySelector('.cocean-bonus-number').textContent = (state.extraPoints + state.balloonBonus).toFixed(1);
+        badge.style.display = (state.extraPoints + state.balloonBonus) > 0 ? 'flex' : 'none';
     }
     const finalDisplay = document.getElementById('coeduca-final-score-display');
     if (finalDisplay) {
@@ -793,6 +793,7 @@
   }
 
   function switchAccount() {
+    if (global.COEDUCA_OCEAN) global.COEDUCA_OCEAN.mount(null);
     archiveAccountState(loadState());
     try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}
     try { sessionStorage.removeItem(state.storageKey + 'resumeAfterHistory'); } catch (e) {}
@@ -822,7 +823,7 @@
     }
     appRoot.className = 'coeduca-app';
     appRoot.innerHTML = `
-      <div class="coeduca-extra-badge" id="coeduca-extra-badge" style="display:none">+0 pts extra</div>
+      <div class="coeduca-extra-badge" id="coeduca-extra-badge" style="display:none" aria-label="Puntos extra"><img class="cocean-bonus-icon" src="shortcut-plus.svg" alt=""><span class="cocean-bonus-number">0.0</span></div>
       <header class="coeduca-header">
         <h1>${escapeHTML(cfg.topic || 'Ejercicio de Inglés')}</h1>
         <p>${escapeHTML(cfg.level || '')} - COEDUCA - Prof. José Eliseo Martínez</p>
@@ -857,6 +858,12 @@
       </div>
     `;
     state.appRoot = appRoot;
+    if (global.COEDUCA_OCEAN) global.COEDUCA_OCEAN.mount(cfg.examMode ? null : {
+      student: state.student,
+      activityId: 'ingles:' + (cfg.id || (cfg.topic + '|' + cfg.level)),
+      badgeId: 'coeduca-extra-badge',
+      getGrade: () => getTotalScore().grade
+    });
 
     // Mostrar nombres en el header
     renderHeaderStudents();
@@ -918,10 +925,7 @@
     if (cfg.game) {
       renderGame(cfg.game);
     } else {
-      document.getElementById('coeduca-game-section').innerHTML =
-        '<div class="coeduca-exercise"><div class="coeduca-exercise-title">Centro de juegos</div>' +
-        '<a class="coeduca-btn coeduca-btn-info" href="juegos.html" target="_blank" rel="noopener" ' +
-        'style="display:inline-flex;align-items:center;text-decoration:none;">🎮 Ir a centro de juegos</a></div>';
+      document.getElementById('coeduca-game-section').replaceChildren();
     }
   }
 
@@ -1220,8 +1224,6 @@
     section.innerHTML = `
       <div class="coeduca-exercise">
         <div class="coeduca-exercise-title">Juego del día</div>
-        <a class="coeduca-btn coeduca-btn-info game-center-link" href="juegos.html" target="_blank" rel="noopener"
-           style="display:flex;align-items:center;justify-content:center;width:max-content;max-width:100%;margin:16px auto 0;text-decoration:none;">🎮 Ir a centro de juegos</a>
         <div id="coeduca-game-body"></div>
       </div>
     `;
@@ -1232,6 +1234,7 @@
           container: document.getElementById('coeduca-game-body'),
           config: gameCfg,
           student: state.student,
+          hideAvatarButton: true,
           onWin: () => {
             const wasWin = state.gameResult === 'win';
             if (global.rigo) global.rigo.setEmotion && global.rigo.setEmotion('excited');
@@ -1266,11 +1269,6 @@
           '<p style="color:red">Error: juego "' + gameCfg.type + '" no disponible</p>';
       }
     }
-    const gameBody = document.getElementById('coeduca-game-body');
-    const ranking = gameBody.querySelector('.cg-leaderboard');
-    const centerLink = section.querySelector('.game-center-link');
-    if (ranking) ranking.before(centerLink);
-    else gameBody.appendChild(centerLink);
   }
 
   // =====================================================================

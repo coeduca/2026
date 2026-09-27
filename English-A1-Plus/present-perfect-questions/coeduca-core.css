@@ -831,11 +831,6 @@ body::after {
   box-shadow: var(--coeduca-shadow-sm);
   z-index: 100;
   text-shadow: 1px 1px 0 var(--coeduca-stroke);
-  animation: coeducaBadgePulse 2.5s ease-in-out infinite;
-}
-@keyframes coeducaBadgePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
 }
 
 /* ===== FINAL SCORE ===== */
