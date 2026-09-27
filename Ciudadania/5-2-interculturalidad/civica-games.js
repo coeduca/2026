@@ -1111,7 +1111,7 @@
 
     let dino, obstacles, clouds, mountains, hills, vy, onGround, gameOver, loop, speed;
     let frames, sunX, groundOffset, dustParticles, started;
-    let distance, finishDist, gate, jumpBuffer, jumpHeld;
+    let distance, finishDist, gate, jumpBuffer, jumpHeld, balloonPoints;
     let balloon, balloonSpawned, balloonFx, plusOne;
     let bonusEarned = false;
     let balloonBonusEarned = false;
@@ -1207,6 +1207,7 @@
       dustParticles = [];
       started = false;
       distance = 0;
+      balloonPoints = 0;
       finishDist = winThreshold / PTS_PER_DIST;
       gate = null;
       jumpBuffer = 0; jumpHeld = false;
@@ -1218,7 +1219,7 @@
     }
 
     function displayedScore() {
-      return Math.floor(distance * PTS_PER_DIST);
+      return Math.floor(distance * PTS_PER_DIST) + balloonPoints;
     }
 
     function spawnDust(n, cx, dirY) {
@@ -1257,11 +1258,16 @@
       }
     }
 
-    // 🎈 Al tocar el globo: explota, muestra +1 y suma un punto extra real
+    // 🎈 Al tocar el globo: explota, suma 100 al marcador y un punto extra real
     // (el core lo limita a una vez por sesión y lo mete en la nota web y PDF).
     function popBalloon(bx, by) {
       balloon = null;
       balloonBonusEarned = true;
+      balloonPoints = 100;
+      const boostedScore = displayedScore();
+      scoreVal.textContent = String(boostedScore);
+      progressEl.style.transform = 'scaleX(' + Math.min(1, boostedScore / winThreshold) + ')';
+      if (boostedScore >= winThreshold) awardBonus();
       const colors = ['#FF6B9D', '#FFD700', '#4FC3F7', '#E63946', '#fff'];
       for (let i = 0; i < 14; i++) {
         const ang = (i / 14) * Math.PI * 2;
@@ -1280,7 +1286,7 @@
       if (ctx.onBalloonBonus) ctx.onBalloonBonus();
       else if (C.addBalloonBonus) C.addBalloonBonus();
       if (global.rigo && global.rigo.say) {
-        global.rigo.say('¡Atrapaste el globo! +1 punto extra 🎈', 4000);
+        global.rigo.say('¡Globo! +100 puntos y +1 punto extra 🎈', 4000);
       }
       spawnConfetti(wrap, 15);
     }
@@ -1331,7 +1337,7 @@
       const shownScore = displayedScore();
       if (scoreVal.textContent !== String(shownScore)) scoreVal.textContent = shownScore;
       if (frames % 4 === 0 || (shownScore >= winThreshold && !bonusEarned)) {
-        progressEl.style.transform = 'scaleX(' + Math.min(1, distance / finishDist) + ')';
+        progressEl.style.transform = 'scaleX(' + Math.min(1, shownScore / winThreshold) + ')';
       }
       if (shownScore >= winThreshold) awardBonus();
 
@@ -1837,11 +1843,11 @@
       cctx.beginPath();
       cctx.ellipse(b.x - 4, by - 5, 3, 4.5, -0.5, 0, Math.PI * 2);
       cctx.fill();
-      // Etiqueta +1
+      // Etiqueta de puntos del globo
       cctx.fillStyle = '#fff';
-      cctx.font = 'bold 10px Comic Sans MS, system-ui';
+      cctx.font = 'bold 8px Comic Sans MS, system-ui';
       cctx.textAlign = 'center';
-      cctx.fillText('+1', b.x, by + 4);
+      cctx.fillText('+100', b.x, by + 4);
       cctx.restore();
     }
 
@@ -2020,7 +2026,7 @@
       });
       cctx.globalAlpha = 1;
 
-      // "+1" flotante al explotar el globo
+      // "+100" flotante al explotar el globo
       if (plusOne) {
         cctx.save();
         cctx.globalAlpha = Math.min(1, plusOne.life / 20);
@@ -2028,9 +2034,9 @@
         cctx.textAlign = 'center';
         cctx.strokeStyle = '#1a1a1a';
         cctx.lineWidth = 4;
-        cctx.strokeText('+1', plusOne.x, plusOne.y);
+        cctx.strokeText('+100', plusOne.x, plusOne.y);
         cctx.fillStyle = '#FFD700';
-        cctx.fillText('+1', plusOne.x, plusOne.y);
+        cctx.fillText('+100', plusOne.x, plusOne.y);
         cctx.restore();
       }
 

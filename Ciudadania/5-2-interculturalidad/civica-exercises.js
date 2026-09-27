@@ -56,9 +56,9 @@
   function gradeButton(onCheck, ctx) {
     const btn = document.createElement('button');
     btn.className = 'civica-btn civica-btn-success';
-    // En exam mode: el boton dice "guardar respuestas" y solo se puede usar una vez
-    btn.textContent = (ctx && ctx.examMode) ? 'guardar respuestas' : 'Revisar respuestas';
-    btn.style.marginTop = '12px';
+    btn.textContent = 'Guardar respuestas';
+    if (ctx && ctx.examMode) btn.style.marginTop = '12px';
+    else btn.style.display = 'none';
     btn.addEventListener('click', () => {
       onCheck();
       if (ctx && ctx.examMode) {
@@ -68,7 +68,62 @@
         btn.style.cursor = 'not-allowed';
       }
     });
+    if (!ctx || !ctx.examMode) queueMicrotask(() => autoReview(btn));
     return btn;
+  }
+
+  function autoReview(btn) {
+    const root = btn.parentElement && btn.parentElement.parentElement;
+    if (!root) return;
+    const selected = new Set();
+    let reviewed = false;
+    const all = (selector, predicate) => {
+      const nodes = [...root.querySelectorAll(selector)];
+      return nodes.length === 0 || nodes.every(predicate);
+    };
+    function ready() {
+      if (root.querySelector('.civica-table')) {
+        const cells = root.querySelectorAll('.civica-table-textarea,.civica-cell-select select,.civica-cell-checkable,.civica-cell-drop');
+        return cells.length > 0 && all('.civica-table-textarea', input => input.value.trim().length >= CIVICA_OPEN_ANSWER_MIN_LENGTH) &&
+          all('.civica-cell-select select', select => select.value !== '') &&
+          all('.civica-cell-checkable', cell => !!cell.dataset.state) &&
+          all('.civica-cell-drop', cell => !!cell.dataset.tokenLabel);
+      }
+      if (root.querySelector('.cv-ta-input')) return all('.cv-ta-input', input => input.value.trim().length >= CIVICA_OPEN_ANSWER_MIN_LENGTH);
+      if (root.querySelector('.cat-drop')) return all('[data-idx]', chip => !!chip.closest('.cat-drop'));
+      if (root.querySelector('.rl-input')) return all('.rl-input', input => !!input.value.trim());
+      if (root.querySelector('.ep-input')) return all('.ep-input', input => !!input.value.trim());
+      if (root.querySelector('input[name^="mc-"]')) {
+        const inputs = [...root.querySelectorAll('input[name^="mc-"]')];
+        const names = new Set(inputs.map(input => input.name));
+        return names.size > 0 && [...names].every(name => inputs.some(input => input.name === name && input.checked));
+      }
+      if (root.querySelector('.se-word')) return selected.size === new Set([...root.querySelectorAll('.se-word')].map(word => word.dataset.i)).size;
+      if (root.querySelector('.dd-sel')) return all('.dd-sel', select => select.value !== '');
+      if (root.querySelector('.fb-input')) return all('.fb-input', input => !!input.value.trim());
+      if (root.querySelector('.tf-btn')) return selected.size === new Set([...root.querySelectorAll('.tf-btn')].map(button => button.dataset.i)).size;
+      if (root.querySelector('.wsel-word')) {
+        const count = root.querySelector('.wsel-counter-global')?.textContent.match(/Seleccionadas:\s*(\d+)\s*\/\s*(\d+)/);
+        return !!count && Number(count[2]) > 0 && Number(count[1]) >= Number(count[2]);
+      }
+      return false;
+    }
+    const check = () => {
+      if (!reviewed && ready()) {
+        reviewed = true;
+        observer.disconnect();
+        btn.click();
+      }
+    };
+    const observer = new MutationObserver(check);
+    observer.observe(root, {subtree:true, childList:true, attributes:true, attributeFilter:['data-state', 'data-token-label']});
+    root.addEventListener('change', check);
+    root.addEventListener('focusout', check);
+    root.addEventListener('click', event => {
+      const choice = event.target.closest('.se-word,.tf-btn');
+      if (choice && root.contains(choice)) selected.add(choice.dataset.i);
+      check();
+    });
   }
 
   // =====================================================================
@@ -881,8 +936,10 @@
     // Validar las respuestas
     const btn = document.createElement('button');
     btn.className = 'civica-btn civica-btn-success';
-    btn.textContent = ctx.examMode ? 'guardar respuestas' : 'Revisar respuestas';
-    btn.style.marginTop = '12px';
+    if (ctx.examMode) {
+      btn.textContent = 'Guardar respuestas';
+      btn.style.marginTop = '12px';
+    }
     btn.addEventListener('click', () => {
       let correct = 0;
       const details = [];
@@ -911,6 +968,19 @@
       }
     });
     wrap.appendChild(btn);
+    if (!ctx.examMode) {
+      btn.style.display = 'none';
+      const autoCheck = new MutationObserver(() => {
+        if (items.length && items.every((it, i) => {
+          const target = wrap.querySelector(`.ro-target[data-i="${i}"]`);
+          return target && target.querySelectorAll('[data-word]').length === it.original.length;
+        })) {
+          autoCheck.disconnect();
+          btn.click();
+        }
+      });
+      autoCheck.observe(wrap, {subtree:true, childList:true});
+    }
 
     ctx.container.appendChild(wrap);
   });

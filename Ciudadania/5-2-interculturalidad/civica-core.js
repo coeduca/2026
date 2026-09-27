@@ -331,8 +331,8 @@
       if (isExam) {
         badge.style.display = 'none';
       } else {
-        badge.textContent = '+' + (state.extraPoints + state.balloonBonus).toFixed(1) + ' pts extra';
-        badge.style.display = (state.extraPoints + state.balloonBonus) > 0 ? 'block' : 'none';
+        badge.querySelector('.cocean-bonus-number').textContent = (state.extraPoints + state.balloonBonus).toFixed(1);
+        badge.style.display = (state.extraPoints + state.balloonBonus) > 0 ? 'flex' : 'none';
       }
     }
     const finalDisplay = document.getElementById('civica-final-score-display');
@@ -733,6 +733,7 @@
   }
 
   function switchAccount() {
+    if (global.COEDUCA_OCEAN) global.COEDUCA_OCEAN.mount(null);
     archiveAccountState(loadState());
     try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}
     try { sessionStorage.removeItem(state.storageKey + 'resumeAfterHistory'); } catch (e) {}
@@ -762,7 +763,7 @@
     appRoot.className = 'civica-app';
     const subjectLabel = cfg.subjectLabel || 'Ciudadanía y Valores';
     appRoot.innerHTML = `
-      <div class="civica-extra-badge" id="civica-extra-badge" style="display:none">+0 pts extra</div>
+      <div class="civica-extra-badge" id="civica-extra-badge" style="display:none" aria-label="Puntos extra"><img class="cocean-bonus-icon" src="shortcut-plus.svg" alt=""><span class="cocean-bonus-number">0.0</span></div>
       <header class="civica-header">
         <div class="civica-subject-pill">${escapeHTML(subjectLabel)}</div>
         <h1>${escapeHTML(cfg.topic || 'Sesión de Ciudadanía y Valores')}</h1>
@@ -798,6 +799,12 @@
       </div>
     `;
     state.appRoot = appRoot;
+    if (global.COEDUCA_OCEAN) global.COEDUCA_OCEAN.mount(cfg.examMode ? null : {
+      student: state.student,
+      activityId: 'civica:' + (cfg.id || cfg.topic),
+      badgeId: 'civica-extra-badge',
+      getGrade: () => getTotalScore().grade
+    });
     renderHeaderStudents();
 
     if (cfg.examMode) {
@@ -904,12 +911,7 @@
     });
 
     if (cfg.game) renderGame(cfg.game);
-    else document.getElementById('civica-game-section').innerHTML =
-      '<div class="civica-section civica-section--consolidate" style="margin-top:32px;">' +
-      '<div class="civica-section-header"><div class="civica-section-icon">🎮</div>' +
-      '<div class="civica-section-titles"><div class="civica-section-title">Centro de juegos</div></div></div>' +
-      '<div class="civica-exercise"><a class="civica-btn civica-btn-info" href="juegos.html" target="_blank" rel="noopener" ' +
-      'style="display:inline-flex;align-items:center;text-decoration:none;">🎮 Ir a centro de juegos</a></div></div>';
+    else document.getElementById('civica-game-section').replaceChildren();
   }
 
   // =====================================================================
@@ -1253,8 +1255,6 @@
           </div>
         </div>
         <div class="civica-exercise">
-          <a class="civica-btn civica-btn-info game-center-link" href="juegos.html" target="_blank" rel="noopener"
-             style="display:flex;align-items:center;justify-content:center;width:max-content;max-width:100%;margin:16px auto 0;text-decoration:none;">🎮 Ir a centro de juegos</a>
           <div id="civica-game-body"></div>
         </div>
       </div>
@@ -1266,6 +1266,7 @@
           container: document.getElementById('civica-game-body'),
           config: gameCfg,
           student: state.student,
+          hideAvatarButton: true,
           onWin: () => {
             const wasWin = state.gameResult === 'win';
             if (global.rigo) global.rigo.setEmotion && global.rigo.setEmotion('excited');
@@ -1298,11 +1299,6 @@
           '<p style="color:red">Error: juego "' + gameCfg.type + '" no disponible</p>';
       }
     }
-    const gameBody = document.getElementById('civica-game-body');
-    const ranking = gameBody.querySelector('.cg-leaderboard');
-    const centerLink = section.querySelector('.game-center-link');
-    if (ranking) ranking.before(centerLink);
-    else gameBody.appendChild(centerLink);
   }
 
   const AUDIO_PLAY_ICON = '<path d="M8 5v14l11-7z"/>';
