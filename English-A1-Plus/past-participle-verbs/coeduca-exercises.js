@@ -59,10 +59,55 @@
   function gradeButton(onCheck) {
     const btn = document.createElement('button');
     btn.className = 'coeduca-btn coeduca-btn-success';
-    btn.textContent = 'Revisar respuestas';
-    btn.style.marginTop = '12px';
+    btn.style.display = 'none';
     btn.addEventListener('click', onCheck);
+    queueMicrotask(() => autoReview(btn));
     return btn;
+  }
+
+  function autoReview(btn) {
+    const root = btn.parentElement && btn.parentElement.parentElement;
+    if (!root) return;
+    const selected = new Set();
+    let reviewed = false;
+    const all = (selector, predicate) => {
+      const nodes = [...root.querySelectorAll(selector)];
+      return nodes.length > 0 && nodes.every(predicate);
+    };
+    function ready() {
+      if (root.querySelector('.rl-slot')) return all('.rl-slot', slot => !!slot.querySelector('.rl-card'));
+      if (root.querySelector('.rl-input')) return all('.rl-input', input => !!input.value.trim());
+      if (root.querySelector('.ep-input')) return all('.ep-input', input => !!input.value.trim());
+      if (root.querySelector('input[name^="mc-"]')) {
+        const names = new Set([...root.querySelectorAll('input[name^="mc-"]')].map(input => input.name));
+        return names.size > 0 && [...names].every(name => [...root.querySelectorAll('input[name^="mc-"]')].some(input => input.name === name && input.checked));
+      }
+      if (root.querySelector('.se-word')) return selected.size === new Set([...root.querySelectorAll('.se-word')].map(word => word.dataset.i)).size;
+      if (root.querySelector('.dd-sel')) return all('.dd-sel', select => select.value !== '');
+      if (root.querySelector('.fb-input')) return all('.fb-input', input => !!input.value.trim());
+      if (root.querySelector('.tf-btn')) return selected.size === new Set([...root.querySelectorAll('.tf-btn')].map(button => button.dataset.i)).size;
+      if (root.querySelector('.wsel-word')) {
+        const count = root.querySelector('.wsel-counter-global')?.textContent.match(/Seleccionadas:\s*(\d+)\s*\/\s*(\d+)/);
+        return !!count && Number(count[2]) > 0 && Number(count[1]) >= Number(count[2]);
+      }
+      return false;
+    }
+    const check = () => {
+      if (!reviewed && ready()) {
+        reviewed = true;
+        observer.disconnect();
+        btn.click();
+      }
+    };
+    const observer = new MutationObserver(check);
+    observer.observe(root, {subtree:true, childList:true});
+    root.addEventListener('change', check);
+    root.addEventListener('focusout', check);
+    root.addEventListener('click', event => {
+      const choice = event.target.closest('.se-word,.tf-btn');
+      if (choice && root.contains(choice)) selected.add(choice.dataset.i);
+      check();
+    });
   }
 
   // =====================================================================
@@ -933,8 +978,6 @@
     // Validar las respuestas
     const btn = document.createElement('button');
     btn.className = 'coeduca-btn coeduca-btn-success';
-    btn.textContent = 'Revisar respuestas';
-    btn.style.marginTop = '12px';
     btn.addEventListener('click', () => {
       let correct = 0;
       const details = [];
@@ -954,6 +997,17 @@
       if (correct === items.length) ctx.cheer(); else ctx.comfort();
     });
     wrap.appendChild(btn);
+    btn.style.display = 'none';
+    const autoCheck = new MutationObserver(() => {
+      if (items.length && items.every((it, i) => {
+        const target = wrap.querySelector(`.ro-target[data-i="${i}"]`);
+        return target && target.querySelectorAll('[data-word]').length === it.original.length;
+      })) {
+        autoCheck.disconnect();
+        btn.click();
+      }
+    });
+    autoCheck.observe(wrap, {subtree:true, childList:true});
 
     ctx.container.appendChild(wrap);
   });
