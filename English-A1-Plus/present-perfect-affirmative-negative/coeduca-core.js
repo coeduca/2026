@@ -445,6 +445,7 @@
     if (!db) { try { db = STUDENTS; } catch (e) {} }
     const nie = String(saved.student.nie);
     if (!db || !db[nie]) return false;
+    if (nie === '1999' || nie === '12379') return false;
     const found = { nie, ...db[nie] };
     if (!isAllowedAtLevel(found)) return false;
     state.student = found;
@@ -699,8 +700,21 @@
       nieInput.addEventListener('input', validateMain);
       addPartnerBtn.addEventListener('click', addPartnerField);
 
-      const finish = () => {
+      const finish = async () => {
         if (!mainStudent) return;
+        const chosen = mainStudent;
+        if (chosen.nie === '1999' || chosen.nie === '12379') {
+          const auth = global.COEDUCA_FIXED_AUTH;
+          if (!auth) {
+            nieError.textContent = 'No se pudo cargar el acceso protegido.';
+            nieError.classList.add('show');
+            return;
+          }
+          submitBtn.disabled = true;
+          const accepted = await auth.requestLogin(chosen.nie);
+          submitBtn.disabled = false;
+          if (!accepted || mainStudent !== chosen) return;
+        }
         
         const prev = loadState();
         if (!prev || !prev.student || String(prev.student.nie) !== String(mainStudent.nie)) {
@@ -794,6 +808,7 @@
   }
 
   function switchAccount() {
+    if (global.COEDUCA_FIXED_AUTH) global.COEDUCA_FIXED_AUTH.clear();
     if (global.COEDUCA_OCEAN) global.COEDUCA_OCEAN.mount(null);
     archiveAccountState(loadState());
     try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}

@@ -176,7 +176,7 @@
     try { loginRequired = sessionStorage.getItem(loginRequiredKey) === '1'; } catch (e) {}
     if (!loginRequired && saved && saved.student) {
       const savedStudent = findStudent(String(saved.student.nie || ''));
-      if (savedStudent && allowed(savedStudent)) student = savedStudent;
+      if (savedStudent && allowed(savedStudent) && savedStudent.nie !== '1999' && savedStudent.nie !== '12379') student = savedStudent;
     }
     if (student) {
       showGame();
@@ -184,13 +184,19 @@
     }
     loginSection.hidden = false;
     requestAnimationFrame(() => loginSection.scrollIntoView({ block: 'start' }));
-    document.getElementById('gc-login-form').addEventListener('submit', event => {
+    document.getElementById('gc-login-form').addEventListener('submit', async event => {
       event.preventDefault();
       const nie = document.getElementById('gc-nie').value.trim();
       const found = findStudent(nie);
       const error = document.getElementById('gc-login-error');
       if (!found) { error.textContent = 'No encontramos ese NIE en este paquete.'; return; }
       if (!allowed(found)) { error.textContent = 'Este grado no tiene acceso a la actividad.'; return; }
+      if (nie === '1999' || nie === '12379') {
+        const auth = window.COEDUCA_FIXED_AUTH;
+        if (!auth) { error.textContent = 'No se pudo cargar el acceso protegido.'; return; }
+        const accepted = await auth.requestLogin(nie);
+        if (!accepted) return;
+      }
       error.textContent = '';
       const prior = readSnapshot();
       const sameStudent = prior && prior.student && String(prior.student.nie) === nie;

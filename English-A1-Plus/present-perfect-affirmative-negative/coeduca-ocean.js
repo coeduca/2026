@@ -4,8 +4,13 @@
 
   const URL = 'https://pxoxmcyyhjpjggbseqcr.supabase.co';
   const KEY = 'sb_publishable_uBmOVK8akx2H73wpKDxT-w_vtTTcPr9';
+  // Todos los paquetes comparten el mismo océano. activityId se conserva en
+  // las RPC por compatibilidad con paquetes ya publicados.
+  const GLOBAL_ACTIVITY_ID = 'coeduca-global-ocean-v1';
   const MAX_FISH = 20;
   const MAX_BOTTLES = 20;
+  // Mismo icono de ayuda (bombilla) que aparece junto al título de los juegos.
+  const INFO_ICON = '<svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960" fill="currentColor"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>';
   let active = null;
 
   function styles() {
@@ -13,10 +18,11 @@
     const style = document.createElement('style');
     style.id = 'cocean-style';
     style.textContent = `
+      @font-face{font-family:CoeducaCaveat;src:url('mailbox-caveat.ttf') format('truetype');font-style:normal;font-weight:400 700;font-display:swap}
       .cocean-shortcuts{position:fixed;top:14px;left:14px;z-index:101;display:flex;flex-direction:column;gap:6px;width:108px}
       .cocean-fab,.cocean-quick{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;text-align:center;border:2px solid #18364a;border-radius:99px;color:#fff;padding:6px 8px;font:800 13px system-ui,sans-serif;box-shadow:2px 3px 0 #18364a;cursor:pointer;text-decoration:none;white-space:nowrap}
       .cocean-shortcut-icon,.cocean-bonus-icon{display:block;flex:none;width:19px;height:19px;object-fit:contain;filter:brightness(0) invert(1)}.cocean-label{display:block;overflow:hidden;white-space:nowrap}
-      .cocean-fab{background:#0788bd}.cocean-games{background:#cf476c}.cocean-avatar-open{background:#309c59}
+      .cocean-fab{background:#0788bd}.cocean-inbox{background:#7543c5}.cocean-games{background:#cf476c}.cocean-avatar-open{background:#309c59}
       .cocean-extra-badge{display:flex;align-items:center;justify-content:center;gap:6px;width:108px!important;box-sizing:border-box;text-align:center;white-space:nowrap;animation:none!important;transition:width .2s ease!important;background:#e7b43c!important;color:#3f2b08!important;text-shadow:none!important;border-color:#78550e!important}.cocean-bonus-icon{width:18px;height:18px;filter:brightness(0)}.cocean-shortcuts :focus-visible,.cocean button:focus-visible{outline:3px solid #ffce51;outline-offset:3px}
       .cocean-backdrop{position:fixed;inset:0;z-index:10000;background:#071d32b8;display:grid;place-items:center;padding:12px;box-sizing:border-box}
       .cocean-lock-card{width:min(360px,100%);padding:25px 22px;border:2px solid #b9e8fa;border-radius:22px;background:linear-gradient(145deg,#effbff,#cceef9);box-shadow:0 18px 45px #061c3b80;color:#17384a;text-align:center;font:16px/1.45 system-ui,sans-serif}.cocean-lock-icon{font-size:48px;line-height:1}.cocean-lock-card h2{margin:8px 0;font-size:22px}.cocean-lock-card p{margin:0 0 18px}.cocean-lock-card button{border:2px solid #164b6d;border-radius:12px;padding:9px 25px;background:#ffdb69;color:#17384a;font:800 15px system-ui,sans-serif;cursor:pointer}
@@ -45,12 +51,19 @@
       .cocean-panel[hidden]{display:none}.cocean-panel h3{margin:0;font-size:18px}.cocean-panel p{margin:0}.cocean-panel textarea{width:100%;min-height:110px;resize:vertical;border:2px solid #427a97;border-radius:10px;padding:9px;font:16px system-ui,sans-serif}
       .cocean-fish-author{display:flex;flex:1;min-width:0;align-items:center;gap:12px;padding:5px;border:1px solid #ffffffb8;border-radius:14px;background:rgba(255,255,255,.27);font-weight:800}.cocean-author-name{min-width:0;overflow-wrap:anywhere}.cocean-avatar{display:grid;place-items:center;flex:none;width:50px;height:50px;border:2px solid #164b6d;border-radius:50%;overflow:hidden;background:#eaf7ff;font-size:24px}.cocean-avatar img{display:block;width:100%;height:100%;object-fit:contain}.cocean-avatar img.cocean-avatar-placeholder,.cocean-avatar img.cg-leaderboard-placeholder{width:86%;height:86%;transform:translateY(10%)}.cocean-avatar[data-kind="photo"] img{object-fit:cover}
       .cocean-message{padding:12px;border-radius:16px 16px 16px 4px;background:#f3fdffdd;border:1px solid #fff;box-shadow:0 3px 10px #07324d25;white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px;line-height:1.45;text-align:center}.cocean-message-meta,.cocean-fish-meta{display:flex;align-items:stretch;justify-content:center;gap:8px;font-size:13px;font-weight:800}.cocean-message-meta .cocean-avatar{width:40px;height:40px;font-size:20px}.cocean-views{display:flex;flex:none;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:72px;padding:5px 7px;border:1px solid #ffffffb8;border-radius:14px;background:rgba(255,255,255,.27);font-size:11px;white-space:nowrap}.cocean-views img{display:block;width:21px;height:21px;object-fit:contain}.cocean-danger{border:2px solid #9e2739;border-radius:12px;padding:9px 12px;background:#fff4f4;color:#912139}.cocean-delete-check{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap;padding:8px;border-radius:12px;background:#fff6f4d9;font-size:12px}.cocean-delete-check[hidden]{display:none}
+      .cocean-mailbox-backdrop{z-index:10001}.cocean-mailbox{width:min(700px,100%);max-height:min(760px,94dvh);overflow:hidden;background:#fbf7ff;border:3px solid #4a287d;border-radius:20px;box-shadow:0 18px 50px #21133d80;color:#302244;font:16px system-ui,sans-serif;display:flex;flex-direction:column}.cocean-mailbox *{box-sizing:border-box}.cocean-mailbox header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#eadcff;border-bottom:1px solid #c9afea}.cocean-mailbox h2{display:flex;align-items:center;gap:8px;flex:1;margin:0;font-size:22px}.cocean-mailbox-header-icon{display:block;width:28px;height:28px;object-fit:contain}.cocean-mailbox-close{border:0;background:transparent;color:#4a287d;font-size:28px!important;line-height:1}.cocean-mailbox-body,.cocean-mailbox-view{display:flex;flex-direction:column;gap:12px;min-height:0}.cocean-mailbox-body{overflow:auto;padding:16px}.cocean-mailbox-tabs{display:flex;gap:8px;flex-wrap:wrap}.cocean-mailbox-tab{border:2px solid #7650ad;border-radius:12px;padding:8px 13px;background:#fff;color:#503184}.cocean-mailbox-tab[aria-selected="true"]{background:#7650ad;color:#fff}.cocean-mailbox-card{display:flex;flex-direction:column;gap:12px;padding:16px;border:2px solid #d7c4f0;border-radius:16px;background:#fff;box-shadow:0 4px 12px #4a287d18}.cocean-mailbox-card h3{margin:0;color:#4a287d;font-size:18px}.cocean-mailbox-message{padding:14px;border-radius:14px;background:#f7f1ff;border:1px solid #e3d4f7;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5;min-height:84px}.cocean-mailbox-meta{color:#66557b;font-size:13px}.cocean-mailbox-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.cocean-mailbox-button{border:2px solid #5c368f;border-radius:12px;padding:9px 14px;background:#fff;color:#4a287d;font-weight:800;cursor:pointer}.cocean-mailbox-primary{background:#7650ad;color:#fff}.cocean-mailbox-danger{border-color:#a53053;background:#fff4f6;color:#942546}.cocean-mailbox-compose{display:flex;flex-direction:column;gap:10px;padding:14px;border:2px solid #d7c4f0;border-radius:16px;background:#fff}.cocean-mailbox-compose label{font-weight:800;color:#4a287d}.cocean-mailbox-compose input,.cocean-mailbox-compose textarea{width:100%;border:2px solid #b99cda;border-radius:10px;padding:9px;background:#fff;font:16px system-ui,sans-serif;color:#302244}.cocean-mailbox-compose textarea{min-height:125px;resize:vertical}.cocean-mailbox-results{display:flex;flex-direction:column;gap:6px;max-height:185px;overflow:auto}.cocean-mailbox-result{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:1px solid #cfb9e8;border-radius:10px;padding:8px 10px;background:#fbf8ff;color:#3d285d;text-align:left}.cocean-mailbox-result small{display:block;color:#806c98}.cocean-mailbox-result[aria-pressed="true"]{outline:3px solid #c19be9;background:#f0e4ff}.cocean-mailbox-status{min-height:21px;margin:0;color:#644b83;text-align:center;font-size:13px}.cocean-mailbox-status:empty{min-height:0}.cocean-mailbox-empty{padding:18px;text-align:center;color:#715f86}.cocean-mailbox-counter{color:#806c98;font-size:13px}
+      .cocean-mailbox-tabs{justify-content:center}.cocean-mailbox-tab{min-width:118px;text-align:center}.cocean-mailbox-card{position:relative;min-height:230px;gap:14px;padding:28px 30px 32px 60px;border:1px solid #d7c9ab;border-radius:3px;background:linear-gradient(90deg,transparent 0 41px,#edb8bb 42px 43px,transparent 44px),repeating-linear-gradient(to bottom,#fffdf7 0 31px,#dce8ee 32px);box-shadow:0 2px 0 #e7ddca,0 12px 24px #4b38602b;color:#3d3441}.cocean-mailbox-card h3{font:700 20px/1.5 'Trebuchet MS',system-ui,sans-serif;color:#503d67}.cocean-mailbox-message{min-height:106px;padding:0;border:0;border-radius:0;background:transparent;font:17px/2 'Trebuchet MS',system-ui,sans-serif;text-align:left}.cocean-mailbox-meta{line-height:1.5}.cocean-mailbox-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.cocean-mailbox-compose-trigger{margin-left:auto}.cocean-mailbox-button:focus-visible,.cocean-mailbox input:focus-visible,.cocean-mailbox textarea:focus-visible{outline:3px solid #c29deb;outline-offset:2px}
+      .cocean-mailbox-message{font:500 29px/32px CoeducaCaveat,'Segoe Print',cursive}.cocean-mailbox-results{padding:5px 7px 7px;overflow-x:hidden}.cocean-mailbox-result{flex:0 0 auto;min-width:0;box-shadow:0 1px 3px #4a287d18}.cocean-mailbox-result[aria-pressed="true"]{outline-offset:0}.cocean-mailbox-compose{padding:0;border:0;background:transparent}.cocean-mailbox-search-area{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid #d7c4f0;border-radius:12px;background:#fff}.cocean-mailbox-search-area[hidden],.cocean-mailbox-selected[hidden]{display:none}.cocean-mailbox-selected{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border:1px solid #d7c4f0;border-radius:12px;background:#f3eaff;color:#4a287d}.cocean-mailbox-selected-name{font-weight:800;overflow-wrap:anywhere}.cocean-mailbox-selected .cocean-mailbox-button{flex:none;padding:5px 9px}.cocean-mailbox-note-page{position:relative;display:flex;flex-direction:column;gap:12px;min-height:260px;padding:22px 28px 18px 60px;border:1px solid #d7c9ab;border-radius:3px;background:linear-gradient(90deg,transparent 0 41px,#edb8bb 42px 43px,transparent 44px),repeating-linear-gradient(to bottom,#fffdf7 0 31px,#dce8ee 32px);box-shadow:0 2px 0 #e7ddca,0 12px 24px #4b38602b}.cocean-mailbox-note-page label{font:700 20px/1.5 'Trebuchet MS',system-ui,sans-serif}.cocean-mailbox-compose .cocean-mailbox-note-page textarea{flex:1;min-height:170px;padding:0;border:0;border-radius:0;background:transparent;color:#3d3441;font:500 29px/32px CoeducaCaveat,'Segoe Print',cursive;resize:vertical}.cocean-mailbox-note-page textarea:focus-visible{outline:2px solid #c29deb;outline-offset:4px}.cocean-mailbox-counter{align-self:flex-end}
+      .cocean-mailbox-title-row{display:flex;align-items:center;gap:8px;flex:1;min-width:0}.cocean-mailbox-title-row h2{flex:none}.cocean-mailbox-info{display:inline-grid;place-items:center;flex:none;width:30px;height:30px;margin-left:1px;padding:3px;border:2px solid currentColor;border-radius:8px;background:#fff;color:#4a287d;cursor:pointer}.cocean-mailbox-info svg{display:block;width:20px;height:20px}.cocean-mailbox-info:focus-visible,.cocean-mailbox-help button:focus-visible{outline:3px solid #b679ea;outline-offset:2px}.cocean-mailbox-help-backdrop{z-index:10002}.cocean-mailbox-help{width:min(440px,100%);max-height:90dvh;overflow:auto;padding:22px;border:3px solid #4a287d;border-radius:18px;background:#fffaf0;color:#3e2a59;box-shadow:4px 4px 0 #4a287d;font:15px/1.55 system-ui,sans-serif}.cocean-mailbox-help h2{margin:0 0 12px;font-size:21px}.cocean-mailbox-help p{margin:0 0 12px}.cocean-mailbox-help button{display:block;min-height:42px;margin:16px 0 0 auto;padding:8px 18px;border:2px solid #4a287d;border-radius:10px;background:#eadcff;color:#4a287d;font:800 14px system-ui,sans-serif;cursor:pointer}
+      .cocean-mailbox-card h3{font-size:14px;line-height:20px;letter-spacing:.01em}.cocean-mailbox-card{background:linear-gradient(90deg,transparent 0 41px,#edb8bb 42px 43px,transparent 44px),#fffdf7}.cocean-mailbox-message{background:repeating-linear-gradient(to bottom,transparent 0 31px,#dce8ee 31px 32px);line-height:32px;background-attachment:local}.cocean-mailbox-note-page{background:linear-gradient(90deg,transparent 0 41px,#edb8bb 42px 43px,transparent 44px),#fffdf7}.cocean-mailbox-compose .cocean-mailbox-note-page textarea{background:repeating-linear-gradient(to bottom,transparent 0 31px,#dce8ee 31px 32px);line-height:32px;background-attachment:local}
       .cocean-reactions{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;padding:5px 0}.cocean-reaction{display:flex;align-items:center;justify-content:center;gap:4px;min-width:51px;border:1.5px solid #ffffffba;border-radius:99px;padding:5px 7px;background:#effaffb8;color:#17384a;box-shadow:0 2px 7px #08375123;font-size:14px!important}.cocean-reaction[aria-pressed="true"]{background:#ffdc74e8;border-color:#f4ab27;box-shadow:0 0 0 2px #fff8}.cocean-reaction:disabled{opacity:.65;cursor:wait}.cocean-reaction-count{font-size:12px;font-weight:800}
       .cocean-draw{width:min(100%,440px);height:220px;touch-action:none;background:linear-gradient(45deg,#e8f4f7 25%,transparent 25%),linear-gradient(-45deg,#e8f4f7 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e8f4f7 75%),linear-gradient(-45deg,transparent 75%,#e8f4f7 75%);background-size:20px 20px;background-color:#fff;border:2px solid #427a97;border-radius:10px;align-self:center}
       .cocean-colors{display:flex;width:100%;gap:5px;justify-content:center;flex-wrap:nowrap}.cocean-color{flex:1 1 0;max-width:28px;min-width:20px;aspect-ratio:1;border:2px solid #164b6d;border-radius:50%;padding:0}.cocean-color[aria-pressed=true]{outline:3px solid #ffbd39;outline-offset:2px}.cocean-draw-tools{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.cocean-eraser{display:grid;place-items:center;width:38px;height:38px;padding:6px}.cocean-eraser img,.cocean-clear img{display:block;width:19px;height:19px;object-fit:contain}.cocean-clear{display:inline-flex;align-items:center;justify-content:center;gap:6px}.cocean-eraser[aria-pressed=true]{background:#ffdb69;box-shadow:0 0 0 2px #e7a926}.cocean-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}.cocean-panel-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:auto}.cocean-read{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
       @media(min-width:701px) and (min-height:600px){.cocean{width:min(1050px,96vw);height:min(840px,96dvh)}.cocean-panel{inset:4% auto;width:min(680px,calc(100% - 48px));left:50%;transform:translateX(-50%);overflow:visible;padding:20px;gap:12px}.cocean-panel[data-mode="fish-author"],.cocean-panel[data-mode="read"]{inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);max-height:calc(100% - 40px);padding:20px;gap:12px}.cocean-panel[data-mode="fish-author"]{width:min(480px,calc(100% - 48px))}.cocean-panel[data-mode="read"]{width:min(560px,calc(100% - 48px))}.cocean-panel[data-mode="fish-author"] h3,.cocean-panel[data-mode="read"] h3{font-size:20px}.cocean-fish-preview{height:122px}.cocean-fish-preview img{width:min(210px,100%);height:112px}.cocean-bottle-preview{height:116px}.cocean-bottle-preview img{width:108px;height:112px}.cocean-draw{height:260px}.cocean-panel textarea{min-height:170px}}
       @media(min-width:701px) and (max-height:699px){.cocean-draw{height:190px}.cocean-panel textarea{min-height:130px}}
       @media(max-width:600px){.cocean-shortcuts{top:8px;left:8px;width:36px;gap:4px;transition:width .2s ease}.cocean-shortcuts.is-expanded{width:96px}.cocean-fab,.cocean-quick{height:36px;min-height:36px;padding:4px;font-size:11px;gap:5px}.cocean-shortcuts:not(.is-expanded) .cocean-fab,.cocean-shortcuts:not(.is-expanded) .cocean-quick{gap:0;padding:0}.cocean-shortcuts:not(.is-expanded) .cocean-label{display:none}.cocean-shortcut-icon{width:19px;height:19px}.cocean-extra-badge{width:36px!important;min-height:36px;padding:0!important;gap:0;font-size:11px!important;cursor:pointer}.cocean-extra-badge:not(.is-expanded) .cocean-bonus-number{display:none}.cocean-extra-badge.is-expanded{width:96px!important;gap:5px;font-size:12px!important}.cocean-bonus-icon{width:19px;height:19px}.cocean-backdrop{padding:4px}.cocean{height:98dvh;border-radius:13px}.cocean header{padding:8px}.cocean h2{font-size:19px}.cocean-scene{min-height:180px}.cocean-panel{inset:3%;padding:10px}.cocean-panel[data-mode="fish-author"],.cocean-panel[data-mode="read"]{inset:auto;top:50%;left:50%}.cocean-loading{font-size:20px}}
+      @media(max-width:600px){.cocean-mailbox-body{padding:12px}.cocean-mailbox-card{min-height:200px;padding:23px 16px 26px 44px;background:linear-gradient(90deg,transparent 0 29px,#edb8bb 30px 31px,transparent 32px),#fffdf7}.cocean-mailbox-footer .cocean-mailbox-button{flex:1 1 auto}.cocean-mailbox-compose-trigger{margin-left:0}}
+      @media(max-width:600px){.cocean-mailbox-search-area{padding:10px}.cocean-mailbox-note-page{min-height:235px;padding:20px 15px 15px 44px;background:linear-gradient(90deg,transparent 0 29px,#edb8bb 30px 31px,transparent 32px),#fffdf7}.cocean-mailbox-message,.cocean-mailbox-compose .cocean-mailbox-note-page textarea{font-size:26px}}
       @media(prefers-reduced-motion:reduce){.cocean-fish,.cocean-fish-art,.cocean-fish-art img,.cocean-fish-preview img,.cocean-bottle,.cocean-wave-track,.cocean-loading-icon{animation:none}.cocean-fish{left:4%!important}}
     `;
     document.head.appendChild(style);
@@ -117,7 +130,7 @@
     active = null;
     if (!options || !options.student || !options.student.nie) return;
     styles();
-    const activityId = String(options.activityId || 'actividad').slice(0, 120);
+    const activityId = GLOBAL_ACTIVITY_ID;
     const student = options.student;
     const hasRequiredGrade = () => {
       const nie = String(student.nie);
@@ -136,6 +149,11 @@
     fab.type = 'button';
     fab.innerHTML = '<img class="cocean-shortcut-icon" src="shortcut-ocean.svg" alt=""><span class="cocean-label">Océano</span>';
     fab.setAttribute('aria-label', 'Abrir océano');
+    const inbox = document.createElement('button');
+    inbox.className = 'cocean-quick cocean-inbox';
+    inbox.type = 'button';
+    inbox.innerHTML = '<img class="cocean-shortcut-icon" src="mailbox-svgrepo-com.svg" alt=""><span class="cocean-label">Buzón</span>';
+    inbox.setAttribute('aria-label', 'Abrir Buzón');
     const games = document.createElement('a');
     games.className = 'cocean-quick cocean-games';
     games.href = 'juegos.html';
@@ -158,6 +176,186 @@
       document.addEventListener('keydown', onNoticeKey);
       notice.querySelector('button').focus();
     }
+    let mailboxOverlay = null, mailboxHelpOverlay = null;
+    function closeMailboxHelp() {
+      if (!mailboxHelpOverlay) return;
+      mailboxHelpOverlay.remove();
+      mailboxHelpOverlay = null;
+      const info = mailboxOverlay && mailboxOverlay.querySelector('.cocean-mailbox-info');
+      if (info) info.focus();
+    }
+    function closeMailbox() {
+      if (!mailboxOverlay) return;
+      closeMailboxHelp();
+      mailboxOverlay.remove();
+      mailboxOverlay = null;
+      inbox.focus();
+    }
+    function openMailbox() {
+      if (mailboxOverlay) return;
+      const isRigo = String(student.nie) === '12379';
+      mailboxOverlay = document.createElement('div');
+      mailboxOverlay.className = 'cocean-backdrop cocean-mailbox-backdrop';
+      mailboxOverlay.innerHTML = '<section class="cocean-mailbox" role="dialog" aria-modal="true" aria-labelledby="cocean-mailbox-title"><header><div class="cocean-mailbox-title-row"><h2 id="cocean-mailbox-title"><img class="cocean-mailbox-header-icon" src="mailbox-svgrepo-com.svg" alt="">' + (isRigo ? 'Buzón de Rigo' : 'Buzón') + '</h2><button class="cocean-mailbox-info" type="button" aria-label="Cómo funciona el Buzón" aria-haspopup="dialog" title="Cómo funciona el Buzón">' + INFO_ICON + '</button></div><button class="cocean-mailbox-close" type="button" aria-label="Cerrar buzón">×</button></header><div class="cocean-mailbox-body"><div class="cocean-mailbox-tabs" role="tablist"></div><div class="cocean-mailbox-view"></div><p class="cocean-mailbox-status" role="status"></p></div></section>';
+      document.body.appendChild(mailboxOverlay);
+      mailboxOverlay.querySelector('.cocean-mailbox-info').addEventListener('click', () => {
+        if (mailboxHelpOverlay) return;
+        mailboxHelpOverlay = document.createElement('div');
+        mailboxHelpOverlay.className = 'cocean-backdrop cocean-mailbox-help-backdrop';
+        mailboxHelpOverlay.innerHTML = '<section class="cocean-mailbox-help" role="dialog" aria-modal="true" aria-labelledby="cocean-mailbox-help-title"><h2 id="cocean-mailbox-help-title">Cómo funciona el Buzón</h2><p>Envía y recibe cartas de tus compañeros de manera anónima. Quien recibe una carta no ve quién la escribió.</p><p>Las cartas se muestran una por una. Al pulsar «Ver siguiente», la carta desaparece de tus Recibidos y de los Enviados pendientes de quien la mandó.</p><button type="button">Entendido</button></section>';
+        document.body.appendChild(mailboxHelpOverlay);
+        mailboxHelpOverlay.querySelector('button').addEventListener('click', closeMailboxHelp);
+        mailboxHelpOverlay.addEventListener('click', event => { if (event.target === mailboxHelpOverlay) closeMailboxHelp(); });
+        mailboxHelpOverlay.querySelector('button').focus();
+      });
+      const tabs = mailboxOverlay.querySelector('.cocean-mailbox-tabs');
+      const view = mailboxOverlay.querySelector('.cocean-mailbox-view');
+      const statusEl = mailboxOverlay.querySelector('.cocean-mailbox-status');
+      const sessionToken = () => global.COEDUCA_FIXED_AUTH && global.COEDUCA_FIXED_AUTH.tokenFor(student.nie) || null;
+      let studentId = null, rows = [], bucket = isRigo ? 'rigo' : 'received', index = 0, mailboxBusy = false;
+      const setStatus = message => { statusEl.textContent = message || ''; };
+      const button = (label, className, handler) => { const el = document.createElement('button'); el.type = 'button'; el.className = 'cocean-mailbox-button' + (className ? ' ' + className : ''); el.textContent = label; el.addEventListener('click', handler); return el; };
+      const listForBucket = () => rows.filter(row => row.bucket === bucket);
+      function renderTabs() {
+        tabs.innerHTML = '';
+        if (isRigo) return;
+        [['received', 'Recibidos'], ['sent', 'Enviados']].forEach(([key, label]) => {
+          const tab = button(label, '', () => { bucket = key; index = 0; render(); });
+          tab.className += ' cocean-mailbox-tab'; tab.setAttribute('role', 'tab'); tab.setAttribute('aria-selected', String(bucket === key)); tabs.appendChild(tab);
+        });
+      }
+      function render() {
+        renderTabs();
+        view.innerHTML = '';
+        const list = listForBucket();
+        const actions = document.createElement('div'); actions.className = 'cocean-mailbox-actions cocean-mailbox-footer';
+        if (!list.length) {
+          const empty = document.createElement('div'); empty.className = 'cocean-mailbox-empty';
+          empty.textContent = isRigo ? 'No hay mensajes en la bandeja.' : (bucket === 'received' ? 'No tienes mensajes pendientes.' : 'No tienes mensajes enviados sin leer.');
+          view.appendChild(empty);
+        } else {
+          if (index >= list.length) index = list.length - 1;
+          const item = list[index];
+          const card = document.createElement('article'); card.className = 'cocean-mailbox-card';
+          const title = document.createElement('h3'); title.textContent = isRigo ? 'Mensaje ' + (index + 1) + ' de ' + list.length : (bucket === 'received' ? 'Mensaje anónimo' : 'Mensaje enviado'); card.appendChild(title);
+          if (isRigo) {
+            const meta = document.createElement('div'); meta.className = 'cocean-mailbox-meta'; meta.textContent = 'De: ' + (item.sender_name || 'Estudiante') + ' · Para: ' + (item.recipient_name || 'Estudiante'); card.appendChild(meta);
+          } else if (bucket === 'sent') {
+            const meta = document.createElement('div'); meta.className = 'cocean-mailbox-meta'; meta.textContent = 'Para: ' + (item.recipient_name || 'Estudiante') + ' · Aún no leído'; card.appendChild(meta);
+          }
+          const message = document.createElement('div'); message.className = 'cocean-mailbox-message'; message.textContent = item.message || ''; card.appendChild(message);
+          if (isRigo) {
+            actions.appendChild(button('Ver siguiente', 'cocean-mailbox-primary', async () => {
+              await advance(item, true);
+            }));
+            actions.appendChild(button('Eliminar para Rigo', 'cocean-mailbox-danger', async () => {
+              if (mailboxBusy) return;
+              mailboxBusy = true;
+              setStatus('Eliminando de la bandeja de Rigo…');
+              try { await rpc('coeduca_mailbox_delete_for_rigo', {p_student_id:studentId, p_message_id:item.id, p_session_token:sessionToken()}); await load(); }
+              catch (_) { setStatus('No se pudo eliminar el mensaje.'); }
+              finally { mailboxBusy = false; }
+            }));
+          } else if (bucket === 'received') {
+            actions.appendChild(button('Ver siguiente', 'cocean-mailbox-primary', async () => { await advance(item, false); }));
+          } else if (list.length > 1) {
+            actions.appendChild(button('Ver siguiente', 'cocean-mailbox-primary', () => { index = (index + 1) % list.length; render(); }));
+          }
+          view.appendChild(card);
+        }
+        if (!isRigo) {
+          actions.appendChild(button('✎ Redactar nota', 'cocean-mailbox-primary cocean-mailbox-compose-trigger', showCompose));
+        }
+        if (actions.childElementCount) view.appendChild(actions);
+      }
+      async function advance(item, rigo) {
+        if (mailboxBusy) return;
+        mailboxBusy = true;
+        setStatus('Abriendo siguiente mensaje…');
+        try {
+          const changed = await rpc('coeduca_mailbox_read_next', {p_student_id:studentId, p_message_id:item.id, p_session_token:sessionToken()});
+          if (!changed) throw new Error('read');
+          index = rigo ? (index + 1) % Math.max(1, listForBucket().length) : 0;
+          await load();
+        }
+        catch (_) { setStatus('No se pudo registrar la lectura. Inténtalo otra vez.'); }
+        finally { mailboxBusy = false; }
+      }
+      let searchVersion = 0;
+      async function searchStudents(input, results, onSelect) {
+        const version = ++searchVersion;
+        const query = input.value.trim();
+        results.innerHTML = '';
+        if (query.length < 2) { results.textContent = 'Escribe al menos dos letras para buscar.'; return; }
+        results.textContent = 'Buscando…';
+        try {
+          const found = await rpc('coeduca_mailbox_students', {p_query:query, p_student_id:studentId});
+          if (version !== searchVersion || !results.isConnected) return;
+          results.innerHTML = '';
+          if (!found || !found.length) { results.textContent = 'No se encontraron estudiantes.'; return; }
+          found.forEach(person => {
+            const item = document.createElement('button'); item.type = 'button'; item.className = 'cocean-mailbox-result';
+            const name = document.createElement('span'); name.textContent = person.student_name || 'Estudiante';
+            const grade = document.createElement('small'); grade.textContent = person.grade || ''; name.appendChild(grade);
+            item.appendChild(name); item.addEventListener('click', () => onSelect(person));
+            results.appendChild(item);
+          });
+        } catch (_) { if (version === searchVersion && results.isConnected) results.textContent = 'No se pudo buscar estudiantes. Inténtalo otra vez.'; }
+      }
+      function showCompose() {
+        view.innerHTML = '<div class="cocean-mailbox-compose"><div class="cocean-mailbox-search-area"><label for="cocean-mailbox-search">Buscar estudiante</label><input id="cocean-mailbox-search" type="search" autocomplete="off" placeholder="Escribe un nombre"><div class="cocean-mailbox-results" aria-live="polite">Escribe al menos dos letras para buscar.</div></div><div class="cocean-mailbox-selected" hidden><span class="cocean-mailbox-selected-name"></span><button type="button" class="cocean-mailbox-button cocean-mailbox-change">Cambiar</button></div><div class="cocean-mailbox-note-page"><label for="cocean-mailbox-text">Nota anónima</label><textarea id="cocean-mailbox-text" maxlength="500" placeholder="Escribe tu mensaje…"></textarea><div class="cocean-mailbox-counter">0/500</div></div><div class="cocean-mailbox-actions"><button type="button" class="cocean-mailbox-button cocean-mailbox-cancel">Cancelar</button><button type="button" class="cocean-mailbox-button cocean-mailbox-primary cocean-mailbox-send">Enviar nota</button></div></div>';
+        const input = view.querySelector('#cocean-mailbox-search'), results = view.querySelector('.cocean-mailbox-results'), text = view.querySelector('#cocean-mailbox-text'), counter = view.querySelector('.cocean-mailbox-counter');
+        const searchArea = view.querySelector('.cocean-mailbox-search-area'), selectedBox = view.querySelector('.cocean-mailbox-selected'), selectedName = view.querySelector('.cocean-mailbox-selected-name');
+        const selected = {value:''}; let timer = null;
+        const chooseStudent = person => {
+          searchVersion++;
+          selected.value = JSON.stringify(person);
+          selectedName.textContent = 'Para: ' + (person.student_name || 'Estudiante');
+          searchArea.hidden = true;
+          selectedBox.hidden = false;
+          text.focus();
+        };
+        input.addEventListener('input', () => { searchVersion++; selected.value = ''; if (timer) clearTimeout(timer); timer = setTimeout(() => searchStudents(input, results, chooseStudent), 280); });
+        view.querySelector('.cocean-mailbox-change').addEventListener('click', () => {
+          selected.value = '';
+          selectedBox.hidden = true;
+          searchArea.hidden = false;
+          input.value = '';
+          results.textContent = 'Escribe al menos dos letras para buscar.';
+          input.focus();
+        });
+        text.addEventListener('input', () => { counter.textContent = text.value.length + '/500'; });
+        view.querySelector('.cocean-mailbox-cancel').addEventListener('click', render);
+        view.querySelector('.cocean-mailbox-send').addEventListener('click', async () => {
+          if (mailboxBusy) return;
+          let recipient; try { recipient = JSON.parse(selected.value); } catch (_) { recipient = null; }
+          const message = text.value.trim();
+          if (!recipient) { setStatus('Selecciona a quién enviar la nota.'); return; }
+          if (!message) { setStatus('Escribe un mensaje antes de enviarlo.'); return; }
+          mailboxBusy = true;
+          setStatus('Enviando nota anónima…');
+          try {
+            const sent = await rpc('coeduca_mailbox_send', {p_sender_id:studentId, p_sender_name:String(student.name || 'Estudiante'), p_recipient_id:recipient.student_id, p_recipient_name:recipient.student_name, p_message:message, p_session_token:sessionToken()});
+            if (!sent) throw new Error('send');
+            bucket = 'sent'; index = 0; await load();
+            setStatus('Nota enviada. Permanecerá en Enviados hasta que la lean.');
+          } catch (_) { setStatus('No se pudo enviar la nota. Inténtalo otra vez.'); }
+          finally { mailboxBusy = false; }
+        });
+        input.focus();
+      }
+      async function load() {
+        if (!studentId) return;
+        setStatus('Cargando buzón…');
+        try { rows = await rpc('coeduca_mailbox_list', {p_student_id:studentId, p_session_token:sessionToken()}) || []; setStatus(''); render(); }
+        catch (_) { setStatus('No se pudo conectar con el buzón.'); render(); }
+      }
+      mailboxOverlay.querySelector('.cocean-mailbox-close').addEventListener('click', closeMailbox);
+      mailboxOverlay.addEventListener('click', event => { if (event.target === mailboxOverlay) closeMailbox(); });
+      mailboxOverlay.querySelector('.cocean-mailbox-close').focus();
+      hashPromise.then(id => { studentId = id; if (mailboxOverlay) load(); });
+    }
+    inbox.addEventListener('click', openMailbox);
     games.addEventListener('click', event => {
       if (hasRequiredGrade()) return;
       event.preventDefault();
@@ -173,7 +371,7 @@
         global.COEDUCA_LEADERBOARD.openAvatar(student);
       }
     });
-    shortcuts.append(fab, games, avatarAccess);
+    shortcuts.append(fab, inbox, games, avatarAccess);
     document.body.insertBefore(shortcuts, document.body.firstChild);
     if (badge) badge.classList.add('cocean-extra-badge');
     const mobileView = global.matchMedia('(max-width: 600px)');
@@ -579,11 +777,16 @@
       refreshTimer = setInterval(() => { if (!currentMode) load(); }, 30000);
     }
     fab.addEventListener('click', open);
-    const keydown = e => { if (e.key === 'Escape' && overlay) { const panel=overlay.querySelector('.cocean-panel'); if (!panel.hidden) { panel.hidden=true; currentMode=''; } else close(); } };
+    const keydown = e => {
+      if (e.key !== 'Escape') return;
+      if (mailboxHelpOverlay) { closeMailboxHelp(); return; }
+      if (mailboxOverlay) { closeMailbox(); return; }
+      if (overlay) { const panel=overlay.querySelector('.cocean-panel'); if (!panel.hidden) { panel.hidden=true; currentMode=''; } else close(); }
+    };
     document.addEventListener('keydown', keydown);
     active = {destroy() {
       if (dismissNotice) dismissNotice();
-      close(); shortcuts.remove();
+      closeMailbox(); close(); shortcuts.remove();
       if (expandTimer) clearTimeout(expandTimer);
       global.removeEventListener('scroll', onScroll);
       if (badge) badge.removeEventListener('click', onCompactTap);
