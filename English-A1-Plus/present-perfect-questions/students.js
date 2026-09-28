@@ -72,7 +72,8 @@ const STUDENTS = {
   "19929938": { name: "Elizabeth Sophia Quinteros Miranda", grade: "Segundo Año" },
   "4210277": { name: "Josué Leonel Rivera Montano", grade: "Segundo Año" },
 
-  // PRUEBAS
-  "1999": { name: "José Eliseo Martínez", grade: "Maestro" },
+  // CUENTAS FIJAS
+  "1999": { name: "Eliseo", grade: "Maestro" },
+  "12379": { name: "Rigo", grade: "Mascota" },
 };
 const COEDUCA_AVAILABLE_GRADES = ["Noveno", "Octavo", "Primer Año", "Segundo Año", "Séptimo"];

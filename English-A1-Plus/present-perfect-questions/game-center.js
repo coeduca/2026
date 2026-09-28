@@ -43,7 +43,7 @@
   }
 
   function allowed(studentRecord) {
-    if (studentRecord.nie === '1999') return true;
+    if (studentRecord.nie === '1999' || studentRecord.nie === '12379') return true;
     if (document.body.dataset.framework === 'civica') return studentRecord.grade === 'Octavo';
     const levels = {
       'A1+': ['Noveno', 'Primer Ano', 'Primer Año', 'Segundo Ano', 'Segundo Año'],

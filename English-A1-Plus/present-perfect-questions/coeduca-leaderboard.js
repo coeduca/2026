@@ -325,7 +325,15 @@
       (choice.kind !== 'emoji' || choice.emoji === profile.avatar_emoji));
   }
 
-  function fillAvatar(element, profile) {
+  function displayStudentName(name) {
+    return name === 'José Eliseo Martínez' ? 'Eliseo' : name || 'Estudiante';
+  }
+
+  function fillAvatar(element, profile, studentName, grade) {
+    if ((!profile || !profile.avatar_kind || profile.avatar_kind === 'none') &&
+        studentName === 'Rigo' && (grade === 'Mascota' || grade == null)) {
+      profile = {avatar_kind:'rigo', avatar_bg:DEFAULT_AVATAR_BG};
+    }
     element.replaceChildren();
     element.dataset.kind = profile?.avatar_kind || 'none';
     element.style.backgroundColor = avatarBackground(profile);
@@ -444,14 +452,14 @@
         avatar.title = avatarAction;
         avatar.addEventListener('click', onAvatarClick);
       } else avatar.setAttribute('aria-hidden', 'true');
-      fillAvatar(avatar, row);
+      fillAvatar(avatar, row, row.student_name, row.grade);
       avatarWrap.appendChild(avatar);
 
       const student = document.createElement('span');
       student.className = 'cg-leaderboard-student';
       const name = document.createElement('span');
       name.className = 'cg-leaderboard-name';
-      name.textContent = row.student_name || 'Estudiante';
+      name.textContent = displayStudentName(row.student_name);
       const grade = document.createElement('span');
       grade.className = 'cg-leaderboard-grade';
       grade.textContent = row.grade || '';
@@ -471,6 +479,7 @@
     const noOp = { submit: async () => false, refresh: async () => {} };
     const student = ctx && ctx.student;
     if (!SUPPORTED_GAMES.has(game) || !student || !student.nie) return noOp;
+    const fixedAvatarAccount = student.nie === '1999' || student.nie === '12379';
 
     ensureStyles();
     const root = document.createElement('section');
@@ -661,7 +670,7 @@
             : 'Ya no estás en el Top 1 global o no se pudo guardar el avatar.');
           ownProfile = { avatar_kind:kind, avatar_emoji:emoji || null,
             avatar_bg:selectedColor, avatar_path:null };
-          fillAvatar(ownAvatarImage, ownProfile);
+          fillAvatar(ownAvatarImage, ownProfile, student.name, student.grade);
           if (hadPhoto) {
             try {
               await storageRequest('DELETE', '', JSON.stringify({ prefixes:[avatarPath(studentKey)] }),
@@ -729,7 +738,7 @@
           });
           if (saved !== true) throw new Error('La foto se subió, pero no se pudo activar.');
           ownProfile = { avatar_kind:'photo', avatar_path:avatarPath(studentKey), photo_version:Date.now() };
-          fillAvatar(ownAvatarImage, ownProfile);
+          fillAvatar(ownAvatarImage, ownProfile, student.name, student.grade);
           close();
           refresh();
           refreshVisibleRankings(refresh);
@@ -744,7 +753,7 @@
       document.addEventListener('keydown', onKeyDown, true);
       activeAvatarDialog = close;
       closeButton.focus();
-      setBusy(true, 'Comprobando tu Top 1…');
+      setBusy(true, fixedAvatarAccount ? 'Preparando tu avatar…' : 'Comprobando tu Top 1…');
       try {
         studentKey = await getStudentKey();
         unlocked = await rpc('unlock_game_avatar', { p_student_key:studentKey }) === true;
@@ -760,8 +769,12 @@
             setBusy(false, '');
           } else {
             heading.textContent = 'Avatar bloqueado';
-            hint.textContent = 'Para escoger una foto de perfil debes estar en el puesto 1 global de cualquier juego.';
-            setBusy(false, 'Llega al puesto 1 global de cualquier juego para elegir tu avatar.');
+            hint.textContent = fixedAvatarAccount
+              ? 'No se pudo habilitar tu cuenta para cambiar el avatar.'
+              : 'Para escoger una foto de perfil debes estar en el puesto 1 global de cualquier juego.';
+            setBusy(false, fixedAvatarAccount
+              ? 'Actualiza la configuración de avatares en Supabase.'
+              : 'Llega al puesto 1 global de cualquier juego para elegir tu avatar.');
           }
         }
       } catch (error) {
@@ -782,11 +795,11 @@
           p_student_key: key
         });
         if (currentRefresh !== refreshNumber) return;
-        const canChooseAvatar = Boolean(data && data.can_choose_avatar);
+        const canChooseAvatar = fixedAvatarAccount || Boolean(data && data.can_choose_avatar);
         ownProfile = data && data.my_avatar;
         ownAvatarButton.hidden = !canChooseAvatar && !hasAvatar(ownProfile);
         ownAvatarButton.setAttribute('aria-label', canChooseAvatar ? 'Elegir o cambiar mi avatar' : 'Eliminar mi avatar');
-        fillAvatar(ownAvatarImage, ownProfile);
+        fillAvatar(ownAvatarImage, ownProfile, student.name, student.grade);
         if (isTeacher && Array.isArray(data && data.grades)) {
           availableGrades = [...availableGrades, ...data.grades];
           renderGradeChips();

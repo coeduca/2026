@@ -833,6 +833,26 @@
             paint.rotate((left ? -1 : 1) * (.12 + age * .85));
             paint.fillStyle = '#754957';
             fillRoundedRect(-half / 2, -4, half, 14, 3);
+            // Redondear solo los extremos exteriores; el corte interior sigue irregular.
+            const outer = left ? -half / 2 : half / 2;
+            const inner = left ? half / 2 + 2 : -half / 2 - 2;
+            paint.beginPath();
+            paint.moveTo(left ? outer + 5 : inner, -7);
+            paint.lineTo(left ? inner : outer - 5, -7);
+            if (left) {
+              paint.lineTo(inner, 7);
+              paint.lineTo(outer + 5, 7);
+              paint.quadraticCurveTo(outer, 7, outer, 2);
+              paint.lineTo(outer, -2);
+              paint.quadraticCurveTo(outer, -7, outer + 5, -7);
+            } else {
+              paint.quadraticCurveTo(outer, -7, outer, -2);
+              paint.lineTo(outer, 2);
+              paint.quadraticCurveTo(outer, 7, outer - 5, 7);
+              paint.lineTo(inner, 7);
+            }
+            paint.closePath();
+            paint.clip();
             paint.fillStyle = '#df9c67';
             paint.beginPath();
             if (left) {
@@ -883,12 +903,7 @@
         fillRoundedRect(platform.x, y, platform.width, 10, 5);
         paint.fillStyle = 'rgba(255,255,255,.55)';
         fillRoundedRect(platform.x + 9, y + 2, Math.max(12, platform.width - 22), 2, 1);
-        if (platform.type === 'moving') {
-          paint.fillStyle = '#244e79';
-          paint.font = '900 14px system-ui';
-          paint.textAlign = 'center';
-          paint.fillText('↔', platform.x + platform.width / 2, y + 1);
-        } else if (platform.type === 'vanishing') {
+        if (platform.type === 'vanishing') {
           paint.fillStyle = '#7347ad';
           paint.fillRect(platform.x + 5, y + 4, 5, 3);
           paint.fillRect(platform.x + platform.width - 10, y + 4, 5, 3);
