@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Present Perfect: Affirmative &amp; Negative</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+          <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+          <span>Volver a la actividad</span>
+        </a>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <div class="gc-hero-label">EL RETO COMIENZA AQUÍ <span aria-hidden="true">✦</span></div>
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+          <div class="gc-hero-tip">Elige un juego · Suma puntos · Supera tu marca</div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-labelledby="gc-catalog-title">
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">TU ZONA DE JUEGOS</span>
+          <h2 id="gc-catalog-title">Juegos con puntuación</h2>
+        </div>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "container": "#app",
+  "topic": "Present Perfect: Affirmative & Negative",
+  "level": "Noveno, Primer Año, Segundo Año",
+  "pdfDesign": "PopArt",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#D1F781",
+    "accent": "#A4F3C0",
+    "bg": "#E3FBD5",
+    "cardBg": "#E9FAC8",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "wordsearch",
+      "title": "Sopa de letras",
+      "instruction": "Instrucción: ",
+      "dataA": {
+        "words": [],
+        "gridSize": 12
+      }
+    }
+  ],
+  "game": {
+    "type": "tictactoe"
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>

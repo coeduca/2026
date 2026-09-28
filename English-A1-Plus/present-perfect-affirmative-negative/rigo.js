@@ -34,12 +34,12 @@
   //   - emotion: emoción forzada al mostrar el mensaje (opcional)
   //              Si no se define, usa la emoción por defecto del contexto.
   const RANDOM_MESSAGES = [
-    { text: "Eres muy inteligente", grade: null, emotion: 'happy' },
-    { text: "Lo haces como un sabedor", grade: null, emotion: 'happy' },
-    { text: "Solo tu puedes hacerlo", grade: null, emotion: 'happy' },
-    { text: "Trabajar en equipo puede hacer el trabajo más fácil", grade: null, emotion: 'happy' },
-    { text: "Inglés es fácil", grade: null, emotion: 'sneaky' },
-    { text: "Creo en ti", grade: null, emotion: 'happy' }
+    { text: "继续工作", grade: null, emotion: 'happy' },
+    { text: "Keep it cool", grade: null, emotion: 'happy' },
+    { text: "¡Abueloo tlalooc! Ayudanos", grade: null, emotion: 'happy' },
+    { text: "Vamos, vamos", grade: null, emotion: 'happy' },
+    { text: "Let\'s go", grade: null, emotion: 'happy' },
+    { text: "我是里戈", grade: null, emotion: 'happy' }
   ];
 
   // HINTS: si grade es null aparecen para todos los grados.
@@ -50,26 +50,31 @@
   //                        dizzy, musical, elder
   // Grados válidos: "Séptimo", "Octavo", "Noveno", "Primer Año", "Segundo Año", "Prueba"
   const HINT_MESSAGES = [
-    { text: "¿Ya viste el precio de las papas?", grade: null, emotion: 'confused' },
-    { text: "Todos aprendemos de diferente manera", grade: null, emotion: 'happy' },
-    { text: "Oh my god!", grade: null, emotion: 'excited' },
-    { text: "Mi primera chamba", grade: null, emotion: 'musical' },
-    { text: "Necesitamos un teléfono público en la escuela", grade: null, emotion: 'sad' },
-    { text: "Si terminas después jugamos mica", grade: null, emotion: 'sneaky' },
-    { text: "Todo bien mientras hagas las tareas", grade: null, emotion: 'happy' },
-    { text: "Quiero comer una ensalada rusa", grade: null, emotion: 'confused' }
+    { text: "Ñoñoooooooo", grade: null, emotion: 'sad' },
+    { text: "你敢碰我试试", grade: null, emotion: 'angry' },
+    { text: "Saaaluuudeeeeemos la paaaatria orgullooosos", grade: null, emotion: 'musical' },
+    { text: "Sci-fi es la abreviación de Science Fiction o sea Ciencia Ficción", grade: null, emotion: 'sneaky' },
+    { text: "La curiosidad mató al camaleón", grade: null, emotion: 'elder' },
+    { text: "Las cucarachas de mi casa retumban cuando pongo perreo", grade: null, emotion: 'excited' },
+    { text: "Todos nacimos super estrellas", grade: null, emotion: 'excited' },
+    { text: "Camarón que se duerme me lo como porque tengo hambre", grade: null, emotion: 'happy' },
+    { text: "Uy llamen a la policía porque me vas a matar de la risa", grade: null, emotion: 'neutral' },
+    { text: "¿Que hace una abeja en el gym? Zum-ba", grade: null, emotion: 'confused' },
+    { text: "Go Go Go", grade: null, emotion: 'neutral' }
   ];
 
   const CHEER_MESSAGES = [
-    "Tu mandas aquí",
-    "Eres un genio",
-    "Lo haces a la perfección"
+    "Tu inteligencia me sorprende",
+    "Claro que si",
+    "Mis respetos",
+    "El conocimiento es poder"
   ];
 
   const COMFORT_MESSAGES = [
-    "Piensa más despacio",
-    "Intenta usando tal vez el cerebro",
-    "Toma se te cayó 🧠"
+    "Admiro tu capacidad para fallar",
+    "Normalicemos no saber la respuesta",
+    "¿Y si usamos el cerebro?",
+    "Pensar es gratis"
   ];
 
   class RigoMascot extends HTMLElement {
