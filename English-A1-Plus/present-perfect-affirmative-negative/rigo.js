@@ -34,12 +34,17 @@
   //   - emotion: emoción forzada al mostrar el mensaje (opcional)
   //              Si no se define, usa la emoción por defecto del contexto.
   const RANDOM_MESSAGES = [
-    { text: "继续工作", grade: null, emotion: 'happy' },
-    { text: "Keep it cool", grade: null, emotion: 'happy' },
-    { text: "¡Abueloo tlalooc! Ayudanos", grade: null, emotion: 'happy' },
-    { text: "Vamos, vamos", grade: null, emotion: 'happy' },
-    { text: "Let\'s go", grade: null, emotion: 'happy' },
-    { text: "我是里戈", grade: null, emotion: 'happy' }
+    { text: "Tranqui", grade: null, emotion: 'thinking' },
+    { text: "Respira y continúa", grade: null, emotion: 'neutral' },
+    { text: "Learning is cool", grade: null, emotion: 'happy' },
+    { text: "You\'re doing great!", grade: null, emotion: 'excited' },
+    { text: "¡No te rindas!", grade: null, emotion: 'excited' },
+    { text: "I believe in you!", grade: null, emotion: 'love' },
+    { text: "Practice makes perfect", grade: null, emotion: 'thinking' },
+    { text: "Keep going, friend!", grade: null, emotion: 'happy' },
+    { text: "¡Tú puedes!", grade: null, emotion: 'excited' },
+    { text: "Vamos por ese 10!", grade: null, emotion: 'love' },
+    { text: "Quizz time!", grade: null, emotion: 'happy' }
   ];
 
   // HINTS: si grade es null aparecen para todos los grados.
@@ -50,31 +55,38 @@
   //                        dizzy, musical, elder
   // Grados válidos: "Séptimo", "Octavo", "Noveno", "Primer Año", "Segundo Año", "Prueba"
   const HINT_MESSAGES = [
-    { text: "Ñoñoooooooo", grade: null, emotion: 'sad' },
-    { text: "你敢碰我试试", grade: null, emotion: 'angry' },
-    { text: "Saaaluuudeeeeemos la paaaatria orgullooosos", grade: null, emotion: 'musical' },
-    { text: "Sci-fi es la abreviación de Science Fiction o sea Ciencia Ficción", grade: null, emotion: 'sneaky' },
-    { text: "La curiosidad mató al camaleón", grade: null, emotion: 'elder' },
-    { text: "Las cucarachas de mi casa retumban cuando pongo perreo", grade: null, emotion: 'excited' },
-    { text: "Todos nacimos super estrellas", grade: null, emotion: 'excited' },
-    { text: "Camarón que se duerme me lo como porque tengo hambre", grade: null, emotion: 'happy' },
-    { text: "Uy llamen a la policía porque me vas a matar de la risa", grade: null, emotion: 'neutral' },
-    { text: "¿Que hace una abeja en el gym? Zum-ba", grade: null, emotion: 'confused' },
-    { text: "Go Go Go", grade: null, emotion: 'neutral' }
+    { text: "Han pasado 84 años", grade: null, emotion: 'elder' },
+    { text: "Respira, esto acabará pronto", grade: null, emotion: 'neutral' },
+    { text: "No te distraigas", grade: null, emotion: 'angry' },
+    { text: "Deja de tocarme", grade: null, emotion: 'angry' },
+    { text: "La respuesta está en tu corazón", grade: null, emotion: 'love' },
+    { text: "¿Necesitas ayuda?", grade: null, emotion: 'confused' },
+    { text: "Duolingo no está aquí", grade: null, emotion: 'sad' },
+    { text: "No dudes tanto", grade: null, emotion: 'sneaky' },
+    { text: "Seguro 10", grade: null, emotion: 'excited' },
+    { text: "Ese examen es míiiiio 🎶", grade: null, emotion: 'musical' },
+    { text: "Hoy es un buen día", grade: null, emotion: 'happy' },
+    { text: "Se trabaja mejor en silencio", grade: null, emotion: 'sneaky' },
+    { text: "Lo estás haciendo bien", grade: null, emotion: 'thinking' },
+    { text: "Psst... piensa rápido", grade: null, emotion: 'sneaky' }
   ];
 
   const CHEER_MESSAGES = [
-    "Tu inteligencia me sorprende",
-    "Claro que si",
-    "Mis respetos",
-    "El conocimiento es poder"
+    "¡Sí señor!",
+    "¡Increíble!",
+    "¡Eres una máquina!",
+    "¡Perfecto!",
+    "¡Genial!",
+    "¡Excelente!",
+    "¡Así se hace!"
   ];
 
   const COMFORT_MESSAGES = [
-    "Admiro tu capacidad para fallar",
-    "Normalicemos no saber la respuesta",
-    "¿Y si usamos el cerebro?",
-    "Pensar es gratis"
+    "Nadie nace sabiendo",
+    "Respira e intenta de nuevo",
+    "Todos aprendemos de los errores",
+    "No pasa nada, seguimos",
+    "Casi casi, inténtalo otra vez"
   ];
 
   class RigoMascot extends HTMLElement {
