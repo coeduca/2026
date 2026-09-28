@@ -1,6 +1,6 @@
 /**
  * COEDUCA Framework v1 - Core
- * Profesor José Eliseo Martínez - COEDUCA
+ * Profesor Eliseo - COEDUCA
  *
  * Maneja: login (NIE), PDF (con fix iOS), anti-copy, hooks de Rigo,
  *         pool A/B, score global, drag&drop con touch + auto-scroll,
@@ -35,6 +35,7 @@
     'PreA1': ['Séptimo', 'Septimo', 'Octavo']
   };
   const TEST_NIE = '1999'; // José Eliseo - siempre permitido
+  const RIGO_NIE = '12379'; // Cuenta fija de Rigo
 
   // =====================================================================
   // 1. STATE GLOBAL
@@ -412,7 +413,7 @@
   // =====================================================================
   function isAllowedAtLevel(student) {
     if (!student) return false;
-    if (student.nie === TEST_NIE) return true; // José Eliseo siempre pasa
+    if (student.nie === TEST_NIE || student.nie === RIGO_NIE) return true;
     const lvl = state.config && state.config.level;
     if (!lvl) return true; // sin filtro
     const allowed = LEVEL_FILTERS[lvl];
@@ -826,7 +827,7 @@
       <div class="coeduca-extra-badge" id="coeduca-extra-badge" style="display:none" aria-label="Puntos extra"><img class="cocean-bonus-icon" src="shortcut-plus.svg" alt=""><span class="cocean-bonus-number">0.0</span></div>
       <header class="coeduca-header">
         <h1>${escapeHTML(cfg.topic || 'Ejercicio de Inglés')}</h1>
-        <p>${escapeHTML(cfg.level || '')} - COEDUCA - Prof. José Eliseo Martínez</p>
+        <p>${escapeHTML(cfg.level || '')} - COEDUCA - Prof. Eliseo</p>
         <div class="coeduca-header-students" id="coeduca-header-students"></div>
         <div class="coeduca-header-actions">
           <button class="coeduca-btn coeduca-btn-info coeduca-add-member-btn" id="coeduca-add-member-btn" type="button">
