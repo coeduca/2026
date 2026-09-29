@@ -1569,12 +1569,12 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:10px;">
         ${cats.map((c, i) => `
           <div class="cat-col" data-cat="${i}" style="background:#fff;border:3px solid #1a1a1a;
-               border-radius:10px;padding:10px;min-height:120px;">
+               border-radius:10px;padding:10px;min-height:120px;display:flex;flex-direction:column;">
             <h4 class="cat-title" style="margin:0 0 8px;text-align:center;background:#FFD700;border:2px solid #1a1a1a;
                 border-radius:6px;padding:4px;text-transform:uppercase;font-size:13px;">
               ${C.escapeHTML(c)}
             </h4>
-            <div class="cat-drop" data-cat="${i}" style="min-height:80px;"></div>
+            <div class="cat-drop" data-cat="${i}" style="min-height:80px;flex:1;"></div>
           </div>
         `).join('')}
       </div>
@@ -1594,7 +1594,8 @@
       bank.appendChild(chip);
       C.makeDraggable(chip, {
         onDrop: ({ under }) => {
-          const drop = under && under.closest && under.closest('.cat-drop');
+          const column = under && under.closest && under.closest('.cat-col');
+          const drop = column && column.querySelector('.cat-drop');
           if (drop) {
             drop.appendChild(chip);
             if (+drop.dataset.cat === it.cat) ctx.cheer(); 
