@@ -58,7 +58,7 @@
       .cocean-mailbox-card h3{font-size:14px;line-height:20px;letter-spacing:.01em}.cocean-mailbox-card{background:linear-gradient(90deg,transparent 0 41px,#edb8bb 42px 43px,transparent 44px),#fffdf7}.cocean-mailbox-message{background:repeating-linear-gradient(to bottom,transparent 0 31px,#dce8ee 31px 32px);line-height:32px;background-attachment:local}.cocean-mailbox-note-page{background:linear-gradient(90deg,transparent 0 41px,#edb8bb 42px 43px,transparent 44px),#fffdf7}.cocean-mailbox-compose .cocean-mailbox-note-page textarea{background:repeating-linear-gradient(to bottom,transparent 0 31px,#dce8ee 31px 32px);line-height:32px;background-attachment:local}
       .cocean-reactions{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;padding:5px 0}.cocean-reaction{display:flex;align-items:center;justify-content:center;gap:4px;min-width:51px;border:1.5px solid #ffffffba;border-radius:99px;padding:5px 7px;background:#effaffb8;color:#17384a;box-shadow:0 2px 7px #08375123;font-size:14px!important}.cocean-reaction[aria-pressed="true"]{background:#ffdc74e8;border-color:#f4ab27;box-shadow:0 0 0 2px #fff8}.cocean-reaction:disabled{opacity:.65;cursor:wait}.cocean-reaction-count{font-size:12px;font-weight:800}
       .cocean-draw{width:min(100%,440px);height:220px;touch-action:none;background:linear-gradient(45deg,#e8f4f7 25%,transparent 25%),linear-gradient(-45deg,#e8f4f7 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e8f4f7 75%),linear-gradient(-45deg,transparent 75%,#e8f4f7 75%);background-size:20px 20px;background-color:#fff;border:2px solid #427a97;border-radius:10px;align-self:center}
-      .cocean-colors{display:flex;width:100%;gap:5px;justify-content:center;flex-wrap:nowrap}.cocean-color{flex:1 1 0;max-width:28px;min-width:20px;aspect-ratio:1;border:2px solid #164b6d;border-radius:50%;padding:0}.cocean-color[aria-pressed=true]{outline:3px solid #ffbd39;outline-offset:2px}.cocean-draw-tools{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.cocean-eraser{display:grid;place-items:center;width:38px;height:38px;padding:6px}.cocean-eraser img,.cocean-clear img{display:block;width:19px;height:19px;object-fit:contain}.cocean-clear{display:inline-flex;align-items:center;justify-content:center;gap:6px}.cocean-eraser[aria-pressed=true]{background:#ffdb69;box-shadow:0 0 0 2px #e7a926}.cocean-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}.cocean-panel-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:auto}.cocean-read{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
+      .cocean-colors{display:flex;width:100%;gap:5px;justify-content:center;flex-wrap:nowrap}.cocean-color{flex:1 1 0;max-width:28px;min-width:20px;aspect-ratio:1;border:2px solid #164b6d;border-radius:50%;padding:0}.cocean-color[aria-pressed=true]{outline:3px solid #ffbd39;outline-offset:2px}.cocean-draw-tools{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.cocean-eraser,.cocean-paint-bucket{display:grid;place-items:center;width:38px;height:38px;padding:6px}.cocean-eraser img,.cocean-paint-bucket img,.cocean-clear img{display:block;width:19px;height:19px;object-fit:contain}.cocean-clear{display:inline-flex;align-items:center;justify-content:center;gap:6px}.cocean-eraser[aria-pressed=true],.cocean-paint-bucket[aria-pressed=true]{background:#ffdb69;box-shadow:0 0 0 2px #e7a926}.cocean-draw[data-tool=fill]{cursor:crosshair}.cocean-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}.cocean-panel-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:auto}.cocean-read{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
       @media(min-width:701px) and (min-height:600px){.cocean{width:min(1050px,96vw);height:min(840px,96dvh)}.cocean-panel{inset:4% auto;width:min(680px,calc(100% - 48px));left:50%;transform:translateX(-50%);overflow:visible;padding:20px;gap:12px}.cocean-panel[data-mode="fish-author"],.cocean-panel[data-mode="read"]{inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);max-height:calc(100% - 40px);padding:20px;gap:12px}.cocean-panel[data-mode="fish-author"]{width:min(480px,calc(100% - 48px))}.cocean-panel[data-mode="read"]{width:min(560px,calc(100% - 48px))}.cocean-panel[data-mode="fish-author"] h3,.cocean-panel[data-mode="read"] h3{font-size:20px}.cocean-fish-preview{height:122px}.cocean-fish-preview img{width:min(210px,100%);height:112px}.cocean-bottle-preview{height:116px}.cocean-bottle-preview img{width:108px;height:112px}.cocean-draw{height:260px}.cocean-panel textarea{min-height:170px}}
       @media(min-width:701px) and (max-height:699px){.cocean-draw{height:190px}.cocean-panel textarea{min-height:130px}}
       @media(max-width:600px){.cocean-shortcuts{top:8px;left:8px;width:36px;gap:4px;transition:width .2s ease}.cocean-shortcuts.is-expanded{width:96px}.cocean-fab,.cocean-quick{height:36px;min-height:36px;padding:4px;font-size:11px;gap:5px}.cocean-shortcuts:not(.is-expanded) .cocean-fab,.cocean-shortcuts:not(.is-expanded) .cocean-quick{gap:0;padding:0}.cocean-shortcuts:not(.is-expanded) .cocean-label{display:none}.cocean-shortcut-icon{width:19px;height:19px}.cocean-extra-badge{width:36px!important;min-height:36px;padding:0!important;gap:0;font-size:11px!important;cursor:pointer}.cocean-extra-badge:not(.is-expanded) .cocean-bonus-number{display:none}.cocean-extra-badge.is-expanded{width:96px!important;gap:5px;font-size:12px!important}.cocean-bonus-icon{width:19px;height:19px}.cocean-backdrop{padding:4px}.cocean{height:98dvh;border-radius:13px}.cocean header{padding:8px}.cocean h2{font-size:19px}.cocean-scene{min-height:180px}.cocean-panel{inset:3%;padding:10px}.cocean-panel[data-mode="fish-author"],.cocean-panel[data-mode="read"]{inset:auto;top:50%;left:50%}.cocean-loading{font-size:20px}}
@@ -192,6 +192,7 @@
       inbox.focus();
     }
     function openMailbox() {
+      if (!hasRequiredGrade()) { showGradeNotice('Buzón'); return; }
       if (mailboxOverlay) return;
       const isRigo = String(student.nie) === '12379';
       mailboxOverlay = document.createElement('div');
@@ -715,13 +716,61 @@
       cancel.addEventListener('click', () => { check.hidden = true; action.focus(); });
       confirm.addEventListener('click', () => deleteEntry(kind));
     }
+    function fillClosedRegion(imageData, width, height, x, y, hexColor) {
+      x = Math.floor(x); y = Math.floor(y);
+      if (x < 0 || y < 0 || x >= width || y >= height) return false;
+      const pixels = imageData.data;
+      const start = y * width + x;
+      // Los trazos opacos actúan como barrera; los bordes suavizados del pincel
+      // también se respetan para que el relleno no se escape por ellos.
+      if (pixels[start * 4 + 3] >= 64) return false;
+      const seen = new Uint8Array(width * height);
+      const queue = new Int32Array(width * height);
+      let head = 0, tail = 1;
+      queue[0] = start; seen[start] = 1;
+      function enqueue(index) {
+        if (!seen[index] && pixels[index * 4 + 3] < 64) {
+          seen[index] = 1;
+          queue[tail++] = index;
+        }
+      }
+      while (head < tail) {
+        const index = queue[head++];
+        const column = index % width;
+        const row = (index / width) | 0;
+        if (column === 0 || row === 0 || column === width - 1 || row === height - 1) return false;
+        enqueue(index - 1);
+        enqueue(index + 1);
+        enqueue(index - width);
+        enqueue(index + width);
+      }
+      const red = parseInt(hexColor.slice(1, 3), 16);
+      const green = parseInt(hexColor.slice(3, 5), 16);
+      const blue = parseInt(hexColor.slice(5, 7), 16);
+      for (let i = 0; i < tail; i++) {
+        const offset = queue[i] * 4;
+        pixels[offset] = red;
+        pixels[offset + 1] = green;
+        pixels[offset + 2] = blue;
+        pixels[offset + 3] = 255;
+      }
+      return true;
+    }
     function drawPanel() {
       const ownFish = fishPool.find(row => row.is_mine);
-      const panel = showPanel('<h3>' + (ownFish ? 'Edita tu pez' : 'Dibuja tu pez') + '</h3><p>Dibuja el pez con el dedo o el mouse. Luego podrás lanzarlo al océano.</p><canvas class="cocean-draw" width="440" height="220" tabindex="0" aria-label="Lienzo para dibujar un pez"></canvas><div class="cocean-colors"></div><div class="cocean-draw-tools"><button type="button" class="cocean-action cocean-eraser" aria-label="Borrador" title="Borrador" aria-pressed="false"><img src="ocean-eraser.svg" alt=""></button><button type="button" class="cocean-action cocean-clear"><img src="ocean-fish-delete.svg" alt="">Borrar todo</button></div><div class="cocean-panel-actions"><button type="button" class="cocean-action cocean-cancel">Cancelar</button><button type="button" class="cocean-primary cocean-send">' + (ownFish ? 'Guardar pez' : 'Lanzar pez') + '</button></div>', 'fish');
+      const panel = showPanel('<h3>' + (ownFish ? 'Edita tu pez' : 'Dibuja tu pez') + '</h3><p>Dibuja el pez con el dedo o el mouse. El bote rellena solo trazos cerrados.</p><canvas class="cocean-draw" width="440" height="220" tabindex="0" aria-label="Lienzo para dibujar un pez"></canvas><div class="cocean-colors"></div><div class="cocean-draw-tools"><button type="button" class="cocean-action cocean-eraser" aria-label="Borrador" title="Borrador" aria-pressed="false"><img src="ocean-eraser.svg" alt=""></button><button type="button" class="cocean-action cocean-paint-bucket" aria-label="Bote de pintura" title="Bote de pintura" aria-pressed="false"><img src="ocean-paint-bucket.svg" alt=""></button><button type="button" class="cocean-action cocean-clear"><img src="ocean-fish-delete.svg" alt="">Borrar todo</button></div><div class="cocean-panel-actions"><button type="button" class="cocean-action cocean-cancel">Cancelar</button><button type="button" class="cocean-primary cocean-send">' + (ownFish ? 'Guardar pez' : 'Lanzar pez') + '</button></div>', 'fish');
       if (ownFish) addDeleteOption(panel, 'fish');
       const canvas = panel.querySelector('canvas'), ctx = canvas.getContext('2d');
       const colors = ['#183b52','#ff5d73','#ffad36','#ffe066','#32b974','#2a92da','#9a6cdd','#808080','#ffffff'];
-      let color = colors[0], erasing = false, drawing = false, touched = false, originalUnchanged = true;
+      let color = colors[0], tool = 'brush', drawing = false, touched = false, originalUnchanged = true;
+      const eraser = panel.querySelector('.cocean-eraser');
+      const bucket = panel.querySelector('.cocean-paint-bucket');
+      function setTool(next) {
+        tool = next;
+        canvas.dataset.tool = tool;
+        eraser.setAttribute('aria-pressed', String(tool === 'eraser'));
+        bucket.setAttribute('aria-pressed', String(tool === 'fill'));
+      }
       if (ownFish && ownFish.image_data) {
         const previous = new Image();
         previous.onload = () => { if (originalUnchanged && panel.isConnected) { ctx.drawImage(previous, 0, 0, canvas.width, canvas.height); touched = true; } };
@@ -730,12 +779,33 @@
       colors.forEach((c,i) => {
         const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'cocean-color'; btn.style.background = c;
         btn.title = 'Color ' + (i+1); btn.setAttribute('aria-label', btn.title); btn.setAttribute('aria-pressed', String(i === 0));
-        btn.addEventListener('click', () => { color = c; erasing = false; panel.querySelector('.cocean-eraser').setAttribute('aria-pressed', 'false'); panel.querySelectorAll('.cocean-color').forEach(x => x.setAttribute('aria-pressed', String(x === btn))); });
+        btn.addEventListener('click', () => { color = c; if (tool === 'eraser') setTool('brush'); panel.querySelectorAll('.cocean-color').forEach(x => x.setAttribute('aria-pressed', String(x === btn))); });
         panel.querySelector('.cocean-colors').appendChild(btn);
       });
-      panel.querySelector('.cocean-eraser').addEventListener('click', e => { erasing = true; e.currentTarget.setAttribute('aria-pressed', 'true'); panel.querySelectorAll('.cocean-color').forEach(x => x.setAttribute('aria-pressed', 'false')); });
+      eraser.addEventListener('click', () => setTool(tool === 'eraser' ? 'brush' : 'eraser'));
+      bucket.addEventListener('click', () => setTool(tool === 'fill' ? 'brush' : 'fill'));
       function point(e) { const r = canvas.getBoundingClientRect(); return {x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}; }
-      canvas.addEventListener('pointerdown', e => { e.preventDefault(); originalUnchanged=false; canvas.setPointerCapture(e.pointerId); const p=point(e); ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+.1,p.y+.1);ctx.globalCompositeOperation=erasing?'destination-out':'source-over';ctx.strokeStyle=erasing?'#000':color;ctx.lineWidth=erasing?18:7;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();drawing=true;touched=true; });
+      canvas.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        const p = point(e);
+        if (tool === 'fill') {
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          if (fillClosedRegion(imageData, canvas.width, canvas.height, p.x, p.y, color)) {
+            ctx.putImageData(imageData, 0, 0);
+            originalUnchanged = false;
+            touched = true;
+          } else status('Toca dentro de un trazo cerrado para rellenarlo.');
+          return;
+        }
+        originalUnchanged = false;
+        canvas.setPointerCapture(e.pointerId);
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+.1,p.y+.1);
+        ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
+        ctx.strokeStyle = tool === 'eraser' ? '#000' : color;
+        ctx.lineWidth = tool === 'eraser' ? 18 : 7;
+        ctx.lineCap = 'round';ctx.lineJoin = 'round';ctx.stroke();
+        drawing = true;touched = true;
+      });
       canvas.addEventListener('pointermove', e => { if (!drawing) return; e.preventDefault();const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke(); });
       ['pointerup','pointercancel'].forEach(type => canvas.addEventListener(type, () => { drawing=false; }));
       panel.querySelector('.cocean-clear').addEventListener('click', () => { originalUnchanged=false; ctx.clearRect(0,0,canvas.width,canvas.height); touched=false; });

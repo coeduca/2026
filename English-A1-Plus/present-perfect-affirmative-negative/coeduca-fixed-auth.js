@@ -4,15 +4,61 @@
   const URL = 'https://pxoxmcyyhjpjggbseqcr.supabase.co';
   const KEY = 'sb_publishable_uBmOVK8akx2H73wpKDxT-w_vtTTcPr9';
   const fixed = new Set(['1999', '12379']);
+  const IDENTITY_KEY = 'coeduca-last-student-v1';
+  const SESSION_KEY = 'coeduca-fixed-session-v1';
   let account = null;
   let token = null;
   let promptOpen = null;
 
+  function lastStudent() {
+    try { return String(localStorage.getItem(IDENTITY_KEY) || '').trim(); }
+    catch (_) { return ''; }
+  }
+
+  function remember(nie) {
+    const selected = String(nie || '').trim();
+    if (!/^[0-9]{4,}$/.test(selected)) return;
+    try { localStorage.setItem(IDENTITY_KEY, selected); } catch (_) {}
+  }
+
+  function storedSession(nie) {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+      return saved && saved.nie === nie && /^[0-9a-f]{64}$/i.test(saved.token)
+        ? saved.token : null;
+    } catch (_) { return null; }
+  }
+
+  function forgetSession() {
+    account = null;
+    token = null;
+    try { localStorage.removeItem(SESSION_KEY); } catch (_) {}
+  }
+
+  async function hasSession(nie) {
+    const selected = String(nie || '').trim();
+    if (!fixed.has(selected)) return true;
+    if (account === selected && token) return true;
+    const savedToken = storedSession(selected);
+    if (!savedToken) return false;
+    const response = await fetch(URL + '/rest/v1/rpc/coeduca_fixed_account_validate', {
+      method: 'POST',
+      headers: {'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json'},
+      body: JSON.stringify({p_nie: selected, p_session_token: savedToken})
+    });
+    if (!response.ok) throw new Error('No se pudo comprobar la sesión guardada. Inténtalo de nuevo.');
+    if (await response.json() !== true) {
+      forgetSession();
+      return false;
+    }
+    account = selected;
+    token = savedToken;
+    return true;
+  }
+
   async function login(nie, password) {
     const selected = String(nie || '').trim();
     if (!fixed.has(selected)) return true;
-    account = null;
-    token = null;
     if (!password) return false;
     const response = await fetch(URL + '/rest/v1/rpc/coeduca_fixed_account_login', {
       method: 'POST',
@@ -24,13 +70,17 @@
     if (typeof value !== 'string' || !value) return false;
     account = selected;
     token = value;
+    try { localStorage.setItem(SESSION_KEY, JSON.stringify({nie: selected, token: value})); } catch (_) {}
+    remember(selected);
     return true;
   }
 
-  function requestLogin(nie) {
+  async function requestLogin(nie) {
     const selected = String(nie || '').trim();
     if (!fixed.has(selected)) return Promise.resolve(true);
     if (promptOpen) return promptOpen;
+    try { if (await hasSession(selected)) return true; }
+    catch (_) { /* Mostrar el formulario si la validación no está disponible. */ }
     promptOpen = new Promise(resolve => {
       if (!document.getElementById('coeduca-fixed-auth-style')) {
         const style = document.createElement('style');
@@ -81,7 +131,13 @@
     isFixed: nie => fixed.has(String(nie || '').trim()),
     login,
     requestLogin,
+    hasSession,
+    lastStudent,
+    remember,
     tokenFor: nie => account === String(nie || '').trim() ? token : null,
-    clear() { account = null; token = null; }
+    clear() {
+      forgetSession();
+      try { localStorage.removeItem(IDENTITY_KEY); } catch (_) {}
+    }
   };
 })(window);

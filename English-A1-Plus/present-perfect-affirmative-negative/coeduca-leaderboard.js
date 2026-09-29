@@ -200,31 +200,32 @@
       }
       .is-podium .cg-leaderboard-score { background: rgba(255,255,255,.72); }
       .cg-leaderboard-empty { padding: 12px 4px; text-align: center; font-size: 12px; opacity: .62; }
-      .cg-avatar-dialog-backdrop { position:fixed; inset:0; z-index:2147483647; display:grid; place-items:center; padding:16px; background:#16293cbb; }
-      .cg-avatar-dialog { box-sizing:border-box; width:min(100%,420px); max-height:min(94dvh,780px); overflow:auto; padding:20px; border:3px solid #22324a; border-radius:20px; background:#fff9ed; color:#22324a; box-shadow:6px 6px 0 #22324a; font-family:system-ui,sans-serif; text-align:center; }
-      .cg-avatar-dialog h3 { margin:0 0 5px; font-size:24px; }
+      .cg-avatar-dialog-backdrop { position:fixed; inset:0; z-index:2147483647; display:grid; place-items:center; padding:16px; background:#102d20bb; }
+      .cg-avatar-dialog { box-sizing:border-box; width:min(100%,420px); max-height:min(94dvh,780px); overflow:auto; padding:20px; border:3px solid #246244; border-radius:20px; background:linear-gradient(155deg,#f5fff4,#e4f7e9); color:#19452f; box-shadow:6px 6px 0 #246244; font-family:system-ui,sans-serif; text-align:center; }
+      .cg-avatar-dialog h3 { margin:0 0 5px; color:#176a3c; font-size:24px; }
       .cg-avatar-dialog p { margin:4px 0 12px; font-size:13px; }
       .cg-avatar-dialog-preview-row { display:flex; align-items:center; justify-content:center; gap:12px; min-height:84px; margin:4px auto 8px; }
       .cg-avatar-dialog-preview-row[hidden] { display:none; }
-      .cg-avatar-dialog-preview { display:grid; place-items:center; flex:none; width:76px; height:76px; margin:0; border:2px solid #22324a; border-radius:50%; overflow:hidden; background:#eaf7ff; }
+      .cg-avatar-dialog-preview { display:grid; place-items:center; flex:none; width:76px; height:76px; margin:0; border:2px solid #246244; border-radius:50%; overflow:hidden; background:#e4f5e8; }
       .cg-avatar-dialog-preview img { display:block; width:100%; height:100%; object-fit:contain; }
-      .cg-avatar-dialog-preview-name { max-width:180px; overflow-wrap:anywhere; color:#22324a; font-size:17px; font-weight:900; text-align:left; }
+      .cg-avatar-dialog-preview-name { max-width:180px; overflow-wrap:anywhere; color:#19452f; font-size:17px; font-weight:900; text-align:left; }
       .cg-avatar-dialog-options { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; margin:12px 0; }
-      .cg-avatar-dialog-options button { display:grid; place-items:center; aspect-ratio:1; padding:0; overflow:hidden; border:2px solid #22324a; border-radius:50%; background:#fff; cursor:pointer; }
-      .cg-avatar-dialog-options button[aria-pressed="true"] { outline:2px solid #22324a; outline-offset:2px; }
+      .cg-avatar-dialog-options button { display:grid; place-items:center; aspect-ratio:1; padding:0; overflow:hidden; border:2px solid #246244; border-radius:50%; background:#fff; cursor:pointer; }
+      .cg-avatar-dialog-options button[aria-pressed="true"] { outline:3px solid #309c59; outline-offset:2px; }
       .cg-avatar-dialog-options button { position:relative; }
       .cg-avatar-dialog-options button.is-locked img { opacity:.4; filter:grayscale(1); }
-      .cg-avatar-dialog-options button.is-locked::after { content:'🔒'; position:absolute; right:10%; bottom:8%; padding:2px; border-radius:50%; background:#fff9ed; font-size:14px; }
+      .cg-avatar-dialog-options button.is-locked::after { content:'🔒'; position:absolute; right:10%; bottom:8%; padding:2px; border-radius:50%; background:#f5fff4; font-size:14px; }
       .cg-avatar-dialog-preview[hidden], .cg-avatar-dialog-color-label[hidden], .cg-avatar-dialog-options[hidden], .cg-avatar-dialog-colors[hidden], .cg-avatar-dialog-upload[hidden], .cg-avatar-dialog-actions button[hidden] { display:none; }
       .cg-avatar-dialog-options img { display:block; width:100%; height:100%; object-fit:contain; }
       .cg-avatar-dialog-colors { display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:7px; margin:8px 0 12px; }
-      .cg-avatar-dialog-colors button { width:100%; aspect-ratio:1; border:2px solid #22324a; border-radius:50%; cursor:pointer; }
-      .cg-avatar-dialog-colors button[aria-pressed="true"] { outline:3px solid #147b69; outline-offset:2px; }
-      .cg-avatar-dialog-colors button:focus-visible, .cg-avatar-dialog-options button:focus-visible { outline:3px solid #147b69; outline-offset:2px; }
-      .cg-avatar-dialog-upload { display:block; width:100%; min-height:42px; padding:9px; border:2px solid #22324a; border-radius:10px; background:#d9f3ff; color:#22324a; font:800 13px system-ui,sans-serif; cursor:pointer; }
-      .cg-avatar-dialog-actions { position:sticky; bottom:-20px; z-index:1; display:flex; justify-content:center; gap:8px; margin-top:10px; padding:8px 0 4px; background:#fff9ed; }
-      .cg-avatar-dialog-actions button { min-height:38px; padding:7px 12px; border:2px solid #22324a; border-radius:9px; background:#fff; color:#22324a; font:800 12px system-ui,sans-serif; cursor:pointer; }
-      .cg-avatar-dialog-actions .cg-avatar-dialog-save { background:#ffe27a; }
+      .cg-avatar-dialog-colors button { width:100%; aspect-ratio:1; border:2px solid #246244; border-radius:50%; cursor:pointer; }
+      .cg-avatar-dialog-colors button[aria-pressed="true"] { outline:3px solid #309c59; outline-offset:2px; }
+      .cg-avatar-dialog-colors button:focus-visible, .cg-avatar-dialog-options button:focus-visible, .cg-avatar-dialog-upload:focus-visible, .cg-avatar-dialog-actions button:focus-visible { outline:3px solid #309c59; outline-offset:2px; }
+      .cg-avatar-dialog-upload { display:block; width:100%; min-height:42px; padding:9px; border:2px solid #246244; border-radius:10px; background:#d5f1df; color:#19452f; font:800 13px system-ui,sans-serif; cursor:pointer; }
+      .cg-avatar-dialog-upload[aria-disabled="true"] { background:#e8f2ea; color:#597566; }
+      .cg-avatar-dialog-actions { position:sticky; bottom:-20px; z-index:1; display:flex; justify-content:center; gap:8px; margin-top:10px; padding:8px 0 4px; background:#e4f7e9; }
+      .cg-avatar-dialog-actions button { min-height:38px; padding:7px 12px; border:2px solid #246244; border-radius:9px; background:#f9fff9; color:#19452f; font:800 12px system-ui,sans-serif; cursor:pointer; }
+      .cg-avatar-dialog-actions .cg-avatar-dialog-save { background:#309c59; color:#fff; }
       .cg-avatar-dialog-status { min-height:18px; margin-top:8px; padding:0 4px; font-size:12px; font-weight:700; line-height:1.35; }
       .cg-avatar-dialog button:disabled { opacity:.55; cursor:wait; }
       @keyframes cgLeaderboardRankFloat {

@@ -151,7 +151,7 @@
       : { enter() {}, leave() {}, destroy() {} };
 
     const canvas = wrap.querySelector('.cj-canvas');
-    const paint = canvas.getContext('2d');
+    const paint = canvas.getContext('2d', { alpha: false });
     const scoreEl = wrap.querySelector('.cj-score');
     const statusEl = wrap.querySelector('.cj-status');
     const startButton = wrap.querySelector('.cj-start');
@@ -159,7 +159,21 @@
       statusEl.textContent = 'Canvas no está disponible.';
       return;
     }
-    paint.scale(2, 2);
+    const memory = Number(global.navigator && global.navigator.deviceMemory);
+    const cores = Number(global.navigator && global.navigator.hardwareConcurrency);
+    let lowPower = (memory > 0 && memory <= 4) || (cores > 0 && cores <= 4);
+    function setCanvasScale(scale) {
+      canvas.width = Math.round(W * scale);
+      canvas.height = Math.round(H * scale);
+      paint.setTransform(scale, 0, 0, scale, 0, 0);
+    }
+    setCanvasScale(lowPower ? 1.25 : 2);
+    const daySky = paint.createLinearGradient(0, 0, 0, H);
+    daySky.addColorStop(0, '#8bcefa');
+    daySky.addColorStop(1, '#e4f9ff');
+    const nightSky = paint.createLinearGradient(0, 0, 0, H);
+    nightSky.addColorStop(0, '#0c1739');
+    nightSky.addColorStop(1, '#304b78');
 
     const leaderboard = global.COEDUCA_LEADERBOARD
       ? global.COEDUCA_LEADERBOARD.create(ctx, 'doodle', 1)
@@ -169,10 +183,12 @@
       : { show() {} };
 
     let phase = 'ready', frameId = null, previousFrame = 0, startToken = 0;
+    let accumulator = 0, lastPaintTime = 0, slowFrames = 0;
+    const STEP_SECONDS = 1 / 60, MAX_STEPS = 6;
     let helpOpen = false, helpPaused = false;
     let playerX = W / 2, playerY = BASE_Y, velocityY = 0;
     let cameraY = 0, highestY = BASE_Y, heightScore = 0, balloonPoints = 0;
-    let score = 0, bonusEarned = false;
+    let score = 0, displayedScore = 0, bonusEarned = false;
     let platforms = [], lastPlatformY = BASE_Y, lastPlatformX = 132, platformCount = 0;
     let balloons = [], balloonFx = [], balloonText = null;
     let flightKind = null, flightTimer = 0, flightSpeed = 0, springEffect = 0;
@@ -297,6 +313,7 @@
       heightScore = 0;
       balloonPoints = 0;
       score = 0;
+      displayedScore = 0;
       bonusEarned = false;
       platforms = [{ x: 132, y: BASE_Y, width: 96 }];
       balloons = [];
@@ -317,6 +334,9 @@
       dizzyTimeLeft = 0;
       nextDizzyIn = 6 + Math.random() * 9;
       previousFrame = 0;
+      accumulator = 0;
+      lastPaintTime = 0;
+      slowFrames = 0;
       tiltCenter = tiltRaw;
       tiltTarget = 0;
       tiltSmooth = 0;
@@ -358,6 +378,8 @@
         startButton.innerHTML = iconButton('retry', 'Reiniciar');
         startButton.disabled = true;
         previousFrame = 0;
+        accumulator = 0;
+        lastPaintTime = 0;
         statusEl.textContent = '¡Sigue subiendo!';
         if (flightKind && flightTimer > 0) startFlightSound(flightKind);
         frameId = global.requestAnimationFrame(tick);
@@ -404,6 +426,8 @@
       frameId = null;
       startButton.innerHTML = iconButton('retry', 'Reintentar');
       startButton.disabled = false;
+      scoreEl.textContent = String(score);
+      displayedScore = score;
       statusEl.textContent = `Fin de la partida: ${score} puntos (${heightScore} de altura). ${bonusEarned ? '¡Conservas tu +1!' : '¡Inténtalo otra vez!'}`;
       leaderboard.submit(score);
       if (!bonusEarned) ctx.onLose();
@@ -491,7 +515,9 @@
         particle.vy -= 130 * dt;
         particle.life -= dt;
       }
-      balloonFx = balloonFx.filter(particle => particle.life > 0);
+      for (let i = balloonFx.length - 1; i >= 0; i--) {
+        if (balloonFx[i].life <= 0) balloonFx.splice(i, 1);
+      }
       if (balloonText) {
         balloonText.y += 35 * dt;
         balloonText.life -= dt;
@@ -519,7 +545,11 @@
         booster.angle += dt * 4;
         booster.life -= dt;
       }
-      fallingBoosters = fallingBoosters.filter(booster => booster.life > 0 && booster.y > cameraY - 90);
+      for (let i = fallingBoosters.length - 1; i >= 0; i--) {
+        if (fallingBoosters[i].life <= 0 || fallingBoosters[i].y <= cameraY - 90) {
+          fallingBoosters.splice(i, 1);
+        }
+      }
       const keyDirection = Number(rightDown) - Number(leftDown);
       tiltSmooth += (tiltTarget - tiltSmooth) * Math.min(1, dt * 12);
       const direction = keyDirection || touchDirection || tiltSmooth;
@@ -553,31 +583,32 @@
       let landed = false;
       if (!wasFlying && velocityY <= 0) {
         // Al cruzar más de una superficie en un fotograma, toca primero la más alta.
-        for (const platform of platforms.slice().sort((a, b) => b.y - a.y)) {
-          if (platform.broken || platform.fading === 0) continue;
-          const overlapsX = [playerX - W, playerX, playerX + W].some(x =>
-            x + PLAYER_W / 2 > platform.x && x - PLAYER_W / 2 < platform.x + platform.width);
-          if (previousY >= platform.y && playerY <= platform.y && overlapsX) {
-            if (platform.type === 'broken') {
-              playSound('broken');
-              platform.broken = true;
-              platform.breakAge = 0;
-              statusEl.textContent = '¡La plataforma se rompió! Busca otra antes de caer.';
-              break;
-            }
-            playerY = platform.y;
+        let landing = null;
+        for (const platform of platforms) {
+          if (platform.broken || platform.fading === 0 ||
+              previousY < platform.y || playerY > platform.y ||
+              (landing && platform.y <= landing.y)) continue;
+          const overlap = wrappedDistance(playerX, platform.x + platform.width / 2) <
+            (platform.width + PLAYER_W) / 2;
+          if (overlap) landing = platform;
+        }
+        if (landing) {
+          if (landing.type === 'broken') {
+            playSound('broken');
+            landing.broken = true;
+            landing.breakAge = 0;
+            statusEl.textContent = '¡La plataforma se rompió! Busca otra antes de caer.';
+          } else {
+            playerY = landing.y;
             velocityY = BOUNCE;
             landed = true;
             springBoostActive = false;
             releaseTimer = 0;
-            if (platform.type === 'vanishing') platform.fading = .35;
-            if (platform.booster === 'spring' &&
-                wrappedDistance(playerX, platform.x + platform.width / 2) < 27) {
-              activateBooster(platform);
-            } else {
-              playSound('jump');
-            }
-            break;
+            if (landing.type === 'vanishing') landing.fading = .35;
+            if (landing.booster === 'spring' &&
+                wrappedDistance(playerX, landing.x + landing.width / 2) < 27) {
+              activateBooster(landing);
+            } else playSound('jump');
           }
         }
       }
@@ -623,7 +654,10 @@
       const newScore = heightScore + balloonPoints;
       if (newScore !== score) {
         score = newScore;
-        scoreEl.textContent = String(score);
+        if (!lowPower) {
+          scoreEl.textContent = String(score);
+          displayedScore = score;
+        }
         if (!bonusEarned && score >= goal) {
           bonusEarned = true;
           statusEl.textContent = '¡Ganaste +1 punto en tu nota final! Sigue subiendo para mejorar tu récord.';
@@ -632,10 +666,17 @@
       }
       cameraY = Math.max(cameraY, highestY - H * .57);
       addPlatforms();
-      balloons = balloons.filter(balloon => !balloon.collected && balloon.y > cameraY - 60);
-      platforms = platforms.filter(platform =>
-        platform.y > cameraY - 45 && platform.fading !== 0 &&
-        (!platform.broken || platform.breakAge < .7));
+      let keep = 0;
+      for (const balloon of balloons) {
+        if (!balloon.collected && balloon.y > cameraY - 60) balloons[keep++] = balloon;
+      }
+      balloons.length = keep;
+      keep = 0;
+      for (const platform of platforms) {
+        if (platform.y > cameraY - 45 && platform.fading !== 0 &&
+            (!platform.broken || platform.breakAge < .7)) platforms[keep++] = platform;
+      }
+      platforms.length = keep;
       if (playerY < cameraY - PLAYER_H) finish();
     }
 
@@ -961,15 +1002,9 @@
     function draw() {
       const nightProgress = clamp((score - NIGHT_START_HEIGHT) / NIGHT_TRANSITION_HEIGHT, 0, 1);
       const night = nightProgress * nightProgress * (3 - 2 * nightProgress);
-      const sky = paint.createLinearGradient(0, 0, 0, H);
-      sky.addColorStop(0, '#8bcefa');
-      sky.addColorStop(1, '#e4f9ff');
-      paint.fillStyle = sky;
+      paint.fillStyle = daySky;
       paint.fillRect(0, 0, W, H);
       if (night > 0) {
-        const nightSky = paint.createLinearGradient(0, 0, 0, H);
-        nightSky.addColorStop(0, '#0c1739');
-        nightSky.addColorStop(1, '#304b78');
         paint.save();
         paint.globalAlpha = night;
         paint.fillStyle = nightSky;
@@ -1041,10 +1076,31 @@
     function tick(now) {
       if (phase !== 'playing') return;
       if (!document.body.contains(wrap)) { cleanup(); return; }
-      const dt = previousFrame ? Math.min((now - previousFrame) / 1000, .033) : 0;
+      const elapsedMs = previousFrame ? Math.max(0, Math.min(now - previousFrame, 100)) : 0;
       previousFrame = now;
-      if (dt) step(dt);
-      draw();
+      if (!lowPower) {
+        slowFrames = elapsedMs > 28 && elapsedMs < 120 ? slowFrames + 1 : Math.max(0, slowFrames - 1);
+        if (slowFrames >= 18) {
+          lowPower = true;
+          setCanvasScale(1.25);
+          lastPaintTime = 0;
+        }
+      }
+      accumulator = Math.min(accumulator + elapsedMs / 1000, STEP_SECONDS * MAX_STEPS);
+      let steps = 0;
+      while (accumulator + 1e-9 >= STEP_SECONDS && steps < MAX_STEPS && phase === 'playing') {
+        step(STEP_SECONDS);
+        accumulator = Math.max(0, accumulator - STEP_SECONDS);
+        steps++;
+      }
+      if (phase === 'playing' && (!lowPower || !lastPaintTime || now - lastPaintTime >= 1000 / 30 - 1)) {
+        if (displayedScore !== score) {
+          scoreEl.textContent = String(score);
+          displayedScore = score;
+        }
+        draw();
+        lastPaintTime = now;
+      }
       if (phase === 'playing') frameId = global.requestAnimationFrame(tick);
     }
 
@@ -1106,6 +1162,8 @@
       if (helpPaused && phase === 'paused' && !document.hidden) {
         phase = 'playing';
         previousFrame = 0;
+        accumulator = 0;
+        lastPaintTime = 0;
         statusEl.textContent = '¡Sigue subiendo!';
         if (flightKind && flightTimer > 0) startFlightSound(flightKind);
         frameId = global.requestAnimationFrame(tick);
