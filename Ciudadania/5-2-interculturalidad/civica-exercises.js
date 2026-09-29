@@ -1475,7 +1475,8 @@
           resetStyle();
         },
         onDrop: ({ under }) => {
-          const drop = under && under.closest && under.closest('.cat-drop');
+          const column = under && under.closest && under.closest('.cat-col');
+          const drop = column && column.querySelector('.cat-drop');
           if (drop) {
             drop.appendChild(chip);
           } else {

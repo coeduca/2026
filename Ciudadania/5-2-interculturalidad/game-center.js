@@ -16,9 +16,19 @@
   const byId = Object.fromEntries(games.map(game => [game.id, game]));
   const selectedId = new URLSearchParams(location.search).get('juego');
   const selected = byId[selectedId] || null;
+  function activityStorageId(config) {
+    if (config.id) return String(config.id);
+    const topicId = (config.topic || 'page').replace(/\W+/g, '_').toLowerCase();
+    const path = (location.pathname || '')
+      .replace(/\/(?:index|juegos)\.html$/i, '/')
+      .replace(/\/+$/, '');
+    const folder = path.split('/').pop().replace(/\W+/g, '_').toLowerCase();
+    return folder && folder !== topicId
+      ? path.split('/').filter(Boolean).slice(-2).join('-').toLowerCase()
+      : topicId;
+  }
   const key = (document.body.dataset.framework === 'civica' ? 'civica_' : 'coeduca_') +
-    (config.id || (config.topic || 'page').replace(/\W+/g, '_').toLowerCase()) + '_state';
-  const loginRequiredKey = key + '_hubLoginRequired';
+    activityStorageId(config) + '_state';
   const catalog = document.getElementById('gc-catalog');
   const loginSection = document.getElementById('gc-login');
   const playSection = document.getElementById('gc-play');
@@ -43,7 +53,7 @@
   }
 
   function allowed(studentRecord) {
-    if (studentRecord.nie === '1999') return true;
+    if (studentRecord.nie === '1999' || studentRecord.nie === '12379') return true;
     if (document.body.dataset.framework === 'civica') return studentRecord.grade === 'Octavo';
     const levels = {
       'A1+': ['Noveno', 'Primer Ano', 'Primer Año', 'Segundo Ano', 'Segundo Año'],
@@ -163,39 +173,48 @@
     });
   }
 
-  function init() {
+  async function init() {
     renderCatalog();
-    const navigation = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-    const reloaded = navigation ? navigation.type === 'reload' : performance.navigation && performance.navigation.type === 1;
-    if (reloaded) {
-      try { sessionStorage.setItem(loginRequiredKey, '1'); } catch (e) {}
-    }
     if (!selected) return;
     const saved = readSnapshot();
-    let loginRequired = false;
-    try { loginRequired = sessionStorage.getItem(loginRequiredKey) === '1'; } catch (e) {}
-    if (!loginRequired && saved && saved.student) {
-      const savedStudent = findStudent(String(saved.student.nie || ''));
-      if (savedStudent && allowed(savedStudent)) student = savedStudent;
+    const auth = window.COEDUCA_FIXED_AUTH;
+    const remembered = auth && auth.lastStudent() || '';
+    const nie = remembered || String(saved && saved.student && saved.student.nie || '');
+    const savedStudent = findStudent(nie);
+    if (savedStudent && allowed(savedStudent)) {
+      if (nie === '1999' || nie === '12379') {
+        try { if (auth && await auth.hasSession(nie)) student = savedStudent; }
+        catch (_) { /* Solicitar acceso si no se pudo validar el token. */ }
+      } else student = savedStudent;
     }
     if (student) {
+      if (!saved || !saved.student || String(saved.student.nie) !== student.nie) {
+        writeSnapshot({student: student});
+      }
+      if (auth) auth.remember(student.nie);
       showGame();
       return;
     }
     loginSection.hidden = false;
     requestAnimationFrame(() => loginSection.scrollIntoView({ block: 'start' }));
-    document.getElementById('gc-login-form').addEventListener('submit', event => {
+    document.getElementById('gc-login-form').addEventListener('submit', async event => {
       event.preventDefault();
       const nie = document.getElementById('gc-nie').value.trim();
       const found = findStudent(nie);
       const error = document.getElementById('gc-login-error');
       if (!found) { error.textContent = 'No encontramos ese NIE en este paquete.'; return; }
       if (!allowed(found)) { error.textContent = 'Este grado no tiene acceso a la actividad.'; return; }
+      if (nie === '1999' || nie === '12379') {
+        const auth = window.COEDUCA_FIXED_AUTH;
+        if (!auth) { error.textContent = 'No se pudo cargar el acceso protegido.'; return; }
+        const accepted = await auth.requestLogin(nie);
+        if (!accepted) return;
+      }
       error.textContent = '';
       const prior = readSnapshot();
       const sameStudent = prior && prior.student && String(prior.student.nie) === nie;
       writeSnapshot(Object.assign(sameStudent ? prior : {}, { student: found }));
-      try { sessionStorage.removeItem(loginRequiredKey); } catch (e) {}
+      if (window.COEDUCA_FIXED_AUTH) window.COEDUCA_FIXED_AUTH.remember(nie);
       student = found;
       showGame();
     });

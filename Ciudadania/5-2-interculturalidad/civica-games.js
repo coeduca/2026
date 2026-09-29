@@ -391,6 +391,18 @@
   function sndMuted() {
     try { return localStorage.getItem(SND_KEY) === '1'; } catch (e) { return false; }
   }
+  function prepareSound() {
+    if (sndMuted()) return;
+    try {
+      const AC = global.AudioContext || global.webkitAudioContext;
+      if (!AC) return;
+      if (!sndCtx || sndCtx.state === 'closed') sndCtx = new AC();
+      if (sndCtx.state === 'suspended') {
+        const resumed = sndCtx.resume();
+        if (resumed && resumed.catch) resumed.catch(() => {});
+      }
+    } catch (_) { /* El juego funciona también sin audio. */ }
+  }
   function sndSetMuted(m) {
     try { localStorage.setItem(SND_KEY, m ? '1' : '0'); } catch (e) {}
   }
@@ -398,10 +410,8 @@
   function beep(f0, f1, dur, type, vol, delay) {
     if (sndMuted()) return;
     try {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      if (!sndCtx) sndCtx = new AC();
-      if (sndCtx.state === 'suspended') sndCtx.resume();
+      prepareSound();
+      if (!sndCtx) return;
       const t0 = sndCtx.currentTime + (delay || 0);
       const osc = sndCtx.createOscillator();
       const g = sndCtx.createGain();
@@ -412,6 +422,7 @@
       g.gain.exponentialRampToValueAtTime(vol || 0.1, t0 + 0.012);
       g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
       osc.connect(g); g.connect(sndCtx.destination);
+      osc.onended = () => { osc.disconnect(); g.disconnect(); };
       osc.start(t0); osc.stop(t0 + dur + 0.03);
     } catch (e) { /* dispositivo sin audio */ }
   }
@@ -490,6 +501,11 @@
     document.addEventListener('visibilitychange', handler);
     wrap.addEventListener('coeduca-game-help-open', onHelpOpen);
     wrap.addEventListener('coeduca-game-help-close', onHelpClose);
+    return () => {
+      document.removeEventListener('visibilitychange', handler);
+      wrap.removeEventListener('coeduca-game-help-open', onHelpOpen);
+      wrap.removeEventListener('coeduca-game-help-close', onHelpClose);
+    };
   }
 
   function avatarHTML(name, emoji, bgColor, opts = {}) {
@@ -1095,8 +1111,10 @@
     const GROUND_H = 8;
     const winThreshold = (ctx.config && ctx.config.winScore) || 500;
 
-    // --- Física (tick de 22ms ≈ 45fps) ---
+    // Unidades originales de 22 ms; simulación fija de 120 Hz, dibujo sincronizado con la pantalla.
     const TICK_MS = 22;
+    const STEP_MS = 1000 / 120;
+    const MAX_STEPS = 8;
     const GRAVITY_UP = 0.85;      // subiendo: más flotante
     const GRAVITY_DOWN = 1.5;     // cayendo: más pesado → el salto se siente ágil
     const HOLD_LIFT = 0.12;       // mantener pulsado da un poco más de altura
@@ -1109,7 +1127,7 @@
     const PTS_PER_DIST = 1 / 24;  // puntos mostrados por píxel recorrido
     const GRACE_FRAMES = 50;
 
-    let dino, obstacles, clouds, mountains, hills, vy, onGround, gameOver, loop, speed;
+    let dino, obstacles, clouds, mountains, hills, vy, onGround, gameOver, speed;
     let frames, sunX, groundOffset, dustParticles, started;
     let distance, finishDist, gate, jumpBuffer, jumpHeld, balloonPoints;
     let balloon, balloonSpawned, balloonFx, plusOne;
@@ -1160,7 +1178,7 @@
     const results = gameResults(ctx, 'dino', wrap);
 
     const canvas = wrap.querySelector('#dino-canvas');
-    const cctx = canvas.getContext('2d');
+    let cctx = canvas.getContext('2d', { alpha: false });
     const skyGradient = cctx.createLinearGradient(0, 0, 0, H);
     skyGradient.addColorStop(0, '#87CEEB');
     skyGradient.addColorStop(0.6, '#B3E5FC');
@@ -1171,19 +1189,93 @@
     const leaderboard = global.COEDUCA_LEADERBOARD
       ? global.COEDUCA_LEADERBOARD.create(ctx, 'dino', winThreshold)
       : { submit: () => Promise.resolve(false) };
-    let paintRequest = null;
+    let paintRequest = null, lastTime = null, accumulator = 0;
+    let resumeTimer = null, disposed = false, paused = false;
+    let lastScore = -1, lastProgress = -1, hudElapsed = 0;
 
-    function scheduleDraw() {
-      if (paintRequest !== null) return;
-      paintRequest = global.requestAnimationFrame(() => {
-        paintRequest = null;
-        if (!gameOver && !paused) draw();
+    function stopLoop() {
+      if (paintRequest !== null) global.cancelAnimationFrame(paintRequest);
+      paintRequest = null;
+      lastTime = null;
+      accumulator = 0;
+    }
+
+    function startLoop() {
+      stopLoop();
+      if (!disposed && started && !gameOver && !paused) {
+        lastTime = global.performance.now();
+        paintRequest = global.requestAnimationFrame(animate);
+      }
+    }
+
+    function animate(now) {
+      paintRequest = null;
+      if (!wrap.isConnected) { dispose(); return; }
+      if (disposed || gameOver || paused || !started) return;
+      // Acotar la recuperación evita una avalancha de trabajo tras un bloqueo.
+      accumulator += Math.min(Math.max(0, now - lastTime), STEP_MS * MAX_STEPS);
+      lastTime = now;
+      let steps = 0;
+      while (accumulator + 0.000001 >= STEP_MS && steps < MAX_STEPS && !gameOver) {
+        step(STEP_MS / TICK_MS);
+        accumulator -= STEP_MS;
+        steps++;
+      }
+      if (gameOver || disposed) return;
+      updateHud();
+      draw();
+      paintRequest = global.requestAnimationFrame(animate);
+    }
+
+    function updateHud(force = false) {
+      if (!force && hudElapsed < 90) return;
+      hudElapsed = 0;
+      const score = displayedScore();
+      if (score !== lastScore) { scoreVal.textContent = String(score); lastScore = score; }
+      const progress = Math.min(1, score / winThreshold);
+      if (progress !== lastProgress) {
+        progressEl.style.transform = 'scaleX(' + progress + ')';
+        lastProgress = progress;
+      }
+    }
+
+    // Rasterizar una vez: los cuadros de juego solo copian estas imágenes pequeñas.
+    function bitmap(width, height, paint) {
+      const surface = document.createElement('canvas');
+      surface.width = Math.ceil(width); surface.height = Math.ceil(height);
+      const mainContext = cctx;
+      cctx = surface.getContext('2d');
+      try { paint(); } finally { cctx = mainContext; }
+      return surface;
+    }
+    let sprites;
+    function prepareSprites() {
+      if (!sprites) {
+        sprites = {
+          cactus_s: bitmap(24, 40, () => drawCactus({ x: 4, y: 8, w: 16, h: 30 }, false)),
+          cactus_l: bitmap(30, 54, () => drawCactus({ x: 4, y: 8, w: 22, h: 44 }, true)),
+          birds: [0, 10].map(flap => bitmap(48, 42, () => drawBird({ x: 10, y: 12, w: 28, h: 20, flap }))),
+          balloon: bitmap(36, 62, () => drawBalloon({ x: 18, y: 16, r: 13, bob: 0 })),
+          dinos: [10, 15, 10, 0, 5, 0].map((frame, i) =>
+            bitmap(58, 56, () => drawDino({ x: 12, y: 10, w: 36, h: 42 }, i % 3 !== 2, frame))),
+          sun: bitmap(84, 84, () => { cctx.translate(0, 7); drawSun(42); }),
+          sunRays: bitmap(64, 64, () => { cctx.translate(32, 32); drawSunRays(); })
+        };
+      }
+      for (const cloud of clouds) cloud.sprite = bitmap(cloud.w * 1.2, cloud.h * 2 + 8, () =>
+        drawCloud({ x: 2, y: cloud.h + 4, w: cloud.w, h: cloud.h }));
+      for (const m of mountains) m.sprite = bitmap(m.w, m.h, () => {
+        cctx.translate(0, m.h - (H - GROUND_H)); drawMountain({ ...m, x: 0 });
+      });
+      for (const h of hills) h.sprite = bitmap(h.w, h.h + 18, () => {
+        cctx.translate(0, h.h + 18 - (H - GROUND_H)); drawHill({ ...h, x: 0 });
       });
     }
 
     function reset() {
-      if (paintRequest !== null) global.cancelAnimationFrame(paintRequest);
-      paintRequest = null;
+      stopLoop();
+      clearTimeout(resumeTimer); resumeTimer = null;
+      paused = false;
       dino = { x: 50, y: H - 42 - GROUND_H, w: 36, h: 42 };
       obstacles = [];
       clouds = [
@@ -1195,7 +1287,8 @@
       hills = [];
       for (let i = 0; i < 4; i++) {
         mountains.push({ x: i * 190 + Math.random() * 60, w: 150 + Math.random() * 80, h: 45 + Math.random() * 25 });
-        hills.push({ x: i * 170 + Math.random() * 50, w: 130 + Math.random() * 70, h: 22 + Math.random() * 14 });
+        hills.push({ x: i * 170 + Math.random() * 50, w: 130 + Math.random() * 70,
+          h: 22 + Math.random() * 14, curlStyle: i % 3 });
       }
       vy = 0; onGround = true;
       gameOver = false; speed = START_SPEED;
@@ -1216,6 +1309,8 @@
       progressEl.style.transform = 'scaleX(0)';
       statusEl.textContent = '';
       statusEl.className = 'cv-status';
+      lastScore = 0; lastProgress = 0; hudElapsed = 0;
+      prepareSprites();
     }
 
     function displayedScore() {
@@ -1235,12 +1330,19 @@
       }
     }
 
-    // El salto se pide (buffer) y se ejecuta en el tick cuando hay suelo:
-    // así, pulsar un instante antes de aterrizar también funciona.
+    // Saltar al presionar; en el aire, guardar brevemente la petición para el aterrizaje.
     function pressJump() {
-      if (gameOver || !started) return;
+      if (disposed || gameOver || !started || paused || resumeTimer !== null) return;
       jumpHeld = true;
       jumpBuffer = BUFFER_FRAMES;
+      if (onGround) beginJump();
+    }
+    function beginJump() {
+      vy = jumpHeld ? JUMP_VELOCITY : JUMP_CUT_VELOCITY;
+      onGround = false;
+      jumpBuffer = 0;
+      spawnDust(6, dino.x + dino.w / 2, -1);
+      SFX.jump();
     }
     function releaseJump() {
       jumpHeld = false;
@@ -1291,26 +1393,21 @@
       spawnConfetti(wrap, 15);
     }
 
-    function step() {
+    function step(dt) {
       if (gameOver) return;
-      frames++;
+      const previousFrame = frames;
+      frames += dt;
+      hudElapsed += dt * TICK_MS;
 
-      // --- Salto con buffer ---
       if (jumpBuffer > 0) {
-        jumpBuffer--;
-        if (onGround) {
-          vy = JUMP_VELOCITY;
-          onGround = false;
-          jumpBuffer = 0;
-          spawnDust(6, dino.x + dino.w / 2, -1);
-          SFX.jump();
-        }
+        if (onGround) beginJump();
+        else jumpBuffer = Math.max(0, jumpBuffer - dt);
       }
 
       // --- Gravedad asimétrica: flotante al subir, pesada al caer ---
-      vy += (vy < 0 ? GRAVITY_UP : GRAVITY_DOWN);
-      if (jumpHeld && vy < 0) vy -= HOLD_LIFT;
-      dino.y += vy;
+      vy += (vy < 0 ? GRAVITY_UP : GRAVITY_DOWN) * dt;
+      if (jumpHeld && vy < 0) vy -= HOLD_LIFT * dt;
+      dino.y += vy * dt;
 
       const groundYPos = H - dino.h - GROUND_H;
       if (dino.y >= groundYPos) {
@@ -1319,7 +1416,7 @@
       }
 
       // Polvo de carrera (continuo)
-      if (onGround && frames % 6 === 0) {
+      if (onGround && Math.floor(frames / 6) !== Math.floor(previousFrame / 6)) {
         dustParticles.push({
           x: dino.x + 4,
           y: H - GROUND_H,
@@ -1329,24 +1426,19 @@
           size: 2 + Math.random() * 1.5
         });
       }
-      dustParticles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.life--; });
-      dustParticles = dustParticles.filter(p => p.life > 0);
+      updateParticles(dustParticles, dt, 0.1);
 
       // --- Avance y puntaje por distancia recorrida ---
-      distance += speed;
+      distance += speed * dt;
       const shownScore = displayedScore();
-      if (scoreVal.textContent !== String(shownScore)) scoreVal.textContent = shownScore;
-      if (frames % 4 === 0 || (shownScore >= winThreshold && !bonusEarned)) {
-        progressEl.style.transform = 'scaleX(' + Math.min(1, shownScore / winThreshold) + ')';
-      }
       if (shownScore >= winThreshold) awardBonus();
 
       // --- Obstáculos ---
       obstacles.forEach(o => {
-        o.x -= speed;
-        if (o.type === 'bird') o.flap = (o.flap + 1) % 20;
+        o.x -= speed * dt;
+        if (o.type === 'bird') o.flap = (o.flap + dt) % 20;
       });
-      obstacles = obstacles.filter(o => o.x + o.w > 0);
+      while (obstacles.length && obstacles[0].x + obstacles[0].w < -10) obstacles.shift();
 
       // La carrera no termina en la meta: los obstaculos siguen apareciendo.
       if (frames > GRACE_FRAMES) {
@@ -1356,7 +1448,7 @@
         // segundos de descanso entre ellos sin crear combinaciones imposibles.
         const gap = 285 - difficulty * 70 + speed * 5;
         const chance = 0.055 + difficulty * 0.045;
-        if (W - last >= gap && Math.random() < chance) spawnObstacle();
+        if (W - last >= gap && Math.random() < 1 - Math.pow(1 - chance, dt)) spawnObstacle();
       }
 
       // --- Globo de bonus: aparece UNA sola vez, casi al final (80% del
@@ -1369,8 +1461,8 @@
         balloon = { x: W + 30, y: H - GROUND_H - 78, r: 13, bob: Math.random() * 6 };
       }
       if (balloon) {
-        balloon.x -= speed;
-        balloon.bob += 0.12;
+        balloon.x -= speed * dt;
+        balloon.bob += 0.12 * dt;
         const by = balloon.y + Math.sin(balloon.bob) * 5;
         // Colisión círculo-rectángulo con el dino
         const nx = Math.max(dino.x, Math.min(balloon.x, dino.x + dino.w));
@@ -1382,43 +1474,36 @@
           balloon = null;
         }
       }
-      balloonFx.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--; });
-      balloonFx = balloonFx.filter(p => p.life > 0);
+      updateParticles(balloonFx, dt, 0.15);
       if (plusOne) {
-        plusOne.y -= 0.8;
-        plusOne.life--;
+        plusOne.y -= 0.8 * dt;
+        plusOne.life -= dt;
         if (plusOne.life <= 0) plusOne = null;
       }
 
       // --- Parallax: nubes, montañas, lomas, sol, suelo ---
       clouds.forEach(c => {
-        c.x -= speed * 0.3;
+        c.x -= speed * 0.3 * dt;
         if (c.x + c.w < 0) {
           c.x = W + Math.random() * 100;
           c.y = 15 + Math.random() * 50;
-          c.w = 36 + Math.random() * 30;
-          c.h = 12 + Math.random() * 8;
         }
       });
       mountains.forEach(m => {
-        m.x -= speed * 0.12;
+        m.x -= speed * 0.12 * dt;
         if (m.x + m.w < 0) {
           m.x = W + Math.random() * 80;
-          m.w = 150 + Math.random() * 80;
-          m.h = 45 + Math.random() * 25;
         }
       });
       hills.forEach(hh => {
-        hh.x -= speed * 0.25;
+        hh.x -= speed * 0.25 * dt;
         if (hh.x + hh.w < 0) {
           hh.x = W + Math.random() * 60;
-          hh.w = 130 + Math.random() * 70;
-          hh.h = 22 + Math.random() * 14;
         }
       });
-      sunX -= speed * 0.05;
+      sunX -= speed * 0.05 * dt;
       if (sunX < -30) sunX = W + 30;
-      groundOffset = (groundOffset + speed) % 28;
+      groundOffset = (groundOffset + speed * dt) % 28;
 
       // --- Colisión con obstáculos ---
       const pad = 5;
@@ -1434,8 +1519,15 @@
       // Aceleración continua: se nota desde los primeros segundos y sigue
       // aumentando hasta una velocidad realmente desafiante.
       speed = Math.min(MAX_SPEED, START_SPEED + frames * SPEED_GAIN_PER_FRAME);
+    }
 
-      scheduleDraw();
+    function updateParticles(items, dt, gravity) {
+      let alive = 0;
+      for (const p of items) {
+        p.x += p.vx * dt; p.y += p.vy * dt; p.vy += gravity * dt; p.life -= dt;
+        if (p.life > 0) items[alive++] = p;
+      }
+      items.length = alive;
     }
 
     function drawCloud(c) {
@@ -1473,39 +1565,86 @@
       const baseY = H - GROUND_H;
       const cx = hh.x + hh.w / 2;
 
-      // Cuerpo del arbusto en dos tonos
+      // Contorno ondulado: cada tramo forma un mechón redondo.
       cctx.fillStyle = '#C9D96A';
       cctx.beginPath();
-      cctx.ellipse(cx, baseY, hh.w / 2, hh.h, 0, Math.PI, Math.PI * 2);
+      cctx.moveTo(hh.x, baseY);
+      for (let i = 0; i < 12; i++) {
+        const middle = Math.PI - (i + 0.5) * Math.PI / 12;
+        const end = Math.PI - (i + 1) * Math.PI / 12;
+        cctx.quadraticCurveTo(
+          cx + Math.cos(middle) * (hh.w / 2 + 7), baseY - Math.sin(middle) * (hh.h + 9),
+          cx + Math.cos(end) * hh.w / 2, baseY - Math.sin(end) * hh.h
+        );
+      }
+      cctx.closePath();
       cctx.fill();
+      // Manchas claras en forma de copos en lugar de una superficie lisa.
       cctx.fillStyle = '#DCE799';
-      cctx.beginPath();
-      cctx.ellipse(cx - hh.w * 0.22, baseY, hh.w * 0.22, hh.h * 0.75, 0, Math.PI, Math.PI * 2);
-      cctx.ellipse(cx + hh.w * 0.2, baseY, hh.w * 0.26, hh.h * 0.85, 0, Math.PI, Math.PI * 2);
-      cctx.fill();
+      const tufts = [[-0.37, 0.25, 0.12], [-0.22, 0.48, 0.16],
+        [0, 0.62, 0.19], [0.22, 0.47, 0.16], [0.37, 0.25, 0.12]];
+      for (const [offset, rise, radius] of tufts) {
+        cctx.beginPath();
+        cctx.ellipse(cx + offset * hh.w, baseY - rise * hh.h,
+          radius * hh.w, hh.h * 0.24, 0, 0, Math.PI * 2);
+        cctx.fill();
+      }
 
-      // Zarcillos rizados que asoman por arriba
-      cctx.strokeStyle = '#A4B84D';
-      cctx.lineWidth = 1.5;
+      // Cada arbusto lleva pocos rizos, con distinta distribución y orientación.
+      // Se dibujan una sola vez en el sprite del fondo.
+      const curlLayouts = [
+        [[-0.26, 1, -0.35, 1], [0.19, -1, 0.42, 0.85]],
+        [[-0.34, -1, 0.2, 0.82], [-0.02, 1, -0.4, 1.05], [0.32, -1, 0.15, 0.9]],
+        [[-0.38, 1, 0.3, 0.75], [-0.15, -1, -0.3, 1],
+          [0.15, 1, 0.25, 0.9], [0.36, -1, -0.2, 0.8]]
+      ];
+      const curlStyle = hh.curlStyle || 0;
+
+      // Uno o dos zarcillos sobresalen de la silueta.
+      cctx.strokeStyle = '#78983B';
+      cctx.lineWidth = 2.2;
       cctx.lineCap = 'round';
-      const curls = [[-0.18, 1.0, 1], [0.08, 1.08, -1], [0.3, 0.82, 1]];
-      curls.forEach(cd => {
-        const px = cx + cd[0] * hh.w;
-        const py = baseY - cd[1] * hh.h;
-        const dir = cd[2];
-        // tallo
+      const tendrils = [[[-0.11, -1]], [[0.1, 1]], [[-0.24, -1], [0.26, 1]]];
+      for (const [offset, direction] of tendrils[curlStyle]) {
+        const px = cx + offset * hh.w;
+        const rise = hh.h * Math.sqrt(1 - 4 * offset * offset);
+        const py = baseY - rise + 5;
+        cctx.save();
+        cctx.translate(px, py);
+        cctx.scale(direction, 1);
         cctx.beginPath();
-        cctx.moveTo(px, py + 9);
-        cctx.quadraticCurveTo(px - 2 * dir, py + 4, px, py);
+        cctx.moveTo(0, 8);
+        cctx.quadraticCurveTo(-4, -3, 2, -5);
+        cctx.arc(5, -5, 3, Math.PI, Math.PI * 2.8);
         cctx.stroke();
-        // rizo en espiral
+        cctx.restore();
+      }
+
+      // Espirales internas: dos, tres o cuatro según el arbusto.
+      cctx.strokeStyle = '#77993D';
+      cctx.lineWidth = 2;
+      for (const [offset, direction, rotation, size] of curlLayouts[curlStyle]) {
+        const rise = hh.h * Math.sqrt(1 - 4 * offset * offset);
+        const px = cx + offset * hh.w;
+        const py = baseY - rise * 0.55;
+        const radius = (2.7 + rise * 0.075) * size;
+        cctx.save();
+        cctx.translate(px, py);
+        cctx.rotate(rotation);
+        cctx.scale(direction, 1);
         cctx.beginPath();
-        cctx.arc(px + 2 * dir, py - 2, 3, Math.PI * 0.5, Math.PI * 2.2);
+        for (let i = 0; i <= 18; i++) {
+          const t = i / 18;
+          const angle = Math.PI * (0.25 + t * 2.8);
+          const r = radius * (1 - t * 0.82);
+          const x = Math.cos(angle) * r;
+          const y = Math.sin(angle) * r;
+          if (i === 0) cctx.moveTo(x, y);
+          else cctx.lineTo(x, y);
+        }
         cctx.stroke();
-        cctx.beginPath();
-        cctx.arc(px + 2 * dir, py - 2, 1.4, Math.PI * 0.5, Math.PI * 1.8);
-        cctx.stroke();
-      });
+        cctx.restore();
+      }
       cctx.lineCap = 'butt';
 
       // Bayas (posiciones fijas relativas para que no parpadeen)
@@ -1527,16 +1666,9 @@
 
     // Dino cartoon: cresta ARRIBA (cabeza y lomo), panza clara, cola curva,
     // hocico con fosa nasal y ojo grande con brillo.
-    function drawDino() {
+    function drawDino(dino, onGround, frames) {
       cctx.save();
       const x = dino.x, y = dino.y, w = dino.w, h = dino.h;
-
-      // Sombra en el suelo
-      cctx.fillStyle = 'rgba(0,0,0,0.2)';
-      const shadowScale = onGround ? 1 : Math.max(0.3, 1 - (groundY() - dino.y) / 80);
-      cctx.beginPath();
-      cctx.ellipse(x + w / 2, H - 6, (w / 2 + 2) * shadowScale, 4 * shadowScale, 0, 0, Math.PI * 2);
-      cctx.fill();
 
       const bodyGrad = cctx.createLinearGradient(x, y, x, y + h);
       bodyGrad.addColorStop(0, '#66BB6A');
@@ -1909,21 +2041,9 @@
       cctx.fillText('META', bx + bw / 2, by + bh + 4);
     }
 
-    function draw() {
-      // Cielo gradiente
-      cctx.fillStyle = skyGradient;
-      cctx.fillRect(0, 0, W, H);
-
-      // Sol: halo, rayos giratorios y carita feliz con cachetes
-      const haloGrad = cctx.createRadialGradient(sunX, 35, 18, sunX, 35, 42);
-      haloGrad.addColorStop(0, 'rgba(255, 215, 0, 0.5)');
-      haloGrad.addColorStop(1, 'rgba(255, 215, 0, 0)');
-      cctx.fillStyle = haloGrad;
-      cctx.fillRect(sunX - 42, -7, 84, 84);
+    function drawSunRays() {
       // Rayos
       cctx.save();
-      cctx.translate(sunX, 35);
-      cctx.rotate((frames * 0.004) % (Math.PI * 2));
       cctx.fillStyle = '#FFD700';
       cctx.strokeStyle = '#1a1a1a';
       cctx.lineWidth = 1.5;
@@ -1937,42 +2057,65 @@
         cctx.fill(); cctx.stroke();
       }
       cctx.restore();
+    }
+
+    function drawSun(x) {
+      // Sol: halo, rayos giratorios y carita feliz con cachetes
+      const haloGrad = cctx.createRadialGradient(x, 35, 18, x, 35, 42);
+      haloGrad.addColorStop(0, 'rgba(255, 215, 0, 0.5)');
+      haloGrad.addColorStop(1, 'rgba(255, 215, 0, 0)');
+      cctx.fillStyle = haloGrad;
+      cctx.fillRect(x - 42, -7, 84, 84);
       // Disco
       cctx.fillStyle = '#FFD700';
       cctx.strokeStyle = '#1a1a1a';
       cctx.lineWidth = 2;
       cctx.beginPath();
-      cctx.arc(sunX, 35, 18, 0, Math.PI * 2);
+      cctx.arc(x, 35, 18, 0, Math.PI * 2);
       cctx.fill(); cctx.stroke();
       // Ojos felices (arcos ∩)
       cctx.lineWidth = 2;
       cctx.lineCap = 'round';
       cctx.beginPath();
-      cctx.arc(sunX - 6, 33, 3, Math.PI * 1.1, Math.PI * 1.9);
+      cctx.arc(x - 6, 33, 3, Math.PI * 1.1, Math.PI * 1.9);
       cctx.stroke();
       cctx.beginPath();
-      cctx.arc(sunX + 6, 33, 3, Math.PI * 1.1, Math.PI * 1.9);
+      cctx.arc(x + 6, 33, 3, Math.PI * 1.1, Math.PI * 1.9);
       cctx.stroke();
       // Cachetes
       cctx.fillStyle = 'rgba(255, 107, 157, 0.45)';
       cctx.beginPath();
-      cctx.arc(sunX - 9, 39, 2.8, 0, Math.PI * 2);
-      cctx.arc(sunX + 9, 39, 2.8, 0, Math.PI * 2);
+      cctx.arc(x - 9, 39, 2.8, 0, Math.PI * 2);
+      cctx.arc(x + 9, 39, 2.8, 0, Math.PI * 2);
       cctx.fill();
       // Sonrisa
       cctx.strokeStyle = '#1a1a1a';
       cctx.lineWidth = 2;
       cctx.beginPath();
-      cctx.arc(sunX, 38, 6, Math.PI * 0.15, Math.PI * 0.85);
+      cctx.arc(x, 38, 6, Math.PI * 0.15, Math.PI * 0.85);
       cctx.stroke();
       cctx.lineCap = 'butt';
 
+    }
+
+    function draw() {
+      // Cielo gradiente
+      cctx.fillStyle = skyGradient;
+      cctx.fillRect(0, 0, W, H);
+
+      cctx.drawImage(sprites.sun, sunX - 42, -7);
+      cctx.save();
+      cctx.translate(sunX, 35);
+      cctx.rotate((frames * 0.004) % (Math.PI * 2));
+      cctx.drawImage(sprites.sunRays, -32, -32);
+      cctx.restore();
+
       // Parallax lejano: montañas y lomas
-      mountains.forEach(drawMountain);
-      hills.forEach(drawHill);
+      mountains.forEach(m => cctx.drawImage(m.sprite, m.x, H - GROUND_H - m.h));
+      hills.forEach(h => cctx.drawImage(h.sprite, h.x, H - GROUND_H - h.h - 18));
 
       // Nubes
-      clouds.forEach(drawCloud);
+      clouds.forEach(c => cctx.drawImage(c.sprite, c.x - 2, c.y - c.h - 4));
 
       // Suelo
       cctx.fillStyle = '#D2B48C';
@@ -2003,18 +2146,25 @@
 
       // Obstáculos
       obstacles.forEach(o => {
-        if (o.type === 'bird') drawBird(o);
-        else drawCactus(o, o.type === 'cactus_l');
+        if (o.type === 'bird') cctx.drawImage(sprites.birds[o.flap < 10 ? 0 : 1], o.x - 10, o.y - 12);
+        else cctx.drawImage(sprites[o.type], o.x - 4, o.y - 8);
       });
 
       // Globo de bonus
-      if (balloon) drawBalloon(balloon);
+      if (balloon) cctx.drawImage(sprites.balloon, balloon.x - 18, balloon.y + Math.sin(balloon.bob) * 5 - 16);
 
       // META (detrás del dino para que el dino la cruce por delante)
       if (gate) drawGate(gate);
 
       // Dino
-      drawDino();
+      const shadowScale = onGround ? 1 : Math.max(0.3, 1 - (groundY() - dino.y) / 80);
+      cctx.fillStyle = 'rgba(0,0,0,0.2)';
+      cctx.beginPath();
+      cctx.ellipse(dino.x + dino.w / 2, H - 6, (dino.w / 2 + 2) * shadowScale, 4 * shadowScale, 0, 0, Math.PI * 2);
+      cctx.fill();
+      const pose = onGround ? Math.floor(frames / 5) % 2 : 2;
+      const blink = frames % 200 < 6;
+      cctx.drawImage(sprites.dinos[pose + (blink ? 3 : 0)], dino.x - 12, dino.y - 10);
 
       // Partículas de la explosión del globo
       balloonFx.forEach(p => {
@@ -2068,7 +2218,9 @@
     }
 
     function end() {
-      gameOver = true; clearInterval(loop);
+      gameOver = true; stopLoop();
+      clearTimeout(resumeTimer); resumeTimer = null;
+      updateHud(true); draw();
       dinoStartButton.disabled = false;
       dinoStartButton.innerHTML = iconButton('retry', 'Volver a jugar');
       SFX.die();
@@ -2094,7 +2246,6 @@
     }
 
     // Pausa automática si la pestaña pierde el foco (evita muertes injustas)
-    let paused = false;
     function drawOverlayBox(text) {
       cctx.fillStyle = 'rgba(26,26,26,0.85)';
       cctx.fillRect(W / 2 - 90, H / 2 - 22, 180, 38);
@@ -2106,58 +2257,93 @@
       cctx.textAlign = 'center';
       cctx.fillText(text, W / 2, H / 2 + 4);
     }
-    autoPause(wrap,
+    const removeAutoPause = autoPause(wrap,
       () => {
-        if (started && !gameOver && loop) {
-          clearInterval(loop); loop = null;
-          paused = true; jumpHeld = false;
-          drawOverlayBox('⏸ PAUSA');
-        }
+        if (!started || gameOver || disposed) return;
+        stopLoop();
+        clearTimeout(resumeTimer); resumeTimer = null;
+        paused = true; jumpHeld = false; jumpBuffer = 0;
+        activePointer = null;
+        draw(); drawOverlayBox('⏸ PAUSA');
       },
       () => {
-        if (!paused) return;
-        paused = false;
-        draw();
-        drawOverlayBox('LISTO...');
-        setTimeout(() => {
-          if (gameOver || !started || paused || document.hidden || wrap.classList.contains('coeduca-game-help-open')) return;
-          clearInterval(loop);
-          loop = setInterval(step, TICK_MS);
+        if (!paused || disposed) return;
+        clearTimeout(resumeTimer);
+        draw(); drawOverlayBox('LISTO...');
+        resumeTimer = setTimeout(() => {
+          resumeTimer = null;
+          if (disposed || gameOver || !started || document.hidden || !wrap.isConnected || wrap.classList.contains('coeduca-game-help-open')) return;
+          paused = false;
+          startLoop();
         }, 900);
       }
     );
 
-    canvas.addEventListener('mousedown', e => { pressJump(); e.preventDefault(); });
-    canvas.addEventListener('mouseup', releaseJump);
-    canvas.addEventListener('mouseleave', releaseJump);
-    canvas.addEventListener('touchstart', e => { pressJump(); e.preventDefault(); }, { passive: false });
-    canvas.addEventListener('touchend', releaseJump);
-    canvas.addEventListener('touchcancel', releaseJump);
-    document.addEventListener('keydown', e => {
-      if (isTypingTarget(e)) return;
+    let activePointer = null;
+    const jumpBtn = wrap.querySelector('#dino-jump-btn');
+    for (const target of [canvas, jumpBtn]) {
+      target.style.touchAction = 'none';
+      target.style.userSelect = 'none';
+      target.addEventListener('pointerdown', event => {
+        if (activePointer !== null || event.isPrimary === false || (event.button != null && event.button !== 0)) return;
+        activePointer = event.pointerId;
+        if (target.setPointerCapture) target.setPointerCapture(event.pointerId);
+        event.preventDefault();
+        pressJump();
+      });
+      for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+        target.addEventListener(type, event => {
+          if (event.pointerId !== activePointer) return;
+          activePointer = null;
+          releaseJump();
+        });
+      }
+      target.addEventListener('contextmenu', event => event.preventDefault());
+    }
+    function onKeyDown(e) {
+      if (isTypingTarget(e) || !wrap.isConnected || paused) return;
       if (e.code === 'Space' && started && !gameOver) {
         if (!e.repeat) pressJump();
         e.preventDefault();
       }
+    }
+    function onKeyUp(e) { if (e.code === 'Space') releaseJump(); }
+    function onBlur() { activePointer = null; releaseJump(); jumpBuffer = 0; }
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+    global.addEventListener('blur', onBlur);
+    // Activación por teclado/tecnología de asistencia (los punteros ya saltaron al bajar).
+    jumpBtn.addEventListener('click', event => {
+      if (event.detail === 0) { pressJump(); releaseJump(); }
     });
-    document.addEventListener('keyup', e => {
-      if (e.code === 'Space') releaseJump();
-    });
-    const jumpBtn = wrap.querySelector('#dino-jump-btn');
-    jumpBtn.addEventListener('mousedown', pressJump);
-    jumpBtn.addEventListener('mouseup', releaseJump);
-    jumpBtn.addEventListener('mouseleave', releaseJump);
-    jumpBtn.addEventListener('touchstart', e => { pressJump(); e.preventDefault(); }, { passive: false });
-    jumpBtn.addEventListener('touchend', releaseJump);
     const dinoStartButton = wrap.querySelector('#dino-start');
     dinoStartButton.addEventListener('click', () => {
-      reset(); started = true; draw();
+      if (disposed) return;
+      prepareSound(); // Desbloquear el audio con START, antes del primer salto.
+      results.hide();
+      reset(); activePointer = null; started = true; draw();
       viewport.enter();
       dinoStartButton.innerHTML = iconButton('play', 'START');
       dinoStartButton.disabled = true;
-      clearInterval(loop);
-      loop = setInterval(step, TICK_MS);
+      startLoop();
     });
+    function dispose() {
+      if (disposed) return;
+      disposed = true;
+      stopLoop();
+      clearTimeout(resumeTimer); resumeTimer = null;
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keyup', onKeyUp);
+      global.removeEventListener('blur', onBlur);
+      removeAutoPause();
+      removalObserver.disconnect();
+      viewport.destroy();
+      sprites = null;
+    }
+    const removalObserver = typeof MutationObserver !== 'undefined'
+      ? new MutationObserver(() => { if (!wrap.isConnected) dispose(); })
+      : { observe() {}, disconnect() {} };
+    removalObserver.observe(document.body, { childList: true, subtree: true });
     reset(); draw();
   });
 

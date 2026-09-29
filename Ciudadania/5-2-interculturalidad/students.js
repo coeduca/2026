@@ -122,7 +122,8 @@ const STUDENTS = {
   "20298196": { name: "María Magdalena Servellón Barrera", grade: "Séptimo" },
   "20138868": { name: "Santos Julian Castillo Cruz", grade: "Séptimo" },
 
-  // PRUEBAS
-  "1999": { name: "José Eliseo Martínez", grade: "Maestro" },
+  // CUENTAS FIJAS
+  "1999": { name: "Eliseo", grade: "Maestro" },
+  "12379": { name: "Rigo", grade: "Mascota" },
 };
 const COEDUCA_AVAILABLE_GRADES = ["Noveno", "Octavo", "Primer Año", "Segundo Año", "Séptimo"];

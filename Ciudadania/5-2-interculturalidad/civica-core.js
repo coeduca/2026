@@ -1,6 +1,6 @@
-﻿/**
+/**
  * CIVICA Framework v1 - Core
- * Profesor José Eliseo Martínez - Ciudadanía y Valores
+ * Profesor Eliseo - Ciudadanía y Valores
  *
  * Adaptación del framework COEDUCA para la materia de Ciudadanía y Valores.
  * Diferencias clave respecto a COEDUCA:
@@ -40,6 +40,7 @@
   // =====================================================================
   const ALLOWED_GRADES = ['Octavo'];
   const TEST_NIE = '1999'; // José Eliseo - siempre permitido
+  const RIGO_NIE = '12379'; // Cuenta fija de Rigo
 
   // =====================================================================
   // METADATA DE SECCIONES
@@ -404,33 +405,40 @@
   // =====================================================================
   function isAllowedAtLevel(student) {
     if (!student) return false;
-    if (student.nie === TEST_NIE) return true;
+    if (student.nie === TEST_NIE || student.nie === RIGO_NIE) return true;
     return ALLOWED_GRADES.indexOf(student.grade) >= 0;
   }
   function getLevelLabel() { return ALLOWED_GRADES.join(' u '); }
 
-  function resumeStudentIfReturning() {
-    let historyReload = false;
-    try {
-      const key = state.storageKey + 'resumeAfterHistory';
-      historyReload = sessionStorage.getItem(key) === '1';
-      sessionStorage.removeItem(key);
-    } catch (e) {}
-    const navigation = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-    const reloaded = navigation ? navigation.type === 'reload' : performance.navigation && performance.navigation.type === 1;
-    if (reloaded && !historyReload) return false;
+  async function resumeStudentIfReturning() {
     const saved = loadState();
-    if (!saved || !saved.student || !saved.student.nie) return false;
+    const auth = global.COEDUCA_FIXED_AUTH;
+    const remembered = auth && auth.lastStudent() || '';
+    const nie = remembered || String(saved && saved.student && saved.student.nie || '');
+    if (!nie) return false;
     let db = null;
     try { db = global.STUDENTS; } catch (e) {}
     if (!db) { try { db = STUDENTS; } catch (e) {} }
-    const nie = String(saved.student.nie);
     if (!db || !db[nie]) return false;
+    if (nie === '1999' || nie === '12379') {
+      if (!auth) return false;
+      try { if (!await auth.hasSession(nie)) return false; }
+      catch (_) { return false; }
+    }
     const found = { nie, ...db[nie] };
     if (!isAllowedAtLevel(found)) return false;
+    if (saved && saved.student && String(saved.student.nie) !== nie) archiveAccountState(saved);
+    const own = saved && saved.student && String(saved.student.nie) === nie ? saved : loadAccountState(nie);
+    state.answers = own && own.answers || {};
+    state.extraPoints = Number(own && own.extraPoints) || 0;
+    state.balloonBonus = Number(own && own.balloonBonus) || 0;
+    state.gameResult = own && own.gameResult || null;
+    if (own && own.poolVersion) state.poolVersion = own.poolVersion;
     state.student = found;
-    state.partners = saved.partners || (saved.partner ? [saved.partner] : []);
+    state.partners = own && (own.partners || (own.partner ? [own.partner] : [])) || [];
     state.partner = state.partners[0] || null;
+    if (auth) auth.remember(nie);
+    saveState();
     if (global.rigo && global.rigo.setGrade) global.rigo.setGrade(found.grade);
     return true;
   }
@@ -639,8 +647,21 @@
       nieInput.addEventListener('input', validateMain);
       addPartnerBtn.addEventListener('click', addPartnerField);
 
-      const finish = () => {
+      const finish = async () => {
         if (!mainStudent) return;
+        const chosen = mainStudent;
+        if (chosen.nie === '1999' || chosen.nie === '12379') {
+          const auth = global.COEDUCA_FIXED_AUTH;
+          if (!auth) {
+            nieError.textContent = 'No se pudo cargar el acceso protegido.';
+            nieError.classList.add('show');
+            return;
+          }
+          submitBtn.disabled = true;
+          const accepted = await auth.requestLogin(chosen.nie);
+          submitBtn.disabled = false;
+          if (!accepted || mainStudent !== chosen) return;
+        }
         const prev = loadState();
         if (!prev || !prev.student || String(prev.student.nie) !== String(mainStudent.nie)) {
           archiveAccountState(prev);
@@ -655,6 +676,7 @@
         state.partners = partners.filter(p => p.student).map(p => p.student);
         state.partner = state.partners[0] || null;
         saveState();
+        if (global.COEDUCA_FIXED_AUTH) global.COEDUCA_FIXED_AUTH.remember(mainStudent.nie);
         if (global.rigo && global.rigo.loginSuccess) global.rigo.loginSuccess(mainStudent.name);
         try {
           const rigoEl = global.rigo;
@@ -733,6 +755,7 @@
   }
 
   function switchAccount() {
+    if (global.COEDUCA_FIXED_AUTH) global.COEDUCA_FIXED_AUTH.clear();
     if (global.COEDUCA_OCEAN) global.COEDUCA_OCEAN.mount(null);
     archiveAccountState(loadState());
     try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}
@@ -767,7 +790,7 @@
       <header class="civica-header">
         <div class="civica-subject-pill">${escapeHTML(subjectLabel)}</div>
         <h1>${escapeHTML(cfg.topic || 'Sesión de Ciudadanía y Valores')}</h1>
-        <p>${escapeHTML(cfg.unit || 'Octavo Grado')} · CIVICA · Prof. José Eliseo Martínez</p>
+        <p>${escapeHTML(cfg.unit || 'Octavo Grado')} · CIVICA · Prof. Eliseo</p>
         <div class="civica-header-students" id="civica-header-students"></div>
         <div class="civica-header-actions">
           <button class="civica-btn civica-btn-info civica-add-member-btn" id="civica-add-member-btn" type="button">
@@ -2333,7 +2356,7 @@
       }
 
       const start = () => {
-        const login = resumeStudentIfReturning() ? Promise.resolve() : showLoginModal();
+        const login = resumeStudentIfReturning().then(resumed => resumed ? undefined : showLoginModal());
         login.then(() => {
           if (config.examMode) pickPoolVersion();
           buildFlatExercises();
