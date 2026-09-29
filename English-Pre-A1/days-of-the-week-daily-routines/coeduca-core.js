@@ -22,6 +22,21 @@
   const STORAGE_KEY_PREFIX = 'coeduca_';
   const VERSION = '1.2.0';
 
+  function activityStorageId(config) {
+    if (config.id) return String(config.id);
+    const topicId = (config.topic || 'page').replace(/\W+/g, '_').toLowerCase();
+    // Paquetes antiguos no tienen id. Conservar su progreso si la carpeta
+    // coincide con el título; una carpeta distinta (p. ej. "...2") debe
+    // usar su propio estado, aunque el título normalizado sea idéntico.
+    const path = (global.location.pathname || '')
+      .replace(/\/(?:index|juegos)\.html$/i, '/')
+      .replace(/\/+$/, '');
+    const folder = path.split('/').pop().replace(/\W+/g, '_').toLowerCase();
+    return folder && folder !== topicId
+      ? path.split('/').filter(Boolean).slice(-2).join('-').toLowerCase()
+      : topicId;
+  }
+
   // =====================================================================
   // FILTRO DE NIVEL POR GRADO
   // =====================================================================
@@ -428,28 +443,35 @@
     return '';
   }
 
-  function resumeStudentIfReturning() {
-    let historyReload = false;
-    try {
-      const key = state.storageKey + 'resumeAfterHistory';
-      historyReload = sessionStorage.getItem(key) === '1';
-      sessionStorage.removeItem(key);
-    } catch (e) {}
-    const navigation = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-    const reloaded = navigation ? navigation.type === 'reload' : performance.navigation && performance.navigation.type === 1;
-    if (reloaded && !historyReload) return false;
+  async function resumeStudentIfReturning() {
     const saved = loadState();
-    if (!saved || !saved.student || !saved.student.nie) return false;
+    const auth = global.COEDUCA_FIXED_AUTH;
+    const remembered = auth && auth.lastStudent() || '';
+    const nie = remembered || String(saved && saved.student && saved.student.nie || '');
+    if (!nie) return false;
     let db = null;
     try { db = global.STUDENTS; } catch (e) {}
     if (!db) { try { db = STUDENTS; } catch (e) {} }
-    const nie = String(saved.student.nie);
     if (!db || !db[nie]) return false;
+    if (nie === '1999' || nie === '12379') {
+      if (!auth) return false;
+      try { if (!await auth.hasSession(nie)) return false; }
+      catch (_) { return false; }
+    }
     const found = { nie, ...db[nie] };
     if (!isAllowedAtLevel(found)) return false;
+    if (saved && saved.student && String(saved.student.nie) !== nie) archiveAccountState(saved);
+    const own = saved && saved.student && String(saved.student.nie) === nie ? saved : loadAccountState(nie);
+    state.answers = own && own.answers || {};
+    state.extraPoints = Number(own && own.extraPoints) || 0;
+    state.balloonBonus = Number(own && own.balloonBonus) || 0;
+    state.gameResult = own && own.gameResult || null;
+    if (own && own.poolVersion) state.poolVersion = own.poolVersion;
     state.student = found;
-    state.partners = saved.partners || (saved.partner ? [saved.partner] : []);
+    state.partners = own && (own.partners || (own.partner ? [own.partner] : [])) || [];
     state.partner = state.partners[0] || null;
+    if (auth) auth.remember(nie);
+    saveState();
     if (global.rigo && global.rigo.setGrade) global.rigo.setGrade(found.grade);
     return true;
   }
@@ -699,8 +721,21 @@
       nieInput.addEventListener('input', validateMain);
       addPartnerBtn.addEventListener('click', addPartnerField);
 
-      const finish = () => {
+      const finish = async () => {
         if (!mainStudent) return;
+        const chosen = mainStudent;
+        if (chosen.nie === '1999' || chosen.nie === '12379') {
+          const auth = global.COEDUCA_FIXED_AUTH;
+          if (!auth) {
+            nieError.textContent = 'No se pudo cargar el acceso protegido.';
+            nieError.classList.add('show');
+            return;
+          }
+          submitBtn.disabled = true;
+          const accepted = await auth.requestLogin(chosen.nie);
+          submitBtn.disabled = false;
+          if (!accepted || mainStudent !== chosen) return;
+        }
         
         const prev = loadState();
         if (!prev || !prev.student || String(prev.student.nie) !== String(mainStudent.nie)) {
@@ -719,6 +754,7 @@
         // Compatibilidad: state.partner = el primero (si hay)
         state.partner = state.partners[0] || null;
         saveState();
+        if (global.COEDUCA_FIXED_AUTH) global.COEDUCA_FIXED_AUTH.remember(mainStudent.nie);
         if (global.rigo && global.rigo.loginSuccess) {
           global.rigo.loginSuccess(mainStudent.name);
         }
@@ -794,6 +830,7 @@
   }
 
   function switchAccount() {
+    if (global.COEDUCA_FIXED_AUTH) global.COEDUCA_FIXED_AUTH.clear();
     if (global.COEDUCA_OCEAN) global.COEDUCA_OCEAN.mount(null);
     archiveAccountState(loadState());
     try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}
@@ -2643,8 +2680,7 @@
 
     init(config) {
       state.config = config;
-      state.storageKey = STORAGE_KEY_PREFIX +
-        (config.id || (config.topic || 'page').replace(/\W+/g, '_').toLowerCase()) + '_';
+      state.storageKey = STORAGE_KEY_PREFIX + activityStorageId(config) + '_';
 
       global.addEventListener('storage', event => {
         if (event.key === state.storageKey + 'state' && syncGameBonus()) updateScoreDisplay();
@@ -2671,7 +2707,7 @@
 
       // Esperar DOM
       const start = () => {
-        const login = resumeStudentIfReturning() ? Promise.resolve() : showLoginModal();
+        const login = resumeStudentIfReturning().then(resumed => resumed ? undefined : showLoginModal());
         login.then(() => {
           renderLayout();
           setupAudioButtons();

@@ -11,22 +11,31 @@
   const SUPPORTED_GAMES = new Set(['snake', 'dino', 'pills', 'hangman', 'sandwich', 'flappy', 'doodle']);
   // Conservamos los valores emoji del servidor para respetar las elecciones anteriores.
   const AVATAR_IMAGES = [
-    { kind:'rigo', emoji:null, name:'Rigo', file:'avatar-rigo.webp' },
-    { kind:'emoji', emoji:'🐱', name:'Gato', file:'avatar-gato.webp' },
-    { kind:'emoji', emoji:'🐶', name:'Perro', file:'avatar-perro.webp' },
-    { kind:'emoji', emoji:'🦊', name:'Loro', file:'avatar-loro.webp' },
-    { kind:'emoji', emoji:'🐼', name:'Caracol', file:'avatar-caracol.webp' },
-    { kind:'emoji', emoji:'🐸', name:'Oruga', file:'avatar-oruga.webp' },
-    { kind:'emoji', emoji:'🐯', name:'León', file:'avatar-leon.webp' },
-    { kind:'emoji', emoji:'🦄', name:'Caballo', file:'avatar-caballo.webp' },
-    { kind:'emoji', emoji:'🐧', name:'Pingüino', file:'avatar-pinguino.webp' },
-    { kind:'emoji', emoji:'🐙', name:'Medusa', file:'avatar-medusa.webp' },
-    { kind:'emoji', emoji:'🚀', name:'Delfín', file:'avatar-delfin.webp' },
-    { kind:'emoji', emoji:'⭐', name:'Pollo', file:'avatar-pollo.webp' },
-    { kind:'emoji', emoji:'⚡', name:'Murciélago', file:'avatar-murcielago.webp' },
-    { kind:'emoji', emoji:'🐻', name:'Camello', file:'avatar-camello.webp' },
-    { kind:'emoji', emoji:'🦋', name:'Mariposa', file:'avatar-mariposa.webp' }
+    { kind:'rigo', emoji:null, name:'Rigo', file:'avatar-rigo.webp', level:1 },
+    { kind:'emoji', emoji:'🐱', name:'Kittycat', file:'avatar-gato.webp', level:1 },
+    { kind:'emoji', emoji:'🐶', name:'Doggy', file:'avatar-perro.webp', level:2 },
+    { kind:'emoji', emoji:'🦊', name:'Lorenzo', file:'avatar-loro.webp', level:2 },
+    { kind:'emoji', emoji:'🐼', name:'Wary', file:'avatar-caracol.webp', level:2 },
+    { kind:'emoji', emoji:'🐨', name:'Panda', file:'avatar-panda.webp', level:2 },
+    { kind:'emoji', emoji:'🐸', name:'Pilar', file:'avatar-oruga.webp', level:3 },
+    { kind:'emoji', emoji:'🐯', name:'Leo', file:'avatar-leon.webp', level:3 },
+    { kind:'emoji', emoji:'🦄', name:'Horsey', file:'avatar-caballo.webp', level:3 },
+    { kind:'emoji', emoji:'🐧', name:'Pinwin', file:'avatar-pinguino.webp', level:3 },
+    { kind:'emoji', emoji:'🐙', name:'Bea', file:'avatar-medusa.webp', level:3 },
+    { kind:'emoji', emoji:'🪰', name:'Mosca', file:'avatar-mosca.webp', level:3 },
+    { kind:'emoji', emoji:'🚀', name:'Rodolfin', file:'avatar-delfin.webp', level:4 },
+    { kind:'emoji', emoji:'⭐', name:'Cucú', file:'avatar-pollo.webp', level:4 },
+    { kind:'emoji', emoji:'⚡', name:'Baty', file:'avatar-murcielago.webp', level:4 },
+    { kind:'emoji', emoji:'🐻', name:'Camilo', file:'avatar-camello.webp', level:4 },
+    { kind:'emoji', emoji:'🦋', name:'Mariann', file:'avatar-mariposa.webp', level:4 },
+    { kind:'emoji', emoji:'🦫', name:'Cappy', file:'avatar-capibara.webp', level:4 }
   ];
+  const AVATAR_REQUIREMENTS = {
+    1: 'Alcanza el Top 1 de tu grado o el Top 3 global en cualquier juego para desbloqueame.',
+    2: 'Alcanza el Top 3 global en cualquier juego para desbloqueame.',
+    3: 'Alcanza el Top 2 global en cualquier juego para desbloqueame.',
+    4: 'Alcanza el Top 1 global en cualquier juego para desbloqueame.'
+  };
   const AVATAR_COLORS = [
     ['Cielo', '#EAF7FF'], ['Blanco', '#FFFFFF'], ['Crema', '#FFF3D6'],
     ['Amarillo', '#FFE27A'], ['Naranja', '#FFC078'], ['Durazno', '#FFD4B8'],
@@ -191,26 +200,33 @@
       }
       .is-podium .cg-leaderboard-score { background: rgba(255,255,255,.72); }
       .cg-leaderboard-empty { padding: 12px 4px; text-align: center; font-size: 12px; opacity: .62; }
-      .cg-avatar-dialog-backdrop { position:fixed; inset:0; z-index:2147483647; display:grid; place-items:center; padding:16px; background:#16293cbb; }
-      .cg-avatar-dialog { width:min(100%,420px); max-height:min(94dvh,780px); overflow:auto; padding:20px; border:3px solid #22324a; border-radius:20px; background:#fff9ed; color:#22324a; box-shadow:6px 6px 0 #22324a; font-family:system-ui,sans-serif; text-align:center; }
-      .cg-avatar-dialog h3 { margin:0 0 5px; font-size:24px; }
+      .cg-avatar-dialog-backdrop { position:fixed; inset:0; z-index:2147483647; display:grid; place-items:center; padding:16px; background:#102d20bb; }
+      .cg-avatar-dialog { box-sizing:border-box; width:min(100%,420px); max-height:min(94dvh,780px); overflow:auto; padding:20px; border:3px solid #246244; border-radius:20px; background:linear-gradient(155deg,#f5fff4,#e4f7e9); color:#19452f; box-shadow:6px 6px 0 #246244; font-family:system-ui,sans-serif; text-align:center; }
+      .cg-avatar-dialog h3 { margin:0 0 5px; color:#176a3c; font-size:24px; }
       .cg-avatar-dialog p { margin:4px 0 12px; font-size:13px; }
-      .cg-avatar-dialog-preview { display:grid; place-items:center; width:76px; height:76px; margin:4px auto 8px; border:2px solid #22324a; border-radius:50%; overflow:hidden; background:#eaf7ff; }
+      .cg-avatar-dialog-preview-row { display:flex; align-items:center; justify-content:center; gap:12px; min-height:84px; margin:4px auto 8px; }
+      .cg-avatar-dialog-preview-row[hidden] { display:none; }
+      .cg-avatar-dialog-preview { display:grid; place-items:center; flex:none; width:76px; height:76px; margin:0; border:2px solid #246244; border-radius:50%; overflow:hidden; background:#e4f5e8; }
       .cg-avatar-dialog-preview img { display:block; width:100%; height:100%; object-fit:contain; }
-      .cg-avatar-dialog-options { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin:12px 0; }
-      .cg-avatar-dialog-options button { display:grid; place-items:center; aspect-ratio:1; padding:0; overflow:hidden; border:2px solid #22324a; border-radius:50%; background:#fff; cursor:pointer; }
-      .cg-avatar-dialog-options button[aria-pressed="true"] { outline:2px solid #22324a; outline-offset:2px; }
+      .cg-avatar-dialog-preview-name { max-width:180px; overflow-wrap:anywhere; color:#19452f; font-size:17px; font-weight:900; text-align:left; }
+      .cg-avatar-dialog-options { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; margin:12px 0; }
+      .cg-avatar-dialog-options button { display:grid; place-items:center; aspect-ratio:1; padding:0; overflow:hidden; border:2px solid #246244; border-radius:50%; background:#fff; cursor:pointer; }
+      .cg-avatar-dialog-options button[aria-pressed="true"] { outline:3px solid #309c59; outline-offset:2px; }
+      .cg-avatar-dialog-options button { position:relative; }
+      .cg-avatar-dialog-options button.is-locked img { opacity:.4; filter:grayscale(1); }
+      .cg-avatar-dialog-options button.is-locked::after { content:'🔒'; position:absolute; right:10%; bottom:8%; padding:2px; border-radius:50%; background:#f5fff4; font-size:14px; }
       .cg-avatar-dialog-preview[hidden], .cg-avatar-dialog-color-label[hidden], .cg-avatar-dialog-options[hidden], .cg-avatar-dialog-colors[hidden], .cg-avatar-dialog-upload[hidden], .cg-avatar-dialog-actions button[hidden] { display:none; }
       .cg-avatar-dialog-options img { display:block; width:100%; height:100%; object-fit:contain; }
       .cg-avatar-dialog-colors { display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:7px; margin:8px 0 12px; }
-      .cg-avatar-dialog-colors button { width:100%; aspect-ratio:1; border:2px solid #22324a; border-radius:50%; cursor:pointer; }
-      .cg-avatar-dialog-colors button[aria-pressed="true"] { outline:3px solid #147b69; outline-offset:2px; }
-      .cg-avatar-dialog-colors button:focus-visible, .cg-avatar-dialog-options button:focus-visible { outline:3px solid #147b69; outline-offset:2px; }
-      .cg-avatar-dialog-upload { display:block; width:100%; min-height:42px; padding:9px; border:2px solid #22324a; border-radius:10px; background:#d9f3ff; color:#22324a; font:800 13px system-ui,sans-serif; cursor:pointer; }
-      .cg-avatar-dialog-actions { position:sticky; bottom:-20px; z-index:1; display:flex; justify-content:center; gap:8px; margin-top:10px; padding:8px 0 4px; background:#fff9ed; }
-      .cg-avatar-dialog-actions button { min-height:38px; padding:7px 12px; border:2px solid #22324a; border-radius:9px; background:#fff; color:#22324a; font:800 12px system-ui,sans-serif; cursor:pointer; }
-      .cg-avatar-dialog-actions .cg-avatar-dialog-save { background:#ffe27a; }
-      .cg-avatar-dialog-status { min-height:18px; font-size:12px; font-weight:700; }
+      .cg-avatar-dialog-colors button { width:100%; aspect-ratio:1; border:2px solid #246244; border-radius:50%; cursor:pointer; }
+      .cg-avatar-dialog-colors button[aria-pressed="true"] { outline:3px solid #309c59; outline-offset:2px; }
+      .cg-avatar-dialog-colors button:focus-visible, .cg-avatar-dialog-options button:focus-visible, .cg-avatar-dialog-upload:focus-visible, .cg-avatar-dialog-actions button:focus-visible { outline:3px solid #309c59; outline-offset:2px; }
+      .cg-avatar-dialog-upload { display:block; width:100%; min-height:42px; padding:9px; border:2px solid #246244; border-radius:10px; background:#d5f1df; color:#19452f; font:800 13px system-ui,sans-serif; cursor:pointer; }
+      .cg-avatar-dialog-upload[aria-disabled="true"] { background:#e8f2ea; color:#597566; }
+      .cg-avatar-dialog-actions { position:sticky; bottom:-20px; z-index:1; display:flex; justify-content:center; gap:8px; margin-top:10px; padding:8px 0 4px; background:#e4f7e9; }
+      .cg-avatar-dialog-actions button { min-height:38px; padding:7px 12px; border:2px solid #246244; border-radius:9px; background:#f9fff9; color:#19452f; font:800 12px system-ui,sans-serif; cursor:pointer; }
+      .cg-avatar-dialog-actions .cg-avatar-dialog-save { background:#309c59; color:#fff; }
+      .cg-avatar-dialog-status { min-height:18px; margin-top:8px; padding:0 4px; font-size:12px; font-weight:700; line-height:1.35; }
       .cg-avatar-dialog button:disabled { opacity:.55; cursor:wait; }
       @keyframes cgLeaderboardRankFloat {
         0%, 100% { transform: translateY(0) rotate(-2deg) scale(1); }
@@ -232,7 +248,7 @@
         .cg-leaderboard-row.rank-1 .cg-leaderboard-avatar-wrap { animation: none; }
       }
       @media (max-width: 620px) { .cg-leaderboard-grids { grid-template-columns: 1fr; } }
-      @media (max-width: 360px) { .cg-avatar-dialog { padding:14px; } .cg-avatar-dialog-options { grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; margin:8px 0; } .cg-avatar-dialog-colors { grid-template-columns:repeat(8,minmax(0,1fr)); gap:5px; } .cg-avatar-dialog-actions { bottom:-14px; } }
+      @media (max-width: 360px) { .cg-avatar-dialog { padding:14px; } .cg-avatar-dialog-options { grid-template-columns:repeat(6,minmax(0,1fr)); gap:5px; margin:8px 0; } .cg-avatar-dialog-colors { grid-template-columns:repeat(8,minmax(0,1fr)); gap:5px; } .cg-avatar-dialog-actions { bottom:-14px; } }
     `;
     document.head.appendChild(style);
   }
@@ -569,10 +585,15 @@
       const heading = document.createElement('h3');
       heading.textContent = 'Elige tu avatar';
       const hint = document.createElement('p');
-      hint.textContent = 'Elige un animal y un color de fondo. También puedes subir una foto.';
+      hint.textContent = 'Desbloquea avatares con tus puestos en el ranking. Toca un candado para ver cómo conseguirlo.';
       const preview = document.createElement('div');
       preview.className = 'cg-avatar-dialog-preview';
       preview.setAttribute('aria-label', 'Vista previa del avatar');
+      const previewRow = document.createElement('div');
+      previewRow.className = 'cg-avatar-dialog-preview-row';
+      const previewName = document.createElement('span');
+      previewName.className = 'cg-avatar-dialog-preview-name';
+      previewRow.append(preview, previewName);
       const options = document.createElement('div');
       options.className = 'cg-avatar-dialog-options';
       options.setAttribute('aria-label', 'Animales disponibles');
@@ -606,12 +627,13 @@
       closeButton.type = 'button';
       closeButton.textContent = 'Cerrar';
       actions.append(saveButton, clear, closeButton);
-      dialog.append(heading, hint, preview, options, colorLabel, colors, upload, input, statusLine, actions);
+      dialog.append(heading, hint, previewRow, options, colorLabel, colors, upload, input, statusLine, actions);
       backdrop.appendChild(dialog);
       document.body.appendChild(backdrop);
 
       let busy = false;
       let unlocked = false;
+      let avatarLevel = 0;
       let canDelete = hasAvatar(ownProfile);
       let studentKey = null;
       let selectedChoice = avatarImage(ownProfile) || null;
@@ -627,27 +649,36 @@
       }
       function setBusy(value, message) {
         busy = value;
-        options.hidden = upload.hidden = !unlocked;
         clear.hidden = !canDelete;
-        options.querySelectorAll('button').forEach(button => { button.disabled = value || !unlocked; });
+        options.querySelectorAll('button').forEach(button => { button.disabled = value; });
         colors.querySelectorAll('button').forEach(button => { button.disabled = value || !unlocked; });
-        upload.disabled = value || !unlocked;
+        upload.disabled = value;
         clear.disabled = value || !canDelete;
         renderSelection();
         statusLine.textContent = message || '';
       }
       function renderSelection() {
-        preview.hidden = !selectedChoice;
-        colorLabel.hidden = colors.hidden = !unlocked || !selectedChoice;
+        previewRow.hidden = !selectedChoice;
+        previewName.textContent = selectedChoice ? selectedChoice.name : '';
+        const canSaveSelection = unlocked && selectedChoice && selectedChoice.level <= avatarLevel;
+        colorLabel.hidden = colors.hidden = !canSaveSelection;
         saveButton.hidden = !unlocked;
-        saveButton.disabled = busy || !unlocked || !selectedChoice;
+        saveButton.disabled = busy || !canSaveSelection;
+        upload.textContent = avatarLevel >= 4 ? '📷 Subir una foto' : '🔒 Subir una foto · Top 1 global';
+        upload.setAttribute('aria-disabled', String(avatarLevel < 4));
         if (selectedChoice) fillAvatar(preview, {
           avatar_kind:selectedChoice.kind, avatar_emoji:selectedChoice.emoji, avatar_bg:selectedColor
         });
         options.querySelectorAll('button').forEach(button => {
-          button.setAttribute('aria-pressed', String(selectedChoice &&
+          const locked = Number(button.dataset.level) > avatarLevel;
+          button.classList.toggle('is-locked', locked);
+          button.setAttribute('aria-disabled', String(locked));
+          const label = button.dataset.name + (locked ? '. Bloqueado. ' + AVATAR_REQUIREMENTS[button.dataset.level] : '');
+          button.setAttribute('aria-label', label);
+          button.title = label;
+          button.setAttribute('aria-pressed', String(Boolean(selectedChoice &&
             button.dataset.kind === selectedChoice.kind &&
-            (selectedChoice.kind !== 'emoji' || button.dataset.emoji === selectedChoice.emoji)));
+            (selectedChoice.kind !== 'emoji' || button.dataset.emoji === selectedChoice.emoji))));
           button.style.backgroundColor = selectedColor;
         });
         colors.querySelectorAll('button').forEach(button =>
@@ -655,6 +686,7 @@
       }
       async function save(kind, emoji) {
         if (busy || (kind === 'none' ? !canDelete : !unlocked)) return;
+        if (kind !== 'none' && (!selectedChoice || selectedChoice.level > avatarLevel)) return;
         setBusy(true, 'Guardando avatar…');
         try {
           const hadPhoto = ownProfile && ownProfile.avatar_kind === 'photo';
@@ -667,7 +699,7 @@
             });
           if (saved !== true) throw new Error(kind === 'none'
             ? 'No se pudo eliminar el avatar.'
-            : 'Ya no estás en el Top 1 global o no se pudo guardar el avatar.');
+            : 'Tu puesto puede haber cambiado. Vuelve a abrir los avatares para comprobar tus desbloqueos.');
           ownProfile = { avatar_kind:kind, avatar_emoji:emoji || null,
             avatar_bg:selectedColor, avatar_path:null };
           fillAvatar(ownAvatarImage, ownProfile, student.name, student.grade);
@@ -691,6 +723,8 @@
         const button = document.createElement('button');
         button.type = 'button';
         button.dataset.kind = choice.kind;
+        button.dataset.level = String(choice.level);
+        button.dataset.name = choice.name;
         if (choice.emoji) button.dataset.emoji = choice.emoji;
         button.setAttribute('aria-label', choice.name);
         button.title = choice.name;
@@ -699,7 +733,13 @@
         img.alt = '';
         button.appendChild(img);
         button.addEventListener('click', () => {
+          if (busy) return;
+          if (choice.level > avatarLevel) {
+            statusLine.textContent = choice.name + ': ' + AVATAR_REQUIREMENTS[choice.level];
+            return;
+          }
           selectedChoice = choice;
+          statusLine.textContent = '';
           renderSelection();
         });
         options.appendChild(button);
@@ -722,11 +762,15 @@
       saveButton.addEventListener('click', () => {
         if (selectedChoice) save(selectedChoice.kind, selectedChoice.emoji);
       });
-      upload.addEventListener('click', () => { if (!busy && unlocked) input.click(); });
+      upload.addEventListener('click', () => {
+        if (busy) return;
+        if (avatarLevel < 4) { statusLine.textContent = 'Foto personalizada: ' + AVATAR_REQUIREMENTS[4]; return; }
+        if (unlocked) input.click();
+      });
       input.addEventListener('change', async () => {
         const file = input.files && input.files[0];
         input.value = '';
-        if (!file || busy || !unlocked) return;
+        if (!file || busy || !unlocked || avatarLevel < 4) return;
         setBusy(true, 'Preparando foto WebP…');
         try {
           const blob = await resizePhoto(file);
@@ -753,28 +797,37 @@
       document.addEventListener('keydown', onKeyDown, true);
       activeAvatarDialog = close;
       closeButton.focus();
-      setBusy(true, fixedAvatarAccount ? 'Preparando tu avatar…' : 'Comprobando tu Top 1…');
+      setBusy(true, 'Comprobando tus desbloqueos…');
       try {
         studentKey = await getStudentKey();
-        unlocked = await rpc('unlock_game_avatar', { p_student_key:studentKey }) === true;
+        const level = await rpc('get_game_avatar_level', { p_student_key:studentKey });
+        if (!Number.isInteger(level) || level < 0 || level > 4) throw new Error('Nivel de avatar no válido');
+        avatarLevel = level;
+        unlocked = avatarLevel > 0 && await rpc('unlock_game_avatar', { p_student_key:studentKey }) === true;
+        if (avatarLevel > 0 && !unlocked) {
+          avatarLevel = 0;
+          throw new Error('Tu puesto cambió durante la comprobación');
+        }
         if (backdrop.isConnected) {
           canDelete = hasAvatar(ownProfile);
           if (unlocked) {
             heading.textContent = 'Elige tu avatar';
-            hint.textContent = 'Elige un animal y uno de los 30 colores de fondo. También puedes subir una foto.';
+            const count = AVATAR_IMAGES.filter(choice => choice.level <= avatarLevel).length;
+            hint.textContent = `${count} de ${AVATAR_IMAGES.length} avatares disponibles y 30 colores de fondo. ` +
+              (avatarLevel === 4 ? 'También puedes subir una foto.' : 'Toca un candado para ver cómo desbloquear más.');
             setBusy(false, '');
           } else if (canDelete) {
             heading.textContent = 'Tu avatar';
-            hint.textContent = 'Ya no lideras el Top 1 global. Tu avatar seguirá visible hasta que decidas eliminarlo.';
+            hint.textContent = 'Tu avatar seguirá visible aunque bajes de puesto. Toca un candado para ver cómo volver a elegir.';
             setBusy(false, '');
           } else {
             heading.textContent = 'Avatar bloqueado';
             hint.textContent = fixedAvatarAccount
               ? 'No se pudo habilitar tu cuenta para cambiar el avatar.'
-              : 'Para escoger una foto de perfil debes estar en el puesto 1 global de cualquier juego.';
+              : 'Toca un avatar para ver cómo desbloquearlo con tus puestos en el ranking.';
             setBusy(false, fixedAvatarAccount
               ? 'Actualiza la configuración de avatares en Supabase.'
-              : 'Llega al puesto 1 global de cualquier juego para elegir tu avatar.');
+              : AVATAR_REQUIREMENTS[1]);
           }
         }
       } catch (error) {
@@ -797,8 +850,8 @@
         if (currentRefresh !== refreshNumber) return;
         const canChooseAvatar = fixedAvatarAccount || Boolean(data && data.can_choose_avatar);
         ownProfile = data && data.my_avatar;
-        ownAvatarButton.hidden = !canChooseAvatar && !hasAvatar(ownProfile);
-        ownAvatarButton.setAttribute('aria-label', canChooseAvatar ? 'Elegir o cambiar mi avatar' : 'Eliminar mi avatar');
+        ownAvatarButton.hidden = false;
+        ownAvatarButton.setAttribute('aria-label', canChooseAvatar ? 'Elegir o cambiar mi avatar' : 'Ver mis avatares y desbloqueos');
         fillAvatar(ownAvatarImage, ownProfile, student.name, student.grade);
         if (isTeacher && Array.isArray(data && data.grades)) {
           availableGrades = [...availableGrades, ...data.grades];

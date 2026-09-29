@@ -1,6 +1,8 @@
-<svg fill="#000000" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+<svg fill="#0878B3" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
 	 viewBox="0 0 297 297" xml:space="preserve">
-<path d="M287.103,239.099c-33.34,0-49.557-4.371-66.725-9c-9.098-2.452-18.36-4.945-30.114-6.789l2.474-2.475
+<!-- At the 20 px button size, eroding 0.75 viewBox units per side thins the silhouette by about 0.1 px. -->
+<defs><filter id="thin-lines" x="-2" y="-2" width="301" height="301" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse"><feMorphology in="SourceGraphic" operator="erode" radius="0.75"/></filter></defs>
+<path filter="url(#thin-lines)" d="M287.103,239.099c-33.34,0-49.557-4.371-66.725-9c-9.098-2.452-18.36-4.945-30.114-6.789l2.474-2.475
 	c15.753-15.769,21.022-39.064,14.083-59.843l47.487-47.52l4.426,4.43c1.933,1.935,4.467,2.901,7.001,2.901
 	c2.531,0,5.063-0.965,6.995-2.896c3.867-3.864,3.869-10.131,0.006-13.997l-5.831-5.835l19.105-6.371
 	c3.252-1.086,5.712-3.776,6.5-7.114c0.788-3.337-0.207-6.845-2.631-9.271l-34.285-34.312c-2.425-2.426-5.934-3.423-9.274-2.637
