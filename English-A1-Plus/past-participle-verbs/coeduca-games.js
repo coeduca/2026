@@ -3206,7 +3206,8 @@
     const COLORS = ['#E63946', '#4FC3F7', '#FFD700', '#4CAF50', '#9B5DE5', '#FF9F1C'];
     const DARK   = ['#8E1B26', '#0277BD', '#B8960B', '#2E7D32', '#6A3AB2', '#C67207'];
     // Velocidad: arranca suave y acelera con cada pieza fijada
-    const START_TICK = 600, MIN_TICK = 180, TICK_STEP = 12;
+    // Conserva un inicio ágil, pero alcanza la velocidad máxima de forma más gradual.
+    const START_TICK = 600, MIN_TICK = 180, TICK_STEP = 10;
     // Probabilidad de píldora normal con ambas mitades iguales (raras a propósito)
     const SAME_COLOR_CHANCE = 0.1;
     // Aproximadamente una de cada 67 piezas contiene una mitad arcoíris.
