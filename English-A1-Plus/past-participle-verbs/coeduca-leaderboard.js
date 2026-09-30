@@ -36,6 +36,7 @@
     3: 'Alcanza el Top 2 global en cualquier juego para desbloqueame.',
     4: 'Alcanza el Top 1 global en cualquier juego para desbloqueame.'
   };
+  const AVATAR_INFO_ICON = '<svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960" fill="currentColor"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>';
   const AVATAR_COLORS = [
     ['Cielo', '#EAF7FF'], ['Blanco', '#FFFFFF'], ['Crema', '#FFF3D6'],
     ['Amarillo', '#FFE27A'], ['Naranja', '#FFC078'], ['Durazno', '#FFD4B8'],
@@ -249,6 +250,40 @@
       }
       @media (max-width: 620px) { .cg-leaderboard-grids { grid-template-columns: 1fr; } }
       @media (max-width: 360px) { .cg-avatar-dialog { padding:14px; } .cg-avatar-dialog-options { grid-template-columns:repeat(6,minmax(0,1fr)); gap:5px; margin:8px 0; } .cg-avatar-dialog-colors { grid-template-columns:repeat(8,minmax(0,1fr)); gap:5px; } .cg-avatar-dialog-actions { bottom:-14px; } }
+      /* Avatar dialog aligned with the COEDUCA feature family */
+      .cg-avatar-dialog-backdrop{background:rgba(12,20,35,.68);-webkit-backdrop-filter:blur(10px) saturate(.9);backdrop-filter:blur(10px) saturate(.9);animation:cgAvatarFade .16s ease-out}
+      @keyframes cgAvatarFade{from{opacity:0}to{opacity:1}}
+      .cg-avatar-dialog{--avatar-accent:#309c59;--avatar-dark:#216d3f;--avatar-soft:#e5f6ea;position:relative;isolation:isolate;width:min(100%,450px);padding:0;border:2px solid #2f8e55;border-radius:26px;background:linear-gradient(180deg,#fbfffc,#eff9f2);color:#244332;box-shadow:0 26px 70px rgba(9,43,26,.28),0 4px 14px rgba(9,43,26,.12),inset 0 1px 0 rgba(255,255,255,.85);text-align:left;animation:cgAvatarPop .2s cubic-bezier(.2,.8,.2,1)}
+      @keyframes cgAvatarPop{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+      .cg-avatar-dialog::before{content:"";position:absolute;z-index:4;top:0;left:28px;right:28px;height:4px;border-radius:0 0 99px 99px;background:linear-gradient(90deg,#76d694,#309c59,#49b970);pointer-events:none}
+      .cg-avatar-dialog-header{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:11px;min-height:64px;padding:11px 14px 11px 16px;border-bottom:1px solid #cde7d5;background:linear-gradient(180deg,rgba(252,255,253,.98),rgba(231,247,236,.98));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+      .cg-avatar-dialog-header-icon{display:block;flex:none;width:38px;height:38px;padding:8px;border:1px solid #a9dcb9;border-radius:12px;background:#e7f6ec;box-shadow:0 4px 10px rgba(34,126,70,.12);filter:none}
+      .cg-avatar-dialog-title-row{display:flex;align-items:center;gap:10px;flex:1;min-width:0}.cg-avatar-dialog-title-row h3{flex:none}.cg-avatar-dialog-info{display:inline-grid;place-items:center;flex:none;width:36px;height:36px;padding:7px;border:1.5px solid #75ad89;border-radius:11px;background:#fff;color:#27804b;box-shadow:0 2px 0 #d2e9d9;cursor:pointer}.cg-avatar-dialog-info svg{display:block;width:20px;height:20px}.cg-avatar-dialog-info:focus-visible,.cg-avatar-help-close:focus-visible{outline:3px solid #7bd498;outline-offset:2px}
+      .cg-avatar-help-backdrop{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:16px;background:rgba(12,20,35,.68);-webkit-backdrop-filter:blur(10px) saturate(.9);backdrop-filter:blur(10px) saturate(.9)}
+      .cg-avatar-help{position:relative;isolation:isolate;box-sizing:border-box;width:min(100%,520px);padding:22px;border:2px solid #2f8e55;border-radius:24px;background:linear-gradient(155deg,#fffef9,#f3fbf5);color:#294637;box-shadow:0 26px 70px rgba(9,43,26,.28),0 4px 14px rgba(9,43,26,.12);font:14px/1.45 system-ui,sans-serif}.cg-avatar-help::before{content:"";position:absolute;top:0;left:28px;right:28px;height:4px;border-radius:0 0 99px 99px;background:linear-gradient(90deg,#76d694,#309c59,#49b970)}.cg-avatar-help h2{margin:0 0 6px;color:#216d3f;font-size:22px}.cg-avatar-help-intro{margin:0 0 14px;color:#526b5a}.cg-avatar-help-levels{display:grid;gap:8px}.cg-avatar-help-level{padding:10px 12px;border:1px solid #d4eadb;border-radius:14px;background:#fff}.cg-avatar-help-level strong{display:block;margin-bottom:2px;color:#216d3f}.cg-avatar-help-level span{display:block;color:#466052}.cg-avatar-help-note{margin:12px 0 0;padding:9px 11px;border-radius:12px;background:#eaf7ee;color:#315a40}.cg-avatar-help-close{display:block;min-height:40px;margin:16px 0 0 auto;padding:8px 18px;border:1.5px solid #216d3f;border-radius:13px;background:linear-gradient(180deg,#3cae65,#309c59);color:#fff;box-shadow:0 3px 0 #216d3f;font:800 14px system-ui,sans-serif;cursor:pointer}
+      .cg-avatar-dialog h3{flex:1;margin:0;color:#216d3f;font-size:22px;font-weight:950;letter-spacing:-.015em}
+      .cg-avatar-dialog-close{display:grid;place-items:center;flex:none;width:38px;height:38px;padding:0;border:1.5px solid #4d9568;border-radius:50%;background:rgba(255,255,255,.82);color:#216d3f;font:800 24px/1 system-ui,sans-serif;cursor:pointer;transition:transform .15s ease,background .15s ease}
+      .cg-avatar-dialog-close:hover{transform:rotate(5deg) scale(1.04);background:#fff}
+      .cg-avatar-dialog>.cg-avatar-dialog-hint,.cg-avatar-dialog>.cg-avatar-dialog-preview-row,.cg-avatar-dialog>.cg-avatar-dialog-options,.cg-avatar-dialog>.cg-avatar-dialog-color-label,.cg-avatar-dialog>.cg-avatar-dialog-colors,.cg-avatar-dialog>.cg-avatar-dialog-upload,.cg-avatar-dialog>.cg-avatar-dialog-status{margin-left:20px;margin-right:20px}
+      .cg-avatar-dialog-hint{margin-top:16px;margin-bottom:12px;padding:10px 12px;border:1px solid #d4eadb;border-radius:14px;background:#f7fcf8;color:#526b5a;font-size:13px;line-height:1.45;text-align:center}
+      .cg-avatar-dialog-preview-row{min-height:88px;margin-top:4px;margin-bottom:10px;padding:10px 12px;border:1px solid #d6ebdc;border-radius:17px;background:#fff;box-shadow:0 8px 22px rgba(28,91,50,.07)}
+      .cg-avatar-dialog-preview{width:76px;height:76px;border:2px solid #398b57;background:#e8f6ec;box-shadow:0 4px 12px rgba(37,115,65,.14)}
+      .cg-avatar-dialog-preview-name{color:#244332}
+      .cg-avatar-dialog-options{gap:8px;margin-top:12px;margin-bottom:14px;padding:12px;border:1px solid #d6ebdc;border-radius:18px;background:#fff;box-shadow:0 8px 22px rgba(28,91,50,.06)}
+      .cg-avatar-dialog-options button{border:1.5px solid #57986e;box-shadow:0 2px 0 #deeee3;transition:transform .14s ease,box-shadow .14s ease}
+      .cg-avatar-dialog-options button:hover{transform:translateY(-2px);box-shadow:0 5px 10px rgba(35,112,63,.15)}
+      .cg-avatar-dialog-options button[aria-pressed="true"]{outline:3px solid #65c583;outline-offset:2px}
+      .cg-avatar-dialog-color-label{margin-top:2px!important;margin-bottom:7px!important;color:#42604c;font-weight:900;text-align:center}
+      .cg-avatar-dialog-colors{gap:7px;margin-top:0;margin-bottom:14px;padding:10px 12px;border:1px solid #d6ebdc;border-radius:15px;background:#fff}
+      .cg-avatar-dialog-colors button{border:1.5px solid #4f8060;box-shadow:0 2px 0 #dbe9df}
+      .cg-avatar-dialog-upload{width:auto;min-height:42px;margin-top:2px;margin-bottom:0;padding:9px 14px;border:1.5px solid #4c9366;border-radius:13px;background:#e5f5ea;color:#28563a;box-shadow:0 2px 0 #c9e6d2}
+      .cg-avatar-dialog-upload[aria-disabled="true"]{background:#f0f5f1;color:#698174;box-shadow:none}
+      .cg-avatar-dialog-status{min-height:20px;margin-top:8px;margin-bottom:2px;color:#3e6a4d;text-align:center}
+      .cg-avatar-dialog-actions{bottom:0;margin-top:8px;padding:12px 20px 16px;border-top:1px solid #cde7d5;background:linear-gradient(180deg,rgba(241,250,244,.96),rgba(231,247,236,.99));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+      .cg-avatar-dialog-actions button{min-height:40px;padding:8px 14px;border:1.5px solid #4f9366;border-radius:13px;background:#fff;color:#28563a;box-shadow:0 2px 0 #cde3d4;transition:transform .14s ease,box-shadow .14s ease}
+      .cg-avatar-dialog-actions button:hover{transform:translateY(-1px)}
+      .cg-avatar-dialog-actions .cg-avatar-dialog-save{border-color:#216d3f;background:linear-gradient(180deg,#3cae65,#309c59);color:#fff;box-shadow:0 3px 0 #216d3f}
+      @media(max-width:360px){.cg-avatar-dialog{border-radius:20px}.cg-avatar-dialog-header{padding:9px 10px 9px 12px}.cg-avatar-dialog-header-icon{width:34px;height:34px}.cg-avatar-dialog-close{width:35px;height:35px}.cg-avatar-dialog>.cg-avatar-dialog-hint,.cg-avatar-dialog>.cg-avatar-dialog-preview-row,.cg-avatar-dialog>.cg-avatar-dialog-options,.cg-avatar-dialog>.cg-avatar-dialog-color-label,.cg-avatar-dialog>.cg-avatar-dialog-colors,.cg-avatar-dialog>.cg-avatar-dialog-upload,.cg-avatar-dialog>.cg-avatar-dialog-status{margin-left:14px;margin-right:14px}.cg-avatar-dialog-actions{padding:10px 14px 14px}}
     `;
     document.head.appendChild(style);
   }
@@ -582,9 +617,32 @@
       dialog.setAttribute('role', 'dialog');
       dialog.setAttribute('aria-modal', 'true');
       dialog.setAttribute('aria-label', 'Elegir avatar');
+      const header = document.createElement('div');
+      header.className = 'cg-avatar-dialog-header';
+      const headerIcon = document.createElement('img');
+      headerIcon.className = 'cg-avatar-dialog-header-icon';
+      headerIcon.src = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAyMCAyMCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICANCiAgICA8dGl0bGU+cHJvZmlsZV9yb3VuZCBbIzEzNDJdPC90aXRsZT4NCiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4NCiAgICA8ZGVmcz4NCg0KPC9kZWZzPg0KICAgIDxnIGlkPSJQYWdlLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPg0KICAgICAgICA8ZyBpZD0iRHJpYmJibGUtTGlnaHQtUHJldmlldyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTE0MC4wMDAwMDAsIC0yMTU5LjAwMDAwMCkiIGZpbGw9IiMwMDAwMDAiPg0KICAgICAgICAgICAgPGcgaWQ9Imljb25zIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1Ni4wMDAwMDAsIDE2MC4wMDAwMDApIj4NCiAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTAwLjU2MjU0OCwyMDE2Ljk5OTk4IEw4Ny40MzgxNzEzLDIwMTYuOTk5OTggQzg2LjczMTc4MDQsMjAxNi45OTk5OCA4Ni4yMTAxNTM1LDIwMTYuMzAyOTggODYuNDc2NTgxMywyMDE1LjY2MTk4IEM4Ny43MTI3NjU1LDIwMTIuNjk3OTggOTAuNjE2OTMwNiwyMDEwLjk5OTk4IDkzLjk5OTg0OTIsMjAxMC45OTk5OCBDOTcuMzgzNzg4NSwyMDEwLjk5OTk4IDEwMC4yODc5NTQsMjAxMi42OTc5OCAxMDEuNTI0MTM4LDIwMTUuNjYxOTggQzEwMS43OTA1NjYsMjAxNi4zMDI5OCAxMDEuMjY4OTM5LDIwMTYuOTk5OTggMTAwLjU2MjU0OCwyMDE2Ljk5OTk4IE04OS45MTY2NjQ1LDIwMDQuOTk5OTggQzg5LjkxNjY2NDUsMjAwMi43OTM5OCA5MS43NDg5OTM2LDIwMDAuOTk5OTggOTMuOTk5ODQ5MiwyMDAwLjk5OTk4IEM5Ni4yNTE3MjU2LDIwMDAuOTk5OTggOTguMDgzMDMzOSwyMDAyLjc5Mzk4IDk4LjA4MzAzMzksMjAwNC45OTk5OCBDOTguMDgzMDMzOSwyMDA3LjIwNTk4IDk2LjI1MTcyNTYsMjAwOC45OTk5OCA5My45OTk4NDkyLDIwMDguOTk5OTggQzkxLjc0ODk5MzYsMjAwOC45OTk5OCA4OS45MTY2NjQ1LDIwMDcuMjA1OTggODkuOTE2NjY0NSwyMDA0Ljk5OTk4IE0xMDMuOTU1Njc0LDIwMTYuNjM1OTggQzEwMy4yMTM1NTYsMjAxMy4yNzY5OCAxMDAuODkyMjY1LDIwMTAuNzk3OTggOTcuODM3MDIyLDIwMDkuNjcyOTggQzk5LjQ1NjAwNDgsMjAwOC4zOTU5OCAxMDAuNDAwMjQxLDIwMDYuMzMwOTggMTAwLjA1MzE3MSwyMDA0LjA2OTk4IEM5OS42NTA5NzY5LDIwMDEuNDQ2OTggOTcuNDIzNTk5NiwxOTk5LjM0Nzk4IDk0LjczNDgyMjQsMTk5OS4wNDE5OCBDOTEuMDIzMjA3NSwxOTk4LjYxODk4IDg3Ljg3NTA3MjEsMjAwMS40NDg5OCA4Ny44NzUwNzIxLDIwMDQuOTk5OTggQzg3Ljg3NTA3MjEsMjAwNi44ODk5OCA4OC43NjkyODk2LDIwMDguNTczOTggOTAuMTYzNjk3MSwyMDA5LjY3Mjk4IEM4Ny4xMDc0MzM0LDIwMTAuNzk3OTggODQuNzg3MTYzNiwyMDEzLjI3Njk4IDg0LjA0NDAyNCwyMDE2LjYzNTk4IEM4My43NzQ1MzM4LDIwMTcuODU2OTggODQuNzc4OTk3MywyMDE4Ljk5OTk4IDg2LjA1Mzk3MTcsMjAxOC45OTk5OCBMMTAxLjk0NTcyNywyMDE4Ljk5OTk4IEMxMDMuMjIxNzIyLDIwMTguOTk5OTggMTA0LjIyNjE4NSwyMDE3Ljg1Njk4IDEwMy45NTU2NzQsMjAxNi42MzU5OCIgaWQ9InByb2ZpbGVfcm91bmQtWyMxMzQyXSI+DQoNCjwvcGF0aD4NCiAgICAgICAgICAgIDwvZz4NCiAgICAgICAgPC9nPg0KICAgIDwvZz4NCjwvc3ZnPg==';
+      headerIcon.alt = '';
       const heading = document.createElement('h3');
       heading.textContent = 'Elige tu avatar';
+      const headerInfo = document.createElement('button');
+      headerInfo.type = 'button';
+      headerInfo.className = 'cg-avatar-dialog-info';
+      headerInfo.setAttribute('aria-label', 'Cómo desbloquear avatares');
+      headerInfo.setAttribute('aria-haspopup', 'dialog');
+      headerInfo.title = 'Cómo desbloquear avatares';
+      headerInfo.innerHTML = AVATAR_INFO_ICON;
+      const titleRow = document.createElement('div');
+      titleRow.className = 'cg-avatar-dialog-title-row';
+      titleRow.append(headerIcon, heading, headerInfo);
+      const headerClose = document.createElement('button');
+      headerClose.type = 'button';
+      headerClose.className = 'cg-avatar-dialog-close';
+      headerClose.setAttribute('aria-label', 'Cerrar avatar');
+      headerClose.textContent = '×';
+      header.append(titleRow, headerClose);
       const hint = document.createElement('p');
+      hint.className = 'cg-avatar-dialog-hint';
       hint.textContent = 'Desbloquea avatares con tus puestos en el ranking. Toca un candado para ver cómo conseguirlo.';
       const preview = document.createElement('div');
       preview.className = 'cg-avatar-dialog-preview';
@@ -627,7 +685,7 @@
       closeButton.type = 'button';
       closeButton.textContent = 'Cerrar';
       actions.append(saveButton, clear, closeButton);
-      dialog.append(heading, hint, previewRow, options, colorLabel, colors, upload, input, statusLine, actions);
+      dialog.append(header, hint, previewRow, options, colorLabel, colors, upload, input, statusLine, actions);
       backdrop.appendChild(dialog);
       document.body.appendChild(backdrop);
 
@@ -638,15 +696,38 @@
       let studentKey = null;
       let selectedChoice = avatarImage(ownProfile) || null;
       let selectedColor = avatarBackground(ownProfile);
+      let avatarHelpBackdrop = null;
+      function closeAvatarHelp() {
+        if (!avatarHelpBackdrop) return;
+        avatarHelpBackdrop.remove();
+        avatarHelpBackdrop = null;
+        if (headerInfo.isConnected) headerInfo.focus();
+      }
+      function openAvatarHelp() {
+        if (avatarHelpBackdrop) return;
+        avatarHelpBackdrop = document.createElement('div');
+        avatarHelpBackdrop.className = 'cg-avatar-help-backdrop';
+        avatarHelpBackdrop.innerHTML = '<section class="cg-avatar-help" role="dialog" aria-modal="true" aria-labelledby="cg-avatar-help-title"><h2 id="cg-avatar-help-title">Cómo desbloquear los avatares</h2><p class="cg-avatar-help-intro">Los avatares se desbloquean según tu mejor puesto en el ranking de cualquiera de los juegos.</p><div class="cg-avatar-help-levels"><div class="cg-avatar-help-level"><strong>Rigo y Kittycat</strong><span>Top 1 de tu grado o Top 3 global.</span></div><div class="cg-avatar-help-level"><strong>Doggy, Lorenzo, Wary y Panda</strong><span>Top 3 global.</span></div><div class="cg-avatar-help-level"><strong>Pilar, Leo, Horsey, Pinwin, Bea y Mosca</strong><span>Top 2 global.</span></div><div class="cg-avatar-help-level"><strong>Rodolfin, Cucú, Baty, Camilo, Mariann y Cappy</strong><span>Top 1 global. Este nivel también desbloquea la foto personalizada.</span></div></div><p class="cg-avatar-help-note">Tu avatar guardado seguirá visible si tu puesto cambia. Para elegir otro avatar bloqueado tendrás que volver a cumplir su requisito.</p><button class="cg-avatar-help-close" type="button">Entendido</button></section>';
+        document.body.appendChild(avatarHelpBackdrop);
+        avatarHelpBackdrop.querySelector('.cg-avatar-help-close').addEventListener('click', closeAvatarHelp);
+        avatarHelpBackdrop.addEventListener('click', event => { if (event.target === avatarHelpBackdrop) closeAvatarHelp(); });
+        avatarHelpBackdrop.querySelector('.cg-avatar-help-close').focus();
+      }
       function close() {
+        closeAvatarHelp();
         backdrop.remove();
         document.removeEventListener('keydown', onKeyDown, true);
         if (activeAvatarDialog === close) activeAvatarDialog = null;
         if (previousFocus && previousFocus.isConnected) previousFocus.focus();
       }
       function onKeyDown(event) {
-        if (event.key === 'Escape') { event.preventDefault(); close(); }
+        if (event.key !== 'Escape') return;
+        event.preventDefault();
+        if (avatarHelpBackdrop) { closeAvatarHelp(); return; }
+        close();
       }
+      headerInfo.addEventListener('click', openAvatarHelp);
+      headerClose.addEventListener('click', close);
       function setBusy(value, message) {
         busy = value;
         clear.hidden = !canDelete;
