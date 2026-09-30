@@ -14,18 +14,21 @@
     <header class="gc-hero">
       <div class="gc-hero-top">
         <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
-        <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
-          <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
-          <span>Volver a la actividad</span>
-        </a>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
       </div>
       <div class="gc-hero-content">
         <div class="gc-hero-copy">
-          <div class="gc-hero-label">EL RETO COMIENZA AQUÍ <span aria-hidden="true">✦</span></div>
           <h1>Centro de <span>juegos</span></h1>
           <p id="gc-project-title"></p>
           <div class="gc-student" id="gc-student" hidden></div>
-          <div class="gc-hero-tip">Elige un juego · Suma puntos · Supera tu marca</div>
         </div>
         <div class="gc-hero-art" aria-hidden="true">
           <img class="gc-hero-art-one" src="flappy.webp" alt="">
@@ -35,12 +38,9 @@
       </div>
     </header>
 
-    <section class="gc-section gc-catalog-section" aria-labelledby="gc-catalog-title">
-      <div class="gc-section-heading">
-        <div>
-          <span class="gc-eyebrow">TU ZONA DE JUEGOS</span>
-          <h2 id="gc-catalog-title">Juegos con puntuación</h2>
-        </div>
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
         <span class="gc-count" id="gc-count"></span>
       </div>
       <div class="gc-grid" id="gc-catalog"></div>
