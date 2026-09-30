@@ -34,7 +34,29 @@
   const playSection = document.getElementById('gc-play');
   const studentBadge = document.getElementById('gc-student');
   const result = document.getElementById('gc-result');
+  const infoButton = document.getElementById('gc-info-button');
+  const INFO_HTML = '<div class="gc-info-overlay" id="gc-info-overlay"><section class="gc-info-dialog" role="dialog" aria-modal="true" aria-labelledby="gc-info-title"><h2 id="gc-info-title">Cómo funciona el Centro de Juegos</h2><p>Los juegos del Centro de Juegos no dan puntos extra para la nota por sí solos.</p><p>Solo el juego del día puede otorgar puntos extra cuando está configurado dentro de la actividad.</p><p>Aun así, puedes jugar cualquier juego para mejorar tu puntaje en el ranking y desbloquear avatares.</p><div class="gc-info-actions"><button class="gc-info-close" type="button">Entendido</button></div></section></div>';
   let student = null;
+  let infoOverlay = null;
+
+  function closeInfo() {
+    if (!infoOverlay) return;
+    infoOverlay.remove();
+    infoOverlay = null;
+    if (infoButton) infoButton.focus();
+  }
+
+  function openInfo() {
+    if (infoOverlay) return;
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = INFO_HTML;
+    infoOverlay = wrapper.firstElementChild;
+    document.body.appendChild(infoOverlay);
+    const closeButton = infoOverlay.querySelector('.gc-info-close');
+    closeButton.addEventListener('click', closeInfo);
+    infoOverlay.addEventListener('click', event => { if (event.target === infoOverlay) closeInfo(); });
+    closeButton.focus();
+  }
 
   function readSnapshot() {
     try { return JSON.parse(localStorage.getItem(key) || 'null'); }
@@ -112,15 +134,16 @@
       result.textContent = 'Este juego no está disponible en el paquete.';
       return;
     }
+    const grantsExtraPoints = !!(config.game && config.game.type === selected.id);
     try {
       renderer({
         container: container,
         config: gameConfig(selected),
         student: student,
-        onWin: () => updateResult('win'),
-        onTie: () => updateResult('tie'),
-        onLose: () => updateResult('lose'),
-        onBalloonBonus: addBalloonBonus
+        onWin: () => { if (grantsExtraPoints) updateResult('win'); },
+        onTie: () => { if (grantsExtraPoints) updateResult('tie'); },
+        onLose: () => { if (grantsExtraPoints) updateResult('lose'); },
+        onBalloonBonus: () => { if (grantsExtraPoints) addBalloonBonus(); }
       });
     } catch (error) {
       console.error('No se pudo abrir el juego', selected.id, error);
@@ -175,6 +198,8 @@
 
   async function init() {
     renderCatalog();
+    if (infoButton) infoButton.addEventListener('click', openInfo);
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && infoOverlay) closeInfo(); });
     if (!selected) return;
     const saved = readSnapshot();
     const auth = window.COEDUCA_FIXED_AUTH;
