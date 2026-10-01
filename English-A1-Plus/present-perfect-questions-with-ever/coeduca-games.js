@@ -1,6 +1,6 @@
 /**
  * COEDUCA Framework v2 - Games (Pop Art ENHANCED)
- * 5 juegos: tictactoe, snake, dino, hangman, trivia
+ * 7 juegos: tictactoe, snake, dino, hangman, trivia, pills, sandwich
  * Depende de coeduca-core.js.
  *
  * Cada juego recibe ctx = { container, config, onWin, onTie, onLose }
@@ -16,6 +16,18 @@
   }
   const C = global.COEDUCA;
   const reg = (type, fn) => C.registerGame(type, fn);
+  const iconButton = global.COEDUCA_GAME_ICONS.button;
+  const arrowIcon = global.COEDUCA_GAME_ICONS.arrow;
+  function gameViewport(wrap, game, title, soundToggle, options = {}) {
+    return global.COEDUCA_GAME_VIEWPORT
+      ? global.COEDUCA_GAME_VIEWPORT.create(wrap, { game, title, soundToggle, ...options })
+      : { enter() {}, leave() {}, destroy() {} };
+  }
+  function gameResults(ctx, game, wrap) {
+    return global.COEDUCA_GAME_RESULTS
+      ? global.COEDUCA_GAME_RESULTS.create(ctx, game, wrap)
+      : { show() {}, hide() {} };
+  }
 
   // ---------- Estilos compartidos por los juegos (inyectados una sola vez) ----------
   if (!document.getElementById('coeduca-games-styles')) {
@@ -66,6 +78,17 @@
       @keyframes cgWiggle {
         0%, 100% { transform: rotate(-3deg); }
         50%      { transform: rotate(3deg); }
+      }
+
+      #snake-start:disabled,
+      #dino-start:disabled,
+      #pl-start:disabled,
+      #sw-start:disabled {
+        opacity: 0.52;
+        cursor: not-allowed;
+        filter: grayscale(0.3);
+        transform: none !important;
+        box-shadow: 1px 1px 0 var(--coeduca-stroke, #1a1a1a) !important;
       }
 
       /* === Avatar de jugador / Rigo === */
@@ -350,7 +373,7 @@
 
   // Cara real de Rigo: el favicon que viaja dentro de cada paquete.
   // Si la imagen no carga (paquete viejo sin favicon), cae al emoji.
-  const RIGO_IMG = '<img src="favicon.png" alt="Rigo" ' +
+  const RIGO_IMG = '<img src="favicon.webp" alt="Rigo" ' +
     'style="width:100%;height:100%;object-fit:cover;border-radius:50%;" ' +
     'onerror="this.outerHTML=\'' + RIGO_EMOJI + '\'">';
 
@@ -368,6 +391,18 @@
   function sndMuted() {
     try { return localStorage.getItem(SND_KEY) === '1'; } catch (e) { return false; }
   }
+  function prepareSound() {
+    if (sndMuted()) return;
+    try {
+      const AC = global.AudioContext || global.webkitAudioContext;
+      if (!AC) return;
+      if (!sndCtx || sndCtx.state === 'closed') sndCtx = new AC();
+      if (sndCtx.state === 'suspended') {
+        const resumed = sndCtx.resume();
+        if (resumed && resumed.catch) resumed.catch(() => {});
+      }
+    } catch (_) { /* El juego funciona también sin audio. */ }
+  }
   function sndSetMuted(m) {
     try { localStorage.setItem(SND_KEY, m ? '1' : '0'); } catch (e) {}
   }
@@ -375,10 +410,8 @@
   function beep(f0, f1, dur, type, vol, delay) {
     if (sndMuted()) return;
     try {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      if (!sndCtx) sndCtx = new AC();
-      if (sndCtx.state === 'suspended') sndCtx.resume();
+      prepareSound();
+      if (!sndCtx) return;
       const t0 = sndCtx.currentTime + (delay || 0);
       const osc = sndCtx.createOscillator();
       const g = sndCtx.createGain();
@@ -389,6 +422,7 @@
       g.gain.exponentialRampToValueAtTime(vol || 0.1, t0 + 0.012);
       g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
       osc.connect(g); g.connect(sndCtx.destination);
+      osc.onended = () => { osc.disconnect(); g.disconnect(); };
       osc.start(t0); osc.stop(t0 + dur + 0.03);
     } catch (e) { /* dispositivo sin audio */ }
   }
@@ -406,38 +440,72 @@
     tie:     () => { beep(440, 440, 0.12, 'triangle', 0.1); beep(440, 440, 0.12, 'triangle', 0.1, 0.14); }
   };
 
-  // Boton flotante de sonido (se recuerda en localStorage). Estilos inline
-  // para que funcione igual en todas las variantes del framework.
+  // Iconos Material proporcionados para el estado activo y silenciado.
+  const SOUND_ON_ICON = '<svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M640-440v-80h160v80H640Zm48 280-128-96 48-64 128 96-48 64Zm-80-480-48-64 128-96 48 64-128 96ZM120-360v-240h160l200-200v640L280-360H120Z"/></svg>';
+  const SOUND_OFF_ICON = '<svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor"><path d="m616-320-56-56 104-104-104-104 56-56 104 104 104-104 56 56-104 104 104 104-56 56-104-104-104 104Zm-496-40v-240h160l200-200v640L280-360H120Z"/></svg>';
+
+  // Botón de sonido en la esquina de la card de Juego final.
   function makeSoundToggle(wrap) {
-    wrap.style.position = 'relative';
+    const host = wrap.closest('.coeduca-exercise, .civica-section--consolidate') || wrap;
+    host.style.position = 'relative';
     const b = document.createElement('button');
     b.type = 'button';
-    b.title = 'Activar/silenciar sonido';
-    b.setAttribute('aria-label', 'Activar o silenciar sonido');
-    b.textContent = sndMuted() ? '\uD83D\uDD07' : '\uD83D\uDD0A';
-    b.style.cssText = 'position:absolute;top:0;right:0;z-index:5;width:44px;height:44px;' +
-      'font-size:20px;border:3px solid #1a1a1a;border-radius:12px;background:#fff;' +
-      'cursor:pointer;box-shadow:2px 2px 0 #1a1a1a;padding:0;line-height:1;';
+    b.className = 'coeduca-game-sound-toggle';
+    b.style.cssText = 'position:absolute;top:12px;right:12px;z-index:10;width:42px;height:42px;' +
+      'display:grid;place-items:center;color:#1a1a1a;border:3px solid #1a1a1a;' +
+      'border-radius:12px;background:#fff;cursor:pointer;box-shadow:2px 2px 0 #1a1a1a;' +
+      'padding:0;line-height:1;transition:transform .15s ease,box-shadow .15s ease;';
+    const renderState = () => {
+      const muted = sndMuted();
+      b.innerHTML = muted ? SOUND_OFF_ICON : SOUND_ON_ICON;
+      b.title = muted ? 'Activar sonido' : 'Desactivar sonido';
+      b.setAttribute('aria-label', b.title);
+      b.setAttribute('aria-pressed', String(muted));
+    };
+    b.addEventListener('pointerdown', () => {
+      b.style.transform = 'translate(2px,2px)';
+      b.style.boxShadow = '0 0 0 #1a1a1a';
+    });
+    const releaseButton = () => {
+      b.style.transform = '';
+      b.style.boxShadow = '2px 2px 0 #1a1a1a';
+    };
+    b.addEventListener('pointerup', releaseButton);
+    b.addEventListener('pointercancel', releaseButton);
+    b.addEventListener('pointerleave', releaseButton);
     b.addEventListener('click', () => {
       sndSetMuted(!sndMuted());
-      b.textContent = sndMuted() ? '\uD83D\uDD07' : '\uD83D\uDD0A';
+      renderState();
       if (!sndMuted()) SFX.tap();
     });
-    wrap.appendChild(b);
+    renderState();
+    host.appendChild(b);
     return b;
   }
 
   // Pausa automatica: llama a onHide cuando la pestana se oculta y a onShow al
   // volver. Se auto-limpia cuando el juego sale del DOM.
   function autoPause(wrap, onHide, onShow) {
+    let helpOpen = false;
     const handler = () => {
       if (!document.body.contains(wrap)) {
         document.removeEventListener('visibilitychange', handler);
+        wrap.removeEventListener('coeduca-game-help-open', onHelpOpen);
+        wrap.removeEventListener('coeduca-game-help-close', onHelpClose);
         return;
       }
-      if (document.hidden) onHide(); else onShow();
+      if (document.hidden || helpOpen) onHide(); else onShow();
     };
+    const onHelpOpen = () => { helpOpen = true; wrap.classList.add('coeduca-game-help-open'); handler(); };
+    const onHelpClose = () => { helpOpen = false; wrap.classList.remove('coeduca-game-help-open'); handler(); };
     document.addEventListener('visibilitychange', handler);
+    wrap.addEventListener('coeduca-game-help-open', onHelpOpen);
+    wrap.addEventListener('coeduca-game-help-close', onHelpClose);
+    return () => {
+      document.removeEventListener('visibilitychange', handler);
+      wrap.removeEventListener('coeduca-game-help-open', onHelpOpen);
+      wrap.removeEventListener('coeduca-game-help-close', onHelpClose);
+    };
   }
 
   function avatarHTML(name, emoji, bgColor, opts = {}) {
@@ -497,12 +565,14 @@
 
         <div id="ttt-status" class="cg-status"></div>
         <button class="coeduca-btn coeduca-btn-success" id="ttt-reset"
-                style="margin-top:14px;display:none;">🔄 Volver a jugar</button>
+                style="margin-top:14px;display:none;">${iconButton('retry', 'Volver a jugar')}</button>
       </div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'tictactoe', 'Tres en raya');
 
     makeSoundToggle(wrap);
+    const results = gameResults(ctx, 'tictactoe', wrap);
     const grid = wrap.querySelector('#ttt-grid');
     const lineSvg = wrap.querySelector('#ttt-line');
     const statusEl = wrap.querySelector('#ttt-status');
@@ -653,6 +723,12 @@
         statusEl.className = 'cg-status is-tie';
         ctx.onTie();
       }
+      const points = winner === 'X' ? 1 : winner === 'O' ? 0 : 0.5;
+      results.show({
+        score: points, points, unit: 'puntos',
+        outcome: winner === 'X' ? '🎉 ¡Ganaste a Rigo!' : winner === 'O' ? 'Rigo ganó esta vez' : '🤝 ¡Empate!',
+        replay: () => resetBtn.click()
+      });
     }
 
     resetBtn.addEventListener('click', () => {
@@ -677,7 +753,14 @@
   // =====================================================================
   reg('snake', function (ctx) {
     const SIZE = 15, CELL = 22;
+    const START_STEP_MS = 250;
+    const PRE_BOOST_MIN_STEP_MS = 150;
+    const HIGH_SCORE_STEP_MS = 120;
+    const SPEED_UP_SCORE = 20;
+    const MAX_SNAKE_LENGTH = 30;
     let snake, dir, nextDir, food, score, gameOver, loop, foodPulse = 0, stepMs = 250, paused = false;
+    let previousSnake = [], animationFrame = null, lastStepAt = 0;
+    let bonusEarned = false;
 
     const wrap = document.createElement('div');
     wrap.className = 'cg-snake-wrap';
@@ -686,42 +769,110 @@
         <span>🍎</span>
         <span>PUNTOS: <span id="snake-score-val">0</span></span>
         <span>·</span>
-        <span>META: <span id="snake-meta">5</span></span>
+        <span>BONUS: <span id="snake-meta">5</span></span>
       </div>
       <canvas class="cg-snake-canvas" id="snake-canvas"
               width="${SIZE * CELL}" height="${SIZE * CELL}"></canvas>
 
       <div class="cg-snake-controls">
-        <button class="coeduca-btn coeduca-btn-success cg-snake-start" id="snake-start">▶ START</button>
+        <button class="coeduca-btn coeduca-btn-success cg-snake-start" id="snake-start">${iconButton('play', 'START')}</button>
         <div class="cg-snake-dpad">
           <span></span>
-          <button class="coeduca-btn cg-snake-dir" data-d="up">↑</button>
+          <button class="coeduca-btn cg-snake-dir" data-d="up" aria-label="Arriba">${arrowIcon('up')}</button>
           <span></span>
-          <button class="coeduca-btn cg-snake-dir" data-d="left">←</button>
-          <button class="coeduca-btn cg-snake-dir" data-d="down">↓</button>
-          <button class="coeduca-btn cg-snake-dir" data-d="right">→</button>
+          <button class="coeduca-btn cg-snake-dir" data-d="left" aria-label="Izquierda">${arrowIcon('left')}</button>
+          <button class="coeduca-btn cg-snake-dir" data-d="down" aria-label="Abajo">${arrowIcon('down')}</button>
+          <button class="coeduca-btn cg-snake-dir" data-d="right" aria-label="Derecha">${arrowIcon('right')}</button>
         </div>
       </div>
       <div id="snake-status" class="cg-status"></div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'snake', 'Snake');
 
-    makeSoundToggle(wrap);
+    const viewport = gameViewport(wrap, 'snake', 'Snake', makeSoundToggle(wrap));
+    const results = gameResults(ctx, 'snake', wrap);
     const canvas = wrap.querySelector('#snake-canvas');
     const cctx = canvas.getContext('2d');
     const scoreVal = wrap.querySelector('#snake-score-val');
     const statusEl = wrap.querySelector('#snake-status');
     const winThreshold = (ctx.config && ctx.config.winScore) || 5;
     wrap.querySelector('#snake-meta').textContent = winThreshold;
+    const leaderboard = global.COEDUCA_LEADERBOARD
+      ? global.COEDUCA_LEADERBOARD.create(ctx, 'snake', winThreshold)
+      : { submit: () => Promise.resolve(false) };
+    const SWIPE_THRESHOLD = 18;
+    const touchCapable = 'ontouchstart' in global || (navigator.maxTouchPoints || 0) > 0;
+    let touchControlsActive = false;
+    let touchStart = null;
+    let previousOverscrollBehavior = '';
+
+    function handleGameTouchStart(event) {
+      if (!touchControlsActive) return;
+      if (!document.body.contains(wrap)) { unlockTouchControls(); return; }
+      const expandedGame = event.target.closest('.coeduca-game-viewport[data-game="snake"]');
+      if (!expandedGame && event.target !== canvas) return;
+      if (event.target.closest('.coeduca-viewport-actions, button, a, input, select, textarea')) return;
+      const touch = event.touches[0];
+      if (!touch) return;
+      touchStart = { x: touch.clientX, y: touch.clientY };
+      event.preventDefault();
+    }
+
+    function handleGameTouchMove(event) {
+      if (!touchControlsActive || !touchStart) return;
+      event.preventDefault();
+      const touch = event.touches[0];
+      if (!touch) return;
+      const dx = touch.clientX - touchStart.x;
+      const dy = touch.clientY - touchStart.y;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_THRESHOLD) return;
+      setDir(Math.abs(dx) > Math.abs(dy)
+        ? (dx > 0 ? 'right' : 'left')
+        : (dy > 0 ? 'down' : 'up'));
+      // Permite encadenar varios giros sin levantar el dedo.
+      touchStart = { x: touch.clientX, y: touch.clientY };
+    }
+
+    function handleGameTouchEnd(event) {
+      if (!touchControlsActive || !touchStart) return;
+      event.preventDefault();
+      touchStart = null;
+    }
+
+    function lockTouchControls() {
+      if (!touchCapable || touchControlsActive) return false;
+      touchControlsActive = true;
+      previousOverscrollBehavior = document.documentElement.style.overscrollBehavior;
+      document.documentElement.style.overscrollBehavior = 'none';
+      document.addEventListener('touchstart', handleGameTouchStart, { passive: false, capture: true });
+      document.addEventListener('touchmove', handleGameTouchMove, { passive: false, capture: true });
+      document.addEventListener('touchend', handleGameTouchEnd, { passive: false, capture: true });
+      document.addEventListener('touchcancel', handleGameTouchEnd, { passive: false, capture: true });
+      return true;
+    }
+
+    function unlockTouchControls() {
+      if (!touchControlsActive) return;
+      touchControlsActive = false;
+      touchStart = null;
+      document.documentElement.style.overscrollBehavior = previousOverscrollBehavior;
+      document.removeEventListener('touchstart', handleGameTouchStart, true);
+      document.removeEventListener('touchmove', handleGameTouchMove, true);
+      document.removeEventListener('touchend', handleGameTouchEnd, true);
+      document.removeEventListener('touchcancel', handleGameTouchEnd, true);
+    }
 
     function reset() {
       snake = [{ x: 7, y: 7 }, { x: 6, y: 7 }, { x: 5, y: 7 }];
       dir = { x: 1, y: 0 };
       nextDir = { x: 1, y: 0 };
+      previousSnake = snake.map(segment => ({ ...segment }));
       placeFood();
       score = 0;
-      stepMs = 250;
+      stepMs = START_STEP_MS;
       gameOver = false;
+      bonusEarned = false;
       scoreVal.textContent = '0';
       statusEl.textContent = '';
       statusEl.className = 'cg-status';
@@ -733,8 +884,30 @@
       } while (snake.some(s => s.x === food.x && s.y === food.y));
     }
 
+    function stopSmoothRendering() {
+      if (animationFrame !== null) global.cancelAnimationFrame(animationFrame);
+      animationFrame = null;
+    }
+
+    function renderSmoothFrame(now) {
+      if (gameOver || paused) { animationFrame = null; return; }
+      foodPulse = (now / 16) % 60;
+      const progress = lastStepAt ? Math.min(1, (now - lastStepAt) / stepMs) : 1;
+      draw(progress);
+      animationFrame = global.requestAnimationFrame(renderSmoothFrame);
+    }
+
+    function startSmoothRendering() {
+      stopSmoothRendering();
+      previousSnake = snake.map(segment => ({ ...segment }));
+      lastStepAt = performance.now();
+      animationFrame = global.requestAnimationFrame(renderSmoothFrame);
+    }
+
     function step() {
       if (gameOver) return;
+      previousSnake = snake.map(segment => ({ ...segment }));
+      lastStepAt = performance.now();
       dir = nextDir;
       const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
       if (head.x < 0 || head.x >= SIZE || head.y < 0 || head.y >= SIZE ||
@@ -747,23 +920,25 @@
         score++;
         scoreVal.textContent = score;
         SFX.eat();
-        // La serpiente acelera un poco con cada manzana (minimo 130ms por paso)
-        stepMs = Math.max(130, stepMs - 12);
+        // Acelera gradualmente y recibe un impulso adicional a los 20 puntos.
+        stepMs = score >= SPEED_UP_SCORE
+          ? HIGH_SCORE_STEP_MS
+          : Math.max(PRE_BOOST_MIN_STEP_MS, START_STEP_MS - score * 5);
         clearInterval(loop);
         loop = setInterval(step, stepMs);
         // Pop animado del score
         scoreVal.style.animation = 'cgPopBounce 0.3s';
         setTimeout(() => { scoreVal.style.animation = ''; }, 300);
-        if (score >= winThreshold) return win();
+        if (score >= winThreshold) awardBonus();
         placeFood();
+        // Al llegar a 30 segmentos continúa sumando, pero deja de crecer.
+        if (snake.length > MAX_SNAKE_LENGTH) snake.pop();
       } else {
         snake.pop();
       }
-      foodPulse = (foodPulse + 1) % 60;
-      draw();
     }
 
-    function draw() {
+    function draw(interpolation = 1) {
       // Fondo con grid sutil
       cctx.fillStyle = '#1d3b1f';
       cctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -802,7 +977,9 @@
 
       // Serpiente
       snake.forEach((s, i) => {
-        const x = s.x * CELL, y = s.y * CELL;
+        const previous = previousSnake[i] || s;
+        const x = (previous.x + (s.x - previous.x) * interpolation) * CELL;
+        const y = (previous.y + (s.y - previous.y) * interpolation) * CELL;
         const isHead = i === 0;
         const t = i / Math.max(snake.length - 1, 1);
         // Color: cabeza más oscura, cola más clara
@@ -844,13 +1021,26 @@
 
     function end() {
       gameOver = true; clearInterval(loop);
+      stopSmoothRendering();
+      draw(1);
+      unlockTouchControls();
+      snakeStartButton.disabled = false;
+      snakeStartButton.innerHTML = iconButton('retry', 'Volver a jugar');
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cg-status is-lose';
-      ctx.onLose();
+      leaderboard.submit(score);
+      if (!bonusEarned) ctx.onLose();
+      viewport.leave();
+      results.show({
+        score, points: bonusEarned ? 1 : 0, unit: 'puntos',
+        outcome: '💥 La serpiente chocó',
+        replay: () => snakeStartButton.click()
+      });
     }
-    function win() {
-      gameOver = true; clearInterval(loop);
-      statusEl.textContent = '🎉 ¡GANASTE!';
+    function awardBonus() {
+      if (bonusEarned) return;
+      bonusEarned = true;
+      statusEl.textContent = '🎉 ¡PUNTO EXTRA! Sigue jugando para mejorar tu récord.';
       statusEl.className = 'cg-status is-win';
       SFX.win();
       spawnConfetti(wrap, 35);
@@ -874,55 +1064,57 @@
       const map = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
       if (map[e.key]) { setDir(map[e.key]); e.preventDefault(); }
     });
-    // Swipe táctil
-    let touchStart = null;
-    canvas.addEventListener('touchstart', e => {
-      const t = e.touches[0]; touchStart = { x: t.clientX, y: t.clientY };
-    }, { passive: true });
-    canvas.addEventListener('touchend', e => {
-      if (!touchStart) return;
-      const t = e.changedTouches[0];
-      const dx = t.clientX - touchStart.x, dy = t.clientY - touchStart.y;
-      if (Math.abs(dx) > Math.abs(dy)) setDir(dx > 0 ? 'right' : 'left');
-      else setDir(dy > 0 ? 'down' : 'up');
-      touchStart = null;
-    }, { passive: true });
-
     // Pausa automatica si la pestana pierde el foco (evita muertes injustas)
     autoPause(wrap,
       () => {
-        if (!gameOver && loop) { clearInterval(loop); loop = null; paused = true; }
+        if (!gameOver && loop) {
+          clearInterval(loop); loop = null; paused = true;
+          stopSmoothRendering(); draw(1);
+        }
       },
       () => {
         if (!paused) return;
         paused = false;
         setTimeout(() => {
-          if (gameOver || paused) return;
+          if (gameOver || paused || document.hidden || wrap.classList.contains('coeduca-game-help-open')) return;
           clearInterval(loop);
           loop = setInterval(step, stepMs);
+          startSmoothRendering();
         }, 600);
       }
     );
 
-    wrap.querySelector('#snake-start').addEventListener('click', () => {
+    const snakeStartButton = wrap.querySelector('#snake-start');
+    snakeStartButton.addEventListener('click', () => {
+      stopSmoothRendering();
       reset(); draw();
+      viewport.enter();
+      snakeStartButton.innerHTML = iconButton('play', 'START');
+      snakeStartButton.disabled = true;
       clearInterval(loop);
       loop = setInterval(step, stepMs);
+      startSmoothRendering();
+      lockTouchControls();
+      if (touchControlsActive) {
+        statusEl.textContent = '📱 Desliza en cualquier área libre para controlar la serpiente.';
+      }
     });
     reset(); draw();
   });
 
   // =====================================================================
   // 3. DINO RUNNER — física mejorada (salto variable), parallax de fondo,
-  //    META visible al final y globo sorpresa de +1 punto extra.
+  //    umbral de bonus, carrera continua y globo sorpresa de +1 punto extra.
   // =====================================================================
   reg('dino', function (ctx) {
     const W = 600, H = 180;
     const GROUND_H = 8;
     const winThreshold = (ctx.config && ctx.config.winScore) || 500;
 
-    // --- Física (tick de 22ms ≈ 45fps) ---
+    // Unidades originales de 22 ms; simulación fija de 120 Hz, dibujo sincronizado con la pantalla.
     const TICK_MS = 22;
+    const STEP_MS = 1000 / 120;
+    const MAX_STEPS = 8;
     const GRAVITY_UP = 0.85;      // subiendo: más flotante
     const GRAVITY_DOWN = 1.5;     // cayendo: más pesado → el salto se siente ágil
     const HOLD_LIFT = 0.12;       // mantener pulsado da un poco más de altura
@@ -930,53 +1122,160 @@
     const JUMP_CUT_VELOCITY = -5; // al soltar se recorta el salto (saltos cortos)
     const BUFFER_FRAMES = 6;      // si pulsa justo antes de aterrizar, salta al tocar suelo
     const START_SPEED = 5.2;
-    const MAX_SPEED = 9.5;
+    const MAX_SPEED = 17;
+    const SPEED_GAIN_PER_FRAME = 0.0028;
     const PTS_PER_DIST = 1 / 24;  // puntos mostrados por píxel recorrido
     const GRACE_FRAMES = 50;
 
-    let dino, obstacles, clouds, mountains, hills, vy, onGround, gameOver, loop, speed;
+    let dino, obstacles, clouds, mountains, hills, vy, onGround, gameOver, speed;
     let frames, sunX, groundOffset, dustParticles, started;
-    let distance, finishDist, gate, jumpBuffer, jumpHeld;
+    let distance, finishDist, gate, jumpBuffer, jumpHeld, balloonPoints;
     let balloon, balloonSpawned, balloonFx, plusOne;
+    let bonusEarned = false;
+    let balloonBonusEarned = false;
 
     const wrap = document.createElement('div');
     wrap.style.position = 'relative';
     wrap.innerHTML = `
       <div style="text-align:center;">
-        <div id="dino-score" style="font-weight:900;margin-bottom:8px;font-size:18px;
+        <div id="dino-score" style="font-weight:900;margin:0 auto 8px;font-size:clamp(11px,3vw,18px);
              background:var(--coeduca-stroke);color:var(--coeduca-primary);
-             display:inline-block;padding:6px 18px;border-radius:50px;letter-spacing:1.5px;
+             display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,18px);
+             width:min(100%,560px);min-height:46px;padding:6px 10px;white-space:nowrap;box-sizing:border-box;
+             border-radius:50px;letter-spacing:clamp(0px,.15vw,1.5px);font-variant-numeric:tabular-nums;
              box-shadow:3px 3px 0 var(--coeduca-stroke);">
-          🏃 PUNTOS: <span id="dino-score-val">0</span> &nbsp;·&nbsp; 🏁 META: ${winThreshold}
+          <span>🏃 PUNTOS: <strong id="dino-score-val">0</strong></span>
+          <span>⭐ BONUS: ${winThreshold}</span>
         </div>
         <div class="cg-progress-bar" style="max-width:${W - 40}px;">
-          <div id="dino-progress" class="cg-progress-fill" style="width:0%"></div>
+          <div id="dino-progress" class="cg-progress-fill" style="width:100%;transform:scaleX(0);transform-origin:left;transition:transform .12s linear;"></div>
         </div>
         <div style="position:relative;display:inline-block;max-width:100%;">
           <canvas class="cg-dino-canvas" id="dino-canvas" width="${W}" height="${H}"></canvas>
         </div>
-        <div style="margin-top:10px;font-size:13px;font-weight:bold;color:var(--coeduca-stroke);">
-          Mantén pulsado para saltar alto, suelta pronto para saltos cortos.
-          Toca el área de juego o presiona <kbd style="background:#fff;border:2px solid var(--coeduca-stroke);border-radius:4px;padding:1px 6px;font-family:inherit;">ESPACIO</kbd>
-          · 🎈 ¡Atrapa el globo para +1 extra!
-        </div>
         <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-          <button class="coeduca-btn coeduca-btn-success" id="dino-start">▶ START</button>
-          <button class="coeduca-btn coeduca-btn-accent" id="dino-jump-btn">⬆ SALTAR</button>
+          <button class="coeduca-btn coeduca-btn-success" id="dino-start" style="display:inline-flex;align-items:center;gap:6px;">
+            ${iconButton('play', 'START')}
+          </button>
+          <button class="coeduca-btn coeduca-btn-accent" id="dino-jump-btn" style="display:inline-flex;align-items:center;gap:6px;">
+            ${iconButton('jump', 'SALTAR')}
+          </button>
         </div>
         <div id="dino-status" class="cg-status"></div>
       </div>
     `;
     ctx.container.appendChild(wrap);
-    makeSoundToggle(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'dino', 'Dino Runner');
+    const viewport = gameViewport(wrap, 'dino', 'Dino Runner', makeSoundToggle(wrap), {
+      onBackgroundPress() {
+        if (!started || gameOver || paused) return false;
+        pressJump();
+      },
+      onBackgroundRelease() {
+        releaseJump();
+      }
+    });
+    const results = gameResults(ctx, 'dino', wrap);
 
     const canvas = wrap.querySelector('#dino-canvas');
-    const cctx = canvas.getContext('2d');
+    let cctx = canvas.getContext('2d', { alpha: false });
+    const skyGradient = cctx.createLinearGradient(0, 0, 0, H);
+    skyGradient.addColorStop(0, '#87CEEB');
+    skyGradient.addColorStop(0.6, '#B3E5FC');
+    skyGradient.addColorStop(1, '#FFE4B5');
     const scoreVal = wrap.querySelector('#dino-score-val');
     const progressEl = wrap.querySelector('#dino-progress');
     const statusEl = wrap.querySelector('#dino-status');
+    const leaderboard = global.COEDUCA_LEADERBOARD
+      ? global.COEDUCA_LEADERBOARD.create(ctx, 'dino', winThreshold)
+      : { submit: () => Promise.resolve(false) };
+    let paintRequest = null, lastTime = null, accumulator = 0;
+    let resumeTimer = null, disposed = false, paused = false;
+    let lastScore = -1, lastProgress = -1, hudElapsed = 0;
+
+    function stopLoop() {
+      if (paintRequest !== null) global.cancelAnimationFrame(paintRequest);
+      paintRequest = null;
+      lastTime = null;
+      accumulator = 0;
+    }
+
+    function startLoop() {
+      stopLoop();
+      if (!disposed && started && !gameOver && !paused) {
+        lastTime = global.performance.now();
+        paintRequest = global.requestAnimationFrame(animate);
+      }
+    }
+
+    function animate(now) {
+      paintRequest = null;
+      if (!wrap.isConnected) { dispose(); return; }
+      if (disposed || gameOver || paused || !started) return;
+      // Acotar la recuperación evita una avalancha de trabajo tras un bloqueo.
+      accumulator += Math.min(Math.max(0, now - lastTime), STEP_MS * MAX_STEPS);
+      lastTime = now;
+      let steps = 0;
+      while (accumulator + 0.000001 >= STEP_MS && steps < MAX_STEPS && !gameOver) {
+        step(STEP_MS / TICK_MS);
+        accumulator -= STEP_MS;
+        steps++;
+      }
+      if (gameOver || disposed) return;
+      updateHud();
+      draw();
+      paintRequest = global.requestAnimationFrame(animate);
+    }
+
+    function updateHud(force = false) {
+      if (!force && hudElapsed < 90) return;
+      hudElapsed = 0;
+      const score = displayedScore();
+      if (score !== lastScore) { scoreVal.textContent = String(score); lastScore = score; }
+      const progress = Math.min(1, score / winThreshold);
+      if (progress !== lastProgress) {
+        progressEl.style.transform = 'scaleX(' + progress + ')';
+        lastProgress = progress;
+      }
+    }
+
+    // Rasterizar una vez: los cuadros de juego solo copian estas imágenes pequeñas.
+    function bitmap(width, height, paint) {
+      const surface = document.createElement('canvas');
+      surface.width = Math.ceil(width); surface.height = Math.ceil(height);
+      const mainContext = cctx;
+      cctx = surface.getContext('2d');
+      try { paint(); } finally { cctx = mainContext; }
+      return surface;
+    }
+    let sprites;
+    function prepareSprites() {
+      if (!sprites) {
+        sprites = {
+          cactus_s: bitmap(24, 40, () => drawCactus({ x: 4, y: 8, w: 16, h: 30 }, false)),
+          cactus_l: bitmap(30, 54, () => drawCactus({ x: 4, y: 8, w: 22, h: 44 }, true)),
+          birds: [0, 10].map(flap => bitmap(48, 42, () => drawBird({ x: 10, y: 12, w: 28, h: 20, flap }))),
+          balloon: bitmap(36, 62, () => drawBalloon({ x: 18, y: 16, r: 13, bob: 0 })),
+          dinos: [10, 15, 10, 0, 5, 0].map((frame, i) =>
+            bitmap(58, 56, () => drawDino({ x: 12, y: 10, w: 36, h: 42 }, i % 3 !== 2, frame))),
+          sun: bitmap(84, 84, () => { cctx.translate(0, 7); drawSun(42); }),
+          sunRays: bitmap(64, 64, () => { cctx.translate(32, 32); drawSunRays(); })
+        };
+      }
+      for (const cloud of clouds) cloud.sprite = bitmap(cloud.w * 1.2, cloud.h * 2 + 8, () =>
+        drawCloud({ x: 2, y: cloud.h + 4, w: cloud.w, h: cloud.h }));
+      for (const m of mountains) m.sprite = bitmap(m.w, m.h, () => {
+        cctx.translate(0, m.h - (H - GROUND_H)); drawMountain({ ...m, x: 0 });
+      });
+      for (const h of hills) h.sprite = bitmap(h.w, h.h + 18, () => {
+        cctx.translate(0, h.h + 18 - (H - GROUND_H)); drawHill({ ...h, x: 0 });
+      });
+    }
 
     function reset() {
+      stopLoop();
+      clearTimeout(resumeTimer); resumeTimer = null;
+      paused = false;
       dino = { x: 50, y: H - 42 - GROUND_H, w: 36, h: 42 };
       obstacles = [];
       clouds = [
@@ -988,28 +1287,34 @@
       hills = [];
       for (let i = 0; i < 4; i++) {
         mountains.push({ x: i * 190 + Math.random() * 60, w: 150 + Math.random() * 80, h: 45 + Math.random() * 25 });
-        hills.push({ x: i * 170 + Math.random() * 50, w: 130 + Math.random() * 70, h: 22 + Math.random() * 14 });
+        hills.push({ x: i * 170 + Math.random() * 50, w: 130 + Math.random() * 70,
+          h: 22 + Math.random() * 14, curlStyle: i % 3 });
       }
       vy = 0; onGround = true;
       gameOver = false; speed = START_SPEED;
+      bonusEarned = false;
+      balloonBonusEarned = false;
       frames = 0;
       sunX = W - 60;
       groundOffset = 0;
       dustParticles = [];
       started = false;
       distance = 0;
+      balloonPoints = 0;
       finishDist = winThreshold / PTS_PER_DIST;
       gate = null;
       jumpBuffer = 0; jumpHeld = false;
       balloon = null; balloonSpawned = false; balloonFx = []; plusOne = null;
       scoreVal.textContent = '0';
-      progressEl.style.width = '0%';
+      progressEl.style.transform = 'scaleX(0)';
       statusEl.textContent = '';
       statusEl.className = 'cg-status';
+      lastScore = 0; lastProgress = 0; hudElapsed = 0;
+      prepareSprites();
     }
 
     function displayedScore() {
-      return Math.min(winThreshold, Math.floor(distance * PTS_PER_DIST));
+      return Math.floor(distance * PTS_PER_DIST) + balloonPoints;
     }
 
     function spawnDust(n, cx, dirY) {
@@ -1025,12 +1330,19 @@
       }
     }
 
-    // El salto se pide (buffer) y se ejecuta en el tick cuando hay suelo:
-    // así, pulsar un instante antes de aterrizar también funciona.
+    // Saltar al presionar; en el aire, guardar brevemente la petición para el aterrizaje.
     function pressJump() {
-      if (gameOver || !started) return;
+      if (disposed || gameOver || !started || paused || resumeTimer !== null) return;
       jumpHeld = true;
       jumpBuffer = BUFFER_FRAMES;
+      if (onGround) beginJump();
+    }
+    function beginJump() {
+      vy = jumpHeld ? JUMP_VELOCITY : JUMP_CUT_VELOCITY;
+      onGround = false;
+      jumpBuffer = 0;
+      spawnDust(6, dino.x + dino.w / 2, -1);
+      SFX.jump();
     }
     function releaseJump() {
       jumpHeld = false;
@@ -1048,10 +1360,16 @@
       }
     }
 
-    // 🎈 Al tocar el globo: explota, muestra +1 y suma un punto extra real
+    // 🎈 Al tocar el globo: explota, suma 100 al marcador y un punto extra real
     // (el core lo limita a una vez por sesión y lo mete en la nota web y PDF).
     function popBalloon(bx, by) {
       balloon = null;
+      balloonBonusEarned = true;
+      balloonPoints = 100;
+      const boostedScore = displayedScore();
+      scoreVal.textContent = String(boostedScore);
+      progressEl.style.transform = 'scaleX(' + Math.min(1, boostedScore / winThreshold) + ')';
+      if (boostedScore >= winThreshold) awardBonus();
       const colors = ['#FF6B9D', '#FFD700', '#4FC3F7', '#E63946', '#fff'];
       for (let i = 0; i < 14; i++) {
         const ang = (i / 14) * Math.PI * 2;
@@ -1067,33 +1385,29 @@
       }
       plusOne = { x: bx, y: by - 6, life: 55 };
       SFX.pop();
-      if (C.addBalloonBonus) C.addBalloonBonus();
+      if (ctx.onBalloonBonus) ctx.onBalloonBonus();
+      else if (C.addBalloonBonus) C.addBalloonBonus();
       if (global.rigo && global.rigo.say) {
-        global.rigo.say('¡Atrapaste el globo! +1 punto extra 🎈', 4000);
+        global.rigo.say('¡Globo! +100 puntos y +1 punto extra 🎈', 4000);
       }
       spawnConfetti(wrap, 15);
     }
 
-    function step() {
+    function step(dt) {
       if (gameOver) return;
-      frames++;
+      const previousFrame = frames;
+      frames += dt;
+      hudElapsed += dt * TICK_MS;
 
-      // --- Salto con buffer ---
       if (jumpBuffer > 0) {
-        jumpBuffer--;
-        if (onGround) {
-          vy = JUMP_VELOCITY;
-          onGround = false;
-          jumpBuffer = 0;
-          spawnDust(6, dino.x + dino.w / 2, -1);
-          SFX.jump();
-        }
+        if (onGround) beginJump();
+        else jumpBuffer = Math.max(0, jumpBuffer - dt);
       }
 
       // --- Gravedad asimétrica: flotante al subir, pesada al caer ---
-      vy += (vy < 0 ? GRAVITY_UP : GRAVITY_DOWN);
-      if (jumpHeld && vy < 0) vy -= HOLD_LIFT;
-      dino.y += vy;
+      vy += (vy < 0 ? GRAVITY_UP : GRAVITY_DOWN) * dt;
+      if (jumpHeld && vy < 0) vy -= HOLD_LIFT * dt;
+      dino.y += vy * dt;
 
       const groundYPos = H - dino.h - GROUND_H;
       if (dino.y >= groundYPos) {
@@ -1102,7 +1416,7 @@
       }
 
       // Polvo de carrera (continuo)
-      if (onGround && frames % 6 === 0) {
+      if (onGround && Math.floor(frames / 6) !== Math.floor(previousFrame / 6)) {
         dustParticles.push({
           x: dino.x + 4,
           y: H - GROUND_H,
@@ -1112,28 +1426,29 @@
           size: 2 + Math.random() * 1.5
         });
       }
-      dustParticles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.life--; });
-      dustParticles = dustParticles.filter(p => p.life > 0);
+      updateParticles(dustParticles, dt, 0.1);
 
       // --- Avance y puntaje por distancia recorrida ---
-      distance += speed;
-      scoreVal.textContent = displayedScore();
-      progressEl.style.width = Math.min(100, (distance / finishDist) * 100) + '%';
+      distance += speed * dt;
+      const shownScore = displayedScore();
+      if (shownScore >= winThreshold) awardBonus();
 
       // --- Obstáculos ---
       obstacles.forEach(o => {
-        o.x -= speed;
-        if (o.type === 'bird') o.flap = (o.flap + 1) % 20;
+        o.x -= speed * dt;
+        if (o.type === 'bird') o.flap = (o.flap + dt) % 20;
       });
-      obstacles = obstacles.filter(o => o.x + o.w > 0);
+      while (obstacles.length && obstacles[0].x + obstacles[0].w < -10) obstacles.shift();
 
-      // Cerca de la meta dejamos de generar obstáculos: la recta final es libre.
-      const nearFinish = distance >= finishDist - (W + 550);
-      if (frames > GRACE_FRAMES && !nearFinish) {
+      // La carrera no termina en la meta: los obstaculos siguen apareciendo.
+      if (frames > GRACE_FRAMES) {
         const last = obstacles.length ? obstacles[obstacles.length - 1].x : -Infinity;
-        const gap = 190 + speed * 18; // separación mínima crece con la velocidad
-        const chance = 0.025 + Math.min(0.02, frames / 8000);
-        if (W - last >= gap && Math.random() < chance) spawnObstacle();
+        const difficulty = Math.min(1, frames / 3200);
+        // Con el tiempo aparecen antes y, al subir la velocidad, hay menos
+        // segundos de descanso entre ellos sin crear combinaciones imposibles.
+        const gap = 285 - difficulty * 70 + speed * 5;
+        const chance = 0.055 + difficulty * 0.045;
+        if (W - last >= gap && Math.random() < 1 - Math.pow(1 - chance, dt)) spawnObstacle();
       }
 
       // --- Globo de bonus: aparece UNA sola vez, casi al final (80% del
@@ -1146,8 +1461,8 @@
         balloon = { x: W + 30, y: H - GROUND_H - 78, r: 13, bob: Math.random() * 6 };
       }
       if (balloon) {
-        balloon.x -= speed;
-        balloon.bob += 0.12;
+        balloon.x -= speed * dt;
+        balloon.bob += 0.12 * dt;
         const by = balloon.y + Math.sin(balloon.bob) * 5;
         // Colisión círculo-rectángulo con el dino
         const nx = Math.max(dino.x, Math.min(balloon.x, dino.x + dino.w));
@@ -1159,52 +1474,36 @@
           balloon = null;
         }
       }
-      balloonFx.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--; });
-      balloonFx = balloonFx.filter(p => p.life > 0);
+      updateParticles(balloonFx, dt, 0.15);
       if (plusOne) {
-        plusOne.y -= 0.8;
-        plusOne.life--;
+        plusOne.y -= 0.8 * dt;
+        plusOne.life -= dt;
         if (plusOne.life <= 0) plusOne = null;
-      }
-
-      // La META aparece de modo que al cruzarla se cumplan justo los puntos.
-      if (!gate && distance >= finishDist - (W + 20 - dino.x - dino.w)) {
-        gate = { x: W + 20 };
-      }
-      if (gate) {
-        gate.x -= speed;
-        if (gate.x + 35 < dino.x + dino.w / 2) return win();
       }
 
       // --- Parallax: nubes, montañas, lomas, sol, suelo ---
       clouds.forEach(c => {
-        c.x -= speed * 0.3;
+        c.x -= speed * 0.3 * dt;
         if (c.x + c.w < 0) {
           c.x = W + Math.random() * 100;
           c.y = 15 + Math.random() * 50;
-          c.w = 36 + Math.random() * 30;
-          c.h = 12 + Math.random() * 8;
         }
       });
       mountains.forEach(m => {
-        m.x -= speed * 0.12;
+        m.x -= speed * 0.12 * dt;
         if (m.x + m.w < 0) {
           m.x = W + Math.random() * 80;
-          m.w = 150 + Math.random() * 80;
-          m.h = 45 + Math.random() * 25;
         }
       });
       hills.forEach(hh => {
-        hh.x -= speed * 0.25;
+        hh.x -= speed * 0.25 * dt;
         if (hh.x + hh.w < 0) {
           hh.x = W + Math.random() * 60;
-          hh.w = 130 + Math.random() * 70;
-          hh.h = 22 + Math.random() * 14;
         }
       });
-      sunX -= speed * 0.05;
+      sunX -= speed * 0.05 * dt;
       if (sunX < -30) sunX = W + 30;
-      groundOffset = (groundOffset + speed) % 28;
+      groundOffset = (groundOffset + speed * dt) % 28;
 
       // --- Colisión con obstáculos ---
       const pad = 5;
@@ -1217,10 +1516,18 @@
         }
       }
 
-      // Aceleración suave con límite
-      if (frames % 240 === 0 && speed < MAX_SPEED) speed += 0.25;
+      // Aceleración continua: se nota desde los primeros segundos y sigue
+      // aumentando hasta una velocidad realmente desafiante.
+      speed = Math.min(MAX_SPEED, START_SPEED + frames * SPEED_GAIN_PER_FRAME);
+    }
 
-      draw();
+    function updateParticles(items, dt, gravity) {
+      let alive = 0;
+      for (const p of items) {
+        p.x += p.vx * dt; p.y += p.vy * dt; p.vy += gravity * dt; p.life -= dt;
+        if (p.life > 0) items[alive++] = p;
+      }
+      items.length = alive;
     }
 
     function drawCloud(c) {
@@ -1258,39 +1565,86 @@
       const baseY = H - GROUND_H;
       const cx = hh.x + hh.w / 2;
 
-      // Cuerpo del arbusto en dos tonos
+      // Contorno ondulado: cada tramo forma un mechón redondo.
       cctx.fillStyle = '#C9D96A';
       cctx.beginPath();
-      cctx.ellipse(cx, baseY, hh.w / 2, hh.h, 0, Math.PI, Math.PI * 2);
+      cctx.moveTo(hh.x, baseY);
+      for (let i = 0; i < 12; i++) {
+        const middle = Math.PI - (i + 0.5) * Math.PI / 12;
+        const end = Math.PI - (i + 1) * Math.PI / 12;
+        cctx.quadraticCurveTo(
+          cx + Math.cos(middle) * (hh.w / 2 + 7), baseY - Math.sin(middle) * (hh.h + 9),
+          cx + Math.cos(end) * hh.w / 2, baseY - Math.sin(end) * hh.h
+        );
+      }
+      cctx.closePath();
       cctx.fill();
+      // Manchas claras en forma de copos en lugar de una superficie lisa.
       cctx.fillStyle = '#DCE799';
-      cctx.beginPath();
-      cctx.ellipse(cx - hh.w * 0.22, baseY, hh.w * 0.22, hh.h * 0.75, 0, Math.PI, Math.PI * 2);
-      cctx.ellipse(cx + hh.w * 0.2, baseY, hh.w * 0.26, hh.h * 0.85, 0, Math.PI, Math.PI * 2);
-      cctx.fill();
+      const tufts = [[-0.37, 0.25, 0.12], [-0.22, 0.48, 0.16],
+        [0, 0.62, 0.19], [0.22, 0.47, 0.16], [0.37, 0.25, 0.12]];
+      for (const [offset, rise, radius] of tufts) {
+        cctx.beginPath();
+        cctx.ellipse(cx + offset * hh.w, baseY - rise * hh.h,
+          radius * hh.w, hh.h * 0.24, 0, 0, Math.PI * 2);
+        cctx.fill();
+      }
 
-      // Zarcillos rizados que asoman por arriba
-      cctx.strokeStyle = '#A4B84D';
-      cctx.lineWidth = 1.5;
+      // Cada arbusto lleva pocos rizos, con distinta distribución y orientación.
+      // Se dibujan una sola vez en el sprite del fondo.
+      const curlLayouts = [
+        [[-0.26, 1, -0.35, 1], [0.19, -1, 0.42, 0.85]],
+        [[-0.34, -1, 0.2, 0.82], [-0.02, 1, -0.4, 1.05], [0.32, -1, 0.15, 0.9]],
+        [[-0.38, 1, 0.3, 0.75], [-0.15, -1, -0.3, 1],
+          [0.15, 1, 0.25, 0.9], [0.36, -1, -0.2, 0.8]]
+      ];
+      const curlStyle = hh.curlStyle || 0;
+
+      // Uno o dos zarcillos sobresalen de la silueta.
+      cctx.strokeStyle = '#78983B';
+      cctx.lineWidth = 2.2;
       cctx.lineCap = 'round';
-      const curls = [[-0.18, 1.0, 1], [0.08, 1.08, -1], [0.3, 0.82, 1]];
-      curls.forEach(cd => {
-        const px = cx + cd[0] * hh.w;
-        const py = baseY - cd[1] * hh.h;
-        const dir = cd[2];
-        // tallo
+      const tendrils = [[[-0.11, -1]], [[0.1, 1]], [[-0.24, -1], [0.26, 1]]];
+      for (const [offset, direction] of tendrils[curlStyle]) {
+        const px = cx + offset * hh.w;
+        const rise = hh.h * Math.sqrt(1 - 4 * offset * offset);
+        const py = baseY - rise + 5;
+        cctx.save();
+        cctx.translate(px, py);
+        cctx.scale(direction, 1);
         cctx.beginPath();
-        cctx.moveTo(px, py + 9);
-        cctx.quadraticCurveTo(px - 2 * dir, py + 4, px, py);
+        cctx.moveTo(0, 8);
+        cctx.quadraticCurveTo(-4, -3, 2, -5);
+        cctx.arc(5, -5, 3, Math.PI, Math.PI * 2.8);
         cctx.stroke();
-        // rizo en espiral
+        cctx.restore();
+      }
+
+      // Espirales internas: dos, tres o cuatro según el arbusto.
+      cctx.strokeStyle = '#77993D';
+      cctx.lineWidth = 2;
+      for (const [offset, direction, rotation, size] of curlLayouts[curlStyle]) {
+        const rise = hh.h * Math.sqrt(1 - 4 * offset * offset);
+        const px = cx + offset * hh.w;
+        const py = baseY - rise * 0.55;
+        const radius = (2.7 + rise * 0.075) * size;
+        cctx.save();
+        cctx.translate(px, py);
+        cctx.rotate(rotation);
+        cctx.scale(direction, 1);
         cctx.beginPath();
-        cctx.arc(px + 2 * dir, py - 2, 3, Math.PI * 0.5, Math.PI * 2.2);
+        for (let i = 0; i <= 18; i++) {
+          const t = i / 18;
+          const angle = Math.PI * (0.25 + t * 2.8);
+          const r = radius * (1 - t * 0.82);
+          const x = Math.cos(angle) * r;
+          const y = Math.sin(angle) * r;
+          if (i === 0) cctx.moveTo(x, y);
+          else cctx.lineTo(x, y);
+        }
         cctx.stroke();
-        cctx.beginPath();
-        cctx.arc(px + 2 * dir, py - 2, 1.4, Math.PI * 0.5, Math.PI * 1.8);
-        cctx.stroke();
-      });
+        cctx.restore();
+      }
       cctx.lineCap = 'butt';
 
       // Bayas (posiciones fijas relativas para que no parpadeen)
@@ -1312,16 +1666,9 @@
 
     // Dino cartoon: cresta ARRIBA (cabeza y lomo), panza clara, cola curva,
     // hocico con fosa nasal y ojo grande con brillo.
-    function drawDino() {
+    function drawDino(dino, onGround, frames) {
       cctx.save();
       const x = dino.x, y = dino.y, w = dino.w, h = dino.h;
-
-      // Sombra en el suelo
-      cctx.fillStyle = 'rgba(0,0,0,0.2)';
-      const shadowScale = onGround ? 1 : Math.max(0.3, 1 - (groundY() - dino.y) / 80);
-      cctx.beginPath();
-      cctx.ellipse(x + w / 2, H - 6, (w / 2 + 2) * shadowScale, 4 * shadowScale, 0, 0, Math.PI * 2);
-      cctx.fill();
 
       const bodyGrad = cctx.createLinearGradient(x, y, x, y + h);
       bodyGrad.addColorStop(0, '#66BB6A');
@@ -1628,11 +1975,11 @@
       cctx.beginPath();
       cctx.ellipse(b.x - 4, by - 5, 3, 4.5, -0.5, 0, Math.PI * 2);
       cctx.fill();
-      // Etiqueta +1
+      // Etiqueta de puntos del globo
       cctx.fillStyle = '#fff';
-      cctx.font = 'bold 10px Comic Sans MS, system-ui';
+      cctx.font = 'bold 8px Comic Sans MS, system-ui';
       cctx.textAlign = 'center';
-      cctx.fillText('+1', b.x, by + 4);
+      cctx.fillText('+100', b.x, by + 4);
       cctx.restore();
     }
 
@@ -1694,25 +2041,9 @@
       cctx.fillText('META', bx + bw / 2, by + bh + 4);
     }
 
-    function draw() {
-      // Cielo gradiente
-      const sky = cctx.createLinearGradient(0, 0, 0, H);
-      sky.addColorStop(0, '#87CEEB');
-      sky.addColorStop(0.6, '#B3E5FC');
-      sky.addColorStop(1, '#FFE4B5');
-      cctx.fillStyle = sky;
-      cctx.fillRect(0, 0, W, H);
-
-      // Sol: halo, rayos giratorios y carita feliz con cachetes
-      const haloGrad = cctx.createRadialGradient(sunX, 35, 18, sunX, 35, 42);
-      haloGrad.addColorStop(0, 'rgba(255, 215, 0, 0.5)');
-      haloGrad.addColorStop(1, 'rgba(255, 215, 0, 0)');
-      cctx.fillStyle = haloGrad;
-      cctx.fillRect(sunX - 42, -7, 84, 84);
+    function drawSunRays() {
       // Rayos
       cctx.save();
-      cctx.translate(sunX, 35);
-      cctx.rotate((frames * 0.004) % (Math.PI * 2));
       cctx.fillStyle = '#FFD700';
       cctx.strokeStyle = '#1a1a1a';
       cctx.lineWidth = 1.5;
@@ -1726,42 +2057,65 @@
         cctx.fill(); cctx.stroke();
       }
       cctx.restore();
+    }
+
+    function drawSun(x) {
+      // Sol: halo, rayos giratorios y carita feliz con cachetes
+      const haloGrad = cctx.createRadialGradient(x, 35, 18, x, 35, 42);
+      haloGrad.addColorStop(0, 'rgba(255, 215, 0, 0.5)');
+      haloGrad.addColorStop(1, 'rgba(255, 215, 0, 0)');
+      cctx.fillStyle = haloGrad;
+      cctx.fillRect(x - 42, -7, 84, 84);
       // Disco
       cctx.fillStyle = '#FFD700';
       cctx.strokeStyle = '#1a1a1a';
       cctx.lineWidth = 2;
       cctx.beginPath();
-      cctx.arc(sunX, 35, 18, 0, Math.PI * 2);
+      cctx.arc(x, 35, 18, 0, Math.PI * 2);
       cctx.fill(); cctx.stroke();
       // Ojos felices (arcos ∩)
       cctx.lineWidth = 2;
       cctx.lineCap = 'round';
       cctx.beginPath();
-      cctx.arc(sunX - 6, 33, 3, Math.PI * 1.1, Math.PI * 1.9);
+      cctx.arc(x - 6, 33, 3, Math.PI * 1.1, Math.PI * 1.9);
       cctx.stroke();
       cctx.beginPath();
-      cctx.arc(sunX + 6, 33, 3, Math.PI * 1.1, Math.PI * 1.9);
+      cctx.arc(x + 6, 33, 3, Math.PI * 1.1, Math.PI * 1.9);
       cctx.stroke();
       // Cachetes
       cctx.fillStyle = 'rgba(255, 107, 157, 0.45)';
       cctx.beginPath();
-      cctx.arc(sunX - 9, 39, 2.8, 0, Math.PI * 2);
-      cctx.arc(sunX + 9, 39, 2.8, 0, Math.PI * 2);
+      cctx.arc(x - 9, 39, 2.8, 0, Math.PI * 2);
+      cctx.arc(x + 9, 39, 2.8, 0, Math.PI * 2);
       cctx.fill();
       // Sonrisa
       cctx.strokeStyle = '#1a1a1a';
       cctx.lineWidth = 2;
       cctx.beginPath();
-      cctx.arc(sunX, 38, 6, Math.PI * 0.15, Math.PI * 0.85);
+      cctx.arc(x, 38, 6, Math.PI * 0.15, Math.PI * 0.85);
       cctx.stroke();
       cctx.lineCap = 'butt';
 
+    }
+
+    function draw() {
+      // Cielo gradiente
+      cctx.fillStyle = skyGradient;
+      cctx.fillRect(0, 0, W, H);
+
+      cctx.drawImage(sprites.sun, sunX - 42, -7);
+      cctx.save();
+      cctx.translate(sunX, 35);
+      cctx.rotate((frames * 0.004) % (Math.PI * 2));
+      cctx.drawImage(sprites.sunRays, -32, -32);
+      cctx.restore();
+
       // Parallax lejano: montañas y lomas
-      mountains.forEach(drawMountain);
-      hills.forEach(drawHill);
+      mountains.forEach(m => cctx.drawImage(m.sprite, m.x, H - GROUND_H - m.h));
+      hills.forEach(h => cctx.drawImage(h.sprite, h.x, H - GROUND_H - h.h - 18));
 
       // Nubes
-      clouds.forEach(drawCloud);
+      clouds.forEach(c => cctx.drawImage(c.sprite, c.x - 2, c.y - c.h - 4));
 
       // Suelo
       cctx.fillStyle = '#D2B48C';
@@ -1792,18 +2146,25 @@
 
       // Obstáculos
       obstacles.forEach(o => {
-        if (o.type === 'bird') drawBird(o);
-        else drawCactus(o, o.type === 'cactus_l');
+        if (o.type === 'bird') cctx.drawImage(sprites.birds[o.flap < 10 ? 0 : 1], o.x - 10, o.y - 12);
+        else cctx.drawImage(sprites[o.type], o.x - 4, o.y - 8);
       });
 
       // Globo de bonus
-      if (balloon) drawBalloon(balloon);
+      if (balloon) cctx.drawImage(sprites.balloon, balloon.x - 18, balloon.y + Math.sin(balloon.bob) * 5 - 16);
 
       // META (detrás del dino para que el dino la cruce por delante)
       if (gate) drawGate(gate);
 
       // Dino
-      drawDino();
+      const shadowScale = onGround ? 1 : Math.max(0.3, 1 - (groundY() - dino.y) / 80);
+      cctx.fillStyle = 'rgba(0,0,0,0.2)';
+      cctx.beginPath();
+      cctx.ellipse(dino.x + dino.w / 2, H - 6, (dino.w / 2 + 2) * shadowScale, 4 * shadowScale, 0, 0, Math.PI * 2);
+      cctx.fill();
+      const pose = onGround ? Math.floor(frames / 5) % 2 : 2;
+      const blink = frames % 200 < 6;
+      cctx.drawImage(sprites.dinos[pose + (blink ? 3 : 0)], dino.x - 12, dino.y - 10);
 
       // Partículas de la explosión del globo
       balloonFx.forEach(p => {
@@ -1815,7 +2176,7 @@
       });
       cctx.globalAlpha = 1;
 
-      // "+1" flotante al explotar el globo
+      // "+100" flotante al explotar el globo
       if (plusOne) {
         cctx.save();
         cctx.globalAlpha = Math.min(1, plusOne.life / 20);
@@ -1823,9 +2184,9 @@
         cctx.textAlign = 'center';
         cctx.strokeStyle = '#1a1a1a';
         cctx.lineWidth = 4;
-        cctx.strokeText('+1', plusOne.x, plusOne.y);
+        cctx.strokeText('+100', plusOne.x, plusOne.y);
         cctx.fillStyle = '#FFD700';
-        cctx.fillText('+1', plusOne.x, plusOne.y);
+        cctx.fillText('+100', plusOne.x, plusOne.y);
         cctx.restore();
       }
 
@@ -1857,26 +2218,34 @@
     }
 
     function end() {
-      gameOver = true; clearInterval(loop);
+      gameOver = true; stopLoop();
+      clearTimeout(resumeTimer); resumeTimer = null;
+      updateHud(true); draw();
+      dinoStartButton.disabled = false;
+      dinoStartButton.innerHTML = iconButton('retry', 'Volver a jugar');
       SFX.die();
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cg-status is-lose';
-      ctx.onLose();
+      leaderboard.submit(displayedScore());
+      if (!bonusEarned) ctx.onLose();
+      viewport.leave();
+      results.show({
+        score: displayedScore(), points: (bonusEarned ? 1 : 0) + (balloonBonusEarned ? 1 : 0),
+        unit: 'puntos', outcome: '💥 El dinosaurio chocó',
+        replay: () => dinoStartButton.click()
+      });
     }
-    function win() {
-      gameOver = true; clearInterval(loop);
-      scoreVal.textContent = winThreshold;
-      progressEl.style.width = '100%';
-      draw();
+    function awardBonus() {
+      if (bonusEarned) return;
+      bonusEarned = true;
       SFX.win();
-      statusEl.textContent = '🏁 ¡META ALCANZADA!';
+      statusEl.textContent = '🏁 ¡PUNTO EXTRA! Sigue corriendo para mejorar tu récord.';
       statusEl.className = 'cg-status is-win';
       spawnConfetti(wrap, 50);
       ctx.onWin();
     }
 
     // Pausa automática si la pestaña pierde el foco (evita muertes injustas)
-    let paused = false;
     function drawOverlayBox(text) {
       cctx.fillStyle = 'rgba(26,26,26,0.85)';
       cctx.fillRect(W / 2 - 90, H / 2 - 22, 180, 38);
@@ -1888,54 +2257,93 @@
       cctx.textAlign = 'center';
       cctx.fillText(text, W / 2, H / 2 + 4);
     }
-    autoPause(wrap,
+    const removeAutoPause = autoPause(wrap,
       () => {
-        if (started && !gameOver && loop) {
-          clearInterval(loop); loop = null;
-          paused = true; jumpHeld = false;
-          drawOverlayBox('⏸ PAUSA');
-        }
+        if (!started || gameOver || disposed) return;
+        stopLoop();
+        clearTimeout(resumeTimer); resumeTimer = null;
+        paused = true; jumpHeld = false; jumpBuffer = 0;
+        activePointer = null;
+        draw(); drawOverlayBox('⏸ PAUSA');
       },
       () => {
-        if (!paused) return;
-        paused = false;
-        draw();
-        drawOverlayBox('LISTO...');
-        setTimeout(() => {
-          if (gameOver || !started || paused) return;
-          clearInterval(loop);
-          loop = setInterval(step, TICK_MS);
+        if (!paused || disposed) return;
+        clearTimeout(resumeTimer);
+        draw(); drawOverlayBox('LISTO...');
+        resumeTimer = setTimeout(() => {
+          resumeTimer = null;
+          if (disposed || gameOver || !started || document.hidden || !wrap.isConnected || wrap.classList.contains('coeduca-game-help-open')) return;
+          paused = false;
+          startLoop();
         }, 900);
       }
     );
 
-    canvas.addEventListener('mousedown', e => { pressJump(); e.preventDefault(); });
-    canvas.addEventListener('mouseup', releaseJump);
-    canvas.addEventListener('mouseleave', releaseJump);
-    canvas.addEventListener('touchstart', e => { pressJump(); e.preventDefault(); }, { passive: false });
-    canvas.addEventListener('touchend', releaseJump);
-    canvas.addEventListener('touchcancel', releaseJump);
-    document.addEventListener('keydown', e => {
-      if (isTypingTarget(e)) return;
+    let activePointer = null;
+    const jumpBtn = wrap.querySelector('#dino-jump-btn');
+    for (const target of [canvas, jumpBtn]) {
+      target.style.touchAction = 'none';
+      target.style.userSelect = 'none';
+      target.addEventListener('pointerdown', event => {
+        if (activePointer !== null || event.isPrimary === false || (event.button != null && event.button !== 0)) return;
+        activePointer = event.pointerId;
+        if (target.setPointerCapture) target.setPointerCapture(event.pointerId);
+        event.preventDefault();
+        pressJump();
+      });
+      for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+        target.addEventListener(type, event => {
+          if (event.pointerId !== activePointer) return;
+          activePointer = null;
+          releaseJump();
+        });
+      }
+      target.addEventListener('contextmenu', event => event.preventDefault());
+    }
+    function onKeyDown(e) {
+      if (isTypingTarget(e) || !wrap.isConnected || paused) return;
       if (e.code === 'Space' && started && !gameOver) {
         if (!e.repeat) pressJump();
         e.preventDefault();
       }
+    }
+    function onKeyUp(e) { if (e.code === 'Space') releaseJump(); }
+    function onBlur() { activePointer = null; releaseJump(); jumpBuffer = 0; }
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+    global.addEventListener('blur', onBlur);
+    // Activación por teclado/tecnología de asistencia (los punteros ya saltaron al bajar).
+    jumpBtn.addEventListener('click', event => {
+      if (event.detail === 0) { pressJump(); releaseJump(); }
     });
-    document.addEventListener('keyup', e => {
-      if (e.code === 'Space') releaseJump();
+    const dinoStartButton = wrap.querySelector('#dino-start');
+    dinoStartButton.addEventListener('click', () => {
+      if (disposed) return;
+      prepareSound(); // Desbloquear el audio con START, antes del primer salto.
+      results.hide();
+      reset(); activePointer = null; started = true; draw();
+      viewport.enter();
+      dinoStartButton.innerHTML = iconButton('play', 'START');
+      dinoStartButton.disabled = true;
+      startLoop();
     });
-    const jumpBtn = wrap.querySelector('#dino-jump-btn');
-    jumpBtn.addEventListener('mousedown', pressJump);
-    jumpBtn.addEventListener('mouseup', releaseJump);
-    jumpBtn.addEventListener('mouseleave', releaseJump);
-    jumpBtn.addEventListener('touchstart', e => { pressJump(); e.preventDefault(); }, { passive: false });
-    jumpBtn.addEventListener('touchend', releaseJump);
-    wrap.querySelector('#dino-start').addEventListener('click', () => {
-      reset(); started = true; draw();
-      clearInterval(loop);
-      loop = setInterval(step, TICK_MS);
-    });
+    function dispose() {
+      if (disposed) return;
+      disposed = true;
+      stopLoop();
+      clearTimeout(resumeTimer); resumeTimer = null;
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keyup', onKeyUp);
+      global.removeEventListener('blur', onBlur);
+      removeAutoPause();
+      removalObserver.disconnect();
+      viewport.destroy();
+      sprites = null;
+    }
+    const removalObserver = typeof MutationObserver !== 'undefined'
+      ? new MutationObserver(() => { if (!wrap.isConnected) dispose(); })
+      : { observe() {}, disconnect() {} };
+    removalObserver.observe(document.body, { childList: true, subtree: true });
     reset(); draw();
   });
 
@@ -1966,6 +2374,18 @@
           gap: 6px;
           flex-wrap: wrap;
           justify-content: center;
+          max-width: 100% !important;
+        }
+        .cg-hm-wrap, .cv-hm-wrap { max-width: 100%; min-width: 0; }
+        .cg-hm-wrap > .cg-snake-score, .cv-hm-wrap > .cv-snake-score {
+          max-width: 100%; flex-wrap: wrap; justify-content: center; gap: 4px 8px;
+        }
+        #hm-keys { width: 100%; max-width: 420px; min-width: 0; }
+        .cg-hm-keys-row, .cv-hm-keys-row { width: 100%; gap: 4px; }
+        #hm-keys .cg-hm-key, #hm-keys .cv-hm-key {
+          flex: 0 0 calc(10% - 3.6px); width: calc(10% - 3.6px);
+          min-width: 0 !important; padding: 0 !important;
+          font-size: clamp(10px, 3vw, 16px) !important;
         }
         .hm2-tile {
           width: 34px; height: 42px;
@@ -1994,17 +2414,89 @@
           font-size: 16px !important;
           border-radius: 10px !important;
         }
+        .hm2-powerups {
+          display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+          margin: 8px 0 12px;
+        }
+        .hm2-powerup {
+          min-height: 42px; padding: 7px 12px;
+          display: inline-flex; align-items: center; gap: 6px;
+          border: 3px solid #1a1a1a; border-radius: 12px;
+          background: #fff; color: #1a1a1a;
+          box-shadow: 3px 3px 0 #1a1a1a;
+          font-family: inherit; font-size: 13px; font-weight: 800; line-height: 1.1;
+          cursor: pointer;
+          transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+        }
+        .hm2-powerup:not(:disabled):active {
+          transform: translate(2px, 2px);
+          box-shadow: 1px 1px 0 #1a1a1a;
+        }
+        .hm2-powerup:disabled { cursor: not-allowed; opacity: 0.42; }
+        .hm2-powerup.is-used { text-decoration: line-through; filter: grayscale(1); }
+        .hm2-powerup-icon { font-size: 19px; text-decoration: none; }
+        .hm2-key-eliminated {
+          opacity: 0.38 !important;
+          background: #e9ecef !important;
+          color: #6c757d !important;
+        }
         @media (max-width: 480px) {
           .cg-hm-key, .cv-hm-key { min-width: 31px !important; height: 42px !important; }
           .hm2-tile { width: 28px; height: 36px; font-size: 18px; }
+          .hm2-powerup { padding: 7px 9px; font-size: 12px; }
         }
       `;
       document.head.appendChild(st);
     }
 
-    const words = (ctx.config && ctx.config.words) || ['ENGLISH', 'TEACHER', 'SCHOOL'];
-    let word, guessed, mistakes, gameOver;
+    function shuffleInPlace(items) {
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+      return items;
+    }
+
+    const configuredWords = (ctx.config && ctx.config.words) || [];
+    const sourceWords = configuredWords.length ? configuredWords : ['CASA', 'ESCUELA', 'APRENDER'];
+    const words = Array.from(new Set(
+      sourceWords.map(item => String(item).trim().toUpperCase()).filter(Boolean)
+    ));
+    shuffleInPlace(words);
+    const thematicWords = new Set(words.map(item => String(item).toUpperCase()));
+    const fallbackWords = Array.isArray(global.COEDUCA_HANGMAN_WORDS)
+      ? global.COEDUCA_HANGMAN_WORDS.filter(item => !thematicWords.has(String(item).toUpperCase()))
+      : [];
+    const winThreshold = (ctx.config && ctx.config.winScore) || 3;
+    const RANKING_MIN_SCORE = 3;
+    let word, guessed, mistakes, gameOver, score, bonusEarned, wordIndex, powerups;
+    let fallbackDeck, fallbackIndex, previousFallbackWord;
     const MAX = 6;
+
+    function shuffleFallbackDeck() {
+      fallbackDeck = fallbackWords.slice();
+      for (let i = fallbackDeck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [fallbackDeck[i], fallbackDeck[j]] = [fallbackDeck[j], fallbackDeck[i]];
+      }
+      // Evita repetir justo en la unión entre dos vueltas completas al banco.
+      if (fallbackDeck.length > 1 && fallbackDeck[0] === previousFallbackWord) {
+        [fallbackDeck[0], fallbackDeck[1]] = [fallbackDeck[1], fallbackDeck[0]];
+      }
+      fallbackIndex = 0;
+    }
+
+    function nextFallbackWord() {
+      if (!fallbackWords.length) {
+        const repeated = String(words[wordIndex % words.length]);
+        wordIndex++;
+        return repeated;
+      }
+      if (!fallbackDeck.length || fallbackIndex >= fallbackDeck.length) shuffleFallbackDeck();
+      const next = fallbackDeck[fallbackIndex++];
+      previousFallbackWord = next;
+      return next;
+    }
 
     // Normaliza letras para comparar: quita acentos (Á -> A) pero conserva la Ñ.
     function normLetter(ch) {
@@ -2017,21 +2509,55 @@
     wrap.className = 'cg-hm-wrap';
     wrap.style.position = 'relative';
     wrap.innerHTML = `
+      <div class="cg-snake-score" style="margin-bottom:12px;">
+        <span>🔤</span>
+        <span>PALABRAS: <span id="hm-score">0</span></span>
+        <span>·</span>
+        <span>BONUS: ${winThreshold}</span>
+      </div>
       <svg id="hm-svg" class="cg-hm-stage" viewBox="0 0 240 240"></svg>
       <div id="hm-hearts" class="cg-hm-hearts"></div>
+      <div id="hm-powerups" class="hm2-powerups" aria-label="Comodines">
+        <button type="button" class="hm2-powerup" data-power="life" title="Recupera una vida perdida">
+          <span class="hm2-powerup-icon">❤️</span><span>Vida extra</span>
+        </button>
+        <button type="button" class="hm2-powerup" data-power="reveal" title="Revela una letra correcta">
+          <span class="hm2-powerup-icon">💡</span><span>Revelar letra</span>
+        </button>
+        <button type="button" class="hm2-powerup" data-power="remove" title="Descarta tres letras incorrectas">
+          <span class="hm2-powerup-icon">✨</span><span>Descartar 3</span>
+        </button>
+      </div>
       <div id="hm-word" class="cg-hm-word"></div>
       <div id="hm-keys" class="cg-hm-keys"></div>
       <div id="hm-status" class="cg-status"></div>
-      <button class="coeduca-btn coeduca-btn-success" id="hm-reset" style="margin-top:10px;">🔄 Nueva palabra</button>
+      <button class="coeduca-btn coeduca-btn-success" id="hm-reset" style="margin-top:10px;">${iconButton('retry', 'Reiniciar partida')}</button>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'hangman', 'Ahorcado');
 
     makeSoundToggle(wrap);
+    const results = gameResults(ctx, 'hangman', wrap);
     const svg = wrap.querySelector('#hm-svg');
     const heartsEl = wrap.querySelector('#hm-hearts');
+    const powerupsEl = wrap.querySelector('#hm-powerups');
     const wordEl = wrap.querySelector('#hm-word');
     const keysEl = wrap.querySelector('#hm-keys');
     const statusEl = wrap.querySelector('#hm-status');
+    const resetButton = wrap.querySelector('#hm-reset');
+    const scoreEl = wrap.querySelector('#hm-score');
+    const leaderboard = global.COEDUCA_LEADERBOARD
+      ? global.COEDUCA_LEADERBOARD.create(ctx, 'hangman', RANKING_MIN_SCORE)
+      : { submit: () => Promise.resolve(false) };
+
+    function updatePowerups() {
+      powerupsEl.querySelectorAll('[data-power]').forEach(btn => {
+        const type = btn.dataset.power;
+        const used = Boolean(powerups && powerups[type]);
+        btn.classList.toggle('is-used', used);
+        btn.disabled = gameOver || used || (type === 'life' && mistakes === 0);
+      });
+    }
 
     function drawHangman() {
       // Escena alegre + muñeco que se revela con cada error.
@@ -2178,11 +2704,16 @@
       });
     }
 
-    function reset() {
-      word = words[Math.floor(Math.random() * words.length)].toUpperCase();
+    function startWord() {
+      if (wordIndex < words.length) {
+        word = String(words[wordIndex++]).toUpperCase();
+      } else {
+        word = String(nextFallbackWord()).toUpperCase();
+      }
       guessed = new Set();
       mistakes = 0;
       gameOver = false;
+      resetButton.disabled = true;
       statusEl.textContent = '';
       statusEl.className = 'cg-status';
       // Defensa contra restauración de DOM (bfcache / iOS): limpiar cualquier
@@ -2195,6 +2726,83 @@
       drawHangman();
       renderHearts();
       renderWord();
+      updatePowerups();
+    }
+
+    function reset() {
+      score = 0;
+      bonusEarned = false;
+      wordIndex = 0;
+      powerups = { life: false, reveal: false, remove: false };
+      shuffleInPlace(words);
+      fallbackDeck = [];
+      fallbackIndex = 0;
+      previousFallbackWord = '';
+      scoreEl.textContent = '0';
+      startWord();
+    }
+
+    function completeWord() {
+      if (gameOver) return;
+      gameOver = true;
+      updatePowerups();
+      score++;
+      scoreEl.textContent = score;
+      if (score === RANKING_MIN_SCORE) leaderboard.submit(score);
+      SFX.win();
+      statusEl.textContent = `🎉 ${word} correcta. Preparando la siguiente…`;
+      statusEl.className = 'cg-status is-win';
+      spawnConfetti(wrap, 30);
+      if (!bonusEarned && score >= winThreshold) {
+        bonusEarned = true;
+        ctx.onWin();
+      }
+      setTimeout(() => {
+        if (document.body.contains(wrap)) startWord();
+      }, 1200);
+    }
+
+    function usePowerup(type) {
+      if (gameOver || !powerups || powerups[type]) return;
+
+      if (type === 'life') {
+        if (mistakes === 0) return;
+        powerups.life = true;
+        mistakes--;
+        drawHangman();
+        renderHearts();
+        statusEl.textContent = '❤️ Recuperaste una vida.';
+      } else if (type === 'reveal') {
+        const candidates = Array.from(new Set(word.split('').map(normLetter)))
+          .filter(letter => !guessed.has(letter));
+        if (!candidates.length) return;
+        powerups.reveal = true;
+        const letter = candidates[Math.floor(Math.random() * candidates.length)];
+        guessed.add(letter);
+        const key = keysEl.querySelector(`[data-letter="${letter}"]`);
+        if (key) {
+          key.disabled = true;
+          key.classList.add('is-hit');
+        }
+        SFX.correct();
+        renderWord();
+        statusEl.textContent = `💡 Se reveló la letra ${letter}.`;
+        if (word.split('').every(c => guessed.has(normLetter(c)))) completeWord();
+      } else if (type === 'remove') {
+        const wordLetters = new Set(word.split('').map(normLetter));
+        const candidates = Array.from(keysEl.querySelectorAll('[data-letter]'))
+          .filter(btn => !btn.disabled && !wordLetters.has(btn.dataset.letter));
+        if (!candidates.length) return;
+        powerups.remove = true;
+        shuffleInPlace(candidates).slice(0, 3).forEach(btn => {
+          guessed.add(btn.dataset.letter);
+          btn.disabled = true;
+          btn.classList.add('hm2-key-eliminated');
+        });
+        statusEl.textContent = '✨ Se descartaron tres letras incorrectas.';
+      }
+      statusEl.className = 'cg-status';
+      updatePowerups();
     }
 
     function guess(letter, btn) {
@@ -2206,12 +2814,7 @@
         SFX.correct();
         renderWord();
         if (word.split('').every(c => guessed.has(normLetter(c)))) {
-          gameOver = true;
-          SFX.win();
-          statusEl.textContent = `🎉 ¡Ganaste! La palabra era ${word}`;
-          statusEl.className = 'cg-status is-win';
-          spawnConfetti(wrap, 30);
-          ctx.onWin();
+          completeWord();
         }
       } else {
         btn.classList.add('is-miss');
@@ -2224,12 +2827,20 @@
         renderHearts();
         if (mistakes >= MAX) {
           gameOver = true;
+          resetButton.disabled = false;
           SFX.lose();
           renderWord(true);
           statusEl.textContent = `💀 Game Over. La palabra era ${word}`;
           statusEl.className = 'cg-status is-lose';
-          ctx.onLose();
+          leaderboard.submit(score);
+          if (!bonusEarned) ctx.onLose();
+          results.show({
+            score, points: bonusEarned ? 1 : 0, unit: 'palabras',
+            outcome: '💀 Se acabaron los intentos · La palabra era ' + word,
+            replay: () => resetButton.click()
+          });
         }
+        updatePowerups();
       }
     }
 
@@ -2258,7 +2869,11 @@
       cleanupObserver.observe(document.body, { childList: true, subtree: true });
     }
 
-    wrap.querySelector('#hm-reset').addEventListener('click', reset);
+    powerupsEl.addEventListener('click', event => {
+      const button = event.target.closest('[data-power]');
+      if (button && powerupsEl.contains(button)) usePowerup(button.dataset.power);
+    });
+    resetButton.addEventListener('click', reset);
     reset();
   });
 
@@ -2269,14 +2884,17 @@
     // Barajar preguntas y opciones: repetir la trivia sirve para aprender,
     // no para memorizar posiciones.
     const rawQuestions = (ctx.config && ctx.config.questions) || [];
-    const questions = C.shuffle(rawQuestions.slice()).map(q => {
-      const order = C.shuffle((q.options || []).map((_, j) => j));
-      return {
-        q: q.q,
-        options: order.map(j => q.options[j]),
-        answer: order.indexOf(q.answer)
-      };
-    });
+    function shuffledQuestions() {
+      return C.shuffle(rawQuestions.slice()).map(q => {
+        const order = C.shuffle((q.options || []).map((_, j) => j));
+        return {
+          q: q.q,
+          options: order.map(j => q.options[j]),
+          answer: order.indexOf(q.answer)
+        };
+      });
+    }
+    const questions = shuffledQuestions();
     const winThreshold = Math.ceil(questions.length * 0.7);
     const tieThreshold = Math.floor(questions.length / 2);
     let idx = 0, correct = 0, wrong = 0, finished = false, transitioning = false;
@@ -2311,8 +2929,10 @@
       </div>
     `;
     ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'trivia', 'Trivia');
 
     makeSoundToggle(wrap);
+    const results = gameResults(ctx, 'trivia', wrap);
     const cardContainer = wrap.querySelector('#tr-card-container');
     const opts = wrap.querySelector('#tr-options');
     const progText = wrap.querySelector('#tr-progress-text');
@@ -2537,7 +3157,29 @@
         ctx.onLose();
       }
       statusEl.innerHTML = `${icon} ${correct} / ${questions.length} (${pct}%)`;
+      results.show({
+        score: correct, points: msgClass === 'is-win' ? 1 : msgClass === 'is-tie' ? 0.5 : 0,
+        unit: 'aciertos', outcome: `${icon} ${correct} de ${questions.length} respuestas correctas`,
+        replay: resetTrivia
+      });
       statusEl.className = 'cg-status ' + msgClass;
+    }
+
+    function resetTrivia() {
+      questions.splice(0, questions.length, ...shuffledQuestions());
+      idx = 0; correct = 0; wrong = 0; finished = false; transitioning = false;
+      doubleActive = false; doublePick = null;
+      used5050 = false; usedDouble = false; usedRigo = false;
+      [btn5050, btnDouble, btnRigo].forEach(button => {
+        button.disabled = false;
+        button.style.opacity = '';
+        button.style.boxShadow = '';
+        button.style.cursor = '';
+      });
+      statusEl.textContent = '';
+      statusEl.classList.remove('is-win', 'is-tie', 'is-lose');
+      progFill.style.width = '0%';
+      render();
     }
 
     if (questions.length === 0) {
@@ -2550,12 +3192,13 @@
   // =====================================================================
   // 6. PILLS — puzle de píldoras bicolores (estilo Dr. Mario / Columns).
   //    ESPACIO (o ⟳ / tocar el tablero) gira, las flechas mueven.
-  //    Se borran 3 o más del mismo color EN LÍNEA (horizontal o vertical);
+  //    Se borran 3 o más del mismo color en horizontal, vertical o diagonal;
   //    el resto cae y puede encadenar combos. La caída se acelera con el
   //    tiempo. Se gana al llegar al puntaje meta.
   //    Una vez por partida cae una píldora DORADA "+1" (ambas mitades del
   //    mismo color): si el estudiante la destruye antes de ganar, suma
   //    +1 punto extra real (máximo 2 extra junto con el +1 de ganar).
+  //    Muy rara vez aparece una mitad ARCOÍRIS que destruye su vecindad 3x3.
   // =====================================================================
   reg('pills', function (ctx) {
     const COLS = 9, ROWS = 14, CELL = 24;
@@ -2563,15 +3206,19 @@
     const COLORS = ['#E63946', '#4FC3F7', '#FFD700', '#4CAF50', '#9B5DE5', '#FF9F1C'];
     const DARK   = ['#8E1B26', '#0277BD', '#B8960B', '#2E7D32', '#6A3AB2', '#C67207'];
     // Velocidad: arranca suave y acelera con cada pieza fijada
-    const START_TICK = 600, MIN_TICK = 180, TICK_STEP = 12;
+    // Conserva un inicio ágil, pero alcanza la velocidad máxima de forma más gradual.
+    const START_TICK = 600, MIN_TICK = 180, TICK_STEP = 10;
     // Probabilidad de píldora normal con ambas mitades iguales (raras a propósito)
     const SAME_COLOR_CHANCE = 0.1;
+    // Aproximadamente una de cada 67 piezas contiene una mitad arcoíris.
+    const RAINBOW_CHANCE = 0.015;
     // dir: posición de la segunda mitad respecto al pivote (derecha/abajo/izq/arriba)
     const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 
-    let grid, piece, loop, running, gameOver, score, paused;
+    let grid, piece, loop, running, gameOver, score, paused, bonusEarned;
     let bonusSpawned, bonusAwarded, bonusAtScore, clearingSet, floats;
     let tickMs, piecesLocked;
+    let scrollLocked = false, previousOverscrollBehavior = '';
 
     const wrap = document.createElement('div');
     wrap.className = 'cg-snake-wrap';
@@ -2580,7 +3227,7 @@
         <span>💊</span>
         <span>PUNTOS: <span id="pl-score">0</span></span>
         <span>·</span>
-        <span>META: ${winThreshold}</span>
+        <span>BONUS: ${winThreshold}</span>
       </div>
       <div class="cg-progress-bar" style="max-width:${COLS * CELL}px;">
         <div id="pl-progress" class="cg-progress-fill" style="width:0%"></div>
@@ -2588,36 +3235,57 @@
       <canvas class="cg-snake-canvas" id="pl-canvas" width="${COLS * CELL}" height="${ROWS * CELL}"
               style="background:#221a3a;"></canvas>
       <div class="cg-snake-controls">
-        <button class="coeduca-btn coeduca-btn-success cg-snake-start" id="pl-start">▶ START</button>
+        <button class="coeduca-btn coeduca-btn-success cg-snake-start" id="pl-start">${iconButton('play', 'START')}</button>
         <div class="cg-snake-dpad">
           <span></span>
           <button class="coeduca-btn cg-snake-dir" id="pl-rot" title="Girar" aria-label="Girar">⟳</button>
           <span></span>
-          <button class="coeduca-btn cg-snake-dir" data-m="left" aria-label="Mover a la izquierda">←</button>
-          <button class="coeduca-btn cg-snake-dir" data-m="down" aria-label="Bajar">↓</button>
-          <button class="coeduca-btn cg-snake-dir" data-m="right" aria-label="Mover a la derecha">→</button>
-        </div>
-        <div style="font-size:12px;font-weight:bold;color:var(--coeduca-stroke);max-width:300px;">
-          ESPACIO o ⟳ gira · Flechas mueven · Haz líneas de 3+ del mismo color ·
-          ¡Cada vez cae más rápido! · 💛 Rompe la píldora dorada para +1 extra
+          <button class="coeduca-btn cg-snake-dir" data-m="left" aria-label="Mover a la izquierda">${arrowIcon('left')}</button>
+          <button class="coeduca-btn cg-snake-dir" data-m="down" aria-label="Bajar">${arrowIcon('down')}</button>
+          <button class="coeduca-btn cg-snake-dir" data-m="right" aria-label="Mover a la derecha">${arrowIcon('right')}</button>
         </div>
       </div>
       <div id="pl-status" class="cg-status"></div>
     `;
     ctx.container.appendChild(wrap);
-    makeSoundToggle(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'pills', 'Píldoras');
+    const viewport = gameViewport(wrap, 'pills', 'Píldoras', makeSoundToggle(wrap));
+    const results = gameResults(ctx, 'pills', wrap);
 
     const canvas = wrap.querySelector('#pl-canvas');
     const cctx = canvas.getContext('2d');
     const scoreEl = wrap.querySelector('#pl-score');
     const progressEl = wrap.querySelector('#pl-progress');
     const statusEl = wrap.querySelector('#pl-status');
+    const leaderboard = global.COEDUCA_LEADERBOARD
+      ? global.COEDUCA_LEADERBOARD.create(ctx, 'pills', winThreshold)
+      : { submit: () => Promise.resolve(false) };
+
+    function preventGameScroll(event) {
+      if (scrollLocked && event.target === canvas) event.preventDefault();
+    }
+
+    function lockGameScroll() {
+      if (scrollLocked) return;
+      scrollLocked = true;
+      previousOverscrollBehavior = document.documentElement.style.overscrollBehavior;
+      document.documentElement.style.overscrollBehavior = 'none';
+      document.addEventListener('touchmove', preventGameScroll, { passive: false, capture: true });
+    }
+
+    function unlockGameScroll() {
+      if (!scrollLocked) return;
+      scrollLocked = false;
+      document.documentElement.style.overscrollBehavior = previousOverscrollBehavior;
+      document.removeEventListener('touchmove', preventGameScroll, true);
+    }
 
     function reset() {
       grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
       piece = null;
       running = false; gameOver = false; paused = false;
       score = 0;
+      bonusEarned = false;
       bonusSpawned = false; bonusAwarded = false;
       // La píldora dorada aparece una vez, entre el 30% y el 60% de la meta
       bonusAtScore = Math.floor(winThreshold * (0.3 + Math.random() * 0.3));
@@ -2634,8 +3302,8 @@
     function cellsOf(p) {
       const d = DIRS[p.dir];
       return [
-        { c: p.x, r: p.y, color: p.colors[0] },
-        { c: p.x + d[0], r: p.y + d[1], color: p.colors[1] }
+        { c: p.x, r: p.y, color: p.colors[0], rainbow: p.rainbowIndex === 0 },
+        { c: p.x + d[0], r: p.y + d[1], color: p.colors[1], rainbow: p.rainbowIndex === 1 }
       ];
     }
 
@@ -2646,6 +3314,7 @@
 
     function spawnPiece() {
       const isBonus = !bonusSpawned && score >= bonusAtScore;
+      const isRainbow = !isBonus && Math.random() < RAINBOW_CHANCE;
       const c1 = Math.floor(Math.random() * COLORS.length);
       let c2;
       if (isBonus || Math.random() < SAME_COLOR_CHANCE) {
@@ -2654,7 +3323,14 @@
         // Forzar mitades de colores distintos (las monocromas son raras)
         c2 = (c1 + 1 + Math.floor(Math.random() * (COLORS.length - 1))) % COLORS.length;
       }
-      const p = { x: Math.floor(COLS / 2) - 1, y: 0, dir: 0, colors: [c1, c2], bonus: isBonus };
+      const p = {
+        x: Math.floor(COLS / 2) - 1,
+        y: 0,
+        dir: 0,
+        colors: [c1, c2],
+        bonus: isBonus,
+        rainbowIndex: isRainbow ? Math.floor(Math.random() * 2) : -1
+      };
       if (isBonus) bonusSpawned = true;
       if (collides(p)) return end();
       piece = p;
@@ -2662,7 +3338,10 @@
 
     function tryMove(dx, dy) {
       if (!piece) return false;
-      const p = { x: piece.x + dx, y: piece.y + dy, dir: piece.dir, colors: piece.colors, bonus: piece.bonus };
+      const p = {
+        x: piece.x + dx, y: piece.y + dy, dir: piece.dir,
+        colors: piece.colors, bonus: piece.bonus, rainbowIndex: piece.rainbowIndex
+      };
       if (collides(p)) return false;
       piece = p;
       draw();
@@ -2676,7 +3355,8 @@
       for (let i = 0; i < kicks.length; i++) {
         const p = {
           x: piece.x + kicks[i][0], y: piece.y + kicks[i][1],
-          dir: (piece.dir + 1) % 4, colors: piece.colors, bonus: piece.bonus
+          dir: (piece.dir + 1) % 4, colors: piece.colors,
+          bonus: piece.bonus, rainbowIndex: piece.rainbowIndex
         };
         if (!collides(p)) { piece = p; SFX.tap(); draw(); return; }
       }
@@ -2690,8 +3370,12 @@
     function lockPiece() {
       if (!piece) return;
       const bonus = piece.bonus;
-      cellsOf(piece).forEach(({ c, r, color }) => {
-        if (r >= 0 && r < ROWS && c >= 0 && c < COLS) grid[r][c] = { color, bonus };
+      const rainbowCells = [];
+      cellsOf(piece).forEach(({ c, r, color, rainbow }) => {
+        if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
+          grid[r][c] = { color, bonus, rainbow };
+          if (rainbow) rainbowCells.push([r, c]);
+        }
       });
       piece = null;
       SFX.place();
@@ -2702,49 +3386,102 @@
         clearInterval(loop);
         loop = setInterval(stepTick, tickMs);
       }
-      resolveBoard();
+      if (rainbowCells.length) resolveRainbow(rainbowCells);
+      else resolveBoard();
     }
 
-    // Líneas de 3+ del mismo color, solo horizontales o verticales
-    // (más difícil que agrupar en cualquier forma)
+    // Líneas rectas de 3+ del mismo color: horizontal, vertical y dos diagonales.
     function findGroups() {
       const mark = {};
-      const flushRow = (r, endC, run) => {
-        if (run >= 3) for (let k = endC - run; k < endC; k++) mark[r * COLS + k] = true;
-      };
-      const flushCol = (c, endR, run) => {
-        if (run >= 3) for (let k = endR - run; k < endR; k++) mark[k * COLS + c] = true;
-      };
+      const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
       for (let r = 0; r < ROWS; r++) {
-        let run = 0;
-        for (let c = 0; c <= COLS; c++) {
-          const cell = c < COLS ? grid[r][c] : null;
-          const prev = c > 0 ? grid[r][c - 1] : null;
-          if (cell && prev && cell.color === prev.color) {
-            run++;
-          } else {
-            flushRow(r, c, run);
-            run = cell ? 1 : 0;
-          }
-        }
-      }
-      for (let c = 0; c < COLS; c++) {
-        let run = 0;
-        for (let r = 0; r <= ROWS; r++) {
-          const cell = r < ROWS ? grid[r][c] : null;
-          const prev = r > 0 ? grid[r - 1][c] : null;
-          if (cell && prev && cell.color === prev.color) {
-            run++;
-          } else {
-            flushCol(c, r, run);
-            run = cell ? 1 : 0;
-          }
+        for (let c = 0; c < COLS; c++) {
+          const cell = grid[r][c];
+          if (!cell || cell.rainbow) continue;
+          directions.forEach(([dr, dc]) => {
+            const previousR = r - dr, previousC = c - dc;
+            const previous = previousR >= 0 && previousR < ROWS &&
+              previousC >= 0 && previousC < COLS ? grid[previousR][previousC] : null;
+            if (previous && !previous.rainbow && previous.color === cell.color) return;
+
+            const run = [];
+            let nextR = r, nextC = c;
+            while (nextR >= 0 && nextR < ROWS && nextC >= 0 && nextC < COLS) {
+              const next = grid[nextR][nextC];
+              if (!next || next.rainbow || next.color !== cell.color) break;
+              run.push([nextR, nextC]);
+              nextR += dr;
+              nextC += dc;
+            }
+            if (run.length >= 3) {
+              run.forEach(([runR, runC]) => { mark[runR * COLS + runC] = true; });
+            }
+          });
         }
       }
       return Object.keys(mark).map(i => {
         const n = +i;
         return [Math.floor(n / COLS), n % COLS];
       });
+    }
+
+    function awardGoldenBonus(bonusHit) {
+      if (!bonusHit || bonusAwarded) return false;
+      bonusAwarded = true;
+      SFX.pop();
+      spawnConfetti(wrap, 15);
+      floats.push({ x: (COLS * CELL) / 2, y: (ROWS * CELL) / 2, life: 55, text: '+1 EXTRA' });
+      // +1 real en la nota (el core lo limita a una vez por sesión)
+      if (ctx.onBalloonBonus) ctx.onBalloonBonus();
+      else if (C.addBalloonBonus) C.addBalloonBonus();
+      if (global.rigo && global.rigo.say) {
+        global.rigo.say('¡Rompiste la píldora dorada! +1 punto extra 💊', 4000);
+      }
+      return true;
+    }
+
+    function resolveRainbow(centers) {
+      const targets = {};
+      centers.forEach(([centerR, centerC]) => {
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            const r = centerR + dr, c = centerC + dc;
+            if (r >= 0 && r < ROWS && c >= 0 && c < COLS && grid[r][c]) {
+              targets[r * COLS + c] = [r, c];
+            }
+          }
+        }
+      });
+      const toClear = Object.values(targets);
+      clearingSet = {};
+      toClear.forEach(([r, c]) => { clearingSet[r * COLS + c] = true; });
+      draw();
+      setTimeout(() => {
+        if (gameOver) return;
+        let bonusHit = false;
+        toClear.forEach(([r, c]) => {
+          const cell = grid[r][c];
+          if (cell && cell.bonus) bonusHit = true;
+          grid[r][c] = null;
+        });
+        clearingSet = null;
+        score += toClear.length * 10;
+        scoreEl.textContent = score;
+        progressEl.style.width = Math.min(100, (score / winThreshold) * 100) + '%';
+        SFX.pop();
+        spawnConfetti(wrap, 12);
+        awardGoldenBonus(bonusHit);
+        floats.push({
+          x: (centers[0][1] + 0.5) * CELL,
+          y: (centers[0][0] + 0.5) * CELL,
+          life: 45,
+          text: '🌈'
+        });
+        pumpFloats();
+        applyGravity();
+        draw();
+        setTimeout(resolveBoard, 200);
+      }, 180);
     }
 
     function applyGravity() {
@@ -2764,7 +3501,7 @@
       if (gameOver) return;
       const toClear = findGroups();
       if (!toClear.length) {
-        if (score >= winThreshold) return win();
+        if (score >= winThreshold) win();
         spawnPiece();
         draw();
         return;
@@ -2786,18 +3523,7 @@
         scoreEl.textContent = score;
         progressEl.style.width = Math.min(100, (score / winThreshold) * 100) + '%';
         SFX.eat();
-        if (bonusHit && !bonusAwarded) {
-          bonusAwarded = true;
-          SFX.pop();
-          spawnConfetti(wrap, 15);
-          floats.push({ x: (COLS * CELL) / 2, y: (ROWS * CELL) / 2, life: 55, text: '+1 EXTRA' });
-          pumpFloats();
-          // +1 real en la nota (el core lo limita a una vez por sesión)
-          if (C.addBalloonBonus) C.addBalloonBonus();
-          if (global.rigo && global.rigo.say) {
-            global.rigo.say('¡Rompiste la píldora dorada! +1 punto extra 💊', 4000);
-          }
-        }
+        if (awardGoldenBonus(bonusHit)) pumpFloats();
         applyGravity();
         draw();
         setTimeout(resolveBoard, 200);
@@ -2812,11 +3538,26 @@
       setTimeout(pumpFloats, 60);
     }
 
-    function drawCell(c, r, colorIdx, bonus) {
+    function drawCell(c, r, colorIdx, bonus, rainbow) {
       const x = c * CELL, y = r * CELL;
       const clearing = clearingSet && clearingSet[r * COLS + c];
-      cctx.fillStyle = clearing ? '#fff' : COLORS[colorIdx];
-      cctx.strokeStyle = clearing ? '#fff' : DARK[colorIdx];
+      if (clearing) {
+        cctx.fillStyle = '#fff';
+        cctx.strokeStyle = '#fff';
+      } else if (rainbow) {
+        const gradient = cctx.createLinearGradient(x + 2, y + 2, x + CELL - 2, y + CELL - 2);
+        gradient.addColorStop(0, '#E63946');
+        gradient.addColorStop(0.2, '#FF9F1C');
+        gradient.addColorStop(0.4, '#FFD700');
+        gradient.addColorStop(0.6, '#4CAF50');
+        gradient.addColorStop(0.8, '#4FC3F7');
+        gradient.addColorStop(1, '#9B5DE5');
+        cctx.fillStyle = gradient;
+        cctx.strokeStyle = '#fff';
+      } else {
+        cctx.fillStyle = COLORS[colorIdx];
+        cctx.strokeStyle = DARK[colorIdx];
+      }
       cctx.lineWidth = 2;
       cctx.beginPath();
       if (cctx.roundRect) cctx.roundRect(x + 2, y + 2, CELL - 4, CELL - 4, 7);
@@ -2828,6 +3569,12 @@
         cctx.beginPath();
         cctx.ellipse(x + CELL * 0.35, y + CELL * 0.32, CELL * 0.18, CELL * 0.12, -0.6, 0, Math.PI * 2);
         cctx.fill();
+      }
+      if (rainbow && !clearing) {
+        cctx.fillStyle = '#fff';
+        cctx.font = 'bold 13px system-ui';
+        cctx.textAlign = 'center';
+        cctx.fillText('✦', x + CELL / 2, y + CELL / 2 + 5);
       }
       if (bonus) {
         // Anillo dorado + etiqueta "+1"
@@ -2873,11 +3620,11 @@
       // Celdas fijas
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
-          if (grid[r][c]) drawCell(c, r, grid[r][c].color, grid[r][c].bonus);
+          if (grid[r][c]) drawCell(c, r, grid[r][c].color, grid[r][c].bonus, grid[r][c].rainbow);
         }
       }
       // Pieza en caída
-      if (piece) cellsOf(piece).forEach(cl => drawCell(cl.c, cl.r, cl.color, piece.bonus));
+      if (piece) cellsOf(piece).forEach(cl => drawCell(cl.c, cl.r, cl.color, piece.bonus, cl.rainbow));
       // Textos flotantes (+1 EXTRA)
       floats.forEach(f => {
         cctx.save();
@@ -2897,17 +3644,28 @@
 
     function end() {
       gameOver = true; running = false; clearInterval(loop);
+      unlockGameScroll();
+      pillsStartButton.disabled = false;
+      pillsStartButton.innerHTML = iconButton('retry', 'Volver a jugar');
       SFX.die();
       statusEl.textContent = '💥 GAME OVER';
       statusEl.className = 'cg-status is-lose';
-      ctx.onLose();
+      leaderboard.submit(score);
+      if (!bonusEarned) ctx.onLose();
       draw();
+      viewport.leave();
+      results.show({
+        score, points: (bonusEarned ? 1 : 0) + (bonusAwarded ? 1 : 0),
+        unit: 'puntos', outcome: '💥 El tablero se llenó',
+        replay: () => pillsStartButton.click()
+      });
     }
 
     function win() {
-      gameOver = true; running = false; clearInterval(loop);
+      if (bonusEarned) return;
+      bonusEarned = true;
       SFX.win();
-      statusEl.textContent = '🎉 ¡GANASTE!';
+      statusEl.textContent = '🎉 ¡PUNTO EXTRA! Sigue jugando para mejorar tu récord.';
       statusEl.className = 'cg-status is-win';
       spawnConfetti(wrap, 40);
       ctx.onWin();
@@ -2919,10 +3677,10 @@
       if (!tryMove(0, 1)) lockPiece();
     }
 
-    // Teclado físico: flechas mueven, ESPACIO (o ↑) gira
+    // Teclado físico: ESPACIO gira; izquierda/derecha mueven y abajo acelera.
     document.addEventListener('keydown', e => {
       if (isTypingTarget(e) || !running || gameOver) return;
-      if (e.code === 'Space' || e.key === 'ArrowUp') { tryRotate(); e.preventDefault(); }
+      if (e.code === 'Space') { tryRotate(); e.preventDefault(); }
       else if (e.key === 'ArrowLeft') { tryMove(-1, 0); e.preventDefault(); }
       else if (e.key === 'ArrowRight') { tryMove(1, 0); e.preventDefault(); }
       else if (e.key === 'ArrowDown') { softDrop(); e.preventDefault(); }
@@ -2965,28 +3723,906 @@
         if (running && !gameOver && loop) {
           clearInterval(loop); loop = null;
           paused = true;
+          unlockGameScroll();
           draw();
         }
       },
       () => {
         if (!paused) return;
         paused = false;
+        lockGameScroll();
         draw();
         setTimeout(() => {
-          if (gameOver || !running || paused) return;
+          if (gameOver || !running || paused || document.hidden || wrap.classList.contains('coeduca-game-help-open')) return;
           clearInterval(loop);
           loop = setInterval(stepTick, tickMs);
         }, 600);
       }
     );
 
-    wrap.querySelector('#pl-start').addEventListener('click', () => {
+    if (typeof MutationObserver !== 'undefined') {
+      const cleanupObserver = new MutationObserver(() => {
+        if (!document.body.contains(wrap)) {
+          unlockGameScroll();
+          cleanupObserver.disconnect();
+        }
+      });
+      cleanupObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    const pillsStartButton = wrap.querySelector('#pl-start');
+    pillsStartButton.addEventListener('click', () => {
       reset();
       running = true;
+      viewport.enter();
+      pillsStartButton.innerHTML = iconButton('play', 'START');
+      pillsStartButton.disabled = true;
+      lockGameScroll();
       spawnPiece();
       draw();
       clearInterval(loop);
       loop = setInterval(stepTick, tickMs);
+    });
+
+    reset();
+    draw();
+  });
+
+  // =====================================================================
+  // 7. TORRE SÁNDWICH — atrapa, centra y equilibra los ingredientes.
+  // =====================================================================
+  reg('sandwich', function (ctx) {
+    const W = 360, H = 470, PLATE_Y = 356, FLOOR_Y = 438, CAMERA_FOLLOW_Y = 172;
+    const winThreshold = Math.max(1, (ctx.config && ctx.config.winScore) || 500);
+    const INGREDIENTS = {
+      // Masas relativas para el juego: el tamaño del dibujo no equivale al peso.
+      bottom: { name: 'PAN', width: 104, height: 22, mass: 32 },
+      cheese: { name: 'QUESO', width: 92, height: 14, mass: 22 },
+      meat: { name: 'CARNE', width: 88, height: 19, mass: 85 },
+      tomato: { name: 'TOMATE', width: 82, height: 13, mass: 28 },
+      lettuce: { name: 'LECHUGA', width: 96, height: 16, mass: 6 },
+      bacon: { name: 'TOCINO', width: 82, height: 12, mass: 18 },
+      onion: { name: 'CEBOLLA', width: 76, height: 12, mass: 12 },
+      pickle: { name: 'PEPINILLO', width: 72, height: 11, mass: 14 },
+      egg: { name: 'HUEVO', width: 84, height: 14, mass: 48 },
+      avocado: { name: 'AGUACATE', width: 78, height: 13, mass: 36 },
+      top: { name: 'PAN', width: 104, height: 27, mass: 36 }
+    };
+    const FILLING_TYPES = ['cheese', 'meat', 'tomato', 'lettuce', 'bacon', 'onion', 'pickle', 'egg', 'avocado'];
+
+    let stack, order, falling, plateX, score, layers, landedTotal, misses;
+    let running, gameOver, paused, serving, bonusEarned, lastAt, raf;
+    let leftHeld = false, rightHeld = false, pointerActive = false;
+    let floatText = null;
+    let brokenHearts = [];
+    let collapseStartedAt = 0, collapseLastAt = 0, lossAnimating = false;
+    let balanceRatio = 0, cameraOffset = 0, targetCameraOffset = 0;
+    let physics, plateBody, floorBody;
+    let plateTarget = W / 2, pointerId = null, pointerOffset = 0;
+    let accumulator = 0, spawnDelay = 0;
+    let inputMode = 'target';
+    // Mismos pasos físicos en móviles de 30 Hz y pantallas de 60/120 Hz.
+    const FIXED_DT = 1 / 120;
+    const MAX_MISSES = 3;
+    const PLATE_SPEED = 185, POINTER_SPEED = 205;
+    const FALL_ACCELERATION = 300;
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const Matter = global.Matter;
+    if (!Matter) { ctx.container.textContent = 'No se pudo cargar la física de Sandwich Stack.'; return; }
+
+    if (!document.getElementById('sandwich-stack-styles')) {
+      const style = document.createElement('style');
+      style.id = 'sandwich-stack-styles';
+      style.textContent = `
+        .sw-game { max-width:380px; margin:0 auto; color:#3d3028; font-family:system-ui,sans-serif; text-align:center; }
+        .sw-game * { box-sizing:border-box; }
+        .sw-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; text-align:left; margin-bottom:12px; }
+        .sw-kicker { color:#7c5845; font-size:10px; font-weight:800; letter-spacing:2px; }
+        .sw-title { margin:2px 0 0; font-size:23px; font-weight:900; letter-spacing:-1px; }
+        .sw-badge { border:1px solid #dfcbb4; border-radius:24px; padding:6px 10px; background:#fff7e9; font-size:10px; font-weight:800; }
+        .sw-lives { color:#bb4150; font-size:16px; letter-spacing:2px; white-space:nowrap; }
+        .sw-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .sw-stat { background:#fff8eb; border:2px solid #48372c; border-radius:14px; padding:8px 12px; text-align:left; }
+        .sw-stat:first-child { background:#ffda79; }
+        .sw-stat small { display:block; font-size:10px; font-weight:800; letter-spacing:1px; }
+        .sw-stat strong { font-size:26px; font-variant-numeric:tabular-nums; line-height:1.2; }
+        .sw-goal { display:flex; justify-content:space-between; gap:8px; margin:12px 0 5px; font-size:11px; font-weight:700; }
+        .sw-progress { height:7px; overflow:hidden; border-radius:8px; background:#e9dfcf; margin-bottom:12px; }
+        .sw-progress > div { height:100%; border-radius:8px; background:#2d8567; transition:width .2s; }
+        .sw-game .sw-canvas { display:block; width:100%; height:auto; border:2px solid #48372c; border-radius:18px; background:#fff6df; touch-action:pan-y; box-shadow:0 5px 0 #e3d2b7; }
+        .sw-game.is-playing .sw-canvas { touch-action:none; }
+        .sw-balance { display:flex; align-items:center; gap:9px; margin:13px 2px; font-size:10px; font-weight:800; }
+        .sw-balance-track { position:relative; flex:1; height:9px; border-radius:9px; background:linear-gradient(90deg,#d76b50,#f3cd6e 22%,#82b69b 38%,#82b69b 62%,#f3cd6e 78%,#d76b50); }
+        .sw-balance-track::after { content:''; position:absolute; left:50%; top:-2px; height:13px; border-left:1px solid #3d302866; }
+        .sw-balance-marker { position:absolute; top:-3px; left:50%; width:5px; height:15px; border-radius:3px; background:#3d3028; transform:translateX(-50%); }
+        .sw-balance-label { min-width:65px; text-align:right; }
+        .sw-controls { display:grid; grid-template-columns:56px 1fr 56px; gap:10px; }
+        .sw-game .sw-button { min-height:48px; border:2px solid #48372c; border-radius:13px; background:#fff8eb; color:#3d3028; font:800 14px system-ui,sans-serif; cursor:pointer; touch-action:manipulation; box-shadow:0 3px 0 #48372c; }
+        .sw-game.is-playing .sw-direction { touch-action:none; }
+        .sw-game .sw-button:active { transform:translateY(2px); box-shadow:0 1px 0 #48372c; }
+        .sw-game .sw-button:focus-visible { outline:3px solid #24856c; outline-offset:4px; }
+        .sw-game .sw-primary { background:#2d8567; color:#fff; }
+        .sw-game .sw-direction { font-size:24px; }
+        .sw-game .sw-status { min-height:24px; margin:8px 0; font-size:12px; font-weight:750; line-height:1.5; }
+        .sw-game .coeduca-game-sound-toggle { position:static !important; margin:8px auto 0; }
+        @media (prefers-reduced-motion:reduce) { .sw-progress > div { transition:none; } }
+      `;
+      document.head.appendChild(style);
+    }
+
+    const wrap = document.createElement('div');
+    wrap.className = 'sw-game';
+    wrap.innerHTML = `
+      <div class="sw-heading">
+        <div><div class="sw-kicker">ATRAPA · APILA · EQUILIBRA</div><h3 class="sw-title">Sandwich Stack</h3></div>
+        <span class="sw-badge sw-lives" id="sw-lives" aria-label="3 oportunidades disponibles">♥♥♥</span>
+      </div>
+      <div class="sw-stats">
+        <div class="sw-stat"><small>PUNTOS</small><strong id="sw-score">0</strong></div>
+        <div class="sw-stat"><small>CAPAS</small><strong id="sw-count">0</strong></div>
+      </div>
+      <div class="sw-goal"><span id="sw-goal-label">Meta para el punto extra</span><span>${winThreshold} pts</span></div>
+      <div class="sw-progress"><div id="sw-progress" style="width:0%"></div></div>
+      <canvas id="sw-canvas" class="sw-canvas" width="${W}" height="${H}"
+        aria-label="Atrapa los ingredientes moviendo el plato con las flechas, A y D o arrastrando."></canvas>
+      <div class="sw-balance"><span>EQUILIBRIO</span><div class="sw-balance-track"><span id="sw-balance-marker" class="sw-balance-marker"></span></div><span id="sw-balance-label" class="sw-balance-label">ESTABLE</span></div>
+      <div class="sw-controls">
+        <button type="button" class="sw-button sw-direction" data-sw-dir="left" aria-label="Mover a la izquierda">${arrowIcon('left')}</button>
+        <button type="button" class="sw-button sw-primary" id="sw-start">${iconButton('play', 'Jugar')}</button>
+        <button type="button" class="sw-button sw-direction" data-sw-dir="right" aria-label="Mover a la derecha">${arrowIcon('right')}</button>
+      </div>
+      <div id="sw-status" class="sw-status" role="status" aria-live="polite"></div>
+    `;
+    ctx.container.appendChild(wrap);
+    global.COEDUCA_GAME_HELP.attach(wrap, 'sandwich', 'Torre sándwich', '.sw-title');
+    const viewport = gameViewport(wrap, 'sandwich', 'Torre sándwich', makeSoundToggle(wrap));
+    const results = gameResults(ctx, 'sandwich', wrap);
+
+    const canvas = wrap.querySelector('#sw-canvas');
+    const cctx = canvas.getContext('2d');
+    const scoreEl = wrap.querySelector('#sw-score');
+    const countEl = wrap.querySelector('#sw-count');
+    const progressEl = wrap.querySelector('#sw-progress');
+    const statusEl = wrap.querySelector('#sw-status');
+    const startButton = wrap.querySelector('#sw-start');
+    const balanceMarker = wrap.querySelector('#sw-balance-marker');
+    const balanceLabel = wrap.querySelector('#sw-balance-label');
+    const goalLabel = wrap.querySelector('#sw-goal-label');
+    const livesEl = wrap.querySelector('#sw-lives');
+    const pixelRatio = Math.min(2, global.devicePixelRatio || 1);
+    canvas.width = W * pixelRatio;
+    canvas.height = H * pixelRatio;
+    cctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    const leaderboard = global.COEDUCA_LEADERBOARD
+      ? global.COEDUCA_LEADERBOARD.create(ctx, 'sandwich', winThreshold)
+      : { submit: () => Promise.resolve(false) };
+
+    function refillIngredientBag() {
+      const middle = FILLING_TYPES.slice();
+      for (let i = middle.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = middle[i]; middle[i] = middle[j]; middle[j] = tmp;
+      }
+      return middle;
+    }
+
+    function reset() {
+      cancelAnimationFrame(raf);
+      stack = [];
+      order = [];
+      falling = null;
+      plateX = W / 2;
+      score = 0;
+      layers = 0;
+      landedTotal = 0;
+      misses = 0;
+      running = false;
+      gameOver = false;
+      paused = false;
+      serving = false;
+      wrap.classList.remove('is-playing');
+      bonusEarned = false;
+      lastAt = 0;
+      floatText = null;
+      brokenHearts = [];
+      collapseStartedAt = 0;
+      collapseLastAt = 0;
+      lossAnimating = false;
+      balanceRatio = 0;
+      inputMode = 'target';
+      cameraOffset = 0;
+      targetCameraOffset = 0;
+      plateTarget = W / 2;
+      accumulator = 0;
+      spawnDelay = 0;
+      pointerId = null;
+      pointerActive = false;
+      leftHeld = false;
+      rightHeld = false;
+      scoreEl.textContent = '0';
+      countEl.textContent = '0';
+      progressEl.style.width = '0%';
+      statusEl.textContent = '';
+      statusEl.className = 'sw-status';
+      goalLabel.textContent = 'Meta para el punto extra';
+      balanceMarker.style.left = '50%';
+      balanceLabel.textContent = 'ESTABLE';
+      updateLives();
+      initPhysics();
+    }
+
+    function updateLives() {
+      const remaining = Math.max(0, MAX_MISSES - misses);
+      livesEl.textContent = '♥'.repeat(remaining) + '♡'.repeat(MAX_MISSES - remaining);
+      livesEl.setAttribute('aria-label', remaining + ' oportunidades disponibles');
+    }
+
+    function registerMiss() {
+      misses++;
+      updateLives();
+      brokenHearts.push({ life: 0.9 });
+      if (brokenHearts.length > 3) brokenHearts.shift();
+      if (misses > MAX_MISSES) {
+        end('¡SE AGOTARON LAS VIDAS!');
+        return;
+      }
+      SFX.tap();
+      const remaining = MAX_MISSES - misses;
+      statusEl.textContent = remaining
+        ? 'Ingrediente perdido. Te quedan ' + remaining + ' oportunidades.'
+        : 'Ingrediente perdido. La próxima caída termina la partida.';
+      statusEl.className = 'sw-status is-tie';
+    }
+
+    function missFallingIngredient() {
+      if (!falling) return;
+      Matter.Composite.remove(physics.world, falling.body);
+      falling = null;
+      spawnDelay = 0.35;
+      registerMiss();
+    }
+
+    function updateBrokenHearts(dt) {
+      brokenHearts = brokenHearts.filter(heart => (heart.life -= dt) > 0);
+    }
+
+    function initPhysics() {
+      physics = Matter.Engine.create({
+        enableSleeping: true,
+        positionIterations: 8,
+        velocityIterations: 8
+      });
+      physics.world.gravity.y = 1;
+      physics.world.gravity.scale = 0.00030;
+      plateBody = Matter.Bodies.rectangle(plateX, PLATE_Y + 7, 104, 14, {
+        isStatic: true, friction: 1, frictionStatic: 3, label: 'plate'
+      });
+      floorBody = Matter.Bodies.rectangle(W / 2, FLOOR_Y + 20, W * 3, 40, {
+        isStatic: true, label: 'floor'
+      });
+      Matter.Composite.add(physics.world, [plateBody, floorBody]);
+      Matter.Events.on(physics, 'collisionActive', event => {
+        if (!falling) return;
+        event.pairs.forEach(pair => {
+          const other = pair.bodyA === falling.body ? pair.bodyB
+            : pair.bodyB === falling.body ? pair.bodyA : null;
+          if (!other) return;
+          if (other === plateBody && falling.type !== 'bottom') {
+            falling.invalidContact = true;
+            falling.support = null;
+            falling.touching = false;
+            falling.body.collisionFilter.mask = 0;
+            return;
+          }
+          const support = other === plateBody ? plateBody
+            : stack.find(item => item.body === other);
+          if (!support || falling.body.position.y >= other.position.y) return;
+          falling.touching = true;
+          falling.support = support;
+        });
+      });
+    }
+
+    function towerTopLocalY() {
+      return stack.length
+        ? Math.min.apply(null, stack.map(item => item.body.bounds.min.y))
+        : PLATE_Y;
+    }
+
+    function spawnIngredient() {
+      if (!running || gameOver || serving || falling) return;
+      if (!order.length) order = refillIngredientBag();
+      const type = stack.length ? order.pop() : 'bottom';
+      const spec = INGREDIENTS[type];
+      const margin = spec.width / 2 + 8;
+      const difficulty = Math.min(1, landedTotal / 18);
+      const speed = 25 + difficulty * 155;
+      let minX = margin, maxX = W - margin;
+      if (stack.length) {
+        const top = stack.reduce((a, b) =>
+          a.body.bounds.min.y < b.body.bounds.min.y ? a : b);
+        const distance = Math.max(0, top.body.bounds.min.y + cameraOffset + 8);
+        const fallTime = (Math.sqrt(speed * speed + 2 * FALL_ACCELERATION * distance) - speed)
+          / FALL_ACCELERATION;
+        const travel = PLATE_SPEED * Math.max(0, fallTime - 0.25);
+        const left = Math.max(margin, top.body.position.x - travel);
+        const right = Math.min(W - margin, top.body.position.x + travel);
+        if (left <= right) { minX = left; maxX = right; }
+      }
+      const x = minX + Math.random() * (maxX - minX);
+      const y = -cameraOffset - spec.height / 2 - 8;
+      const body = Matter.Bodies.rectangle(x, y, spec.width, spec.height, {
+        chamfer: { radius: Math.min(5, spec.height * 0.3) },
+        friction: type === 'lettuce' ? 0.9 : 1,
+        frictionStatic: 3,
+        frictionAir: 0.004,
+        restitution: 0.025,
+        slop: 0.01,
+        sleepThreshold: 90,
+        label: 'ingredient'
+      });
+      Matter.Body.setMass(body, spec.mass / 32);
+      Matter.Body.setVelocity(body, { x: 0, y: speed * FIXED_DT });
+      falling = {
+        type, name: spec.name, width: spec.width, height: spec.height,
+        body, support: null, touching: false, invalidContact: false, settledFor: 0
+      };
+      Matter.Composite.add(physics.world, body);
+    }
+
+    function calculateBalance() {
+      if (!stack.length) return 0;
+      let totalMass = 0, weightedX = 0;
+      stack.forEach(item => {
+        const mass = item.body.mass;
+        totalMass += mass;
+        weightedX += mass * item.body.position.x;
+      });
+      return totalMass ? (weightedX / totalMass - plateX) / 52 : 0;
+    }
+
+    function carryStackWithPlate(dx) {
+      // Los ingredientes colocados comparten el desplazamiento del plato.
+      // Su velocidad relativa, rotación y caída siguen a cargo de Matter.js.
+      stack.forEach(item => {
+        const body = item.body;
+        if (body.position.y > PLATE_Y + 15) return;
+        Matter.Body.setPosition(body, { x: body.position.x + dx, y: body.position.y });
+      });
+    }
+
+    function updateCamera(dt) {
+      if (stack.length) {
+        targetCameraOffset = Math.max(targetCameraOffset, CAMERA_FOLLOW_Y - towerTopLocalY());
+      }
+      cameraOffset += (targetCameraOffset - cameraOffset) * Math.min(1, dt * 3.4);
+    }
+
+    function updateTowerBalance() {
+      balanceRatio = calculateBalance();
+      if (Math.abs(balanceRatio) > 0.85 && !gameOver) {
+        statusEl.textContent = '⚠️ ¡La torre pierde apoyo! Mueve el plato con cuidado.';
+        statusEl.className = 'sw-status is-tie';
+      } else if (statusEl.textContent.indexOf('La torre pierde apoyo') >= 0) {
+        statusEl.textContent = '';
+        statusEl.className = 'sw-status';
+      }
+    }
+
+    function awardBonus() {
+      if (bonusEarned || score < winThreshold) return;
+      bonusEarned = true;
+      SFX.win();
+      statusEl.textContent = '🎉 ¡PUNTO EXTRA! Sigue apilando para mejorar tu récord.';
+      statusEl.className = 'sw-status is-win';
+      goalLabel.textContent = '✓ Punto extra conseguido';
+      spawnConfetti(wrap, 45);
+      ctx.onWin();
+    }
+
+    function collapseFrame(now) {
+      if (!lossAnimating) return;
+      if (!collapseStartedAt) {
+        collapseStartedAt = now;
+        collapseLastAt = now;
+      }
+      const dt = Math.min(0.05, (now - collapseLastAt) / 1000);
+      collapseLastAt = now;
+      accumulator += dt;
+      while (accumulator >= FIXED_DT) {
+        Matter.Engine.update(physics, FIXED_DT * 1000);
+        accumulator -= FIXED_DT;
+      }
+      updateBrokenHearts(dt);
+      draw();
+      if (now - collapseStartedAt < 1800) raf = requestAnimationFrame(collapseFrame);
+      else { lossAnimating = false; draw(); }
+    }
+
+    function end(reason) {
+      if (gameOver) return;
+      gameOver = true;
+      running = false;
+      serving = false;
+      wrap.classList.remove('is-playing');
+      viewport.leave();
+      leftHeld = false;
+      rightHeld = false;
+      cancelAnimationFrame(raf);
+      startButton.disabled = false;
+      startButton.innerHTML = iconButton('retry', 'Volver a jugar');
+      pointerActive = false;
+      pointerId = null;
+      // El plato desaparece y los mismos cuerpos físicos forman la caída final.
+      Matter.Composite.remove(physics.world, plateBody);
+      stack.forEach(item => Matter.Sleeping.set(item.body, false));
+      if (falling) Matter.Sleeping.set(falling.body, false);
+      lossAnimating = true;
+      collapseStartedAt = 0;
+      collapseLastAt = 0;
+      accumulator = 0;
+      SFX.die();
+      statusEl.textContent = '💥 ' + (reason || '¡LA TORRE CAYÓ!');
+      statusEl.className = 'sw-status is-lose';
+      leaderboard.submit(score);
+      if (!bonusEarned) ctx.onLose();
+      draw();
+      raf = requestAnimationFrame(collapseFrame);
+      results.show({
+        score, points: bonusEarned ? 1 : 0, unit: 'puntos',
+        outcome: '💥 ' + (reason || '¡La torre cayó!'),
+        replay: () => startButton.click()
+      });
+    }
+
+    function landIngredient() {
+      if (!falling || !falling.support) return;
+      const support = falling.support === plateBody ? plateBody : falling.support.body;
+      const delta = falling.body.position.x - support.position.x;
+      const overlap = Math.max(0, Math.min(falling.body.bounds.max.x, support.bounds.max.x)
+        - Math.max(falling.body.bounds.min.x, support.bounds.min.x));
+      const accuracy = clamp(0.55 * overlap / falling.width
+        + 0.45 * (1 - Math.abs(delta) / (falling.width / 2)), 0, 1);
+      const gained = 25 + Math.round(accuracy * 75);
+      stack.push(falling);
+      landedTotal++;
+      layers = landedTotal;
+      score += gained;
+      scoreEl.textContent = score;
+      countEl.textContent = layers;
+      progressEl.style.width = Math.min(100, score / winThreshold * 100) + '%';
+      floatText = { text: '+' + gained + (accuracy > 0.86 ? ' ¡PERFECTO!' : ''), life: 1.1 };
+      SFX.place();
+      falling = null;
+      if (statusEl.textContent.indexOf('Ingrediente perdido') >= 0) {
+        statusEl.textContent = '';
+        statusEl.className = 'sw-status';
+      }
+      awardBonus();
+      spawnDelay = Math.max(0.22, 0.42 - landedTotal * 0.003);
+    }
+
+    function roundedRect(x, y, width, height, radius) {
+      cctx.beginPath();
+      if (cctx.roundRect) cctx.roundRect(x, y, width, height, radius);
+      else cctx.rect(x, y, width, height);
+    }
+
+    function drawIngredient(item, x, y) {
+      const left = x - item.width / 2;
+      cctx.save();
+      cctx.lineWidth = 2.5;
+      cctx.strokeStyle = '#4a2919';
+      if (item.type === 'bottom' || item.type === 'top') {
+        const gradient = cctx.createLinearGradient(0, y, 0, y + item.height);
+        gradient.addColorStop(0, '#ffd88b'); gradient.addColorStop(1, '#d88a3d');
+        cctx.fillStyle = gradient;
+        roundedRect(left, y, item.width, item.height, item.type === 'top' ? 18 : 8);
+        cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#fff1b6';
+        for (let i = 0; i < 5; i++) {
+          cctx.beginPath();
+          cctx.ellipse(left + 18 + i * 20, y + 8 + (i % 2) * 5, 2.5, 1.2, -0.5, 0, Math.PI * 2);
+          cctx.fill();
+        }
+      } else if (item.type === 'cheese') {
+        cctx.fillStyle = '#ffd633';
+        roundedRect(left, y, item.width, item.height, 4); cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#f4b400';
+        [0.24, 0.7].forEach(pos => { cctx.beginPath(); cctx.arc(left + item.width * pos, y + 6, 2.5, 0, Math.PI * 2); cctx.fill(); });
+      } else if (item.type === 'meat') {
+        cctx.fillStyle = '#7a3f24';
+        cctx.beginPath(); cctx.ellipse(x, y + item.height / 2, item.width / 2, item.height / 2, 0, 0, Math.PI * 2); cctx.fill(); cctx.stroke();
+        cctx.strokeStyle = '#b66a3a'; cctx.lineWidth = 2;
+        for (let i = -2; i <= 2; i++) { cctx.beginPath(); cctx.moveTo(x + i * 17 - 7, y + 7); cctx.lineTo(x + i * 17 + 6, y + 14); cctx.stroke(); }
+      } else if (item.type === 'tomato') {
+        cctx.fillStyle = '#f04444';
+        roundedRect(left, y, item.width, item.height, 7); cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#ffd36a';
+        for (let i = 0; i < 4; i++) { cctx.beginPath(); cctx.arc(left + 16 + i * 22, y + 7, 1.8, 0, Math.PI * 2); cctx.fill(); }
+      } else if (item.type === 'lettuce') {
+        // Hoja continua, con borde rizado y pliegues superpuestos. El contorno
+        // ocupa toda la altura física, sin los huecos de la antigua tira de ondas.
+        cctx.translate(left, y);
+        cctx.scale(item.width / 96, item.height / 16);
+        const leafGradient = cctx.createLinearGradient(0, 0, 0, 16);
+        leafGradient.addColorStop(0, '#b9ed6b');
+        leafGradient.addColorStop(0.45, '#70c84b');
+        leafGradient.addColorStop(1, '#2f923e');
+        cctx.fillStyle = leafGradient;
+        cctx.strokeStyle = '#286c32'; cctx.lineWidth = 1.5;
+        cctx.beginPath();
+        cctx.moveTo(1, 8);
+        cctx.bezierCurveTo(0, 4, 4, 2, 10, 4);
+        cctx.bezierCurveTo(13, 0, 20, 0, 24, 4);
+        cctx.bezierCurveTo(28, 5, 28, 0, 35, 1);
+        cctx.bezierCurveTo(41, 0, 43, 5, 48, 3);
+        cctx.bezierCurveTo(53, 0, 59, 0, 63, 4);
+        cctx.bezierCurveTo(69, 5, 71, 0, 77, 2);
+        cctx.bezierCurveTo(82, 1, 84, 5, 88, 4);
+        cctx.bezierCurveTo(94, 2, 96, 6, 94, 9);
+        cctx.bezierCurveTo(96, 13, 88, 16, 82, 13);
+        cctx.bezierCurveTo(77, 12, 77, 17, 70, 15);
+        cctx.bezierCurveTo(65, 16, 63, 12, 57, 14);
+        cctx.bezierCurveTo(50, 17, 46, 13, 41, 14);
+        cctx.bezierCurveTo(35, 16, 30, 16, 26, 13);
+        cctx.bezierCurveTo(20, 12, 18, 17, 12, 14);
+        cctx.bezierCurveTo(7, 15, 0, 13, 1, 8);
+        cctx.closePath(); cctx.fill(); cctx.stroke();
+        cctx.strokeStyle = '#c9ef8d'; cctx.lineWidth = 1.2; cctx.lineCap = 'round';
+        cctx.beginPath(); cctx.moveTo(7, 8);
+        cctx.bezierCurveTo(29, 5, 54, 12, 89, 7); cctx.stroke();
+        [16, 32, 49, 66, 82].forEach((vx, index) => {
+          cctx.beginPath(); cctx.moveTo(vx - 3, 8);
+          cctx.quadraticCurveTo(vx + 2, 7, vx + (index % 2 ? 4 : 1), 3); cctx.stroke();
+          cctx.strokeStyle = '#3c9d40';
+          cctx.beginPath(); cctx.moveTo(vx, 9);
+          cctx.quadraticCurveTo(vx + 3, 10, vx + 5, 13); cctx.stroke();
+          cctx.strokeStyle = '#c9ef8d';
+        });
+      } else if (item.type === 'bacon') {
+        cctx.fillStyle = '#e56b6f';
+        roundedRect(left, y, item.width, item.height, 5); cctx.fill(); cctx.stroke();
+        cctx.strokeStyle = '#ffe0c2'; cctx.lineWidth = 3;
+        cctx.beginPath(); cctx.moveTo(left + 8, y + 4); cctx.bezierCurveTo(x - 22, y + 12, x + 22, y, left + item.width - 8, y + 9); cctx.stroke();
+      } else if (item.type === 'onion') {
+        cctx.fillStyle = '#ead7f4';
+        roundedRect(left, y, item.width, item.height, 7); cctx.fill(); cctx.stroke();
+        cctx.strokeStyle = '#9b59b6'; cctx.lineWidth = 2;
+        [-0.28, 0, 0.28].forEach(offset => {
+          cctx.beginPath();
+          cctx.ellipse(x + item.width * offset, y + item.height / 2, 10, 4, 0, 0, Math.PI * 2);
+          cctx.stroke();
+        });
+      } else if (item.type === 'pickle') {
+        const pickleGradient = cctx.createLinearGradient(left, y, left + item.width, y);
+        pickleGradient.addColorStop(0, '#2f8f46'); pickleGradient.addColorStop(0.5, '#75c84f'); pickleGradient.addColorStop(1, '#2f8f46');
+        cctx.fillStyle = pickleGradient;
+        roundedRect(left, y, item.width, item.height, 6); cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#d4ec72';
+        for (let i = 0; i < 5; i++) {
+          cctx.beginPath(); cctx.arc(left + 10 + i * 13, y + 5 + (i % 2) * 2, 1.4, 0, Math.PI * 2); cctx.fill();
+        }
+      } else if (item.type === 'egg') {
+        cctx.fillStyle = '#fffdf0';
+        cctx.beginPath();
+        cctx.ellipse(x, y + item.height / 2, item.width / 2, item.height / 2, 0, 0, Math.PI * 2);
+        cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#ffb400';
+        cctx.beginPath(); cctx.ellipse(x + 5, y + item.height / 2, 13, 5, 0, 0, Math.PI * 2); cctx.fill();
+      } else if (item.type === 'avocado') {
+        cctx.fillStyle = '#7fbe42';
+        roundedRect(left, y, item.width, item.height, 7); cctx.fill(); cctx.stroke();
+        cctx.fillStyle = '#c7e879';
+        roundedRect(left + 8, y + 3, item.width - 16, item.height - 6, 4); cctx.fill();
+        cctx.fillStyle = '#8a5a2b';
+        cctx.beginPath(); cctx.ellipse(x + 12, y + item.height / 2, 5, 3.5, 0, 0, Math.PI * 2); cctx.fill();
+      }
+      cctx.restore();
+    }
+
+    function drawScene() {
+      const sky = cctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#fffbef'); sky.addColorStop(1, '#f5e6cb');
+      cctx.fillStyle = sky; cctx.fillRect(0, 0, W, H);
+      // Azulejos discretos y toldo de cocina; el contraste queda en la comida.
+      cctx.strokeStyle = '#e7d8be'; cctx.lineWidth = 1;
+      for (let y = (cameraOffset * 0.25) % 40; y < H; y += 40) {
+        cctx.beginPath(); cctx.moveTo(0, y); cctx.lineTo(W, y); cctx.stroke();
+      }
+      for (let x = 0; x < W; x += 40) {
+        cctx.beginPath(); cctx.moveTo(x, 0); cctx.lineTo(x, H); cctx.stroke();
+      }
+      for (let x = 0; x < W; x += 30) {
+        cctx.fillStyle = (x / 30) % 2 ? '#f7e6c7' : '#458b72';
+        roundedRect(x, -10, 30, 30, 7); cctx.fill();
+      }
+      const groundY = FLOOR_Y + cameraOffset;
+      if (groundY < H) {
+        cctx.fillStyle = '#c99662'; cctx.fillRect(0, groundY, W, H - groundY);
+        cctx.fillStyle = '#ead0a9'; cctx.fillRect(0, groundY, W, 7);
+      }
+      // El plato puede salir de cámara en torres altas; esta guía lo localiza.
+      if (PLATE_Y + cameraOffset > H - 20 && running) {
+        cctx.fillStyle = '#3b6e59';
+        roundedRect(plateX - 26, H - 22, 52, 6, 3); cctx.fill();
+        cctx.font = '700 9px system-ui'; cctx.textAlign = 'center';
+        cctx.fillText('PLATO', plateX, H - 5);
+      }
+    }
+
+    function drawCharacter() {
+      cctx.save();
+      cctx.translate(0, cameraOffset);
+      cctx.strokeStyle = '#3b2417'; cctx.lineWidth = 5; cctx.lineCap = 'round';
+      cctx.fillStyle = '#458b72'; roundedRect(plateX - 25, 411, 50, 42, 12); cctx.fill(); cctx.stroke();
+      cctx.fillStyle = '#fff8e9'; roundedRect(plateX - 14, 416, 28, 34, 6); cctx.fill();
+      cctx.fillStyle = '#f4b183'; cctx.beginPath(); cctx.arc(plateX, 399, 23, 0, Math.PI * 2); cctx.fill(); cctx.stroke();
+      cctx.fillStyle = '#fffdf5';
+      roundedRect(plateX - 23, 372, 46, 15, 7); cctx.fill(); cctx.stroke();
+      cctx.fillStyle = '#3b2417'; cctx.beginPath(); cctx.arc(plateX - 7, 397, 2.3, 0, Math.PI * 2); cctx.arc(plateX + 7, 397, 2.3, 0, Math.PI * 2); cctx.fill();
+      cctx.beginPath(); cctx.arc(plateX, 405, 7, 0.2, Math.PI - 0.2); cctx.stroke();
+      cctx.beginPath(); cctx.moveTo(plateX - 21, 421); cctx.lineTo(plateX - 48, 373); cctx.moveTo(plateX + 21, 421); cctx.lineTo(plateX + 48, 373); cctx.stroke();
+      cctx.fillStyle = '#f4b183'; cctx.beginPath(); cctx.arc(plateX - 48, 373, 7, 0, Math.PI * 2); cctx.arc(plateX + 48, 373, 7, 0, Math.PI * 2); cctx.fill();
+      if (!gameOver) {
+        cctx.fillStyle = '#f7f7f7';
+        cctx.beginPath(); cctx.ellipse(plateX, PLATE_Y + 9, 60, 12, 0, 0, Math.PI * 2); cctx.fill(); cctx.strokeStyle = '#64808d'; cctx.lineWidth = 3; cctx.stroke();
+        cctx.fillStyle = '#d8edf2'; cctx.beginPath(); cctx.ellipse(plateX, PLATE_Y + 7, 46, 6, 0, 0, Math.PI * 2); cctx.fill();
+      }
+      cctx.restore();
+    }
+
+    function overlay(text, subtitle) {
+      cctx.fillStyle = 'rgba(255,250,239,0.96)'; roundedRect(30, 166, 300, 100, 18); cctx.fill();
+      cctx.strokeStyle = '#48372c'; cctx.lineWidth = 2; cctx.stroke();
+      cctx.fillStyle = '#3d3028'; cctx.font = '800 21px system-ui'; cctx.textAlign = 'center';
+      cctx.fillText(text, W / 2, 206);
+      cctx.fillStyle = '#765b49'; cctx.font = '12px system-ui';
+      cctx.fillText(subtitle || '', W / 2, 234);
+    }
+
+    function draw() {
+      drawScene();
+      drawCharacter();
+      stack.concat(falling ? [falling] : []).forEach(item => {
+        const body = item.body;
+        cctx.save();
+        cctx.translate(body.position.x, body.position.y + cameraOffset);
+        cctx.rotate(body.angle);
+        drawIngredient(item, 0, -item.height / 2);
+        cctx.restore();
+      });
+      if (floatText && floatText.life > 0) {
+        const textY = 100 - (1.1 - floatText.life) * 18;
+        cctx.save(); cctx.globalAlpha = Math.min(1, floatText.life / 0.3);
+        cctx.font = '800 17px system-ui'; cctx.textAlign = 'center';
+        cctx.strokeStyle = '#fffaf0'; cctx.lineWidth = 5; cctx.strokeText(floatText.text, W / 2, textY);
+        cctx.fillStyle = '#2c7257'; cctx.fillText(floatText.text, W / 2, textY); cctx.restore();
+      }
+      brokenHearts.forEach((heart, index) => {
+        cctx.save();
+        cctx.globalAlpha = Math.min(0.75, heart.life / 0.3);
+        cctx.font = '16px system-ui';
+        cctx.textAlign = 'center';
+        cctx.fillText('💔', W - 24 - index * 19, 76 - (0.9 - heart.life) * 9);
+        cctx.restore();
+      });
+      if (falling && running) {
+        cctx.fillStyle = '#6a5544'; cctx.font = '800 10px system-ui'; cctx.textAlign = 'center';
+        cctx.fillText(falling.name, W / 2, 43);
+      }
+      balanceMarker.style.left = (50 + clamp(balanceRatio, -1.2, 1.2) / 1.2 * 46) + '%';
+      balanceLabel.textContent = Math.abs(balanceRatio) > 1 ? '¡CUIDADO!' : Math.abs(balanceRatio) > 0.7 ? 'INCLINADA' : 'ESTABLE';
+      if (!running && !gameOver) {
+        drawIngredient({ type:'bottom', width:104, height:22 }, W / 2, 130);
+        overlay('¿Qué tan alto llegas?', 'Pulsa Jugar y atrapa el primer pan');
+      }
+      if (paused) overlay('Pausa', 'Tu torre te espera');
+      if (gameOver && !lossAnimating) overlay(score + ' puntos · ' + layers + ' capas', 'Vuelve a jugar y supera tu torre');
+    }
+
+    function movePlateTo(x) {
+      plateTarget = clamp(x, 58, W - 58);
+      inputMode = 'target';
+    }
+
+    function stopPlate() {
+      plateTarget = plateX;
+    }
+
+    function simulate(dt) {
+      const direction = Number(rightHeld) - Number(leftHeld);
+      const previousX = plateX;
+      if (leftHeld || rightHeld) {
+        plateX = clamp(plateX + direction * PLATE_SPEED * dt, 58, W - 58);
+        plateTarget = plateX;
+        inputMode = 'keys';
+      } else if (inputMode === 'keys') {
+        stopPlate();
+      } else {
+        const distance = plateTarget - plateX;
+        const step = clamp(distance, -POINTER_SPEED * dt, POINTER_SPEED * dt);
+        plateX += Math.abs(distance) < 0.1 ? distance : step;
+      }
+      if (plateX !== previousX) {
+        carryStackWithPlate(plateX - previousX);
+        Matter.Body.setPosition(plateBody, { x: plateX, y: PLATE_Y + 7 });
+      }
+      // Evita que el solver añada un segundo empujón lateral al desplazamiento compartido.
+      Matter.Body.setVelocity(plateBody, { x: 0, y: 0 });
+
+      if (falling) falling.touching = false;
+      Matter.Engine.update(physics, FIXED_DT * 1000);
+      if (falling) {
+        const body = falling.body;
+        if (!falling.invalidContact && falling.touching
+          && body.speed < 1.5 && body.angularSpeed < 0.045) {
+          falling.settledFor += dt;
+          if (falling.settledFor >= 0.12) landIngredient();
+        } else {
+          falling.settledFor = Math.max(0, falling.settledFor - dt * 2);
+        }
+      }
+      if (gameOver) return;
+      const lost = stack.filter(item => item.body.position.y > PLATE_Y + 45
+        || item.body.bounds.max.x < 0 || item.body.bounds.min.x > W);
+      if (lost.length >= 4 || (stack.length >= 4 && lost.some(item => item.type === 'bottom'))) {
+        end('¡SE DERRUMBÓ TODO EL SÁNDWICH!');
+        return;
+      }
+      for (const item of lost) {
+        Matter.Composite.remove(physics.world, item.body);
+        stack.splice(stack.indexOf(item), 1);
+        registerMiss();
+        if (gameOver) return;
+      }
+      if (!stack.length && falling && falling.type !== 'bottom') {
+        Matter.Composite.remove(physics.world, falling.body);
+        falling = null;
+        spawnDelay = 0.35;
+      }
+      if (falling && falling.body.position.y > PLATE_Y + 48) missFallingIngredient();
+      if (gameOver) return;
+      if (!falling) {
+        spawnDelay -= dt;
+        if (spawnDelay <= 0) spawnIngredient();
+      }
+      updateTowerBalance();
+      updateCamera(dt);
+      if (floatText) { floatText.life -= dt; if (floatText.life <= 0) floatText = null; }
+      updateBrokenHearts(dt);
+    }
+
+    function frame(now) {
+      if (!running || gameOver || paused) return;
+      accumulator += lastAt ? Math.min(0.1, (now - lastAt) / 1000) : 0;
+      lastAt = now;
+      while (accumulator >= FIXED_DT && running && !gameOver) {
+        simulate(FIXED_DT);
+        accumulator -= FIXED_DT;
+      }
+      if (gameOver) return;
+      draw();
+      raf = requestAnimationFrame(frame);
+    }
+
+    function onKeyDown(event) {
+      if (isTypingTarget(event) || !running || gameOver || paused) return;
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') { leftHeld = true; event.preventDefault(); }
+      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') { rightHeld = true; event.preventDefault(); }
+    }
+    function onKeyUp(event) {
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') leftHeld = false;
+      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') rightHeld = false;
+      if (!leftHeld && !rightHeld && inputMode === 'keys') stopPlate();
+    }
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+
+    function clearInput() {
+      leftHeld = false;
+      rightHeld = false;
+      pointerActive = false;
+      pointerId = null;
+      stopPlate();
+    }
+    global.addEventListener('blur', clearInput);
+
+    function pointerX(event) {
+      const rect = canvas.getBoundingClientRect();
+      return (event.clientX - rect.left) * W / rect.width;
+    }
+    canvas.addEventListener('pointerdown', event => {
+      if (!running || gameOver || paused || pointerActive || (event.button != null && event.button !== 0)) return;
+      pointerActive = true;
+      pointerId = event.pointerId;
+      leftHeld = false;
+      rightHeld = false;
+      stopPlate();
+      inputMode = 'target';
+      // Arrastre relativo: tocar lejos del plato no teletransporta la torre.
+      pointerOffset = pointerX(event) - plateX;
+      if (canvas.setPointerCapture) canvas.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+    canvas.addEventListener('pointermove', event => {
+      if (!pointerActive || event.pointerId !== pointerId || !running || gameOver || paused) return;
+      movePlateTo(pointerX(event) - pointerOffset);
+      event.preventDefault();
+    });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => canvas.addEventListener(type, event => {
+      if (event.pointerId === pointerId) { pointerActive = false; pointerId = null; stopPlate(); }
+    }));
+
+    wrap.querySelectorAll('[data-sw-dir]').forEach(button => {
+      const direction = button.dataset.swDir;
+      const setHeld = value => {
+        if (direction === 'left') leftHeld = value;
+        else rightHeld = value;
+        if (!leftHeld && !rightHeld) stopPlate();
+      };
+      button.addEventListener('pointerdown', event => {
+        if (running && !gameOver && !paused) {
+          setHeld(true);
+          if (button.setPointerCapture) button.setPointerCapture(event.pointerId);
+          event.preventDefault();
+        }
+      });
+      ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => button.addEventListener(type, () => setHeld(false)));
+      // También permite activar las flechas con teclado o tecnología de apoyo.
+      button.addEventListener('click', event => {
+        if (event.detail === 0 && running && !gameOver && !paused) movePlateTo(plateTarget + (direction === 'left' ? -28 : 28));
+      });
+    });
+
+    autoPause(wrap,
+      () => {
+        if (running && !gameOver) {
+          paused = true;
+          clearInput();
+          accumulator = 0;
+          cancelAnimationFrame(raf);
+          draw();
+        }
+      },
+      () => {
+        if (!paused || gameOver) return;
+        paused = false;
+        lastAt = 0;
+        draw();
+        raf = requestAnimationFrame(frame);
+      }
+    );
+
+    if (typeof MutationObserver !== 'undefined') {
+      const cleanupObserver = new MutationObserver(() => {
+        if (!document.body.contains(wrap)) {
+          running = false;
+          gameOver = true;
+          leftHeld = false;
+          rightHeld = false;
+          cancelAnimationFrame(raf);
+          lossAnimating = false;
+          clearInput();
+          document.removeEventListener('keydown', onKeyDown);
+          document.removeEventListener('keyup', onKeyUp);
+          global.removeEventListener('blur', clearInput);
+          cleanupObserver.disconnect();
+        }
+      });
+      cleanupObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    startButton.addEventListener('click', () => {
+      reset();
+      running = true;
+      wrap.classList.add('is-playing');
+      viewport.enter();
+      startButton.disabled = true;
+      startButton.textContent = 'Apilando…';
+      spawnIngredient();
+      lastAt = 0;
+      raf = requestAnimationFrame(frame);
     });
 
     reset();

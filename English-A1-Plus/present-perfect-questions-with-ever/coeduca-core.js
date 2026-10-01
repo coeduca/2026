@@ -1,6 +1,6 @@
 /**
  * COEDUCA Framework v1 - Core
- * Profesor José Eliseo Martínez - COEDUCA
+ * Profesor Eliseo - COEDUCA
  *
  * Maneja: login (NIE), PDF (con fix iOS), anti-copy, hooks de Rigo,
  *         pool A/B, score global, drag&drop con touch + auto-scroll,
@@ -22,6 +22,21 @@
   const STORAGE_KEY_PREFIX = 'coeduca_';
   const VERSION = '1.2.0';
 
+  function activityStorageId(config) {
+    if (config.id) return String(config.id);
+    const topicId = (config.topic || 'page').replace(/\W+/g, '_').toLowerCase();
+    // Paquetes antiguos no tienen id. Conservar su progreso si la carpeta
+    // coincide con el título; una carpeta distinta (p. ej. "...2") debe
+    // usar su propio estado, aunque el título normalizado sea idéntico.
+    const path = (global.location.pathname || '')
+      .replace(/\/(?:index|juegos)\.html$/i, '/')
+      .replace(/\/+$/, '');
+    const folder = path.split('/').pop().replace(/\W+/g, '_').toLowerCase();
+    return folder && folder !== topicId
+      ? path.split('/').filter(Boolean).slice(-2).join('-').toLowerCase()
+      : topicId;
+  }
+
   // =====================================================================
   // FILTRO DE NIVEL POR GRADO
   // =====================================================================
@@ -35,6 +50,7 @@
     'PreA1': ['Séptimo', 'Septimo', 'Octavo']
   };
   const TEST_NIE = '1999'; // José Eliseo - siempre permitido
+  const RIGO_NIE = '12379'; // Cuenta fija de Rigo
 
   // =====================================================================
   // 1. STATE GLOBAL
@@ -179,6 +195,7 @@
     window.addEventListener('pageshow', function (e) {
       if (e.persisted) {
         // La página viene del bfcache: recargar para reconstruir UI desde state.
+        try { sessionStorage.setItem(state.storageKey + 'resumeAfterHistory', '1'); } catch (err) {}
         location.reload();
       }
     });
@@ -211,6 +228,7 @@
   // =====================================================================
   function saveState() {
     try {
+      syncGameBonus();
       const snapshot = {
         student: state.student,
         partner: state.partner,
@@ -231,6 +249,45 @@
       if (!raw) return null;
       return JSON.parse(raw);
     } catch (e) { return null; }
+  }
+
+  function accountStateKey(nie) {
+    return state.storageKey + 'account_' + String(nie) + '_state';
+  }
+
+  function archiveAccountState(snapshot) {
+    if (!snapshot || !snapshot.student || !snapshot.student.nie) return;
+    try {
+      localStorage.setItem(accountStateKey(snapshot.student.nie), JSON.stringify(snapshot));
+    } catch (e) {}
+  }
+
+  function loadAccountState(nie) {
+    try {
+      const raw = localStorage.getItem(accountStateKey(nie));
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function clearAccountStates() {
+    try {
+      const prefix = state.storageKey + 'account_';
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(prefix) && key.endsWith('_state')) localStorage.removeItem(key);
+      }
+    } catch (e) {}
+  }
+
+  function syncGameBonus() {
+    const latest = loadState();
+    if (!latest || !latest.student || !state.student || latest.student.nie !== state.student.nie) return false;
+    if ((Number(latest.extraPoints) || 0) > state.extraPoints) {
+      state.extraPoints = Number(latest.extraPoints);
+      state.gameResult = latest.gameResult || state.gameResult;
+    }
+    state.balloonBonus = Math.max(state.balloonBonus, Number(latest.balloonBonus) || 0);
+    return true;
   }
 
   function recordAnswer(exerciseId, score, total, details, userAnswer) {
@@ -301,8 +358,8 @@
   function updateScoreDisplay() {
     const badge = document.getElementById('coeduca-extra-badge');
     if (badge) {
-      badge.textContent = '+' + (state.extraPoints + state.balloonBonus).toFixed(1) + ' pts extra';
-      badge.style.display = (state.extraPoints + state.balloonBonus) > 0 ? 'block' : 'none';
+      badge.querySelector('.cocean-bonus-number').textContent = (state.extraPoints + state.balloonBonus).toFixed(1);
+        badge.style.display = (state.extraPoints + state.balloonBonus) > 0 ? 'flex' : 'none';
     }
     const finalDisplay = document.getElementById('coeduca-final-score-display');
     if (finalDisplay) {
@@ -370,8 +427,9 @@
   // VALIDACIÓN DE NIVEL
   // =====================================================================
   function isAllowedAtLevel(student) {
+    if (global.COEDUCA_CLASSROOM) return !!student;
     if (!student) return false;
-    if (student.nie === TEST_NIE) return true; // José Eliseo siempre pasa
+    if (student.nie === TEST_NIE || student.nie === RIGO_NIE) return true;
     const lvl = state.config && state.config.level;
     if (!lvl) return true; // sin filtro
     const allowed = LEVEL_FILTERS[lvl];
@@ -386,10 +444,50 @@
     return '';
   }
 
+  async function resumeStudentIfReturning() {
+    const saved = loadState();
+    const auth = global.COEDUCA_FIXED_AUTH;
+    const remembered = auth && auth.lastStudent() || '';
+    const nie = remembered || String(saved && saved.student && saved.student.nie || '');
+    if (!nie) return false;
+    let db = null;
+    try { db = global.STUDENTS; } catch (e) {}
+    if (!db) { try { db = STUDENTS; } catch (e) {} }
+    let found;
+    if (global.COEDUCA_CLASSROOM) {
+      try { found = await global.COEDUCA_CLASSROOM.lookup(nie); }
+      catch (_) { found = saved && saved.student && String(saved.student.nie) === nie ? saved.student : null; }
+      if (!found) return false;
+    } else {
+      if (!db || !db[nie]) return false;
+      found = { nie, ...db[nie] };
+    }
+    if (!global.COEDUCA_CLASSROOM && (nie === '1999' || nie === '12379')) {
+      if (!auth) return false;
+      try { if (!await auth.hasSession(nie)) return false; }
+      catch (_) { return false; }
+    }
+    if (!isAllowedAtLevel(found)) return false;
+    if (saved && saved.student && String(saved.student.nie) !== nie) archiveAccountState(saved);
+    const own = saved && saved.student && String(saved.student.nie) === nie ? saved : loadAccountState(nie);
+    state.answers = own && own.answers || {};
+    state.extraPoints = Number(own && own.extraPoints) || 0;
+    state.balloonBonus = Number(own && own.balloonBonus) || 0;
+    state.gameResult = own && own.gameResult || null;
+    if (own && own.poolVersion) state.poolVersion = own.poolVersion;
+    state.student = found;
+    state.partners = own && (own.partners || (own.partner ? [own.partner] : [])) || [];
+    state.partner = state.partners[0] || null;
+    if (auth) auth.remember(nie);
+    saveState();
+    if (global.rigo && global.rigo.setGrade) global.rigo.setGrade(found.grade);
+    return true;
+  }
+
   // =====================================================================
   // 7. LOGIN MODAL
   // =====================================================================
-  function showLoginModal() {
+  function showLoginModal(fresh = false) {
     return new Promise((resolve) => {
       const MAX_PARTNERS = 4;
 
@@ -463,7 +561,8 @@
       let mainStudent = null;
       const partners = []; // [{ student, fieldEl, inputEl }]
 
-      function lookupNIE(nie) {
+      async function lookupNIE(nie) {
+        if (global.COEDUCA_CLASSROOM) return global.COEDUCA_CLASSROOM.lookup(nie);
         // STUDENTS puede estar como global (var) o lexical (const/let).
         let DB = null;
         try { DB = global.STUDENTS; } catch (e) {}
@@ -483,8 +582,12 @@
         addPartnerBtn.style.opacity = partners.length >= MAX_PARTNERS ? '0.5' : '1';
       }
 
-      function validateMain() {
-        const found = lookupNIE(nieInput.value);
+      async function validateMain() {
+        const value = nieInput.value; mainStudent = null; submitBtn.disabled = true;
+        let found;
+        try { found = await lookupNIE(value); }
+        catch (error) { if (nieInput.value !== value) return; nieError.textContent = error.message; nieError.classList.add('show'); return; }
+        if (nieInput.value !== value) return;
         if (found) {
           if (!isAllowedAtLevel(found)) {
             mainStudent = null;
@@ -540,7 +643,8 @@
         slot.fieldEl = field;
         slot.inputEl = inp;
 
-        const validate = () => {
+        const validate = async () => {
+          slot.student = null;
           const v = inp.value.trim();
           if (!v) {
             slot.student = null;
@@ -563,7 +667,10 @@
             err.classList.add('show');
             return;
           }
-          const found = lookupNIE(v);
+          let found;
+          try { found = await lookupNIE(v); }
+          catch (error) { if (inp.value.trim() !== v) return; err.textContent = error.message; err.classList.add('show'); return; }
+          if (inp.value.trim() !== v || !field.isConnected) return;
           if (found) {
             if (!isAllowedAtLevel(found)) {
               slot.student = null;
@@ -631,15 +738,31 @@
       nieInput.addEventListener('input', validateMain);
       addPartnerBtn.addEventListener('click', addPartnerField);
 
-      const finish = () => {
+      const finish = async () => {
         if (!mainStudent) return;
+        const chosen = mainStudent;
+        if (chosen.nie === '1999' || chosen.nie === '12379') {
+          const auth = global.COEDUCA_FIXED_AUTH;
+          if (!auth) {
+            nieError.textContent = 'No se pudo cargar el acceso protegido.';
+            nieError.classList.add('show');
+            return;
+          }
+          submitBtn.disabled = true;
+          const accepted = await auth.requestLogin(chosen.nie);
+          submitBtn.disabled = false;
+          if (!accepted || mainStudent !== chosen) return;
+        }
         
         const prev = loadState();
-        if (prev && prev.student && prev.student.nie !== mainStudent.nie) {
-          // Si hay un cambio de estudiante principal, limpiamos el progreso
-          state.answers = {};
-          state.extraPoints = 0; state.balloonBonus = 0;
-          state.gameResult = null;
+        if (!prev || !prev.student || String(prev.student.nie) !== String(mainStudent.nie)) {
+          archiveAccountState(prev);
+          const savedAccount = loadAccountState(mainStudent.nie);
+          state.answers = savedAccount && savedAccount.answers || {};
+          state.extraPoints = Number(savedAccount && savedAccount.extraPoints) || 0;
+          state.balloonBonus = Number(savedAccount && savedAccount.balloonBonus) || 0;
+          state.gameResult = savedAccount && savedAccount.gameResult || null;
+          if (savedAccount && savedAccount.poolVersion) state.poolVersion = savedAccount.poolVersion;
         }
 
         state.student = mainStudent;
@@ -648,6 +771,7 @@
         // Compatibilidad: state.partner = el primero (si hay)
         state.partner = state.partners[0] || null;
         saveState();
+        if (global.COEDUCA_FIXED_AUTH) global.COEDUCA_FIXED_AUTH.remember(mainStudent.nie);
         if (global.rigo && global.rigo.loginSuccess) {
           global.rigo.loginSuccess(mainStudent.name);
         }
@@ -677,7 +801,7 @@
 
       // Restaurar sesión si existe
       const prev = loadState();
-      if (prev && prev.student) {
+      if (!fresh && prev && prev.student) {
         nieInput.value = prev.student.nie;
         validateMain();
         // Restaurar compañeros (soporta state.partners[] nuevo o state.partner viejo)
@@ -708,6 +832,7 @@
     if (colors.bg) root.style.setProperty('--coeduca-bg', colors.bg);
     // Nuevos colores: surface = fondo de tarjetas, text = color de texto.
     if (colors.cardBg) root.style.setProperty('--coeduca-surface', colors.cardBg);
+    if (colors.itemBg) root.style.setProperty('--coeduca-item-bg', colors.itemBg);
     if (colors.text) root.style.setProperty('--coeduca-text', colors.text);
   }
 
@@ -721,6 +846,27 @@
     document.documentElement.setAttribute('data-coeduca-ui-theme', selected);
   }
 
+  function switchAccount() {
+    if (global.COEDUCA_FIXED_AUTH) global.COEDUCA_FIXED_AUTH.clear();
+    if (global.COEDUCA_OCEAN) global.COEDUCA_OCEAN.mount(null);
+    archiveAccountState(loadState());
+    try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}
+    try { sessionStorage.removeItem(state.storageKey + 'resumeAfterHistory'); } catch (e) {}
+    state.student = null;
+    state.partner = null;
+    state.partners = [];
+    state.answers = {};
+    state.extraPoints = 0;
+    state.balloonBonus = 0;
+    state.gameResult = null;
+    if (state.appRoot) state.appRoot.style.display = 'none';
+    showLoginModal(true).then(() => {
+      if (state.appRoot) state.appRoot.style.display = '';
+      renderLayout();
+      updateScoreDisplay();
+    });
+  }
+
   function renderLayout() {
     const cfg = state.config;
     const containerSel = cfg.container || '#app';
@@ -732,14 +878,20 @@
     }
     appRoot.className = 'coeduca-app';
     appRoot.innerHTML = `
-      <div class="coeduca-extra-badge" id="coeduca-extra-badge" style="display:none">+0 pts extra</div>
+      <div class="coeduca-extra-badge" id="coeduca-extra-badge" style="display:none" aria-label="Puntos extra"><img class="cocean-bonus-icon" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxwYXRoIGQ9Ik00IDEySDIwTTEyIDRWMjAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4NCjwvc3ZnPg==" alt=""><span class="cocean-bonus-number">0.0</span></div>
       <header class="coeduca-header">
         <h1>${escapeHTML(cfg.topic || 'Ejercicio de Inglés')}</h1>
-        <p>${escapeHTML(cfg.level || '')} - COEDUCA - Prof. José Eliseo Martínez</p>
+        <p>${escapeHTML(cfg.level || '')} - COEDUCA - Prof. Eliseo</p>
         <div class="coeduca-header-students" id="coeduca-header-students"></div>
-        <button class="coeduca-btn coeduca-btn-info coeduca-add-member-btn" id="coeduca-add-member-btn" type="button">
-          + Agregar miembro
-        </button>
+        <div class="coeduca-header-actions">
+          <button class="coeduca-btn coeduca-btn-info coeduca-add-member-btn" id="coeduca-add-member-btn" type="button">
+            + Agregar miembro
+          </button>
+          <button class="coeduca-btn coeduca-btn-info coeduca-switch-account-btn" id="coeduca-switch-account-btn"
+                  type="button" aria-label="Cambiar de cuenta" title="Cambiar de cuenta">
+            <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PgoNPCEtLSBVcGxvYWRlZCB0bzogU1ZHIFJlcG8sIHd3dy5zdmdyZXBvLmNvbSwgR2VuZXJhdG9yOiBTVkcgUmVwbyBNaXhlciBUb29scyAtLT4KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB2ZXJzaW9uPSIxLjEiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgoNPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCgkuc3Qwe2ZpbGw6IzMzMzMzMzt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMzMzMzMzM7c3Ryb2tlLXdpZHRoOjMyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPgoNPGcgaWQ9IkxheWVyXzEiLz4KDTxnIGlkPSJMYXllcl8yIj4KDTxnPgoNPGc+Cg08ZWxsaXBzZSBjbGFzcz0ic3QwIiBjeD0iMTM5LjYxIiBjeT0iMjczLjciIHJ4PSI2My45NiIgcnk9IjYzLjk2IiB0cmFuc2Zvcm09Im1hdHJpeCgwLjkyMzkgLTAuMzgyNyAwLjM4MjcgMC45MjM5IC05NC4xMTE4IDc0LjI2MSkiLz4KDTwvZz4KDTxnPgoNPHBhdGggY2xhc3M9InN0MCIgZD0iTTE1MS44LDM4NS4yMmgtMjQuMzdjLTQ2LjM1LDAtODMuOTMsMzcuNTctODMuOTMsODMuOTNsMCwwaDE5Mi4yMmwwLDAgICAgIEMyMzUuNzIsNDIyLjc5LDE5OC4xNSwzODUuMjIsMTUxLjgsMzg1LjIyeiIvPgoNPC9nPgoNPGc+Cg08ZWxsaXBzZSBjbGFzcz0ic3QwIiBjeD0iMzcyLjM5IiBjeT0iMTA2LjgyIiByeD0iNjMuOTYiIHJ5PSI2My45NiIgdHJhbnNmb3JtPSJtYXRyaXgoMC44NTA3IC0wLjUyNTcgMC41MjU3IDAuODUwNyAtMC41NDA4IDIxMS43MjkyKSIvPgoNPC9nPgoNPGc+Cg08cGF0aCBjbGFzcz0ic3QwIiBkPSJNMzg0LjU3LDIxOC4zNEgzNjAuMmMtNDYuMzUsMC04My45MywzNy41Ny04My45Myw4My45M3YwSDQ2OC41djBDNDY4LjUsMjU1LjkxLDQzMC45MywyMTguMzQsMzg0LjU3LDIxOC4zNCAgICAgeiIvPgoNPC9nPgoNPGc+Cg08cGF0aCBjbGFzcz0ic3QwIiBkPSJNMzgzLjcxLDM0OS42MWMtMC4zOC0wLjM4LTAuNzctMC43My0xLjE4LTEuMDdjLTAuMTgtMC4xNC0wLjM2LTAuMjctMC41NC0wLjQxICAgICBjLTAuMjQtMC4xOC0wLjQ3LTAuMzYtMC43MS0wLjUzYy0wLjIyLTAuMTUtMC40NS0wLjI4LTAuNjgtMC40MWMtMC4yMi0wLjEzLTAuNDQtMC4yNy0wLjY2LTAuMzljLTAuMjMtMC4xMi0wLjQ3LTAuMjMtMC43MS0wLjM0ICAgICBjLTAuMjQtMC4xMS0wLjQ3LTAuMjMtMC43MS0wLjMzYy0wLjIzLTAuMS0wLjQ3LTAuMTctMC43LTAuMjZjLTAuMjYtMC4wOS0wLjUxLTAuMTktMC43OC0wLjI3Yy0wLjIzLTAuMDctMC40Ny0wLjEyLTAuNy0wLjE4ICAgICBjLTAuMjctMC4wNy0wLjU0LTAuMTQtMC44Mi0wLjJjLTAuMjYtMC4wNS0wLjUzLTAuMDgtMC44LTAuMTJjLTAuMjUtMC4wNC0wLjUtMC4wOC0wLjc1LTAuMTFjLTAuNDgtMC4wNS0wLjk1LTAuMDctMS40My0wLjA3ICAgICBjLTAuMDUsMC0wLjEtMC4wMS0wLjE0LTAuMDFjLTAuMDYsMC0wLjExLDAuMDEtMC4xNywwLjAxYy0wLjQ3LDAtMC45NCwwLjAzLTEuNDEsMC4wN2MtMC4yNiwwLjAzLTAuNTEsMC4wNy0wLjc3LDAuMTEgICAgIGMtMC4yNiwwLjA0LTAuNTIsMC4wNy0wLjc4LDAuMTJjLTAuMjgsMC4wNi0wLjU2LDAuMTMtMC44NCwwLjJjLTAuMjMsMC4wNi0wLjQ2LDAuMTEtMC42OCwwLjE4Yy0wLjI3LDAuMDgtMC41MywwLjE4LTAuOCwwLjI4ICAgICBjLTAuMjMsMC4wOC0wLjQ2LDAuMTYtMC42OCwwLjI1Yy0wLjI1LDAuMS0wLjQ4LDAuMjItMC43MywwLjM0Yy0wLjIzLDAuMTEtMC40NywwLjIxLTAuNywwLjMzYy0wLjIzLDAuMTItMC40NSwwLjI2LTAuNjcsMC40ICAgICBjLTAuMjIsMC4xMy0wLjQ1LDAuMjYtMC42NywwLjQxYy0wLjI1LDAuMTYtMC40OCwwLjM1LTAuNzEsMC41MmMtMC4xOCwwLjE0LTAuMzcsMC4yNi0wLjU1LDAuNDFjLTAuNDEsMC4zNC0wLjgsMC42OS0xLjE3LDEuMDYgICAgIGwtMjkuNDQsMjkuNDRjLTYuMjUsNi4yNS02LjI1LDE2LjM4LDAsMjIuNjNjMy4xMiwzLjEyLDcuMjIsNC42OSwxMS4zMSw0LjY5YzQuMDksMCw4LjE5LTEuNTYsMTEuMzEtNC42OWwyLjEzLTIuMTN2MzYuOTYgICAgIGgtNzYuNzVjLTguODQsMC0xNiw3LjE2LTE2LDE2czcuMTYsMTYsMTYsMTZoOTIuNzVjOC44NCwwLDE2LTcuMTYsMTYtMTZ2LTUyLjk2bDIuMTMsMi4xM2MzLjEyLDMuMTIsNy4yMiw0LjY5LDExLjMxLDQuNjkgICAgIGM0LjA5LDAsOC4xOS0xLjU2LDExLjMxLTQuNjljNi4yNS02LjI1LDYuMjUtMTYuMzgsMC0yMi42M0wzODMuNzEsMzQ5LjYxeiIvPgoNPC9nPgoNPGc+Cg08cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjMyLjQxLDQ1LjAyaC05Mi43NWMtOC44NCwwLTE2LDcuMTYtMTYsMTZ2NTIuOTZsLTIuMTMtMi4xM2MtNi4yNS02LjI1LTE2LjM4LTYuMjUtMjIuNjMsMCAgICAgYy02LjI1LDYuMjUtNi4yNSwxNi4zOCwwLDIyLjYzbDI5LjQzLDI5LjQzYzAuMzgsMC4zOCwwLjc3LDAuNzMsMS4xOCwxLjA3YzAuMTgsMC4xNSwwLjM2LDAuMjcsMC41NSwwLjQxICAgICBjMC4yNCwwLjE4LDAuNDcsMC4zNiwwLjcxLDAuNTJjMC4yMiwwLjE1LDAuNDYsMC4yOCwwLjY4LDAuNDJjMC4yMiwwLjEzLDAuNDMsMC4yNywwLjY2LDAuMzljMC4yNCwwLjEzLDAuNDgsMC4yMywwLjcyLDAuMzUgICAgIGMwLjIzLDAuMTEsMC40NiwwLjIzLDAuNywwLjMyYzAuMjQsMC4xLDAuNDgsMC4xOCwwLjcxLDAuMjZjMC4yNSwwLjA5LDAuNSwwLjE5LDAuNzYsMC4yN2MwLjI0LDAuMDcsMC40OCwwLjEzLDAuNzIsMC4xOSAgICAgYzAuMjYsMC4wNywwLjUzLDAuMTQsMC44LDAuMTljMC4yOCwwLjA2LDAuNTYsMC4wOSwwLjg0LDAuMTNjMC4yNCwwLjAzLDAuNDcsMC4wOCwwLjcxLDAuMWMwLjUyLDAuMDUsMS4wNSwwLjA4LDEuNTgsMC4wOCAgICAgczEuMDUtMC4wMywxLjU4LTAuMDhjMC4yNC0wLjAyLDAuNDctMC4wNywwLjcxLTAuMWMwLjI4LTAuMDQsMC41Ni0wLjA3LDAuODQtMC4xM2MwLjI3LTAuMDUsMC41My0wLjEzLDAuNzktMC4xOSAgICAgYzAuMjQtMC4wNiwwLjQ4LTAuMTEsMC43Mi0wLjE5YzAuMjYtMC4wOCwwLjUxLTAuMTgsMC43Ni0wLjI3YzAuMjQtMC4wOSwwLjQ4LTAuMTYsMC43MS0wLjI2YzAuMjQtMC4xLDAuNDctMC4yMSwwLjctMC4zMiAgICAgYzAuMjQtMC4xMSwwLjQ4LTAuMjIsMC43Mi0wLjM1YzAuMjItMC4xMiwwLjQ0LTAuMjYsMC42Ni0wLjM5YzAuMjMtMC4xNCwwLjQ2LTAuMjcsMC42OS0wLjQyYzAuMjQtMC4xNiwwLjQ3LTAuMzUsMC43MS0wLjUyICAgICBjMC4xOC0wLjE0LDAuMzctMC4yNiwwLjU1LTAuNDFjMC40MS0wLjM0LDAuODEtMC42OSwxLjE4LTEuMDdsMjkuNDMtMjkuNDNjNi4yNS02LjI1LDYuMjUtMTYuMzgsMC0yMi42MyAgICAgYy02LjI1LTYuMjUtMTYuMzgtNi4yNS0yMi42MywwbC0yLjEzLDIuMTNWNzcuMDJoNzYuNzVjOC44NCwwLDE2LTcuMTYsMTYtMTZTMjQxLjI0LDQ1LjAyLDIzMi40MSw0NS4wMnoiLz4KDTwvZz4KDTwvZz4KDTwvZz4KDTwvc3ZnPg==" alt="" aria-hidden="true">
+          </button>
+        </div>
       </header>
       <div id="coeduca-exercises"></div>
       <div id="coeduca-game-section"></div>
@@ -761,12 +913,19 @@
       </div>
     `;
     state.appRoot = appRoot;
+    if (global.COEDUCA_OCEAN) global.COEDUCA_OCEAN.mount(cfg.examMode ? null : {
+      student: state.student,
+      activityId: 'ingles:' + (cfg.id || (cfg.topic + '|' + cfg.level)),
+      badgeId: 'coeduca-extra-badge',
+      getGrade: () => getTotalScore().grade
+    });
 
     // Mostrar nombres en el header
     renderHeaderStudents();
 
     // Botón de agregar miembro durante el ejercicio
     document.getElementById('coeduca-add-member-btn').addEventListener('click', showAddMemberModal);
+    document.getElementById('coeduca-switch-account-btn').addEventListener('click', switchAccount);
 
     // Botón de PDF
     document.getElementById('coeduca-pdf-btn').addEventListener('click', function () {
@@ -775,6 +934,8 @@
     document.getElementById('coeduca-pdf-view-btn').addEventListener('click', function () {
       generatePDF({ view: true });
     });
+
+    if (global.COEDUCA_CLASSROOM) global.COEDUCA_CLASSROOM.mount(state, syncGameBonus);
 
     // Renderizar ejercicios
     const container = document.getElementById('coeduca-exercises');
@@ -820,6 +981,8 @@
     // Renderizar juego
     if (cfg.game) {
       renderGame(cfg.game);
+    } else {
+      document.getElementById('coeduca-game-section').replaceChildren();
     }
   }
 
@@ -1005,7 +1168,8 @@
     const cancelBtn = overlay.querySelector('#coeduca-add-member-cancel');
     let candidate = null;
 
-    function lookup(nie) {
+    async function lookup(nie) {
+        if (global.COEDUCA_CLASSROOM) return global.COEDUCA_CLASSROOM.lookup(nie);
       let DB = null;
       try { DB = global.STUDENTS; } catch (e) {}
       if (!DB) { try { DB = STUDENTS; } catch (e) {} }
@@ -1014,7 +1178,7 @@
       return clean && DB[clean] ? { nie: clean, ...DB[clean] } : null;
     }
 
-    function validate() {
+    async function validate() {
       const v = inp.value.trim();
       candidate = null;
       okBtn.disabled = true;
@@ -1030,7 +1194,10 @@
         err.textContent = 'Ya está agregado al equipo';
         err.classList.add('show'); return;
       }
-      const found = lookup(v);
+      let found;
+      try { found = await lookup(v); }
+      catch (error) { if (inp.value.trim() !== v) return; err.textContent = error.message; err.classList.add('show'); return; }
+      if (inp.value.trim() !== v || !overlay.isConnected) return;
       if (!found) {
         info.classList.remove('show');
         if (v.length >= 4) { err.textContent = 'NIE no encontrado'; err.classList.add('show'); }
@@ -1117,7 +1284,7 @@
     const section = document.getElementById('coeduca-game-section');
     section.innerHTML = `
       <div class="coeduca-exercise">
-        <div class="coeduca-exercise-title">Juego final</div>
+        <div class="coeduca-exercise-title">Juego del día</div>
         <div id="coeduca-game-body"></div>
       </div>
     `;
@@ -1127,6 +1294,8 @@
         renderer({
           container: document.getElementById('coeduca-game-body'),
           config: gameCfg,
+          student: state.student,
+          hideAvatarButton: true,
           onWin: () => {
             const wasWin = state.gameResult === 'win';
             if (global.rigo) global.rigo.setEmotion && global.rigo.setEmotion('excited');
@@ -2528,11 +2697,20 @@
     registerGame(type, renderer) {
       state.gameRegistry[type] = renderer;
     },
+    getGameRenderer(type) {
+      return state.gameRegistry[type] || null;
+    },
 
     init(config) {
       state.config = config;
-      state.storageKey = STORAGE_KEY_PREFIX +
-        (config.id || (config.topic || 'page').replace(/\W+/g, '_').toLowerCase()) + '_';
+      state.storageKey = STORAGE_KEY_PREFIX + activityStorageId(config) + '_';
+
+      global.addEventListener('storage', event => {
+        if (event.key === state.storageKey + 'state' && syncGameBonus()) updateScoreDisplay();
+      });
+      global.addEventListener('focus', () => {
+        if (syncGameBonus()) updateScoreDisplay();
+      });
 
       ensureNoTranslate();
       setupBfCacheGuard();
@@ -2552,7 +2730,8 @@
 
       // Esperar DOM
       const start = () => {
-        showLoginModal().then(() => {
+        const login = resumeStudentIfReturning().then(resumed => resumed ? undefined : showLoginModal());
+        login.then(() => {
           renderLayout();
           setupAudioButtons();
           updateScoreDisplay();
@@ -2568,6 +2747,7 @@
     reset() {
       try { localStorage.removeItem(state.storageKey + 'state'); } catch (e) {}
       try { localStorage.removeItem(state.storageKey + 'pool'); } catch (e) {}
+      clearAccountStates();
       location.reload();
     },
 

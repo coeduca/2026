@@ -34,12 +34,11 @@
   //   - emotion: emoción forzada al mostrar el mensaje (opcional)
   //              Si no se define, usa la emoción por defecto del contexto.
   const RANDOM_MESSAGES = [
-    { text: "Eres muy inteligente", grade: null, emotion: 'happy' },
-    { text: "Lo haces como un sabedor", grade: null, emotion: 'happy' },
-    { text: "Solo tu puedes hacerlo", grade: null, emotion: 'happy' },
-    { text: "Trabajar en equipo puede hacer el trabajo más fácil", grade: null, emotion: 'happy' },
-    { text: "Inglés es fácil", grade: null, emotion: 'sneaky' },
-    { text: "Creo en ti", grade: null, emotion: 'happy' }
+    { text: "Hoy no me bañé", grade: null, emotion: 'happy' },
+    { text: "Mejor tarde que nunca", grade: null, emotion: 'happy' },
+    { text: "¿Y mis hotwheels?", grade: null, emotion: 'happy' },
+    { text: "No le tengo miedo a las cucarachas", grade: null, emotion: 'happy' },
+    { text: "Have you ever fallen in love?", grade: null, emotion: 'happy' }
   ];
 
   // HINTS: si grade es null aparecen para todos los grados.
@@ -50,26 +49,30 @@
   //                        dizzy, musical, elder
   // Grados válidos: "Séptimo", "Octavo", "Noveno", "Primer Año", "Segundo Año", "Prueba"
   const HINT_MESSAGES = [
-    { text: "¿Ya viste el precio de las papas?", grade: null, emotion: 'confused' },
-    { text: "Todos aprendemos de diferente manera", grade: null, emotion: 'happy' },
-    { text: "Oh my god!", grade: null, emotion: 'excited' },
-    { text: "Mi primera chamba", grade: null, emotion: 'musical' },
-    { text: "Necesitamos un teléfono público en la escuela", grade: null, emotion: 'sad' },
-    { text: "Si terminas después jugamos mica", grade: null, emotion: 'sneaky' },
-    { text: "Todo bien mientras hagas las tareas", grade: null, emotion: 'happy' },
-    { text: "Quiero comer una ensalada rusa", grade: null, emotion: 'confused' }
+    { text: "El amor es una magia 🪄", grade: null, emotion: 'musical' },
+    { text: "Te Observo", grade: null, emotion: 'neutral' },
+    { text: "¿Ya viste mi pez en el océano?", grade: null, emotion: 'happy' },
+    { text: "Tu no podrías deletrear RIGO así se te fuera la vida en ello", grade: null, emotion: 'angry' },
+    { text: "No te distraigas jugando", grade: null, emotion: 'happy' },
+    { text: "Soy mudo, no puedo hablar.", grade: null, emotion: 'dizzy' },
+    { text: "Amor y Paz", grade: null, emotion: 'love' },
+    { text: "El participio de Creer es Creido, como yo", grade: null, emotion: 'game' }
   ];
 
   const CHEER_MESSAGES = [
-    "Tu mandas aquí",
-    "Eres un genio",
-    "Lo haces a la perfección"
+    "No pues... imposible fallar",
+    "Sigue así",
+    "Eres como un genio pero mejor",
+    "Asi es",
+    "Trabajas duro"
   ];
 
   const COMFORT_MESSAGES = [
-    "Piensa más despacio",
-    "Intenta usando tal vez el cerebro",
-    "Toma se te cayó 🧠"
+    "El cerebro, usa el cerebro",
+    "Sigue intentando",
+    "Intenta otra vez",
+    "Casi pero no",
+    "No puedo creerlo"
   ];
 
   class RigoMascot extends HTMLElement {
