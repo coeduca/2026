@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"8fd56aa7-f813-4c54-82e8-ed4a2622be72","token":"c94bbe61-bf9e-4085-8cfd-cf29fa4ec9f5"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Present Perfect Questions 9th</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "f0cfb09b-7c3b-4008-8ff1-7debdc7bd3b7",
+  "container": "#app",
+  "topic": "Present Perfect Questions 9th",
+  "level": "Noveno 1618487 · Complejo Educativo Cantón Las Ánimas · 2026",
+  "pdfDesign": "PopArt",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#81BBF7",
+    "accent": "#437EB0",
+    "bg": "#99D5D6",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "reorder_sentences",
+      "title": "Build the Question",
+      "instruction": "Ordena las palabras para formar preguntas correctas en Present Perfect con ever.",
+      "dataA": [
+        {
+          "sentence": "Have you ever broken a bone?",
+          "es": "¿Alguna vez te has roto un hueso?"
+        },
+        {
+          "sentence": "Have you ever traveled by plane?",
+          "es": "¿Alguna vez has viajado en avión?"
+        },
+        {
+          "sentence": "Have you ever eaten sushi?",
+          "es": "¿Alguna vez has comido sushi?"
+        },
+        {
+          "sentence": "Have you ever seen a ghost?",
+          "es": "¿Alguna vez has visto un fantasma?"
+        },
+        {
+          "sentence": "Have you ever won a competition?",
+          "es": "¿Alguna vez has ganado una competencia?"
+        },
+        {
+          "sentence": "Have you ever ridden a horse?",
+          "es": "¿Alguna vez has montado a caballo?"
+        },
+        {
+          "sentence": "Have you ever lost your phone?",
+          "es": "¿Alguna vez has perdido tu teléfono?"
+        },
+        {
+          "sentence": "Have you ever met a famous person?",
+          "es": "¿Alguna vez has conocido a una persona famosa?"
+        }
+      ],
+      "dataB": [
+        {
+          "sentence": "Have you ever climbed a mountain?",
+          "es": "¿Alguna vez has escalado una montaña?"
+        },
+        {
+          "sentence": "Have you ever slept in a tent?",
+          "es": "¿Alguna vez has dormido en una tienda de campaña?"
+        },
+        {
+          "sentence": "Have you ever cooked for your family?",
+          "es": "¿Alguna vez has cocinado para tu familia?"
+        },
+        {
+          "sentence": "Have you ever sung in public?",
+          "es": "¿Alguna vez has cantado en público?"
+        },
+        {
+          "sentence": "Have you ever forgotten a birthday?",
+          "es": "¿Alguna vez has olvidado un cumpleaños?"
+        },
+        {
+          "sentence": "Have you ever swum in a river?",
+          "es": "¿Alguna vez has nadado en un río?"
+        },
+        {
+          "sentence": "Have you ever found money in the street?",
+          "es": "¿Alguna vez has encontrado dinero en la calle?"
+        },
+        {
+          "sentence": "Have you ever written a poem?",
+          "es": "¿Alguna vez has escrito un poema?"
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Life Experiences",
+      "instruction": "Relaciona cada experiencia con la imagen correspondiente.",
+      "dataA": [
+        {
+          "word": "broken a bone",
+          "image": "files/broken_bone.png"
+        },
+        {
+          "word": "traveled by plane",
+          "image": "files/travel_plane.png"
+        },
+        {
+          "word": "eaten sushi",
+          "image": "files/eat_sushi.png"
+        },
+        {
+          "word": "ridden a horse",
+          "image": "files/ride_horse.png"
+        },
+        {
+          "word": "won a competition",
+          "image": "files/win_competition.png"
+        },
+        {
+          "word": "seen a ghost",
+          "image": "files/see_ghost.png"
+        },
+        {
+          "word": "lost a phone",
+          "image": "files/lost_phone.png"
+        },
+        {
+          "word": "met a famous person",
+          "image": "files/meet_famous_person.png"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "climbed a mountain",
+          "image": "files/climb_mountain.png"
+        },
+        {
+          "word": "slept in a tent",
+          "image": "files/sleep_tent.png"
+        },
+        {
+          "word": "cooked dinner",
+          "image": "files/cook_dinner.png"
+        },
+        {
+          "word": "sung on stage",
+          "image": "files/sing_stage.png"
+        },
+        {
+          "word": "swum in a river",
+          "image": "files/swim_river.png"
+        },
+        {
+          "word": "found money",
+          "image": "files/find_money.png"
+        },
+        {
+          "word": "written a poem",
+          "image": "files/write_poem.png"
+        },
+        {
+          "word": "forgotten a birthday",
+          "image": "files/forget_birthday.png"
+        }
+      ]
+    },
+    {
+      "type": "memory",
+      "title": "Past Participles",
+      "instruction": "Encuentra las parejas entre el verbo base y su participio pasado.",
+      "dataA": [
+        {
+          "left": "break",
+          "right": "broken"
+        },
+        {
+          "left": "eat",
+          "right": "eaten"
+        },
+        {
+          "left": "see",
+          "right": "seen"
+        },
+        {
+          "left": "ride",
+          "right": "ridden"
+        },
+        {
+          "left": "win",
+          "right": "won"
+        },
+        {
+          "left": "lose",
+          "right": "lost"
+        },
+        {
+          "left": "meet",
+          "right": "met"
+        },
+        {
+          "left": "travel",
+          "right": "traveled"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "climb",
+          "right": "climbed"
+        },
+        {
+          "left": "sleep",
+          "right": "slept"
+        },
+        {
+          "left": "cook",
+          "right": "cooked"
+        },
+        {
+          "left": "sing",
+          "right": "sung"
+        },
+        {
+          "left": "swim",
+          "right": "swum"
+        },
+        {
+          "left": "find",
+          "right": "found"
+        },
+        {
+          "left": "write",
+          "right": "written"
+        },
+        {
+          "left": "forget",
+          "right": "forgotten"
+        }
+      ]
+    },
+    {
+      "type": "matchlines",
+      "title": "Questions and Answers",
+      "instruction": "Relaciona cada pregunta con la respuesta corta correcta.",
+      "dataA": [
+        {
+          "left": "Have you ever traveled by plane?",
+          "right": "Yes, I have."
+        },
+        {
+          "left": "Has Laura ever ridden a horse?",
+          "right": "No, she hasn’t."
+        },
+        {
+          "left": "Have your friends ever eaten sushi?",
+          "right": "Yes, they have."
+        },
+        {
+          "left": "Has Daniel ever broken a bone?",
+          "right": "Yes, he has."
+        },
+        {
+          "left": "Have you and Ana ever seen a ghost?",
+          "right": "No, we haven’t."
+        },
+        {
+          "left": "Has your teacher ever won a competition?",
+          "right": "No, he hasn’t."
+        }
+      ],
+      "dataB": [
+        {
+          "left": "Have you ever slept in a tent?",
+          "right": "No, I haven’t."
+        },
+        {
+          "left": "Has Marta ever written a poem?",
+          "right": "Yes, she has."
+        },
+        {
+          "left": "Have your classmates ever climbed a mountain?",
+          "right": "No, they haven’t."
+        },
+        {
+          "left": "Has Carlos ever sung in public?",
+          "right": "Yes, he has."
+        },
+        {
+          "left": "Have you and Luis ever swum in a river?",
+          "right": "Yes, we have."
+        },
+        {
+          "left": "Has your sister ever found money?",
+          "right": "No, she hasn’t."
+        }
+      ]
+    },
+    {
+      "type": "spoterror",
+      "title": "Find the Mistake",
+      "instruction": "Encuentra la palabra incorrecta y corrígela.",
+      "dataA": [
+        {
+          "words": [
+            "Have",
+            "you",
+            "ever",
+            "break",
+            "a",
+            "bone?"
+          ],
+          "errorIndex": 3,
+          "fix": "broken"
+        },
+        {
+          "words": [
+            "Has",
+            "she",
+            "ever",
+            "eat",
+            "sushi?"
+          ],
+          "errorIndex": 3,
+          "fix": "eaten"
+        },
+        {
+          "words": [
+            "Have",
+            "he",
+            "ever",
+            "seen",
+            "a",
+            "ghost?"
+          ],
+          "errorIndex": 0,
+          "fix": "Has"
+        },
+        {
+          "words": [
+            "Has",
+            "they",
+            "ever",
+            "traveled",
+            "abroad?"
+          ],
+          "errorIndex": 0,
+          "fix": "Have"
+        },
+        {
+          "words": [
+            "Have",
+            "you",
+            "never",
+            "ridden",
+            "a",
+            "horse?"
+          ],
+          "errorIndex": 2,
+          "fix": "ever"
+        },
+        {
+          "words": [
+            "Has",
+            "Daniel",
+            "ever",
+            "winned",
+            "a",
+            "prize?"
+          ],
+          "errorIndex": 3,
+          "fix": "won"
+        },
+        {
+          "words": [
+            "Have",
+            "your",
+            "sister",
+            "ever",
+            "lost",
+            "her",
+            "phone?"
+          ],
+          "errorIndex": 0,
+          "fix": "Has"
+        },
+        {
+          "words": [
+            "Have",
+            "you",
+            "ever",
+            "meet",
+            "a",
+            "famous",
+            "person?"
+          ],
+          "errorIndex": 3,
+          "fix": "met"
+        }
+      ],
+      "dataB": [
+        {
+          "words": [
+            "Have",
+            "you",
+            "ever",
+            "sleeped",
+            "in",
+            "a",
+            "tent?"
+          ],
+          "errorIndex": 3,
+          "fix": "slept"
+        },
+        {
+          "words": [
+            "Has",
+            "your",
+            "friends",
+            "ever",
+            "climbed",
+            "a",
+            "mountain?"
+          ],
+          "errorIndex": 0,
+          "fix": "Have"
+        },
+        {
+          "words": [
+            "Have",
+            "Maria",
+            "ever",
+            "written",
+            "a",
+            "poem?"
+          ],
+          "errorIndex": 0,
+          "fix": "Has"
+        },
+        {
+          "words": [
+            "Has",
+            "you",
+            "ever",
+            "sung",
+            "on",
+            "stage?"
+          ],
+          "errorIndex": 0,
+          "fix": "Have"
+        },
+        {
+          "words": [
+            "Have",
+            "they",
+            "ever",
+            "swam",
+            "in",
+            "a",
+            "river?"
+          ],
+          "errorIndex": 3,
+          "fix": "swum"
+        },
+        {
+          "words": [
+            "Has",
+            "Pedro",
+            "ever",
+            "find",
+            "money",
+            "in",
+            "the",
+            "street?"
+          ],
+          "errorIndex": 3,
+          "fix": "found"
+        },
+        {
+          "words": [
+            "Have",
+            "we",
+            "ever",
+            "forgot",
+            "a",
+            "birthday?"
+          ],
+          "errorIndex": 3,
+          "fix": "forgotten"
+        },
+        {
+          "words": [
+            "Has",
+            "Ana",
+            "ever",
+            "cooking",
+            "for",
+            "her",
+            "family?"
+          ],
+          "errorIndex": 3,
+          "fix": "cooked"
+        }
+      ]
+    },
+    {
+      "type": "wordselect",
+      "title": "Find the Key Words",
+      "instruction": "Selecciona solamente las palabras indicadas en cada oración.",
+      "dataA": [
+        {
+          "text": "Have you [ever] [traveled] by plane?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Have they [ever] [eaten] sushi before?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Has Laura [ever] [seen] a ghost?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Have your friends [ever] [ridden] a horse?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Has Daniel [ever] [won] a competition?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Have you [ever] [broken] a bone?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Has she [ever] [lost] her phone?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Have you [ever] [met] a famous person?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        }
+      ],
+      "dataB": [
+        {
+          "text": "Have you [ever] [slept] in a tent?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Has Carlos [ever] [climbed] a mountain?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Have they [ever] [swum] in a river?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Has Marta [ever] [written] a poem?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Have you [ever] [found] money in the street?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Has Luis [ever] [sung] in public?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Have your parents [ever] [cooked] this dish?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        },
+        {
+          "text": "Have you [ever] [forgotten] an important date?",
+          "hint": "Selecciona “ever” y el participio pasado."
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "Complete the Question",
+      "instruction": "Selecciona la opción correcta para completar cada pregunta.",
+      "dataA": [
+        {
+          "before": "",
+          "options": [
+            "Have",
+            "Has",
+            "Do"
+          ],
+          "answer": 0,
+          "after": " you ever broken a bone?"
+        },
+        {
+          "before": "Has she ever ",
+          "options": [
+            "eat",
+            "eaten",
+            "ate"
+          ],
+          "answer": 1,
+          "after": " sushi?"
+        },
+        {
+          "before": "",
+          "options": [
+            "Have",
+            "Has",
+            "Did"
+          ],
+          "answer": 1,
+          "after": " Daniel ever won a competition?"
+        },
+        {
+          "before": "Have they ",
+          "options": [
+            "never",
+            "ever",
+            "yet"
+          ],
+          "answer": 1,
+          "after": " traveled by plane?"
+        },
+        {
+          "before": "Have you ever ",
+          "options": [
+            "rode",
+            "ridden",
+            "ride"
+          ],
+          "answer": 1,
+          "after": " a horse?"
+        },
+        {
+          "before": "Has Laura ever ",
+          "options": [
+            "saw",
+            "see",
+            "seen"
+          ],
+          "answer": 2,
+          "after": " a ghost?"
+        },
+        {
+          "before": "",
+          "options": [
+            "Have",
+            "Has",
+            "Is"
+          ],
+          "answer": 0,
+          "after": " your friends ever met a famous person?"
+        },
+        {
+          "before": "Have you ever ",
+          "options": [
+            "lost",
+            "lose",
+            "losing"
+          ],
+          "answer": 0,
+          "after": " your phone?"
+        }
+      ],
+      "dataB": [
+        {
+          "before": "",
+          "options": [
+            "Have",
+            "Has",
+            "Are"
+          ],
+          "answer": 0,
+          "after": " you ever slept in a tent?"
+        },
+        {
+          "before": "Has Marta ever ",
+          "options": [
+            "wrote",
+            "written",
+            "write"
+          ],
+          "answer": 1,
+          "after": " a poem?"
+        },
+        {
+          "before": "",
+          "options": [
+            "Have",
+            "Has",
+            "Does"
+          ],
+          "answer": 1,
+          "after": " Carlos ever climbed a mountain?"
+        },
+        {
+          "before": "Have your classmates ",
+          "options": [
+            "ever",
+            "yesterday",
+            "last"
+          ],
+          "answer": 0,
+          "after": " swum in a river?"
+        },
+        {
+          "before": "Have you ever ",
+          "options": [
+            "find",
+            "found",
+            "finding"
+          ],
+          "answer": 1,
+          "after": " money in the street?"
+        },
+        {
+          "before": "Has Luis ever ",
+          "options": [
+            "sang",
+            "sing",
+            "sung"
+          ],
+          "answer": 2,
+          "after": " in public?"
+        },
+        {
+          "before": "",
+          "options": [
+            "Have",
+            "Has",
+            "Did"
+          ],
+          "answer": 0,
+          "after": " your parents ever cooked this dish?"
+        },
+        {
+          "before": "Have you ever ",
+          "options": [
+            "forgot",
+            "forgotten",
+            "forget"
+          ],
+          "answer": 1,
+          "after": " an important birthday?"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "sandwich",
+    "winScore": 500
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
