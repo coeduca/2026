@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"55d3a561-6599-4998-93c3-b7aab72c8655","token":"7de2d898-2e19-42fb-8dfe-2d915d7fb95e"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Simple Present Negative</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "1f0f4cea-647c-4a9e-8b37-1a2dd40f624a",
+  "container": "#app",
+  "topic": "Simple Present Negative",
+  "level": "Octavo, Séptimo",
+  "pdfDesign": "PopArt",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#81F7AE",
+    "accent": "#276F40",
+    "bg": "#63BAA8",
+    "cardBg": "#96D9D3",
+    "itemBg": "#C9E9E5",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "matchlines",
+      "title": "Personal Pronouns",
+      "instruction": "Une cada pronombre personal en inglés con su significado en español.",
+      "dataA": [
+        {
+          "left": "I",
+          "right": "Yo"
+        },
+        {
+          "left": "You",
+          "right": "Tú / Usted"
+        },
+        {
+          "left": "He",
+          "right": "Él"
+        },
+        {
+          "left": "She",
+          "right": "Ella"
+        },
+        {
+          "left": "We",
+          "right": "Nosotros / Nosotras"
+        },
+        {
+          "left": "They",
+          "right": "Ellos / Ellas"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "Yo",
+          "right": "I"
+        },
+        {
+          "left": "Tú / Usted",
+          "right": "You"
+        },
+        {
+          "left": "Él",
+          "right": "He"
+        },
+        {
+          "left": "Ella",
+          "right": "She"
+        },
+        {
+          "left": "Nosotros / Nosotras",
+          "right": "We"
+        },
+        {
+          "left": "Ellos / Ellas",
+          "right": "They"
+        }
+      ]
+    },
+    {
+      "type": "truefalse",
+      "title": "Is It a Verb?",
+      "instruction": "Decide si la palabra indicada es un verbo en inglés.",
+      "dataA": [
+        {
+          "statement": "RUN is a verb.",
+          "answer": true
+        },
+        {
+          "statement": "TREE is a verb.",
+          "answer": false
+        },
+        {
+          "statement": "EAT is a verb.",
+          "answer": true
+        },
+        {
+          "statement": "CHAIR is a verb.",
+          "answer": false
+        },
+        {
+          "statement": "PLAY is a verb.",
+          "answer": true
+        },
+        {
+          "statement": "HOUSE is a verb.",
+          "answer": false
+        },
+        {
+          "statement": "STUDY is a verb.",
+          "answer": true
+        },
+        {
+          "statement": "PENCIL is a verb.",
+          "answer": false
+        }
+      ],
+      "dataB": [
+        {
+          "statement": "DRINK is a verb.",
+          "answer": true
+        },
+        {
+          "statement": "WINDOW is a verb.",
+          "answer": false
+        },
+        {
+          "statement": "SLEEP is a verb.",
+          "answer": true
+        },
+        {
+          "statement": "SCHOOL is a verb.",
+          "answer": false
+        },
+        {
+          "statement": "READ is a verb.",
+          "answer": true
+        },
+        {
+          "statement": "TABLE is a verb.",
+          "answer": false
+        },
+        {
+          "statement": "WORK is a verb.",
+          "answer": true
+        },
+        {
+          "statement": "BOOK is a verb.",
+          "answer": false
+        }
+      ]
+    },
+    {
+      "type": "note",
+      "title": "Simple Present Negative",
+      "html": "\u003cdiv class=\"grammar-note\">\u003ch2>📒 Simple Present Negative\u003c/h2>\u003cp>\u003cstrong>✍️ Copia esta información en tu cuaderno.\u003c/strong>\u003c/p>\u003chr>\u003ch3>1. ¿Para qué lo usamos?\u003c/h3>\u003cp>Usamos el presente simple negativo para decir que una persona \u003cstrong>NO hace\u003c/strong> algo habitualmente.\u003c/p>\u003ch3>2. Estructura con I, You, We, They\u003c/h3>\u003cp>\u003cstrong>Subject + don&#39;t + verb + complement\u003c/strong>\u003c/p>\u003cp>✅ I \u003cstrong>don&#39;t play\u003c/strong> football.\u003c/p>\u003cp>✅ They \u003cstrong>don&#39;t study\u003c/strong> at night.\u003c/p>\u003ch3>3. Estructura con He, She, It\u003c/h3>\u003cp>\u003cstrong>Subject + doesn&#39;t + verb + complement\u003c/strong>\u003c/p>\u003cp>✅ He \u003cstrong>doesn&#39;t eat\u003c/strong> pizza.\u003c/p>\u003cp>✅ She \u003cstrong>doesn&#39;t watch\u003c/strong> TV.\u003c/p>\u003ch3>⚠️ Regla importante\u003c/h3>\u003cp>Después de \u003cstrong>don&#39;t\u003c/strong> y \u003cstrong>doesn&#39;t\u003c/strong>, el verbo siempre va en su forma base.\u003c/p>\u003cp>❌ He doesn&#39;t \u003cstrong>plays\u003c/strong> football.\u003c/p>\u003cp>✅ He doesn&#39;t \u003cstrong>play\u003c/strong> football.\u003c/p>\u003chr>\u003cp>\u003cstrong>DON&#39;T:\u003c/strong> I · You · We · They\u003c/p>\u003cp>\u003cstrong>DOESN&#39;T:\u003c/strong> He · She · It\u003c/p>\u003c/div>"
+    },
+    {
+      "type": "categorize",
+      "title": "Affirmative or Negative?",
+      "instruction": "Clasifica cada oración como afirmativa o negativa.",
+      "dataA": {
+        "categories": [
+          "Affirmative",
+          "Negative"
+        ],
+        "items": [
+          {
+            "text": "I play soccer.",
+            "cat": 0
+          },
+          {
+            "text": "She does not read comics.",
+            "cat": 1
+          },
+          {
+            "text": "We study English.",
+            "cat": 0
+          },
+          {
+            "text": "He does not drink coffee.",
+            "cat": 1
+          },
+          {
+            "text": "They live near school.",
+            "cat": 0
+          },
+          {
+            "text": "You do not watch TV.",
+            "cat": 1
+          },
+          {
+            "text": "My brother likes music.",
+            "cat": 0
+          },
+          {
+            "text": "Ana does not cook dinner.",
+            "cat": 1
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "Affirmative",
+          "Negative"
+        ],
+        "items": [
+          {
+            "text": "Carlos walks to school.",
+            "cat": 0
+          },
+          {
+            "text": "I do not eat fish.",
+            "cat": 1
+          },
+          {
+            "text": "The dog sleeps outside.",
+            "cat": 0
+          },
+          {
+            "text": "They do not play basketball.",
+            "cat": 1
+          },
+          {
+            "text": "She speaks English.",
+            "cat": 0
+          },
+          {
+            "text": "We do not work on Sunday.",
+            "cat": 1
+          },
+          {
+            "text": "You listen to music.",
+            "cat": 0
+          },
+          {
+            "text": "Mario does not ride a bike.",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "reorder_sentences",
+      "title": "Build the Negative Sentence",
+      "instruction": "Ordena las palabras para formar correctamente cada oración negativa.",
+      "dataA": [
+        {
+          "sentence": "I do not play tennis.",
+          "es": "Yo no juego tenis."
+        },
+        {
+          "sentence": "She does not eat meat.",
+          "es": "Ella no come carne."
+        },
+        {
+          "sentence": "They do not study French.",
+          "es": "Ellos no estudian francés."
+        },
+        {
+          "sentence": "He does not watch TV.",
+          "es": "Él no mira televisión."
+        },
+        {
+          "sentence": "We do not walk to school.",
+          "es": "Nosotros no caminamos a la escuela."
+        },
+        {
+          "sentence": "You do not drink milk.",
+          "es": "Tú no bebes leche."
+        },
+        {
+          "sentence": "My sister does not cook.",
+          "es": "Mi hermana no cocina."
+        },
+        {
+          "sentence": "The cat does not sleep outside.",
+          "es": "El gato no duerme afuera."
+        }
+      ],
+      "dataB": [
+        {
+          "sentence": "I do not read comics.",
+          "es": "Yo no leo cómics."
+        },
+        {
+          "sentence": "He does not play basketball.",
+          "es": "Él no juega baloncesto."
+        },
+        {
+          "sentence": "We do not eat breakfast early.",
+          "es": "Nosotros no desayunamos temprano."
+        },
+        {
+          "sentence": "She does not ride a bike.",
+          "es": "Ella no monta bicicleta."
+        },
+        {
+          "sentence": "They do not live here.",
+          "es": "Ellos no viven aquí."
+        },
+        {
+          "sentence": "You do not speak German.",
+          "es": "Tú no hablas alemán."
+        },
+        {
+          "sentence": "Pedro does not clean his room.",
+          "es": "Pedro no limpia su habitación."
+        },
+        {
+          "sentence": "My dog does not eat vegetables.",
+          "es": "Mi perro no come vegetales."
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Negative Sentences and Pictures",
+      "instruction": "Une cada oración negativa con la imagen que representa su significado.",
+      "dataA": [
+        {
+          "word": "He doesn't play football.",
+          "image": "files/boy-not-playing-football.png"
+        },
+        {
+          "word": "She doesn't drink coffee.",
+          "image": "files/girl-not-drinking-coffee.png"
+        },
+        {
+          "word": "They don't watch TV.",
+          "image": "files/friends-not-watching-tv.png"
+        },
+        {
+          "word": "I don't eat fish.",
+          "image": "files/person-not-eating-fish.png"
+        },
+        {
+          "word": "We don't ride bikes.",
+          "image": "files/children-not-riding-bikes.png"
+        },
+        {
+          "word": "He doesn't read books.",
+          "image": "files/boy-not-reading-book.png"
+        },
+        {
+          "word": "She doesn't play the guitar.",
+          "image": "files/girl-not-playing-guitar.png"
+        },
+        {
+          "word": "They don't swim.",
+          "image": "files/children-not-swimming.png"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "He doesn't eat pizza.",
+          "image": "files/boy-not-eating-pizza.png"
+        },
+        {
+          "word": "She doesn't play basketball.",
+          "image": "files/girl-not-playing-basketball.png"
+        },
+        {
+          "word": "They don't study at night.",
+          "image": "files/students-not-studying-at-night.png"
+        },
+        {
+          "word": "I don't drink soda.",
+          "image": "files/person-not-drinking-soda.png"
+        },
+        {
+          "word": "We don't play video games.",
+          "image": "files/friends-not-playing-video-games.png"
+        },
+        {
+          "word": "He doesn't cook.",
+          "image": "files/boy-not-cooking.png"
+        },
+        {
+          "word": "She doesn't sing.",
+          "image": "files/girl-not-singing.png"
+        },
+        {
+          "word": "They don't run in the park.",
+          "image": "files/children-not-running-park.png"
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "Don't or Doesn't?",
+      "instruction": "Selecciona don't o doesn't para completar correctamente cada oración.",
+      "dataA": [
+        {
+          "before": "I",
+          "options": [
+            "don't",
+            "doesn't"
+          ],
+          "answer": 0,
+          "after": "play baseball."
+        },
+        {
+          "before": "She",
+          "options": [
+            "don't",
+            "doesn't"
+          ],
+          "answer": 1,
+          "after": "eat meat."
+        },
+        {
+          "before": "They",
+          "options": [
+            "don't",
+            "doesn't"
+          ],
+          "answer": 0,
+          "after": "study on Sunday."
+        },
+        {
+          "before": "He",
+          "options": [
+            "don't",
+            "doesn't"
+          ],
+          "answer": 1,
+          "after": "drink tea."
+        },
+        {
+          "before": "We",
+          "options": [
+            "don't",
+            "doesn't"
+          ],
+          "answer": 0,
+          "after": "watch that show."
+        },
+        {
+          "before": "You",
+          "options": [
+            "don't",
+            "doesn't"
+          ],
+          "answer": 0,
+          "after": "live here."
+        },
+        {
+          "before": "My sister",
+          "options": [
+            "don't",
+            "doesn't"
+          ],
+          "answer": 1,
+          "after": "play tennis."
+        },
+        {
+          "before": "The dog",
+          "options": [
+            "don't",
+            "doesn't"
+          ],
+          "answer": 1,
+          "after": "sleep inside."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "I",
+          "options": [
+            "doesn't",
+            "don't"
+          ],
+          "answer": 1,
+          "after": "read newspapers."
+        },
+        {
+          "before": "Carlos",
+          "options": [
+            "doesn't",
+            "don't"
+          ],
+          "answer": 0,
+          "after": "play the piano."
+        },
+        {
+          "before": "We",
+          "options": [
+            "doesn't",
+            "don't"
+          ],
+          "answer": 1,
+          "after": "eat lunch at home."
+        },
+        {
+          "before": "Ana",
+          "options": [
+            "doesn't",
+            "don't"
+          ],
+          "answer": 0,
+          "after": "ride a motorcycle."
+        },
+        {
+          "before": "You",
+          "options": [
+            "doesn't",
+            "don't"
+          ],
+          "answer": 1,
+          "after": "speak Italian."
+        },
+        {
+          "before": "My parents",
+          "options": [
+            "doesn't",
+            "don't"
+          ],
+          "answer": 1,
+          "after": "work on Saturday."
+        },
+        {
+          "before": "The cat",
+          "options": [
+            "doesn't",
+            "don't"
+          ],
+          "answer": 0,
+          "after": "eat carrots."
+        },
+        {
+          "before": "Pedro and Luis",
+          "options": [
+            "doesn't",
+            "don't"
+          ],
+          "answer": 1,
+          "after": "walk to school."
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "sandwich",
+    "winScore": 500
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
