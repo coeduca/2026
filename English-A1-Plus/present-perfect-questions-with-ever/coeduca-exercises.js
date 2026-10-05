@@ -68,8 +68,9 @@
   function autoReview(btn) {
     const root = btn.parentElement && btn.parentElement.parentElement;
     if (!root) return;
-    const selected = new Set();
-    let reviewed = false;
+    const selected = new Map();
+    const pickedWords = new Set();
+    let lastSnapshot = null;
     const all = (selector, predicate) => {
       const nodes = [...root.querySelectorAll(selector)];
       return nodes.length > 0 && nodes.every(predicate);
@@ -93,19 +94,33 @@
       return false;
     }
     const check = () => {
-      if (!reviewed && ready()) {
-        reviewed = true;
-        observer.disconnect();
-        btn.click();
-      }
+      if (!btn.isConnected) { observer.disconnect(); return; }
+      const hasDraft = [...root.querySelectorAll('.fb-input,.ep-input,.rl-input')].some(input => input.value.trim());
+      if (!ready() && lastSnapshot === null && !hasDraft) return;
+      // Feedback also mutates the DOM. Only changed answers should trigger a save.
+      const snapshot = JSON.stringify([
+        [...root.querySelectorAll('input,textarea,select')].map(input => [input.value, input.checked]),
+        [...root.querySelectorAll('.rl-slot')].map(slot => slot.querySelector('.rl-card')?.textContent || ''),
+        [...selected], [...pickedWords].sort()
+      ]);
+      if (snapshot === lastSnapshot) return;
+      lastSnapshot = snapshot;
+      btn.click();
     };
     const observer = new MutationObserver(check);
     observer.observe(root, {subtree:true, childList:true});
+    root.addEventListener('input', event => { if (!event.isComposing) check(); });
+    root.addEventListener('compositionend', check);
     root.addEventListener('change', check);
     root.addEventListener('focusout', check);
     root.addEventListener('click', event => {
       const choice = event.target.closest('.se-word,.tf-btn');
-      if (choice && root.contains(choice)) selected.add(choice.dataset.i);
+      if (choice && root.contains(choice)) selected.set(choice.dataset.i, choice.dataset.j ?? choice.dataset.v);
+      const word = event.target.closest('.wsel-word');
+      if (word && root.contains(word)) {
+        const key = word.dataset.i + ':' + word.dataset.ti;
+        if (pickedWords.has(key)) pickedWords.delete(key); else pickedWords.add(key);
+      }
       check();
     });
   }
@@ -782,6 +797,7 @@
             if (el.parentElement && !el.parentElement.classList.contains('db-slot')) {
             } else {
               bankEl.appendChild(el);
+              check();
             }
           }
         }
@@ -998,12 +1014,13 @@
     });
     wrap.appendChild(btn);
     btn.style.display = 'none';
+    let lastOrder = null;
     const autoCheck = new MutationObserver(() => {
-      if (items.length && items.every((it, i) => {
-        const target = wrap.querySelector(`.ro-target[data-i="${i}"]`);
-        return target && target.querySelectorAll('[data-word]').length === it.original.length;
-      })) {
-        autoCheck.disconnect();
+      if (!btn.isConnected) { autoCheck.disconnect(); return; }
+      const order = items.map((it, i) => [...wrap.querySelector(`.ro-target[data-i="${i}"]`).querySelectorAll('[data-word]')].map(chip => chip.textContent));
+      const snapshot = JSON.stringify(order);
+      if (snapshot !== lastOrder && items.length && (lastOrder !== null || order.some(words => words.length > 0))) {
+        lastOrder = snapshot;
         btn.click();
       }
     });

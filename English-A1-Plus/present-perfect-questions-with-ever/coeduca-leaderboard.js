@@ -439,6 +439,7 @@
 
   function configuredGrades() {
     const grades = [];
+    if (Array.isArray(window.COEDUCA_REMOTE_GRADES)) grades.push(...window.COEDUCA_REMOTE_GRADES);
     if (typeof COEDUCA_AVAILABLE_GRADES !== 'undefined' && Array.isArray(COEDUCA_AVAILABLE_GRADES)) {
       grades.push(...COEDUCA_AVAILABLE_GRADES);
     }

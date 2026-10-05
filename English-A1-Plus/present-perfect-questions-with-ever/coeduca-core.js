@@ -290,6 +290,91 @@
     return true;
   }
 
+  // A saved snapshot can still be a draft. Completion is based on answered items.
+  function isCompletedAnswer(ex, answer) {
+    if (!answer || !(answer.total > 0)) return false;
+    const raw = answer.userAnswer;
+    if (raw == null) return true; // Preserve summaries from older packages.
+    const data = getPoolData(ex);
+    const filled = value => value != null && String(value).trim() !== '';
+    const all = (values, count, test = filled) => Array.isArray(values) && count > 0 && values.length >= count && values.slice(0, count).every(test);
+    if (ex.type === 'cv_table') {
+      const rows = raw.gradingRows || raw.rows || [];
+      let count = 0, complete = true;
+      (data.rows || []).forEach((row, r) => (row.cells || row).forEach((cell, c) => {
+        if (!['input','select','drop','drop_image','check'].includes(cell.type)) return;
+        count++;
+        const value = rows[r]?.[c];
+        if (!filled(value) || (cell.type === 'input' && !cell.answer && String(value).trim().length < 16)) complete = false;
+      }));
+      return count > 0 && complete;
+    }
+    if (ex.type === 'dragbank') return all(raw, (data.sentences || []).length);
+    if (ex.type === 'comicdialogue') return all(raw, data.flatMap(panel => panel.bubbles || []).filter(bubble => bubble.blank).length);
+    if (ex.type === 'categorize') return all(raw, (data.items || []).length, item => item?.cat != null);
+    if (ex.type === 'matchimage') return all(raw, data.length, Number.isInteger);
+    if (ex.type === 'reorder_sentences') return all(raw, data.length, (words, i) => {
+      const item = data[i], expected = item.words || String(typeof item === 'string' ? item : item.sentence).split(/\s+/);
+      return Array.isArray(words) && words.length === expected.length;
+    });
+    if (ex.type === 'fillblank') return all(raw, data.flatMap(item => Array.isArray(item.answer) ? item.answer : [item.answer]).length);
+    if (['dropdown','multiplechoice','spoterror'].includes(ex.type)) return all(raw, data.length, Number.isInteger);
+    if (ex.type === 'truefalse') return all(raw, data.length, value => typeof value === 'boolean');
+    if (ex.type === 'reorder_letters') return all(raw, data.length, (value, i) => filled(value) && String(value).length === String(data[i].word).length);
+    if (['emojiphrase','reorder_letters'].includes(ex.type)) return all(raw, data.length);
+    if (ex.type === 'cv_textanswer') return all(raw, data.length, item => String(item?.a || '').trim().length >= 16);
+    return true;
+  }
+
+  function restoreExerciseDraft(body, ex, raw) {
+    if (!raw || ex.type === 'cv_table') return; // Tables restore their own tokens.
+    const inputs = body.querySelectorAll('.fb-input,.ep-input,.rl-input,.cv-ta-input,.dd-sel');
+    inputs.forEach((input, i) => { if (raw[i] != null) input.value = String(ex.type === 'cv_textanswer' ? raw[i].a || '' : raw[i]); });
+    if (ex.type === 'truefalse') raw.forEach((value, i) => {
+      if (typeof value === 'boolean') body.querySelector(`.tf-btn[data-i="${i}"][data-v="${value}"]`)?.click();
+    });
+    function restoreTokens(slotSelector, tokenSelector, values) {
+      const tokens = [...body.querySelectorAll(tokenSelector)];
+      [...body.querySelectorAll(slotSelector)].forEach((slot, i) => {
+        const value = values[i];
+        if (value == null || value === '') return;
+        const index = tokens.findIndex(token => ex.type === 'matchimage' ? Number(token.dataset.idx) === value : normalize(token.textContent) === normalize(value));
+        if (index >= 0) slot.appendChild(tokens.splice(index, 1)[0]);
+      });
+    }
+    if (ex.type === 'dragbank') restoreTokens('.db-slot', '.db-word', raw);
+    if (ex.type === 'comicdialogue') restoreTokens('.cd-slot', '.cd-chip', raw);
+    if (ex.type === 'matchimage') restoreTokens('.mi-slot', '[id^="mi-bank"] [data-idx]', raw);
+    if (ex.type === 'categorize') {
+      const tokens = [...body.querySelectorAll('[id^="cat-bank"] [data-idx]')];
+      raw.forEach(item => {
+        if (item?.cat == null) return;
+        const index = tokens.findIndex(token => token.textContent === item.text);
+        const target = body.querySelector(`.cat-drop[data-cat="${item.cat}"]`);
+        if (index >= 0 && target) target.appendChild(tokens.splice(index, 1)[0]);
+      });
+    }
+    if (ex.type === 'reorder_sentences') raw.forEach((words, i) => {
+      const target = body.querySelector(`.ro-target[data-i="${i}"]`);
+      const source = target?.parentElement.querySelector(".ro-source");
+      if (!target || !source || !Array.isArray(words)) return;
+      const tokens = [...source.querySelectorAll('[data-word]')];
+      words.forEach(word => {
+        const index = tokens.findIndex(token => token.textContent === word);
+        if (index >= 0) { target.appendChild(tokens.splice(index, 1)[0]); target.removeAttribute("data-show-placeholder"); }
+      });
+    });
+    if (ex.type === 'reorder_letters' && !inputs.length) raw.forEach((word, i) => {
+      const row = body.querySelector(`.rl-slots[data-i="${i}"]`);
+      if (!row) return;
+      const tokens = [...row.parentElement.querySelectorAll(".rl-card")];
+      [...String(word)].forEach((letter, j) => {
+        const index = tokens.findIndex(token => token.textContent === letter);
+        if (index >= 0 && row.children[j]) row.children[j].appendChild(tokens.splice(index, 1)[0]);
+      });
+    });
+  }
+
   function recordAnswer(exerciseId, score, total, details, userAnswer) {
     // userAnswer: snapshot crudo de lo que el alumno respondió.
     // Si el renderer no lo manda (renderers viejos), se preserva el que ya hubiera.
@@ -366,7 +451,7 @@
       const s = getTotalScore();
       const cfg = state.config;
       const realExercises = (cfg && cfg.exercises ? cfg.exercises : []).filter(e => e.type !== 'note');
-      const answeredCount = Object.keys(state.answers).length;
+      const answeredCount = (cfg?.exercises || []).filter((ex, idx) => ex.type !== 'note' && isCompletedAnswer(ex, state.answers['ex_' + idx])).length;
       const totalCount = realExercises.length;
       const allDone = totalCount > 0 && answeredCount >= totalCount;
       const progressLine = allDone
@@ -462,7 +547,7 @@
       if (!db || !db[nie]) return false;
       found = { nie, ...db[nie] };
     }
-    if (!global.COEDUCA_CLASSROOM && (nie === '1999' || nie === '12379')) {
+    if (nie === '1999' || nie === '12379') {
       if (!auth) return false;
       try { if (!await auth.hasSession(nie)) return false; }
       catch (_) { return false; }
@@ -971,7 +1056,7 @@
       // Si no, montar el ejercicio normalmente.
       const exerciseId = 'ex_' + idx;
       const previousAnswer = state.answers[exerciseId];
-      if (previousAnswer && previousAnswer.total > 0) {
+      if (isCompletedAnswer(ex, previousAnswer)) {
         renderCompletedSummary(idx, ex, previousAnswer);
       } else {
         mountExercise(idx, ex);
@@ -1002,13 +1087,17 @@
       return;
     }
     try {
+      const previous = state.answers['ex_' + idx];
+      let restoringDraft = previous && !isCompletedAnswer(ex, previous);
       renderer({
         container: body,
         exerciseId: 'ex_' + idx,
         data: getPoolData(ex),
         config: ex,
-        recordAnswer: (score, total, details, userAnswer) =>
-          recordAnswer('ex_' + idx, score, total, details, userAnswer),
+        previousAnswer: state.answers['ex_' + idx]?.userAnswer,
+        recordAnswer: (score, total, details, userAnswer) => {
+          if (!restoringDraft) recordAnswer('ex_' + idx, score, total, details, userAnswer);
+        },
         cheer: () => {
           if (global.rigo && global.rigo.cheer) global.rigo.cheer();
           sfx.play('victory');
@@ -1018,6 +1107,8 @@
           sfx.play('error');
         }
       });
+      if (restoringDraft) restoreExerciseDraft(body, ex, previous.userAnswer);
+      queueMicrotask(() => { restoringDraft = false; });
     } catch (err) {
       console.error('Error rendering exercise', ex.type, err);
       body.innerHTML = '<p style="color:red">Error: tipo "' + ex.type + '" no disponible</p>';

@@ -216,12 +216,20 @@ body::after {
   position: relative;
   z-index: 1;
 }
-.coeduca-header-actions .coeduca-add-member-btn { margin-top: 0; }
+.coeduca-header-actions .coeduca-add-member-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  box-sizing: border-box;
+  margin-top: 0;
+  white-space: nowrap;
+}
 .coeduca-header-actions .coeduca-switch-account-btn {
   display: inline-grid;
   place-items: center;
   width: 42px;
-  height: 36px;
+  height: 40px;
   padding: 4px !important;
   box-sizing: border-box;
 }

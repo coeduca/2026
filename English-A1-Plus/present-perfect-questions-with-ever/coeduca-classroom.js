@@ -9,12 +9,18 @@
  let currentState=null, sending=null, statusEl=null, button=null, displayKey='', beforeSnapshot=()=>{};
  const cache=new Map();
  const received=new Map();
+ const fixedNie=nie=>String(nie)==='1999'||String(nie)==='12379';
+ const syncMessage='No puedes enviar la nota. Notifica a tu maestro para que sincronice tu usuario.';
  async function request(action, data) {
   const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),90_000);
   try {
    const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify(Object.assign({action,publicationId:config.publicationId,token:config.token},data)),signal:controller.signal});
-   const result=await response.json(); if(!response.ok) throw new Error(result.error||'No se pudo registrar la nota.'); return result;
+   const result=await response.json(); if(!response.ok) {
+    const error=new Error(result.error||'No se pudo registrar la nota.');
+    error.syncRequired=response.status===409&&error.message===syncMessage;
+    throw error;
+   } return result;
   } finally { clearTimeout(timer); }
  }
  function storageRead() { try{return JSON.parse(localStorage.getItem(pendingKey)||'[]');}catch(_){return [];} }
@@ -22,7 +28,7 @@
  function snapshot(state) {
   if(!state.student) throw new Error('Ingresa tu NIE antes de enviar.');
   const partners=state.partners|| (state.partner?[state.partner]:[]);
-  const team=[state.student].concat(partners).map(s=>String(s.nie).trim());
+  const team=[state.student].concat(partners).map(s=>String(s.nie).trim()).filter(nie=>!fixedNie(nie));
   if(team.length>5||new Set(team).size!==team.length) throw new Error('Revisa los integrantes del equipo.');
   const answers={}; Object.keys(state.answers||{}).sort().forEach(k=>{
    const a=state.answers[k]; if(a.userAnswer==null) throw new Error('Revisa de nuevo los ejercicios para registrar sus respuestas.');
@@ -49,7 +55,13 @@
   return 'Envío guardado; '+sent+'/'+members.length+' notas registradas. Las restantes están pendientes de Classroom.';
  }
  async function transmit(item) {
-  const result=await request('submit',{submission:item.submission});
+  let result;
+  try {result=await request('submit',{submission:item.submission});}
+  catch(error) {
+   // Missing enrollment is not an offline failure. Keep answers/PDF and let the student retry after synchronization.
+   if(error.syncRequired) storageWrite(storageRead().filter(v=>v.key!==item.key));
+   throw error;
+  }
   // Remove only the successfully received snapshot. A newer revision stays pending.
   storageWrite(storageRead().filter(v=>v.key!==item.key));
   received.set(item.key,result);
@@ -65,6 +77,7 @@
  }
  async function send() {
   if(sending) return sending;
+  if(fixedNie(currentState?.student?.nie)) {message('Cuenta de práctica: no se envían notas a Classroom. Puedes descargar tu comprobante.');return;}
   try {
    beforeSnapshot();
    const submission=snapshot(currentState), key=JSON.stringify(submission);
@@ -81,14 +94,18 @@
    message('Registrando nota…'); if(button) button.disabled=true;
    sending=transmit(item);
    await sending;
-  }catch(error){message((error.message||'No hay conexión.')+' El PDF puede descargarse por separado. Puedes reintentar con Enviar nota.');}
+  }catch(error){message(error.syncRequired?syncMessage+' Puedes descargar tu PDF.':(error.message||'No hay conexión.')+' El PDF puede descargarse por separado. Puedes reintentar con Enviar nota.');}
   finally {sending=null;if(button)button.disabled=false;}
  }
  global.COEDUCA_CLASSROOM={
   lookup:async function(nie){
    const clean=String(nie||'').trim(); if(clean.length<4)return null;
    if(cache.has(clean))return cache.get(clean);
-   try {const result=await request('lookup',{nie:clean});cache.set(clean,result.student);return result.student;}
+   try {const result=await request('lookup',{nie:clean});
+    if(Array.isArray(result.availableGrades)) {
+     global.COEDUCA_REMOTE_GRADES=result.availableGrades;
+    }
+    cache.set(clean,result.student);return result.student;}
    catch(error){if(error.message.includes('NIE no encontrado'))return null;throw error;}
   },
   snapshot,
@@ -110,12 +127,15 @@
    statusEl.style.cssText='display:block;flex-basis:100%;font-size:12px;margin:8px 0;';
    actions.appendChild(statusEl);
    message('Enviar nota registra el resultado; entrega el PDF o una captura en Classroom.');
+   if(state.student?.synced===false||(state.partners||[]).some(s=>s.synced===false)) message(syncMessage+' Puedes descargar tu PDF.');
+   if(fixedNie(state.student?.nie)) {button.disabled=true;message('Cuenta de práctica: puedes resolver y descargar el PDF; no se envían notas a Classroom.');}
    // Do not await: preserve the direct user gesture needed by Safari's PDF handler.
    pdf.addEventListener('click',()=>{void send();},{capture:true});
    const retry=async()=>{
+    if(fixedNie(state.student?.nie))return;
     if(sending||!navigator.onLine)return;
     const items=storageRead().filter(v=>v.submission.team[0]===state.student?.nie);
-    for(const item of items) {try {displayKey=item.key;sending=transmit(item);await sending;}catch(_){message('Hay un envío pendiente. Pulsa Enviar nota al recuperar la conexión.');break;}finally{sending=null;}}
+    for(const item of items) {try {displayKey=item.key;sending=transmit(item);await sending;}catch(error){message(error.syncRequired?syncMessage+' Puedes descargar tu PDF.':'Hay un envío pendiente. Pulsa Enviar nota al recuperar la conexión.');break;}finally{sending=null;}}
    };
    global.addEventListener('online',retry);void retry();
   }
