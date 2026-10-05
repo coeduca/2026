@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"cead5a0f-245a-4431-b427-9e11251bc8d3","token":"ac62b730-8a7b-4d3e-a951-c1cbb14f8887"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Life Events Vocabulary &amp; Irregular Participles</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "66efc5cf-27e0-4831-b79b-82f8b968de43",
+  "container": "#app",
+  "topic": "Life Events Vocabulary & Irregular Participles",
+  "level": "1er Año de Bach., 2do Año de Bach., Noveno",
+  "pdfDesign": "PopArt",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#81F7A6",
+    "accent": "#43B069",
+    "bg": "#AEC245",
+    "cardBg": "#7D9EA0",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "cv_table",
+      "title": "Life Events",
+      "instruction": "Arrastra la traducción al español y la imagen correcta para cada experiencia.",
+      "dataA": {
+        "columns": [
+          "Life event",
+          "Español",
+          "Ilustración"
+        ],
+        "rows": [
+          [
+            {
+              "type": "text",
+              "value": "Ride a bike"
+            },
+            {
+              "type": "drop",
+              "answer": "Montar bicicleta"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/ride-bike.png",
+              "alt": "Persona montando bicicleta"
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "value": "Make a wish"
+            },
+            {
+              "type": "drop",
+              "answer": "Pedir un deseo"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/make-wish.png",
+              "alt": "Persona pidiendo un deseo"
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "value": "Build a sandcastle"
+            },
+            {
+              "type": "drop",
+              "answer": "Construir un castillo de arena"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/build-sandcastle.png",
+              "alt": "Castillo de arena"
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "value": "Make cupcakes"
+            },
+            {
+              "type": "drop",
+              "answer": "Hacer cupcakes"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/make-cupcakes.png",
+              "alt": "Persona preparando cupcakes"
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "value": "Win a prize"
+            },
+            {
+              "type": "drop",
+              "answer": "Ganar un premio"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/win-prize.png",
+              "alt": "Persona recibiendo un premio"
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "value": "Break a bone"
+            },
+            {
+              "type": "drop",
+              "answer": "Romperse un hueso"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/break-bone.png",
+              "alt": "Persona con un hueso fracturado"
+            }
+          ]
+        ],
+        "bank": [
+          "Visitar un museo",
+          "Aprender a nadar"
+        ]
+      },
+      "dataB": {
+        "columns": [
+          "Life event",
+          "Español",
+          "Ilustración"
+        ],
+        "rows": [
+          [
+            {
+              "type": "text",
+              "value": "Climb a mountain"
+            },
+            {
+              "type": "drop",
+              "answer": "Escalar una montaña"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/climb-mountain.png",
+              "alt": "Persona escalando una montaña"
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "value": "Meet a celebrity"
+            },
+            {
+              "type": "drop",
+              "answer": "Conocer a una celebridad"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/meet-celebrity.png",
+              "alt": "Persona conociendo a una celebridad"
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "value": "Travel by plane"
+            },
+            {
+              "type": "drop",
+              "answer": "Viajar en avión"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/travel-plane.png",
+              "alt": "Persona viajando en avión"
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "value": "Learn an instrument"
+            },
+            {
+              "type": "drop",
+              "answer": "Aprender un instrumento"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/learn-instrument.png",
+              "alt": "Persona aprendiendo un instrumento musical"
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "value": "Visit another country"
+            },
+            {
+              "type": "drop",
+              "answer": "Visitar otro país"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/visit-country.png",
+              "alt": "Persona visitando otro país"
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "value": "See a wild animal"
+            },
+            {
+              "type": "drop",
+              "answer": "Ver un animal salvaje"
+            },
+            {
+              "type": "drop_image",
+              "src": "files/see-wild-animal.png",
+              "alt": "Persona viendo un animal salvaje"
+            }
+          ]
+        ],
+        "bank": [
+          "Ganar una carrera",
+          "Construir una casa"
+        ]
+      }
+    },
+    {
+      "type": "categorize",
+      "title": "Base Form or Past Participle?",
+      "instruction": "Clasifica cada verbo como forma base o participio pasado.",
+      "dataA": {
+        "categories": [
+          "Base form",
+          "Past participle"
+        ],
+        "items": [
+          {
+            "text": "ride",
+            "cat": 0
+          },
+          {
+            "text": "ridden",
+            "cat": 1
+          },
+          {
+            "text": "make",
+            "cat": 0
+          },
+          {
+            "text": "made",
+            "cat": 1
+          },
+          {
+            "text": "build",
+            "cat": 0
+          },
+          {
+            "text": "built",
+            "cat": 1
+          },
+          {
+            "text": "win",
+            "cat": 0
+          },
+          {
+            "text": "won",
+            "cat": 1
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "Base form",
+          "Past participle"
+        ],
+        "items": [
+          {
+            "text": "break",
+            "cat": 0
+          },
+          {
+            "text": "broken",
+            "cat": 1
+          },
+          {
+            "text": "see",
+            "cat": 0
+          },
+          {
+            "text": "seen",
+            "cat": 1
+          },
+          {
+            "text": "take",
+            "cat": 0
+          },
+          {
+            "text": "taken",
+            "cat": 1
+          },
+          {
+            "text": "go",
+            "cat": 0
+          },
+          {
+            "text": "gone",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "matchlines",
+      "title": "Life Events & Participles",
+      "instruction": "Relaciona cada expresión en inglés con su significado correcto.",
+      "dataA": [
+        {
+          "left": "ridden a bike",
+          "right": "montado bicicleta"
+        },
+        {
+          "left": "made a wish",
+          "right": "pedido un deseo"
+        },
+        {
+          "left": "built a sandcastle",
+          "right": "construido un castillo de arena"
+        },
+        {
+          "left": "won a prize",
+          "right": "ganado un premio"
+        },
+        {
+          "left": "broken a bone",
+          "right": "roto un hueso"
+        },
+        {
+          "left": "seen a wild animal",
+          "right": "visto un animal salvaje"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "climbed a mountain",
+          "right": "escalado una montaña"
+        },
+        {
+          "left": "met a celebrity",
+          "right": "conocido a una celebridad"
+        },
+        {
+          "left": "gone abroad",
+          "right": "ido al extranjero"
+        },
+        {
+          "left": "taken a flight",
+          "right": "tomado un vuelo"
+        },
+        {
+          "left": "learned an instrument",
+          "right": "aprendido un instrumento"
+        },
+        {
+          "left": "visited another country",
+          "right": "visitado otro país"
+        }
+      ]
+    },
+    {
+      "type": "wordsearch",
+      "title": "Life Events Word Search",
+      "instruction": "Encuentra las 6 palabras relacionadas con experiencias de vida.",
+      "dataA": {
+        "words": [
+          "RIDDEN",
+          "WISH",
+          "BUILT",
+          "PRIZE",
+          "BROKEN",
+          "CUPCAKES"
+        ],
+        "gridSize": 12
+      },
+      "dataB": {
+        "words": [
+          "CLIMBED",
+          "CELEBRITY",
+          "TRAVEL",
+          "LEARNED",
+          "COUNTRY",
+          "MOUNTAIN"
+        ],
+        "gridSize": 12
+      }
+    },
+    {
+      "type": "truefalse",
+      "title": "What has Melissa done?",
+      "instruction": "Observa la imagen de Melissa y decide si cada oración es verdadera o falsa.",
+      "image": "files/melissa-life-events.png",
+      "dataA": [
+        {
+          "statement": "Melissa has ridden a bike.",
+          "answer": true
+        },
+        {
+          "statement": "Melissa has made a wish.",
+          "answer": true
+        },
+        {
+          "statement": "Melissa has built a sandcastle.",
+          "answer": true
+        },
+        {
+          "statement": "Melissa has flown a helicopter.",
+          "answer": false
+        },
+        {
+          "statement": "Melissa has met a famous singer.",
+          "answer": false
+        },
+        {
+          "statement": "Melissa has won a chess tournament.",
+          "answer": false
+        }
+      ],
+      "dataB": [
+        {
+          "statement": "Melissa has made cupcakes.",
+          "answer": true
+        },
+        {
+          "statement": "Melissa has won a prize.",
+          "answer": true
+        },
+        {
+          "statement": "Melissa has broken a bone.",
+          "answer": true
+        },
+        {
+          "statement": "Melissa has ridden a horse.",
+          "answer": false
+        },
+        {
+          "statement": "Melissa has climbed a volcano.",
+          "answer": false
+        },
+        {
+          "statement": "Melissa has played the violin.",
+          "answer": false
+        }
+      ]
+    },
+    {
+      "type": "dragbank",
+      "title": "Listen and Complete",
+      "instruction": "Escucha el audio y arrastra el participio correcto a cada espacio. Hay dos distractores.",
+      "audio": "files/life-experiences-audio.mp3",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "I have ___ so many experiences this year.",
+            "answer": "lived"
+          },
+          {
+            "text": "I have ___ a mountain.",
+            "answer": "climbed"
+          },
+          {
+            "text": "I have ___ Paris Hilton at a party.",
+            "answer": "met"
+          },
+          {
+            "text": "I have been ___ by a bee.",
+            "answer": "bitten"
+          },
+          {
+            "text": "I have just ___ something important.",
+            "answer": "remembered"
+          },
+          {
+            "text": "I have ___ to play the trumpet.",
+            "answer": "learned"
+          }
+        ],
+        "bank": [
+          "gone",
+          "written"
+        ]
+      },
+      "dataB": {
+        "sentences": [
+          {
+            "text": "Many experiences have been ___ by the speaker this year.",
+            "answer": "lived"
+          },
+          {
+            "text": "A mountain has been ___ by the speaker.",
+            "answer": "climbed"
+          },
+          {
+            "text": "Paris Hilton has been ___ by the speaker at a party.",
+            "answer": "met"
+          },
+          {
+            "text": "The speaker has been ___ by a bee.",
+            "answer": "bitten"
+          },
+          {
+            "text": "The speaker has just ___ learning the trumpet.",
+            "answer": "remembered"
+          },
+          {
+            "text": "The trumpet has been ___ by the speaker this year.",
+            "answer": "learned"
+          }
+        ],
+        "bank": [
+          "driven",
+          "eaten"
+        ]
+      }
+    }
+  ],
+  "game": {
+    "type": "dino",
+    "winScore": 500
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
