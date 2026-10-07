@@ -536,12 +536,12 @@
 
     const wrap = document.createElement('div');
     wrap.innerHTML = `
-      <div class="ml-stage" style="position:relative; padding: 20px 0; width: 100%;">
+      <div class="ml-stage" style="position:relative; padding:20px 3px; width:100%; min-width:0; box-sizing:border-box;">
         <svg id="ml-svg-${ctx.exerciseId}" style="position:absolute;inset:0;width:100%;height:100%;
              pointer-events:none;z-index:1; overflow:visible;"></svg>
-        <div class="ml-board" style="display:flex; justify-content:center; gap:120px; position:relative; z-index:2;">
-          <div class="ml-column ml-column-left" id="ml-left-${ctx.exerciseId}" style="display:flex; flex-direction:column; justify-content:center; gap:15px;"></div>
-          <div class="ml-column ml-column-right" id="ml-right-${ctx.exerciseId}" style="display:flex; flex-direction:column; justify-content:center; gap:15px;"></div>
+        <div class="ml-board" style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:clamp(24px,12%,120px); position:relative; z-index:2;">
+          <div class="ml-column ml-column-left" id="ml-left-${ctx.exerciseId}" style="display:flex; flex-direction:column; justify-content:center; gap:15px; min-width:0;"></div>
+          <div class="ml-column ml-column-right" id="ml-right-${ctx.exerciseId}" style="display:flex; flex-direction:column; justify-content:center; gap:15px; min-width:0;"></div>
         </div>
       </div>
     `;
@@ -561,9 +561,9 @@
       const bgColor = side === 'L' ? '#E1F5FE' : '#FFF9C4';
 
       el.style.cssText = `background:${bgColor}; border:3px solid #1a1a1a; border-radius:10px;
-        padding:10px 20px; font-weight:bold; cursor:pointer; box-sizing: border-box;
+        padding:10px clamp(6px,2vw,20px); font-weight:bold; cursor:pointer; box-sizing: border-box;
         text-align:center; box-shadow:2px 2px 0 #1a1a1a; transition:transform 0.15s, background 0.15s;
-        width:max-content; position:relative; z-index:2;`;
+        width:100%; min-width:0; max-width:100%; white-space:normal; overflow-wrap:anywhere; position:relative; z-index:2;`;
         
       return el;
     }
@@ -704,23 +704,19 @@
         connections.map(c => `${c.leftId} -> ${c.rightId}: ${c.correct ? 'OK' : 'X'}`), connections.map(c=>({leftId:Number(c.leftId),rightId:Number(c.rightId)})));
     }
 
-    function equalizeWidthsAndDraw() {
-      let maxW = 0;
-      const allCards = wrap.querySelectorAll('[data-id]');
-      
-      allCards.forEach(el => {
-        if (el.offsetWidth > maxW) maxW = el.offsetWidth;
+    // El texto determina la altura; las líneas siguen los bordes al cambiar
+    // el ancho del contenedor, la fuente o la orientación de la pantalla.
+    if (typeof ResizeObserver === 'function') {
+      const observer = new ResizeObserver(() => {
+        if (!wrap.isConnected) { observer.disconnect(); return; }
+        redrawAll();
       });
-      
-      allCards.forEach(el => {
-        el.style.width = maxW + 'px';
-      });
-      
-      redrawAll();
+      observer.observe(wrap);
+    } else {
+      window.addEventListener('resize', redrawAll);
+      if (document.fonts) document.fonts.ready.then(redrawAll);
     }
-
-    setTimeout(equalizeWidthsAndDraw, 100);
-    window.addEventListener('resize', redrawAll);
+    requestAnimationFrame(redrawAll);
 });
 
   // =====================================================================
