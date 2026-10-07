@@ -423,7 +423,7 @@
     if (!SUPPORTED_GAMES.has(game) || !student || !student.nie) return null;
     const data = await rpc('get_game_leaderboards', {
       p_game: game,
-      p_grade: student.grade || '',
+      p_grade: rankingGrade(student.grade),
       p_student_key: await hashStudentId(student.nie)
     });
     // Las páginas que todavía usan la función SQL anterior también pueden
@@ -435,6 +435,22 @@
     }
     const valid = scores.map(Number).filter(value => Number.isSafeInteger(value) && value >= 0);
     return valid.length ? Math.max(...valid) : null;
+  }
+
+  // Debe coincidir con coeduca_ranking_grade de Supabase. Los nombres del
+  // padrón oficial y de los ZIP antiguos identifican el mismo grado.
+  function rankingGrade(value) {
+    const grade = typeof value === 'string' ? value.trim() : '';
+    const plain = grade.split(' · ')[0].normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    if (/^(primer|primero|1|1er|1ro) ano( (de )?(bach|bachillerato))?$/.test(plain)) return 'Primer Año';
+    if (/^(segundo|2|2do) ano( (de )?(bach|bachillerato))?$/.test(plain)) return 'Segundo Año';
+    if (/^(septimo|7|7mo)( grado)?$/.test(plain)) return 'Séptimo';
+    if (/^(octavo|8|8vo)( grado)?$/.test(plain)) return 'Octavo';
+    if (/^(noveno|9|9no)( grado)?$/.test(plain)) return 'Noveno';
+    if (plain === 'maestro') return 'Maestro';
+    if (plain === 'mascota') return 'Mascota';
+    return grade;
   }
 
   function configuredGrades() {
@@ -513,7 +529,7 @@
       name.textContent = displayStudentName(row.student_name);
       const grade = document.createElement('span');
       grade.className = 'cg-leaderboard-grade';
-      grade.textContent = row.grade || '';
+      grade.textContent = rankingGrade(row.grade);
       student.append(name, grade);
 
       const score = document.createElement('span');
@@ -574,7 +590,7 @@
     // rechazada por el servidor nunca debe impedir un reintento posterior.
     let bestSent = 0;
     let requestRunning = false;
-    let selectedGrade = student.grade || '';
+    let selectedGrade = rankingGrade(student.grade);
     let availableGrades = configuredGrades();
     let refreshNumber = 0;
     let ownProfile = null;
@@ -583,7 +599,7 @@
       if (!isTeacher) return;
       const grades = [...new Set([selectedGrade, ...availableGrades]
         .filter(grade => typeof grade === 'string' && grade.trim())
-        .map(grade => grade.trim()))].sort((a, b) => a.localeCompare(b, 'es'));
+        .map(rankingGrade))].sort((a, b) => a.localeCompare(b, 'es'));
       gradeChips.replaceChildren(...grades.map(grade => {
         const chip = document.createElement('button');
         chip.type = 'button';
@@ -960,7 +976,7 @@
         const improved = await rpc('submit_game_score', {
           p_student_key: key,
           p_student_name: student.name || 'Estudiante',
-          p_grade: student.grade || 'Sin grado',
+          p_grade: rankingGrade(student.grade) || 'Sin grado',
           p_game: game,
           p_score: score
         });
