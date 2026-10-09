@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"3dfb2735-5493-4d38-b8fd-eeb58fd513df","token":"d5246770-fe2f-4c32-8d10-7e01a659350a"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Simple Present Affirmative 7th</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "dded7b4f-f690-443d-8b03-1c4901c43311",
+  "container": "#app",
+  "topic": "Simple Present Affirmative 7th",
+  "level": "Séptimo",
+  "pdfDesign": "PopArt",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#81F6F7",
+    "accent": "#43B069",
+    "bg": "#FFBF00",
+    "cardBg": "#88BEB3",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "wordsearch",
+      "title": "Find the Verbs",
+      "instruction": "Encuentra seis verbos usados en oraciones afirmativas del Simple Present.",
+      "dataA": {
+        "words": [
+          "STUDY",
+          "PLAY",
+          "WATCH",
+          "READ",
+          "COOK",
+          "WORK"
+        ],
+        "gridSize": 12
+      },
+      "dataB": {
+        "words": [
+          "DRINK",
+          "WRITE",
+          "CLEAN",
+          "WALK",
+          "SLEEP",
+          "LISTEN"
+        ],
+        "gridSize": 12
+      }
+    },
+    {
+      "type": "matchlines",
+      "title": "Match the Sentences",
+      "instruction": "Une cada oración en inglés con su significado en español.",
+      "dataA": [
+        {
+          "left": "I play soccer after school.",
+          "right": "Yo juego fútbol después de clases."
+        },
+        {
+          "left": "She studies English every day.",
+          "right": "Ella estudia inglés todos los días."
+        },
+        {
+          "left": "He watches TV at night.",
+          "right": "Él mira televisión por la noche."
+        },
+        {
+          "left": "We eat lunch at school.",
+          "right": "Nosotros almorzamos en la escuela."
+        },
+        {
+          "left": "My mother cooks dinner.",
+          "right": "Mi mamá cocina la cena."
+        },
+        {
+          "left": "They walk to the park.",
+          "right": "Ellos caminan al parque."
+        }
+      ],
+      "dataB": [
+        {
+          "left": "I read books at home.",
+          "right": "Yo leo libros en casa."
+        },
+        {
+          "left": "She listens to music.",
+          "right": "Ella escucha música."
+        },
+        {
+          "left": "He goes to school early.",
+          "right": "Él va temprano a la escuela."
+        },
+        {
+          "left": "We clean the classroom.",
+          "right": "Nosotros limpiamos el salón."
+        },
+        {
+          "left": "My brother drinks water.",
+          "right": "Mi hermano bebe agua."
+        },
+        {
+          "left": "They work in the morning.",
+          "right": "Ellos trabajan por la mañana."
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Look and Match",
+      "instruction": "Relaciona cada imagen con la oración que mejor describe la acción.",
+      "dataA": [
+        {
+          "word": "She reads a book.",
+          "image": "files/girl-reading-book.png"
+        },
+        {
+          "word": "He plays soccer.",
+          "image": "files/boy-playing-soccer.png"
+        },
+        {
+          "word": "She cooks dinner.",
+          "image": "files/girl-cooking-dinner.png"
+        },
+        {
+          "word": "He rides a bike.",
+          "image": "files/boy-riding-bike.png"
+        },
+        {
+          "word": "She studies English.",
+          "image": "files/girl-studying-english.png"
+        },
+        {
+          "word": "He watches TV.",
+          "image": "files/boy-watching-tv.png"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "She drinks water.",
+          "image": "files/girl-drinking-water.png"
+        },
+        {
+          "word": "He cleans his room.",
+          "image": "files/boy-cleaning-room.png"
+        },
+        {
+          "word": "She walks to school.",
+          "image": "files/girl-walking-school.png"
+        },
+        {
+          "word": "He listens to music.",
+          "image": "files/boy-listening-music.png"
+        },
+        {
+          "word": "She writes in a notebook.",
+          "image": "files/girl-writing-notebook.png"
+        },
+        {
+          "word": "He eats breakfast.",
+          "image": "files/boy-eating-breakfast.png"
+        }
+      ]
+    },
+    {
+      "type": "memory",
+      "title": "Simple Present Memory",
+      "instruction": "Encuentra las parejas correctas entre las oraciones y sus significados.",
+      "dataA": [
+        {
+          "left": "I study English.",
+          "right": "Yo estudio inglés."
+        },
+        {
+          "left": "She plays volleyball.",
+          "right": "Ella juega voleibol."
+        },
+        {
+          "left": "He reads comics.",
+          "right": "Él lee cómics."
+        },
+        {
+          "left": "We watch movies.",
+          "right": "Nosotros vemos películas."
+        },
+        {
+          "left": "They eat breakfast.",
+          "right": "Ellos desayunan."
+        },
+        {
+          "left": "My father works.",
+          "right": "Mi papá trabaja."
+        },
+        {
+          "left": "Ana walks to school.",
+          "right": "Ana camina a la escuela."
+        },
+        {
+          "left": "The dog sleeps outside.",
+          "right": "El perro duerme afuera."
+        }
+      ],
+      "dataB": [
+        {
+          "left": "I listen to music.",
+          "right": "Yo escucho música."
+        },
+        {
+          "left": "She washes the dishes.",
+          "right": "Ella lava los platos."
+        },
+        {
+          "left": "He drinks juice.",
+          "right": "Él bebe jugo."
+        },
+        {
+          "left": "We clean our house.",
+          "right": "Nosotros limpiamos nuestra casa."
+        },
+        {
+          "left": "They play basketball.",
+          "right": "Ellos juegan baloncesto."
+        },
+        {
+          "left": "My sister studies math.",
+          "right": "Mi hermana estudia matemáticas."
+        },
+        {
+          "left": "Carlos goes to school.",
+          "right": "Carlos va a la escuela."
+        },
+        {
+          "left": "The cat eats fish.",
+          "right": "El gato come pescado."
+        }
+      ]
+    },
+    {
+      "type": "spoterror",
+      "title": "Fix the Mistake",
+      "instruction": "Encuentra la palabra incorrecta y corrígela para formar una oración afirmativa en Simple Present.",
+      "dataA": [
+        {
+          "words": [
+            "She",
+            "play",
+            "soccer",
+            "every",
+            "day."
+          ],
+          "errorIndex": 1,
+          "fix": "plays"
+        },
+        {
+          "words": [
+            "He",
+            "watch",
+            "TV",
+            "at",
+            "night."
+          ],
+          "errorIndex": 1,
+          "fix": "watches"
+        },
+        {
+          "words": [
+            "My",
+            "mother",
+            "cook",
+            "dinner."
+          ],
+          "errorIndex": 2,
+          "fix": "cooks"
+        },
+        {
+          "words": [
+            "Daniel",
+            "study",
+            "English",
+            "after",
+            "school."
+          ],
+          "errorIndex": 1,
+          "fix": "studies"
+        },
+        {
+          "words": [
+            "The",
+            "dog",
+            "sleep",
+            "outside."
+          ],
+          "errorIndex": 2,
+          "fix": "sleeps"
+        },
+        {
+          "words": [
+            "Ana",
+            "go",
+            "to",
+            "school",
+            "early."
+          ],
+          "errorIndex": 1,
+          "fix": "goes"
+        },
+        {
+          "words": [
+            "My",
+            "brother",
+            "wash",
+            "the",
+            "car."
+          ],
+          "errorIndex": 2,
+          "fix": "washes"
+        },
+        {
+          "words": [
+            "Pedro",
+            "read",
+            "a",
+            "book",
+            "every",
+            "week."
+          ],
+          "errorIndex": 1,
+          "fix": "reads"
+        }
+      ],
+      "dataB": [
+        {
+          "words": [
+            "She",
+            "drink",
+            "water",
+            "in",
+            "the",
+            "morning."
+          ],
+          "errorIndex": 1,
+          "fix": "drinks"
+        },
+        {
+          "words": [
+            "He",
+            "walk",
+            "to",
+            "school",
+            "every",
+            "day."
+          ],
+          "errorIndex": 1,
+          "fix": "walks"
+        },
+        {
+          "words": [
+            "My",
+            "sister",
+            "listen",
+            "to",
+            "music."
+          ],
+          "errorIndex": 2,
+          "fix": "listens"
+        },
+        {
+          "words": [
+            "Carlos",
+            "do",
+            "his",
+            "homework",
+            "at",
+            "home."
+          ],
+          "errorIndex": 1,
+          "fix": "does"
+        },
+        {
+          "words": [
+            "The",
+            "cat",
+            "eat",
+            "fish."
+          ],
+          "errorIndex": 2,
+          "fix": "eats"
+        },
+        {
+          "words": [
+            "Laura",
+            "write",
+            "in",
+            "her",
+            "notebook."
+          ],
+          "errorIndex": 1,
+          "fix": "writes"
+        },
+        {
+          "words": [
+            "My",
+            "father",
+            "drive",
+            "to",
+            "work."
+          ],
+          "errorIndex": 2,
+          "fix": "drives"
+        },
+        {
+          "words": [
+            "Sofia",
+            "clean",
+            "her",
+            "room",
+            "on",
+            "Saturday."
+          ],
+          "errorIndex": 1,
+          "fix": "cleans"
+        }
+      ]
+    },
+    {
+      "type": "comicdialogue",
+      "title": "A Day in Our Lives",
+      "instruction": "Completa las conversaciones arrastrando las oraciones correctas a los espacios.",
+      "dataA": [
+        {
+          "title": "After School",
+          "bubbles": [
+            {
+              "author": "A",
+              "blank": false,
+              "text": "What do you do after school?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "I play soccer with my friends."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "Nice! What does your sister do?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "She studies English at home."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "And your brother?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "He watches TV after dinner."
+            }
+          ],
+          "bank": [
+            "I play soccer with my friends.",
+            "She studies English at home.",
+            "He watches TV after dinner.",
+            "They goes to school.",
+            "She play basketball."
+          ]
+        },
+        {
+          "title": "Morning Routine",
+          "bubbles": [
+            {
+              "author": "A",
+              "blank": false,
+              "text": "My family is very busy in the morning."
+            },
+            {
+              "author": "B",
+              "blank": false,
+              "text": "What does your father do?"
+            },
+            {
+              "author": "A",
+              "blank": true,
+              "answer": "He drinks coffee and goes to work."
+            },
+            {
+              "author": "B",
+              "blank": false,
+              "text": "What about your mother?"
+            },
+            {
+              "author": "A",
+              "blank": true,
+              "answer": "She prepares breakfast for us."
+            },
+            {
+              "author": "B",
+              "blank": false,
+              "text": "And you?"
+            },
+            {
+              "author": "A",
+              "blank": true,
+              "answer": "I walk to school with my cousin."
+            }
+          ],
+          "bank": [
+            "He drinks coffee and goes to work.",
+            "She prepares breakfast for us.",
+            "I walk to school with my cousin.",
+            "He drink coffees every day.",
+            "I walks to school."
+          ]
+        }
+      ],
+      "dataB": [
+        {
+          "title": "Weekend Activities",
+          "bubbles": [
+            {
+              "author": "A",
+              "blank": false,
+              "text": "What do you do on Saturday?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "I clean my room in the morning."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "What does your brother do?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "He rides his bike in the park."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "And your parents?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "They cook lunch together."
+            }
+          ],
+          "bank": [
+            "I clean my room in the morning.",
+            "He rides his bike in the park.",
+            "They cook lunch together.",
+            "He ride his bicycle.",
+            "They cooks lunch."
+          ]
+        },
+        {
+          "title": "At Home",
+          "bubbles": [
+            {
+              "author": "A",
+              "blank": false,
+              "text": "What happens at your house in the evening?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "My mother reads a book."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "What does your father do?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "He listens to the radio."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "What do you and your sister do?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "We do our homework together."
+            }
+          ],
+          "bank": [
+            "My mother reads a book.",
+            "He listens to the radio.",
+            "We do our homework together.",
+            "My mother read a books.",
+            "We does our homework."
+          ]
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "doodle"
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
