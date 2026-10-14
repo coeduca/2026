@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"6a701a4c-b060-4b59-a654-b6b9247d408c","token":"e69da30a-a464-4d3a-90f4-a04aa135ef31"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · 5.3 El Proyecto de vida y el empoderamiento juvenil</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="civica">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="civica-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "6c896bfb-2e7e-4230-bfff-622c2feb1942",
+  "container": "#app",
+  "topic": "5.3 El Proyecto de vida y el empoderamiento juvenil",
+  "unit": "Unidad 5 - Semana 3",
+  "subjectLabel": "Ciudadanía y Valores",
+  "book": {
+    "url": "https://drive.google.com/file/d/18XuylAeUW3PUR7epq3VNPK89jekZHTgu/view?usp=drivesdk",
+    "label": "Libro de Octavo"
+  },
+  "colors": {
+    "primary": "#D4AF37",
+    "accent": "#9B59B6",
+    "bg": "#87CEEB",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "pdfDesign": "Default",
+  "sections": {
+    "explore": [
+      {
+        "type": "note",
+        "title": "Conozcamos el tema",
+        "html": "\u003ch3>El proyecto de vida y el empoderamiento juvenil\u003c/h3>\u003cp>El \u003cstrong>proyecto de vida\u003c/strong> es una herramienta de planificación que nos permite pensar en nuestro futuro, establecer metas y decidir qué acciones debemos realizar para alcanzar nuestros sueños.\u003c/p>\u003cp>Para elaborar un proyecto de vida debemos conocer nuestras habilidades, intereses, valores y capacidades. También necesitamos identificar los obstáculos que podrían dificultar nuestras metas y buscar formas de superarlos.\u003c/p>\u003cp>El \u003cstrong>empoderamiento juvenil\u003c/strong> permite que los jóvenes desarrollen sus capacidades, tengan confianza en sí mismos, tomen decisiones y participen activamente en su comunidad.\u003c/p>\u003cp>La educación, la capacitación, la participación ciudadana y las oportunidades de desarrollo ayudan a los jóvenes a construir un mejor futuro.\u003c/p>"
+      },
+      {
+        "type": "note",
+        "title": "Actividad 1. Mi autobiografía",
+        "html": "\u003ch3>Actividad individual\u003c/h3>\u003cp>Redacta tu autobiografía tomando en cuenta los siguientes puntos:\u003c/p>\u003col type=\"a\">\u003cli>¿Quién y cómo eres?\u003c/li>\u003cli>¿Quiénes conforman tu familia y quiénes son tus mejores amigos?\u003c/li>\u003cli>¿Cuáles son tus gustos personales y aficiones?\u003c/li>\u003cli>¿Cuáles son tus aspiraciones personales?\u003c/li>\u003c/ol>\u003cp>Escribe dos objetivos personales que deseas cumplir a lo largo de este año y los pasos que debes seguir para alcanzarlos.\u003c/p>\u003cp>\u003cstrong>Reflexiona:\u003c/strong> ¿Consideras importante que cada persona se trace objetivos y metas para el futuro? ¿Por qué?\u003c/p>"
+      },
+      {
+        "type": "note",
+        "title": "Actividad 2. Oportunidades para los jóvenes",
+        "html": "\u003ch3>Los CUBO como herramientas de desarrollo comunitario\u003c/h3>\u003cp>Los Centros Urbanos de Bienestar y Oportunidades (CUBO) son espacios dentro de las comunidades que permiten promover el desarrollo de la población. En los CUBO, los niños y jóvenes reciben capacitación en diseño gráfico, inglés, italiano, voleibol, lectoescritura, computación, ajedrez, lenguaje de señas salvadoreñas y náhuat.\u003c/p>\u003cp>\u003cstrong>Reflexionen:\u003c/strong>\u003c/p>\u003col type=\"a\">\u003cli>¿De qué manera los CUBO contribuyen al desarrollo de la juventud en El Salvador?\u003c/li>\u003cli>¿Cuáles consideran que son los beneficios de que los niños y los jóvenes reciban capacitación en áreas como diseño gráfico, idiomas, deportes y otras habilidades?\u003c/li>\u003cli>¿Cómo impactan las oportunidades de capacitación y desarrollo en el futuro de los jóvenes?\u003c/li>\u003cli>¿Qué otras iniciativas se podrían promover desde las comunidades y los centros educativos para que la juventud tenga mayores oportunidades de desarrollo?\u003c/li>\u003c/ol>"
+      }
+    ],
+    "deepen": [
+      {
+        "type": "note",
+        "title": "El proyecto de vida",
+        "html": "\u003ch3>¿Qué es un proyecto de vida?\u003c/h3>\u003cp>El proyecto de vida es un instrumento de planificación que permite tomar decisiones sobre el futuro y dirigir los esfuerzos hacia el logro de metas relacionadas con nuestros intereses, capacidades, habilidades y recursos.\u003c/p>\u003ch3>Los cinco pasos para crear un proyecto de vida\u003c/h3>\u003col>\u003cli>\u003cstrong>Autoevaluación y autoconocimiento:\u003c/strong> conocer nuestra identidad, valores, intereses, habilidades y limitaciones.\u003c/li>\u003cli>\u003cstrong>Definición de metas:\u003c/strong> establecer objetivos claros, realistas y alcanzables a corto y largo plazo.\u003c/li>\u003cli>\u003cstrong>Plan de acción:\u003c/strong> identificar las acciones y los recursos necesarios para alcanzar cada meta.\u003c/li>\u003cli>\u003cstrong>Ejecución del plan:\u003c/strong> realizar las actividades planificadas en el tiempo establecido.\u003c/li>\u003cli>\u003cstrong>Seguimiento y evaluación:\u003c/strong> revisar los avances y realizar ajustes cuando sea necesario.\u003c/li>\u003c/ol>"
+      },
+      {
+        "type": "note",
+        "title": "Personalidad y superación personal",
+        "html": "\u003ch3>La personalidad\u003c/h3>\u003cp>La personalidad es el conjunto de rasgos emocionales y conductuales que identifican a una persona y la distinguen de los demás.\u003c/p>\u003cp>Entre sus elementos se encuentran:\u003c/p>\u003cul>\u003cli>\u003cstrong>Temperamento:\u003c/strong> predisposición biológica para responder de determinada manera al entorno.\u003c/li>\u003cli>\u003cstrong>Carácter:\u003c/strong> rasgos relacionados con los valores, las normas y los principios aprendidos.\u003c/li>\u003cli>\u003cstrong>Capacidades cognitivas:\u003c/strong> habilidades relacionadas con el pensamiento, la creatividad y la solución de problemas.\u003c/li>\u003cli>\u003cstrong>Historia de vida:\u003c/strong> experiencias personales y sociales que influyen en nuestra forma de pensar y actuar.\u003c/li>\u003c/ul>\u003ch3>La superación personal\u003c/h3>\u003cp>Es un proceso continuo de crecimiento que busca mejorar la calidad de vida, superar obstáculos, adquirir nuevas habilidades y alcanzar objetivos.\u003c/p>"
+      },
+      {
+        "type": "note",
+        "title": "Actividad 3. Toma de decisiones",
+        "html": "\u003ch3>Actividad individual\u003c/h3>\u003cp>Desarrolla la habilidad de toma de decisiones. Para ello, responde:\u003c/p>\u003col type=\"a\">\u003cli>¿Qué sentido tiene seguir un orden al elaborar el proyecto de vida?\u003c/li>\u003cli>¿Por qué es importante tener objetivos realistas al plantearse un proyecto de vida?\u003c/li>\u003cli>¿Cuál debe ser tu actitud al encontrarte con obstáculos que te dificultan conseguir tus metas?\u003c/li>\u003c/ol>"
+      },
+      {
+        "type": "note",
+        "title": "Áreas de superación personal y social",
+        "html": "\u003ch3>Las cinco áreas de superación\u003c/h3>\u003cul>\u003cli>\u003cstrong>Vocacional:\u003c/strong> estudios y futuro desempeño laboral.\u003c/li>\u003cli>\u003cstrong>Emocional-conductual:\u003c/strong> desarrollo de habilidades y cualidades personales, como vencer la timidez.\u003c/li>\u003cli>\u003cstrong>Cultural y recreativa:\u003c/strong> actividades artísticas, deportivas y culturales.\u003c/li>\u003cli>\u003cstrong>Afectiva:\u003c/strong> relaciones personales, convivencia y amistades.\u003c/li>\u003cli>\u003cstrong>Sociopolítica:\u003c/strong> valores cívicos, compromiso social y participación ciudadana.\u003c/li>\u003c/ul>\u003cp>Para alcanzar la superación personal se necesitan esfuerzo, tiempo, dedicación, disciplina y perseverancia.\u003c/p>"
+      },
+      {
+        "type": "note",
+        "title": "El empoderamiento juvenil",
+        "html": "\u003ch3>¿Qué es el empoderamiento?\u003c/h3>\u003cp>Es el proceso mediante el cual las personas adquieren la capacidad de tomar decisiones autónomas y efectivas sobre su vida y su participación en la sociedad.\u003c/p>\u003ch3>Acciones individuales\u003c/h3>\u003cul>\u003cli>Promover la autoestima y la confianza en sí mismo.\u003c/li>\u003cli>Desarrollar nuevas habilidades y conocimientos.\u003c/li>\u003cli>Buscar oportunidades de formación.\u003c/li>\u003c/ul>\u003ch3>Acciones colectivas\u003c/h3>\u003cul>\u003cli>Diseñar espacios de participación juvenil.\u003c/li>\u003cli>Ofrecer oportunidades educativas y de capacitación.\u003c/li>\u003cli>Promover la igualdad de oportunidades.\u003c/li>\u003c/ul>\u003ch3>Espacios de empoderamiento juvenil\u003c/h3>\u003cp>Entre ellos se encuentran los clubes estudiantiles, centros juveniles, organizaciones juveniles y centros de emprendimiento juvenil.\u003c/p>"
+      },
+      {
+        "type": "note",
+        "title": "Actividad 4. Participación juvenil",
+        "html": "\u003ch3>Actividad en equipo\u003c/h3>\u003cp>Desarrollen la habilidad de participación activa y responsable. Para ello:\u003c/p>\u003col type=\"a\">\u003cli>Investiguen cuáles espacios de empoderamiento y participación juvenil existen en el país.\u003c/li>\u003cli>Elaboren una presentación digital para mostrar los resultados de su investigación.\u003c/li>\u003c/ol>"
+      }
+    ],
+    "consolidate": [
+      {
+        "type": "note",
+        "title": "Actividad 5. Una persona que admiro",
+        "html": "\u003ch3>Actividad en pares\u003c/h3>\u003cp>Elijan a un personaje que admiren. Puede ser un deportista, un científico, un artista u otra figura que les inspire.\u003c/p>\u003col type=\"a\">\u003cli>Investiguen la vida de ese personaje utilizando fuentes confiables.\u003c/li>\u003cli>Completen una tabla con los siguientes datos: nombre, nacionalidad, edad, aspiración o meta más importante, acciones que realizó para alcanzar su meta, obstáculos que encontró y cómo superó las dificultades.\u003c/li>\u003c/ol>\u003cp>\u003cstrong>Respondan:\u003c/strong>\u003c/p>\u003cul>\u003cli>¿Qué les llamó la atención de la vida de este personaje?\u003c/li>\u003cli>¿Cómo se relaciona la historia de este personaje con la importancia de tener un proyecto de vida?\u003c/li>\u003cli>¿Qué lecciones pueden extraer de su experiencia para sus propios proyectos de vida?\u003c/li>\u003cli>¿Cómo les inspira esta historia a perseverar y superar obstáculos?\u003c/li>\u003c/ul>\u003cp>Compartan sus reflexiones con el resto de la clase y elaboren una conclusión sobre la importancia de los proyectos de vida.\u003c/p>"
+      },
+      {
+        "type": "note",
+        "title": "Mi propio proyecto de vida",
+        "html": "\u003ch3>Actividad individual\u003c/h3>\u003cp>Elabora tu proyecto de vida, tomando en cuenta los siguientes aspectos:\u003c/p>\u003col type=\"a\">\u003cli>Reflexiona detenidamente qué quieres lograr y cómo debes hacerlo.\u003c/li>\u003cli>Considera los diversos factores que conforman y ejercen influencia en tu personalidad.\u003c/li>\u003cli>Para definir tus metas y objetivos, reflexiona acerca de lo que quieres conseguir en las diversas áreas del desarrollo personal y social.\u003c/li>\u003cli>Utiliza un formato creativo para presentarlo a tus compañeros y procura que la información sea clara y concisa.\u003c/li>\u003c/ol>"
+      },
+      {
+        "type": "note",
+        "title": "Actividad 7. Mural del empoderamiento",
+        "html": "\u003ch3>Actividad con docente\u003c/h3>\u003cp>Propicien una lluvia de ideas sobre lo que consideran símbolos, conceptos, frases o palabras clave relacionadas con el empoderamiento y la superación personal.\u003c/p>\u003cp>Elaboren un mural que tenga por objetivo reflexionar sobre cómo el empoderamiento ayuda a superar retos y a alcanzar la superación personal.\u003c/p>"
+      },
+      {
+        "type": "multiplechoice",
+        "title": "Compruebo mis aprendizajes",
+        "instruction": "Lee cada pregunta y selecciona la respuesta correcta. Las preguntas se relacionan con las actividades y los contenidos del libro.",
+        "dataA": [
+          {
+            "q": "¿Qué es un proyecto de vida?",
+            "options": [
+              "Una planificación de metas para el futuro",
+              "Una lista de películas favoritas",
+              "Un horario de vacaciones",
+              "Un juego de entretenimiento"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Qué debemos tomar en cuenta al escribir nuestra autobiografía?",
+            "options": [
+              "Los nombres de todos los países",
+              "Nuestra familia, gustos y aspiraciones",
+              "Los resultados de un partido",
+              "Los precios de los productos"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿Qué debemos escribir junto a nuestros objetivos personales?",
+            "options": [
+              "Los obstáculos de otras personas",
+              "Una lista de animales",
+              "Los pasos para lograrlos",
+              "Los nombres de nuestros vecinos"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "¿Qué significan las siglas CUBO?",
+            "options": [
+              "Comités Unidos de Bienestar Oficial",
+              "Centros Universales de Biblioteca y Oficios",
+              "Comunidades Unidas de Buenas Obras",
+              "Centros Urbanos de Bienestar y Oportunidades"
+            ],
+            "answer": 3
+          },
+          {
+            "q": "¿Cuál es el primer paso para crear un proyecto de vida?",
+            "options": [
+              "Autoevaluación y autoconocimiento",
+              "Celebración de los resultados",
+              "Ejecución de un plan",
+              "Seguimiento y evaluación"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Qué significa definir metas?",
+            "options": [
+              "Dejar que otros decidan por nosotros",
+              "Establecer objetivos realistas y alcanzables",
+              "Cambiar nuestros sueños todos los días",
+              "Realizar actividades sin objetivos"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿En qué consiste el plan de acción?",
+            "options": [
+              "En olvidar nuestras metas",
+              "En imaginar resultados sin actuar",
+              "En identificar las acciones necesarias",
+              "En evitar responsabilidades"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "¿Qué debemos hacer cuando encontramos obstáculos para alcanzar nuestras metas?",
+            "options": [
+              "Abandonar todos nuestros objetivos",
+              "Esperar que otros hagan nuestro trabajo",
+              "Dejar de intentarlo",
+              "Perseverar y buscar soluciones"
+            ],
+            "answer": 3
+          },
+          {
+            "q": "¿Qué elemento de la personalidad se relaciona con los valores y principios aprendidos?",
+            "options": [
+              "El carácter",
+              "La estatura",
+              "La edad",
+              "La apariencia"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Cuál de las siguientes metas pertenece al área vocacional?",
+            "options": [
+              "Aprender a tocar guitarra",
+              "Terminar mis estudios y prepararme para trabajar",
+              "Hacer nuevos amigos",
+              "Participar en un equipo deportivo"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿Qué es el empoderamiento juvenil?",
+            "options": [
+              "Evitar la participación de los jóvenes",
+              "Depender siempre de otras personas",
+              "Desarrollar capacidades para decidir y participar",
+              "Dejar de aprender nuevas habilidades"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "¿Cuál es una acción individual de empoderamiento?",
+            "options": [
+              "Evitar aprender cosas nuevas",
+              "Rechazar las oportunidades educativas",
+              "Dejar que otros tomen todas las decisiones",
+              "Fortalecer la autoestima y la confianza"
+            ],
+            "answer": 3
+          },
+          {
+            "q": "¿Cuál de estos lugares es un espacio de empoderamiento juvenil?",
+            "options": [
+              "Un club estudiantil",
+              "Un lugar sin actividades educativas",
+              "Un espacio que impide la participación",
+              "Un centro que prohíbe expresar opiniones"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Qué debemos investigar sobre una persona que admiramos?",
+            "options": [
+              "Únicamente sus gustos musicales",
+              "Sus metas, obstáculos y cómo los superó",
+              "Solamente sus comidas favoritas",
+              "Los objetos que tiene en casa"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿Cuál es el propósito del mural de empoderamiento?",
+            "options": [
+              "Mostrar únicamente dibujos decorativos",
+              "Comparar las calificaciones de los estudiantes",
+              "Reflexionar sobre la superación de retos",
+              "Elegir al estudiante más popular"
+            ],
+            "answer": 2
+          }
+        ]
+      }
+    ]
+  },
+  "game": {
+    "type": "dino",
+    "winScore": 500,
+    "questions": []
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
