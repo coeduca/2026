@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"9c55e51c-932f-4281-9513-c20f1ed55d86","token":"233f6987-9efe-414b-ba0c-dfb175213ddd"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Numbers 1–100 &amp; Telling the Time</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "ca6d6027-ad05-48ef-aff1-c9cf27f36ef1",
+  "container": "#app",
+  "topic": "Numbers 1–100 & Telling the Time",
+  "level": "Octavo, Séptimo",
+  "pdfDesign": "PopArt",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#F7CA81",
+    "accent": "#E4D59E",
+    "bg": "#FFF1F8",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#E9E4C9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "📚 Learn! Numbers & Telling the Time",
+      "instruction": "Lee la explicación y estudia los ejemplos antes de comenzar los ejercicios.",
+      "html": "\n            \u003ch2>🔢 NUMBERS 1–100\u003c/h2>\n\n            \u003cp>En inglés, los números se utilizan para contar objetos, expresar cantidades y decir la hora.\u003c/p>\n\n            \u003cp>\u003cstrong>Number\u003c/strong> significa número y \u003cstrong>Time\u003c/strong> significa tiempo u hora.\u003c/p>\n\n            \u003ch3>Numbers from 1 to 20\u003c/h3>\n\n            \u003ctable>\n              \u003cthead>\n                \u003ctr>\n                  \u003cth>Number\u003c/th>\n                  \u003cth>English\u003c/th>\n                \u003c/tr>\n              \u003c/thead>\n              \u003ctbody>\n                \u003ctr>\u003ctd>1\u003c/td>\u003ctd>One\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>2\u003c/td>\u003ctd>Two\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>3\u003c/td>\u003ctd>Three\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>4\u003c/td>\u003ctd>Four\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>5\u003c/td>\u003ctd>Five\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>6\u003c/td>\u003ctd>Six\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>7\u003c/td>\u003ctd>Seven\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>8\u003c/td>\u003ctd>Eight\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>9\u003c/td>\u003ctd>Nine\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>10\u003c/td>\u003ctd>Ten\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>11\u003c/td>\u003ctd>Eleven\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>12\u003c/td>\u003ctd>Twelve\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>13\u003c/td>\u003ctd>Thirteen\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>14\u003c/td>\u003ctd>Fourteen\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>15\u003c/td>\u003ctd>Fifteen\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>16\u003c/td>\u003ctd>Sixteen\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>17\u003c/td>\u003ctd>Seventeen\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>18\u003c/td>\u003ctd>Eighteen\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>19\u003c/td>\u003ctd>Nineteen\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>20\u003c/td>\u003ctd>Twenty\u003c/td>\u003c/tr>\n              \u003c/tbody>\n            \u003c/table>\n\n            \u003ch3>Numbers from 30 to 100\u003c/h3>\n\n            \u003ctable>\n              \u003cthead>\n                \u003ctr>\n                  \u003cth>Number\u003c/th>\n                  \u003cth>English\u003c/th>\n                \u003c/tr>\n              \u003c/thead>\n              \u003ctbody>\n                \u003ctr>\u003ctd>30\u003c/td>\u003ctd>Thirty\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>40\u003c/td>\u003ctd>Forty\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>50\u003c/td>\u003ctd>Fifty\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>60\u003c/td>\u003ctd>Sixty\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>70\u003c/td>\u003ctd>Seventy\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>80\u003c/td>\u003ctd>Eighty\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>90\u003c/td>\u003ctd>Ninety\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>100\u003c/td>\u003ctd>One hundred\u003c/td>\u003c/tr>\n              \u003c/tbody>\n            \u003c/table>\n\n            \u003ch3>💡 How to form numbers\u003c/h3>\n\n            \u003cp>Para formar números del 21 al 99 que no son decenas exactas, combinamos las decenas con las unidades utilizando un guion.\u003c/p>\n\n            \u003cp>\u003cstrong>Examples:\u003c/strong>\u003c/p>\n\n            \u003cul>\n              \u003cli>21 → Twenty-one\u003c/li>\n              \u003cli>32 → Thirty-two\u003c/li>\n              \u003cli>45 → Forty-five\u003c/li>\n              \u003cli>58 → Fifty-eight\u003c/li>\n              \u003cli>67 → Sixty-seven\u003c/li>\n              \u003cli>79 → Seventy-nine\u003c/li>\n              \u003cli>84 → Eighty-four\u003c/li>\n              \u003cli>96 → Ninety-six\u003c/li>\n            \u003c/ul>\n\n            \u003cp>\u003cstrong>Remember!\u003c/strong> Se escribe \u003cstrong>forty\u003c/strong>, no fourty; y \u003cstrong>fifteen\u003c/strong>, no fiveteen.\u003c/p>\n\n            \u003chr>\n\n            \u003ch2>🕒 TELLING THE TIME\u003c/h2>\n\n            \u003cp>Para preguntar la hora en inglés utilizamos:\u003c/p>\n\n            \u003cp>\u003cstrong>What time is it?\u003c/strong> — ¿Qué hora es?\u003c/p>\n\n            \u003cp>Para responder comenzamos con:\u003c/p>\n\n            \u003cp>\u003cstrong>It's...\u003c/strong> — Son las... / Es la...\u003c/p>\n\n            \u003ch3>1. O'clock — En punto\u003c/h3>\n\n            \u003cp>Utilizamos \u003cstrong>o'clock\u003c/strong> cuando el reloj marca una hora exacta.\u003c/p>\n\n            \u003cul>\n              \u003cli>1:00 → It's one o'clock.\u003c/li>\n              \u003cli>3:00 → It's three o'clock.\u003c/li>\n              \u003cli>6:00 → It's six o'clock.\u003c/li>\n              \u003cli>10:00 → It's ten o'clock.\u003c/li>\n            \u003c/ul>\n\n            \u003ch3>2. Half past — Y media\u003c/h3>\n\n            \u003cp>Utilizamos \u003cstrong>half past\u003c/strong> cuando han pasado 30 minutos de una hora.\u003c/p>\n\n            \u003cul>\n              \u003cli>2:30 → It's half past two.\u003c/li>\n              \u003cli>4:30 → It's half past four.\u003c/li>\n              \u003cli>7:30 → It's half past seven.\u003c/li>\n              \u003cli>9:30 → It's half past nine.\u003c/li>\n            \u003c/ul>\n\n            \u003ch3>3. Quarter past — Y cuarto\u003c/h3>\n\n            \u003cp>Utilizamos \u003cstrong>a quarter past\u003c/strong> cuando han pasado 15 minutos de una hora.\u003c/p>\n\n            \u003cul>\n              \u003cli>1:15 → It's a quarter past one.\u003c/li>\n              \u003cli>3:15 → It's a quarter past three.\u003c/li>\n              \u003cli>8:15 → It's a quarter past eight.\u003c/li>\n            \u003c/ul>\n\n            \u003ch3>4. Quarter to — Cuarto para\u003c/h3>\n\n            \u003cp>Utilizamos \u003cstrong>a quarter to\u003c/strong> cuando faltan 15 minutos para la siguiente hora.\u003c/p>\n\n            \u003cul>\n              \u003cli>2:45 → It's a quarter to three.\u003c/li>\n              \u003cli>5:45 → It's a quarter to six.\u003c/li>\n              \u003cli>10:45 → It's a quarter to eleven.\u003c/li>\n            \u003c/ul>\n\n            \u003ch3>5. Digital Time\u003c/h3>\n\n            \u003cp>También podemos expresar la hora leyendo directamente los números del reloj digital.\u003c/p>\n\n            \u003cul>\n              \u003cli>3:10 → It's three ten.\u003c/li>\n              \u003cli>4:20 → It's four twenty.\u003c/li>\n              \u003cli>6:30 → It's six thirty.\u003c/li>\n              \u003cli>8:45 → It's eight forty-five.\u003c/li>\n            \u003c/ul>\n\n            \u003ch3>⭐ Quick Review\u003c/h3>\n\n            \u003ctable>\n              \u003cthead>\n                \u003ctr>\n                  \u003cth>Time\u003c/th>\n                  \u003cth>Expression\u003c/th>\n                \u003c/tr>\n              \u003c/thead>\n              \u003ctbody>\n                \u003ctr>\u003ctd>5:00\u003c/td>\u003ctd>Five o'clock\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>5:15\u003c/td>\u003ctd>A quarter past five\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>5:30\u003c/td>\u003ctd>Half past five\u003c/td>\u003c/tr>\n                \u003ctr>\u003ctd>5:45\u003c/td>\u003ctd>A quarter to six\u003c/td>\u003c/tr>\n              \u003c/tbody>\n            \u003c/table>\n\n            \u003cp>\u003cstrong>🎯 Your turn!\u003c/strong> Practica los números y las horas en las actividades siguientes.\u003c/p>\n          "
+    },
+    {
+      "type": "dragbank",
+      "title": "🎯 Complete the Numbers & Time",
+      "instruction": "Arrastra la palabra o expresión correcta para completar cada oración.",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "The number 12 is ___.",
+            "answer": "twelve"
+          },
+          {
+            "text": "The number 30 is ___.",
+            "answer": "thirty"
+          },
+          {
+            "text": "The number 45 is ___.",
+            "answer": "forty-five"
+          },
+          {
+            "text": "The number 80 is ___.",
+            "answer": "eighty"
+          },
+          {
+            "text": "It is 1:00. It is ___.",
+            "answer": "one o'clock"
+          },
+          {
+            "text": "It is 4:30. It is ___.",
+            "answer": "half past four"
+          },
+          {
+            "text": "It is 6:15. It is ___.",
+            "answer": "a quarter past six"
+          },
+          {
+            "text": "It is 8:45. It is ___.",
+            "answer": "a quarter to nine"
+          }
+        ],
+        "bank": [
+          "twenty",
+          "half past five"
+        ]
+      },
+      "dataB": {
+        "sentences": [
+          {
+            "text": "The number 19 is ___.",
+            "answer": "nineteen"
+          },
+          {
+            "text": "The number 50 is ___.",
+            "answer": "fifty"
+          },
+          {
+            "text": "The number 72 is ___.",
+            "answer": "seventy-two"
+          },
+          {
+            "text": "The number 90 is ___.",
+            "answer": "ninety"
+          },
+          {
+            "text": "It is 2:00. It is ___.",
+            "answer": "two o'clock"
+          },
+          {
+            "text": "It is 7:30. It is ___.",
+            "answer": "half past seven"
+          },
+          {
+            "text": "It is 3:15. It is ___.",
+            "answer": "a quarter past three"
+          },
+          {
+            "text": "It is 10:45. It is ___.",
+            "answer": "a quarter to eleven"
+          }
+        ],
+        "bank": [
+          "sixty",
+          "half past eight"
+        ]
+      }
+    },
+    {
+      "type": "categorize",
+      "title": "📦 Numbers or Time?",
+      "instruction": "Clasifica cada palabra o expresión en la categoría correcta: números o expresiones para decir la hora.",
+      "dataA": {
+        "categories": [
+          "Numbers 🔢",
+          "Time Expressions 🕒"
+        ],
+        "items": [
+          {
+            "text": "Thirteen",
+            "cat": 0
+          },
+          {
+            "text": "Twenty-eight",
+            "cat": 0
+          },
+          {
+            "text": "Sixty",
+            "cat": 0
+          },
+          {
+            "text": "Ninety-one",
+            "cat": 0
+          },
+          {
+            "text": "Three o'clock",
+            "cat": 1
+          },
+          {
+            "text": "Half past five",
+            "cat": 1
+          },
+          {
+            "text": "A quarter past two",
+            "cat": 1
+          },
+          {
+            "text": "A quarter to eight",
+            "cat": 1
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "Numbers 🔢",
+          "Time Expressions 🕒"
+        ],
+        "items": [
+          {
+            "text": "Fourteen",
+            "cat": 0
+          },
+          {
+            "text": "Thirty-six",
+            "cat": 0
+          },
+          {
+            "text": "Seventy",
+            "cat": 0
+          },
+          {
+            "text": "Eighty-nine",
+            "cat": 0
+          },
+          {
+            "text": "Nine o'clock",
+            "cat": 1
+          },
+          {
+            "text": "Half past eleven",
+            "cat": 1
+          },
+          {
+            "text": "A quarter past four",
+            "cat": 1
+          },
+          {
+            "text": "A quarter to seven",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "memory",
+      "title": "🧠 Number & Clock Memory",
+      "instruction": "Encuentra las parejas correctas. Relaciona cada número u hora con su expresión en inglés.",
+      "dataA": [
+        {
+          "left": "11",
+          "right": "Eleven"
+        },
+        {
+          "left": "16",
+          "right": "Sixteen"
+        },
+        {
+          "left": "25",
+          "right": "Twenty-five"
+        },
+        {
+          "left": "40",
+          "right": "Forty"
+        },
+        {
+          "left": "2:00",
+          "right": "Two o'clock"
+        },
+        {
+          "left": "5:30",
+          "right": "Half past five"
+        },
+        {
+          "left": "7:15",
+          "right": "A quarter past seven"
+        },
+        {
+          "left": "9:45",
+          "right": "A quarter to ten"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "12",
+          "right": "Twelve"
+        },
+        {
+          "left": "18",
+          "right": "Eighteen"
+        },
+        {
+          "left": "35",
+          "right": "Thirty-five"
+        },
+        {
+          "left": "60",
+          "right": "Sixty"
+        },
+        {
+          "left": "4:00",
+          "right": "Four o'clock"
+        },
+        {
+          "left": "8:30",
+          "right": "Half past eight"
+        },
+        {
+          "left": "10:15",
+          "right": "A quarter past ten"
+        },
+        {
+          "left": "11:45",
+          "right": "A quarter to twelve"
+        }
+      ]
+    },
+    {
+      "type": "reorder_letters",
+      "title": "🔤 Unscramble the Words!",
+      "instruction": "Ordena las letras para formar correctamente cada número o palabra relacionada con la hora. Utiliza la pista en español.",
+      "dataA": [
+        {
+          "word": "THIRTEEN",
+          "hint": "Número 13"
+        },
+        {
+          "word": "TWENTY",
+          "hint": "Número 20"
+        },
+        {
+          "word": "FORTY",
+          "hint": "Número 40"
+        },
+        {
+          "word": "SIXTY",
+          "hint": "Número 60"
+        },
+        {
+          "word": "EIGHTY",
+          "hint": "Número 80"
+        },
+        {
+          "word": "ELEVEN",
+          "hint": "Número 11"
+        },
+        {
+          "word": "HALF",
+          "hint": "Media / Mitad"
+        },
+        {
+          "word": "QUARTER",
+          "hint": "Cuarto / 15 minutos"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "FOURTEEN",
+          "hint": "Número 14"
+        },
+        {
+          "word": "THIRTY",
+          "hint": "Número 30"
+        },
+        {
+          "word": "FIFTY",
+          "hint": "Número 50"
+        },
+        {
+          "word": "SEVENTY",
+          "hint": "Número 70"
+        },
+        {
+          "word": "NINETY",
+          "hint": "Número 90"
+        },
+        {
+          "word": "TWELVE",
+          "hint": "Número 12"
+        },
+        {
+          "word": "CLOCK",
+          "hint": "Reloj"
+        },
+        {
+          "word": "PAST",
+          "hint": "Pasados / Después de"
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "⏰ Choose the Correct Answer",
+      "instruction": "Selecciona la palabra o expresión correcta para completar cada oración.",
+      "dataA": [
+        {
+          "before": "The number 17 in English is ",
+          "options": [
+            "seventeen",
+            "seventy",
+            "seven"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "The number 40 in English is ",
+          "options": [
+            "fourty",
+            "fourteen",
+            "forty"
+          ],
+          "answer": 2,
+          "after": "."
+        },
+        {
+          "before": "The number 63 in English is ",
+          "options": [
+            "sixty-three",
+            "sixteen-three",
+            "seventy-three"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "The number 100 in English is ",
+          "options": [
+            "one thousand",
+            "one hundred",
+            "one million"
+          ],
+          "answer": 1,
+          "after": "."
+        },
+        {
+          "before": "It is 5:00. It is five ",
+          "options": [
+            "past",
+            "o'clock",
+            "quarter"
+          ],
+          "answer": 1,
+          "after": "."
+        },
+        {
+          "before": "It is 3:30. It is ",
+          "options": [
+            "half past three",
+            "half past four",
+            "three o’clock"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "It is 6:15. It is a quarter ",
+          "options": [
+            "to six",
+            "past six",
+            "past seven"
+          ],
+          "answer": 1,
+          "after": "."
+        },
+        {
+          "before": "It is 9:45. It is a quarter ",
+          "options": [
+            "past nine",
+            "to nine",
+            "to ten"
+          ],
+          "answer": 2,
+          "after": "."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "The number 18 in English is ",
+          "options": [
+            "eighty",
+            "eighteen",
+            "eight"
+          ],
+          "answer": 1,
+          "after": "."
+        },
+        {
+          "before": "The number 50 in English is ",
+          "options": [
+            "fifty",
+            "fivety",
+            "fifteen"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "The number 74 in English is ",
+          "options": [
+            "seventeen-four",
+            "sixty-four",
+            "seventy-four"
+          ],
+          "answer": 2,
+          "after": "."
+        },
+        {
+          "before": "The number 90 in English is ",
+          "options": [
+            "nineteen",
+            "ninety",
+            "nine"
+          ],
+          "answer": 1,
+          "after": "."
+        },
+        {
+          "before": "It is 8:00. It is eight ",
+          "options": [
+            "o'clock",
+            "half",
+            "to"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "It is 10:30. It is ",
+          "options": [
+            "half past nine",
+            "ten o’clock",
+            "half past ten"
+          ],
+          "answer": 2,
+          "after": "."
+        },
+        {
+          "before": "It is 2:15. It is a quarter ",
+          "options": [
+            "to three",
+            "past two",
+            "to two"
+          ],
+          "answer": 1,
+          "after": "."
+        },
+        {
+          "before": "It is 4:45. It is a quarter ",
+          "options": [
+            "past five",
+            "to four",
+            "to five"
+          ],
+          "answer": 2,
+          "after": "."
+        }
+      ]
+    },
+    {
+      "type": "matchlines",
+      "title": "🔗 Match the Numbers & Times",
+      "instruction": "Une cada número u hora con su escritura correcta en inglés.",
+      "dataA": [
+        {
+          "left": "15",
+          "right": "Fifteen"
+        },
+        {
+          "left": "38",
+          "right": "Thirty-eight"
+        },
+        {
+          "left": "70",
+          "right": "Seventy"
+        },
+        {
+          "left": "94",
+          "right": "Ninety-four"
+        },
+        {
+          "left": "1:00",
+          "right": "One o'clock"
+        },
+        {
+          "left": "6:30",
+          "right": "Half past six"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "19",
+          "right": "Nineteen"
+        },
+        {
+          "left": "47",
+          "right": "Forty-seven"
+        },
+        {
+          "left": "80",
+          "right": "Eighty"
+        },
+        {
+          "left": "96",
+          "right": "Ninety-six"
+        },
+        {
+          "left": "3:00",
+          "right": "Three o'clock"
+        },
+        {
+          "left": "9:30",
+          "right": "Half past nine"
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "🕒 What Time Is It?",
+      "instruction": "Observa los relojes y relaciona cada imagen con la hora correcta en inglés.",
+      "dataA": [
+        {
+          "word": "It's one o'clock.",
+          "image": "files/reloj_01_00.png"
+        },
+        {
+          "word": "It's half past two.",
+          "image": "files/reloj_02_30.png"
+        },
+        {
+          "word": "It's three o'clock.",
+          "image": "files/reloj_03_00.png"
+        },
+        {
+          "word": "It's half past four.",
+          "image": "files/reloj_04_30.png"
+        },
+        {
+          "word": "It's five o'clock.",
+          "image": "files/reloj_05_00.png"
+        },
+        {
+          "word": "It's half past six.",
+          "image": "files/reloj_06_30.png"
+        },
+        {
+          "word": "It's seven o'clock.",
+          "image": "files/reloj_07_00.png"
+        },
+        {
+          "word": "It's half past eight.",
+          "image": "files/reloj_08_30.png"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "It's nine o'clock.",
+          "image": "files/reloj_09_00.png"
+        },
+        {
+          "word": "It's half past ten.",
+          "image": "files/reloj_10_30.png"
+        },
+        {
+          "word": "It's eleven o'clock.",
+          "image": "files/reloj_11_00.png"
+        },
+        {
+          "word": "It's half past twelve.",
+          "image": "files/reloj_12_30.png"
+        },
+        {
+          "word": "It's half past one.",
+          "image": "files/reloj_01_30.png"
+        },
+        {
+          "word": "It's two o'clock.",
+          "image": "files/reloj_02_00.png"
+        },
+        {
+          "word": "It's half past three.",
+          "image": "files/reloj_03_30.png"
+        },
+        {
+          "word": "It's four o'clock.",
+          "image": "files/reloj_04_00.png"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "dino",
+    "winScore": 500
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
