@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"9057472d-4fd8-4292-81da-b2faa15cd2f3","token":"318d73b2-495e-433b-81a7-f19d0db8b2f4"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Days of the Week and Daily Routines Test</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "889d0b9c-9324-4bf8-b75b-2b66b389ec81",
+  "container": "#app",
+  "topic": "Days of the Week and Daily Routines Test",
+  "level": "Séptimo",
+  "pdfDesign": "HollyHobbie",
+  "examMode": true,
+  "examPools": {
+    "20176653": "A",
+    "20176654": "B",
+    "20176658": "C",
+    "20316947": "D",
+    "20176659": "A",
+    "20138868": "B",
+    "20182709": "C",
+    "20176660": "D",
+    "20316949": "A",
+    "20298183": "B",
+    "20062372": "C",
+    "20298185": "D",
+    "20199089": "A",
+    "20182722": "B",
+    "20141583": "C",
+    "20138865": "D",
+    "20298188": "A",
+    "20062488": "B",
+    "20182730": "C",
+    "20298191": "D",
+    "10000395": "A",
+    "20298192": "B",
+    "20298195": "C",
+    "20298194": "D",
+    "20176670": "A",
+    "20316951": "B",
+    "20171117": "C",
+    "20298196": "D"
+  },
+  "colors": {
+    "primary": "#8800FF",
+    "accent": "#B467CD",
+    "bg": "#D4C8F5",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#D4BCE1",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Nota / texto libre",
+      "instruction": "Instrucción: ",
+      "html": "Esta es una prueba rápida, Rigo no puede ayudarte con las respuestas esta vez, aqui demostraras cuanto has aprendido."
+    },
+    {
+      "type": "matchlines",
+      "title": "Unir con líneas",
+      "instruction": "Instrucción: Une con una línea los días de la semana Inglés - Español",
+      "dataA": [
+        {
+          "left": "Wednesday",
+          "right": "Miércoles"
+        },
+        {
+          "left": "Monday",
+          "right": "Lunes"
+        },
+        {
+          "left": "Sunday",
+          "right": "Domingo"
+        },
+        {
+          "left": "Saturday",
+          "right": "Sábado"
+        },
+        {
+          "left": "Tuesday",
+          "right": "Martes"
+        },
+        {
+          "left": "Thursday",
+          "right": "Jueves"
+        },
+        {
+          "left": "Friday",
+          "right": "Viernes"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "Wednesday",
+          "right": "Miércoles"
+        },
+        {
+          "left": "Monday",
+          "right": "Lunes"
+        },
+        {
+          "left": "Sunday",
+          "right": "Domingo"
+        },
+        {
+          "left": "Saturday",
+          "right": "Sábado"
+        },
+        {
+          "left": "Tuesday",
+          "right": "Martes"
+        },
+        {
+          "left": "Thursday",
+          "right": "Jueves"
+        },
+        {
+          "left": "Friday",
+          "right": "Viernes"
+        }
+      ],
+      "dataC": [
+        {
+          "left": "Wednesday",
+          "right": "Miércoles"
+        },
+        {
+          "left": "Monday",
+          "right": "Lunes"
+        },
+        {
+          "left": "Sunday",
+          "right": "Domingo"
+        },
+        {
+          "left": "Saturday",
+          "right": "Sábado"
+        },
+        {
+          "left": "Tuesday",
+          "right": "Martes"
+        },
+        {
+          "left": "Thursday",
+          "right": "Jueves"
+        },
+        {
+          "left": "Friday",
+          "right": "Viernes"
+        }
+      ],
+      "dataD": [
+        {
+          "left": "Wednesday",
+          "right": "Miércoles"
+        },
+        {
+          "left": "Monday",
+          "right": "Lunes"
+        },
+        {
+          "left": "Sunday",
+          "right": "Domingo"
+        },
+        {
+          "left": "Saturday",
+          "right": "Sábado"
+        },
+        {
+          "left": "Tuesday",
+          "right": "Martes"
+        },
+        {
+          "left": "Thursday",
+          "right": "Jueves"
+        },
+        {
+          "left": "Friday",
+          "right": "Viernes"
+        }
+      ]
+    },
+    {
+      "type": "reorder_letters",
+      "title": "1. Unscramble the Days of the Week",
+      "instruction": "Ordena las letras para formar correctamente los nombres de los días de la semana en inglés. Lee las pistas para identificar cada día.",
+      "dataA": [
+        {
+          "word": "Monday",
+          "hint": "Lunes. Día después de Sunday."
+        },
+        {
+          "word": "Tuesday",
+          "hint": "Martes. Día después de Monday."
+        },
+        {
+          "word": "Wednesday",
+          "hint": "Miércoles. Día antes de Thursday."
+        },
+        {
+          "word": "Thursday",
+          "hint": "Jueves. Día después de Wednesday."
+        },
+        {
+          "word": "Friday",
+          "hint": "Viernes. Día antes de Saturday."
+        },
+        {
+          "word": "Saturday",
+          "hint": "Sábado. Día después de Friday."
+        },
+        {
+          "word": "Sunday",
+          "hint": "Domingo. Día antes de Monday."
+        }
+      ],
+      "dataB": [
+        {
+          "word": "Sunday",
+          "hint": "Último día de la semana, domingo."
+        },
+        {
+          "word": "Friday",
+          "hint": "Quinto día de la semana escolar."
+        },
+        {
+          "word": "Tuesday",
+          "hint": "Segundo día de clases, martes."
+        },
+        {
+          "word": "Saturday",
+          "hint": "Primer día del fin de semana."
+        },
+        {
+          "word": "Thursday",
+          "hint": "Día entre Wednesday y Friday."
+        },
+        {
+          "word": "Monday",
+          "hint": "Primer día de la semana escolar."
+        },
+        {
+          "word": "Wednesday",
+          "hint": "Día entre Tuesday y Thursday."
+        }
+      ],
+      "dataC": [
+        {
+          "word": "Wednesday",
+          "hint": "Miércoles. Está a mitad de la semana escolar."
+        },
+        {
+          "word": "Saturday",
+          "hint": "Sábado. Es un día del fin de semana."
+        },
+        {
+          "word": "Monday",
+          "hint": "Lunes. Se escribe antes de Tuesday."
+        },
+        {
+          "word": "Friday",
+          "hint": "Viernes. Está después de Thursday."
+        },
+        {
+          "word": "Sunday",
+          "hint": "Domingo. Está después de Saturday."
+        },
+        {
+          "word": "Thursday",
+          "hint": "Jueves. Está antes de Friday."
+        },
+        {
+          "word": "Tuesday",
+          "hint": "Martes. Está antes de Wednesday."
+        }
+      ],
+      "dataD": [
+        {
+          "word": "Thursday",
+          "hint": "El día que sigue al miércoles."
+        },
+        {
+          "word": "Sunday",
+          "hint": "El día que sigue al sábado."
+        },
+        {
+          "word": "Tuesday",
+          "hint": "El día que sigue al lunes."
+        },
+        {
+          "word": "Friday",
+          "hint": "El día que sigue al jueves."
+        },
+        {
+          "word": "Monday",
+          "hint": "El día que sigue al domingo."
+        },
+        {
+          "word": "Saturday",
+          "hint": "El día que sigue al viernes."
+        },
+        {
+          "word": "Wednesday",
+          "hint": "El día que sigue al martes."
+        }
+      ]
+    },
+    {
+      "type": "categorize",
+      "title": "2. Days and Numbers",
+      "instruction": "Clasifica cada palabra en inglés según corresponda. Coloca los nombres de los días en Days of the Week y los números del 1 al 20 en Numbers.",
+      "dataA": {
+        "categories": [
+          "Days of the Week",
+          "Numbers"
+        ],
+        "items": [
+          {
+            "text": "Three",
+            "cat": 1
+          },
+          {
+            "text": "Monday",
+            "cat": 0
+          },
+          {
+            "text": "Five",
+            "cat": 1
+          },
+          {
+            "text": "Wednesday",
+            "cat": 0
+          },
+          {
+            "text": "One",
+            "cat": 1
+          },
+          {
+            "text": "Tuesday",
+            "cat": 0
+          },
+          {
+            "text": "Four",
+            "cat": 1
+          },
+          {
+            "text": "Two",
+            "cat": 1
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "Days of the Week",
+          "Numbers"
+        ],
+        "items": [
+          {
+            "text": "Saturday",
+            "cat": 0
+          },
+          {
+            "text": "Seven",
+            "cat": 1
+          },
+          {
+            "text": "Thursday",
+            "cat": 0
+          },
+          {
+            "text": "Ten",
+            "cat": 1
+          },
+          {
+            "text": "Six",
+            "cat": 1
+          },
+          {
+            "text": "Friday",
+            "cat": 0
+          },
+          {
+            "text": "Nine",
+            "cat": 1
+          },
+          {
+            "text": "Eight",
+            "cat": 1
+          }
+        ]
+      },
+      "dataC": {
+        "categories": [
+          "Days of the Week",
+          "Numbers"
+        ],
+        "items": [
+          {
+            "text": "Twelve",
+            "cat": 1
+          },
+          {
+            "text": "Sunday",
+            "cat": 0
+          },
+          {
+            "text": "Fifteen",
+            "cat": 1
+          },
+          {
+            "text": "Thursday",
+            "cat": 0
+          },
+          {
+            "text": "Eleven",
+            "cat": 1
+          },
+          {
+            "text": "Fourteen",
+            "cat": 1
+          },
+          {
+            "text": "Monday",
+            "cat": 0
+          },
+          {
+            "text": "Thirteen",
+            "cat": 1
+          }
+        ]
+      },
+      "dataD": {
+        "categories": [
+          "Days of the Week",
+          "Numbers"
+        ],
+        "items": [
+          {
+            "text": "Nineteen",
+            "cat": 1
+          },
+          {
+            "text": "Friday",
+            "cat": 0
+          },
+          {
+            "text": "Sixteen",
+            "cat": 1
+          },
+          {
+            "text": "Sunday",
+            "cat": 0
+          },
+          {
+            "text": "Twenty",
+            "cat": 1
+          },
+          {
+            "text": "Eighteen",
+            "cat": 1
+          },
+          {
+            "text": "Tuesday",
+            "cat": 0
+          },
+          {
+            "text": "Seventeen",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "matchimage",
+      "title": "3. My Daily Routines",
+      "instruction": "Observa las ilustraciones y relaciona cada una con la rutina diaria correcta en inglés.",
+      "dataA": [
+        {
+          "word": "Wake up",
+          "emoji": "⏰"
+        },
+        {
+          "word": "Brush my teeth",
+          "emoji": "🪥"
+        },
+        {
+          "word": "Take a shower",
+          "emoji": "🚿"
+        },
+        {
+          "word": "Get dressed",
+          "emoji": "👕"
+        },
+        {
+          "word": "Have breakfast",
+          "emoji": "🥞"
+        },
+        {
+          "word": "Go to school",
+          "emoji": "🏫"
+        },
+        {
+          "word": "Do homework",
+          "emoji": "📝"
+        },
+        {
+          "word": "Go to bed",
+          "emoji": "🛌"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "Make my bed",
+          "emoji": "🛏️"
+        },
+        {
+          "word": "Wash my face",
+          "emoji": "🧖"
+        },
+        {
+          "word": "Comb my hair",
+          "emoji": "🪮"
+        },
+        {
+          "word": "Have lunch",
+          "emoji": "🍱"
+        },
+        {
+          "word": "Play soccer",
+          "emoji": "⚽"
+        },
+        {
+          "word": "Read a book",
+          "emoji": "📖"
+        },
+        {
+          "word": "Ride a bike",
+          "emoji": "🚲"
+        },
+        {
+          "word": "Watch TV",
+          "emoji": "📺"
+        }
+      ],
+      "dataC": [
+        {
+          "word": "Walk my dog",
+          "emoji": "🦮"
+        },
+        {
+          "word": "Study English",
+          "emoji": "🔤"
+        },
+        {
+          "word": "Listen to music",
+          "emoji": "🎧"
+        },
+        {
+          "word": "Play video games",
+          "emoji": "🎮"
+        },
+        {
+          "word": "Have dinner",
+          "emoji": "🍽️"
+        },
+        {
+          "word": "Clean my room",
+          "emoji": "🧹"
+        },
+        {
+          "word": "Wash the dishes",
+          "emoji": "🧽"
+        },
+        {
+          "word": "Drink water",
+          "emoji": "💧"
+        }
+      ],
+      "dataD": [
+        {
+          "word": "Exercise",
+          "emoji": "🏋️"
+        },
+        {
+          "word": "Run in the park",
+          "emoji": "🏃"
+        },
+        {
+          "word": "Get a haircut",
+          "emoji": "💇"
+        },
+        {
+          "word": "Go shopping",
+          "emoji": "🛍️"
+        },
+        {
+          "word": "Cook food",
+          "emoji": "👩‍🍳"
+        },
+        {
+          "word": "Draw a picture",
+          "emoji": "🎨"
+        },
+        {
+          "word": "Take the bus",
+          "emoji": "🚌"
+        },
+        {
+          "word": "Sleep",
+          "emoji": "😴"
+        }
+      ]
+    },
+    {
+      "type": "dragbank",
+      "title": "4. Listening: My Weekly Activities",
+      "instruction": "Escucha el audio sobre las actividades de la semana. Arrastra los nombres de los días desde el banco de palabras para completar correctamente las oraciones. Puedes escuchar el audio nuevamente antes de responder.",
+      "audio": "files/my-weekly-activities.mp3",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "I do many things during the week. On ___ I go to school.",
+            "answer": "Monday"
+          },
+          {
+            "text": "On ___ I wash my clothes.",
+            "answer": "Wednesday"
+          },
+          {
+            "text": "On ___ I watch TV all day.",
+            "answer": "Saturday"
+          },
+          {
+            "text": "But on ___ I go to church.",
+            "answer": "Sunday"
+          }
+        ],
+        "bank": [
+          "Tuesday",
+          "Thursday",
+          "Friday"
+        ]
+      },
+      "dataB": {
+        "sentences": [
+          {
+            "text": "I do many things during the week. On ___ I go to school.",
+            "answer": "Monday"
+          },
+          {
+            "text": "On ___ I wash my clothes.",
+            "answer": "Wednesday"
+          },
+          {
+            "text": "On ___ I watch TV all day.",
+            "answer": "Saturday"
+          },
+          {
+            "text": "But on ___ I go to church.",
+            "answer": "Sunday"
+          }
+        ],
+        "bank": [
+          "Tuesday",
+          "Thursday",
+          "Friday"
+        ]
+      },
+      "dataC": {
+        "sentences": [
+          {
+            "text": "I do many things during the week. On ___ I go to school.",
+            "answer": "Monday"
+          },
+          {
+            "text": "On ___ I wash my clothes.",
+            "answer": "Wednesday"
+          },
+          {
+            "text": "On ___ I watch TV all day.",
+            "answer": "Saturday"
+          },
+          {
+            "text": "But on ___ I go to church.",
+            "answer": "Sunday"
+          }
+        ],
+        "bank": [
+          "Tuesday",
+          "Thursday",
+          "Friday"
+        ]
+      },
+      "dataD": {
+        "sentences": [
+          {
+            "text": "I do many things during the week. On ___ I go to school.",
+            "answer": "Monday"
+          },
+          {
+            "text": "On ___ I wash my clothes.",
+            "answer": "Wednesday"
+          },
+          {
+            "text": "On ___ I watch TV all day.",
+            "answer": "Saturday"
+          },
+          {
+            "text": "But on ___ I go to church.",
+            "answer": "Sunday"
+          }
+        ],
+        "bank": [
+          "Tuesday",
+          "Thursday",
+          "Friday"
+        ]
+      }
+    }
+  ],
+  "game": {
+    "type": "flappy"
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
