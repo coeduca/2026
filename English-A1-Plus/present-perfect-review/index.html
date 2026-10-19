@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Present Perfect Review - 1er Año de Bach., 2do Año de Bach., Noveno</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-ocean.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-tables.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "id": "26c7e6ca-e310-4eed-aec4-598be00e749f",
+  "container": "#app",
+  "topic": "Present Perfect Review",
+  "level": "1er Año de Bach., 2do Año de Bach., Noveno",
+  "pdfDesign": "HollyHobbie",
+  "uiTheme": "HollyHobbie",
+  "colors": {
+    "primary": "#81BBF7",
+    "accent": "#43B069",
+    "bg": "#FFF9C8",
+    "cardBg": "#F8C9FF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "dragbank",
+      "title": "1. Complete with the Past Participle",
+      "instruction": "Arrastra el participio pasado correcto para completar cada oración en Present Perfect. Recuerda que los verbos pueden ser regulares o irregulares.",
+      "dataA": {
+        "sentences": [
+          {
+            "text": "I have ___ my homework.",
+            "answer": "done"
+          },
+          {
+            "text": "She has ___ a letter to her friend.",
+            "answer": "written"
+          },
+          {
+            "text": "We have ___ breakfast.",
+            "answer": "eaten"
+          },
+          {
+            "text": "They have ___ that movie.",
+            "answer": "seen"
+          },
+          {
+            "text": "He has ___ his keys.",
+            "answer": "lost"
+          },
+          {
+            "text": "You have ___ this song before.",
+            "answer": "heard"
+          },
+          {
+            "text": "My sister has ___ a cake.",
+            "answer": "made"
+          },
+          {
+            "text": "The students have ___ to class.",
+            "answer": "come"
+          }
+        ],
+        "bank": [
+          "went",
+          "doing",
+          "wrote"
+        ]
+      },
+      "dataB": {
+        "sentences": [
+          {
+            "text": "My father has ___ a new table.",
+            "answer": "built"
+          },
+          {
+            "text": "I have ___ a new backpack.",
+            "answer": "bought"
+          },
+          {
+            "text": "She has ___ her missing notebook.",
+            "answer": "found"
+          },
+          {
+            "text": "We have ___ many photos.",
+            "answer": "taken"
+          },
+          {
+            "text": "He has ___ some orange juice.",
+            "answer": "drunk"
+          },
+          {
+            "text": "The boy has ___ his toy.",
+            "answer": "broken"
+          },
+          {
+            "text": "They have ___ to the principal.",
+            "answer": "spoken"
+          },
+          {
+            "text": "My uncle has ___ a truck.",
+            "answer": "driven"
+          }
+        ],
+        "bank": [
+          "buyed",
+          "took",
+          "drinked"
+        ]
+      }
+    },
+    {
+      "type": "categorize",
+      "title": "2. HAVE or HAS?",
+      "instruction": "Clasifica cada pronombre o sujeto según el auxiliar que necesita para formar oraciones en Present Perfect.",
+      "dataA": {
+        "categories": [
+          "HAVE",
+          "HAS"
+        ],
+        "items": [
+          {
+            "text": "I",
+            "cat": 0
+          },
+          {
+            "text": "You",
+            "cat": 0
+          },
+          {
+            "text": "We",
+            "cat": 0
+          },
+          {
+            "text": "They",
+            "cat": 0
+          },
+          {
+            "text": "He",
+            "cat": 1
+          },
+          {
+            "text": "She",
+            "cat": 1
+          },
+          {
+            "text": "It",
+            "cat": 1
+          },
+          {
+            "text": "My friends and I (we)",
+            "cat": 0
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "HAVE",
+          "HAS"
+        ],
+        "items": [
+          {
+            "text": "My brother (he)",
+            "cat": 1
+          },
+          {
+            "text": "Your mother (she)",
+            "cat": 1
+          },
+          {
+            "text": "This phone (it)",
+            "cat": 1
+          },
+          {
+            "text": "Laura (she)",
+            "cat": 1
+          },
+          {
+            "text": "My classmates (they)",
+            "cat": 0
+          },
+          {
+            "text": "The dogs (they)",
+            "cat": 0
+          },
+          {
+            "text": "My cousin and I (we)",
+            "cat": 0
+          },
+          {
+            "text": "You and your sister (you)",
+            "cat": 0
+          }
+        ]
+      }
+    },
+    {
+      "type": "matchimage",
+      "title": "3. Match the Sentences",
+      "instruction": "Relaciona cada oración en Present Perfect con el emoji que mejor representa su significado.",
+      "dataA": [
+        {
+          "word": "cooked",
+          "emoji": "🧑‍🍳"
+        },
+        {
+          "word": "played",
+          "emoji": "⚽"
+        },
+        {
+          "word": "read",
+          "emoji": "📖"
+        },
+        {
+          "word": "washed",
+          "emoji": "🧼"
+        },
+        {
+          "word": "traveled",
+          "emoji": "✈️"
+        },
+        {
+          "word": "slept",
+          "emoji": "😴"
+        },
+        {
+          "word": "painted",
+          "emoji": "🎨"
+        },
+        {
+          "word": "ridden",
+          "emoji": "🚲"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "sung",
+          "emoji": "🎤"
+        },
+        {
+          "word": "planted",
+          "emoji": "🌳"
+        },
+        {
+          "word": "cought",
+          "emoji": "🎣"
+        },
+        {
+          "word": "taken",
+          "emoji": "📸"
+        },
+        {
+          "word": "climbed",
+          "emoji": "🏔️"
+        },
+        {
+          "word": "baked",
+          "emoji": "🎂"
+        },
+        {
+          "word": "sent",
+          "emoji": "💬"
+        },
+        {
+          "word": "fixed",
+          "emoji": "🔧"
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "4. Choose the Correct Form",
+      "instruction": "Selecciona la opción correcta para completar cada oración. Presta atención al auxiliar HAVE/HAS y a los participios pasados.",
+      "dataA": [
+        {
+          "before": "She ",
+          "options": [
+            "have",
+            "has",
+            "having"
+          ],
+          "answer": 1,
+          "after": " visited her grandmother."
+        },
+        {
+          "before": "They ",
+          "options": [
+            "has",
+            "having",
+            "have"
+          ],
+          "answer": 2,
+          "after": " finished the project."
+        },
+        {
+          "before": "My brother ",
+          "options": [
+            "has",
+            "have",
+            "had"
+          ],
+          "answer": 0,
+          "after": " cleaned his room."
+        },
+        {
+          "before": "We ",
+          "options": [
+            "has",
+            "have",
+            "having"
+          ],
+          "answer": 1,
+          "after": " studied English."
+        },
+        {
+          "before": "I have ",
+          "options": [
+            "see",
+            "saw",
+            "seen"
+          ],
+          "answer": 2,
+          "after": " that film."
+        },
+        {
+          "before": "He has ",
+          "options": [
+            "gone",
+            "went",
+            "go"
+          ],
+          "answer": 0,
+          "after": " to school."
+        },
+        {
+          "before": "You have ",
+          "options": [
+            "ate",
+            "eaten",
+            "eat"
+          ],
+          "answer": 1,
+          "after": " an apple."
+        },
+        {
+          "before": "The students have ",
+          "options": [
+            "finish",
+            "finishing",
+            "finished"
+          ],
+          "answer": 2,
+          "after": " their homework."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "My parents ",
+          "options": [
+            "has",
+            "have",
+            "having"
+          ],
+          "answer": 1,
+          "after": " traveled to another city."
+        },
+        {
+          "before": "The teacher ",
+          "options": [
+            "has",
+            "have",
+            "having"
+          ],
+          "answer": 0,
+          "after": " explained the lesson."
+        },
+        {
+          "before": "I ",
+          "options": [
+            "has",
+            "having",
+            "have"
+          ],
+          "answer": 2,
+          "after": " learned new words."
+        },
+        {
+          "before": "The cat ",
+          "options": [
+            "have",
+            "has",
+            "having"
+          ],
+          "answer": 1,
+          "after": " jumped onto the chair."
+        },
+        {
+          "before": "She has ",
+          "options": [
+            "wrote",
+            "write",
+            "written"
+          ],
+          "answer": 2,
+          "after": " a short story."
+        },
+        {
+          "before": "They have ",
+          "options": [
+            "bought",
+            "buy",
+            "buyed"
+          ],
+          "answer": 0,
+          "after": " new shoes."
+        },
+        {
+          "before": "He has ",
+          "options": [
+            "took",
+            "taken",
+            "take"
+          ],
+          "answer": 1,
+          "after": " a picture."
+        },
+        {
+          "before": "We have ",
+          "options": [
+            "speak",
+            "spoke",
+            "spoken"
+          ],
+          "answer": 2,
+          "after": " with our teacher."
+        }
+      ]
+    },
+    {
+      "type": "memory",
+      "title": "5. Past Participle Memory",
+      "instruction": "Encuentra las parejas correctas entre el verbo en su forma base y su participio pasado. Memoriza las posiciones de las tarjetas.",
+      "dataA": [
+        {
+          "left": "GO",
+          "right": "GONE"
+        },
+        {
+          "left": "SEE",
+          "right": "SEEN"
+        },
+        {
+          "left": "EAT",
+          "right": "EATEN"
+        },
+        {
+          "left": "WRITE",
+          "right": "WRITTEN"
+        },
+        {
+          "left": "TAKE",
+          "right": "TAKEN"
+        },
+        {
+          "left": "SPEAK",
+          "right": "SPOKEN"
+        },
+        {
+          "left": "BREAK",
+          "right": "BROKEN"
+        },
+        {
+          "left": "DO",
+          "right": "DONE"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "SING",
+          "right": "SUNG"
+        },
+        {
+          "left": "BUY",
+          "right": "BOUGHT"
+        },
+        {
+          "left": "MAKE",
+          "right": "MADE"
+        },
+        {
+          "left": "DRINK",
+          "right": "DRUNK"
+        },
+        {
+          "left": "CHOOSE",
+          "right": "CHOSEN"
+        },
+        {
+          "left": "GIVE",
+          "right": "GIVEN"
+        },
+        {
+          "left": "DRIVE",
+          "right": "DRIVEN"
+        },
+        {
+          "left": "FORGET",
+          "right": "FORGOTTEN"
+        }
+      ]
+    },
+    {
+      "type": "reorder_sentences",
+      "title": "6. Build Present Perfect Sentences",
+      "instruction": "Ordena las palabras para construir oraciones correctas en Present Perfect. Utiliza la traducción al español como pista.",
+      "dataA": [
+        {
+          "sentence": "I have finished my homework.",
+          "es": "He terminado mi tarea."
+        },
+        {
+          "sentence": "She has visited her grandparents.",
+          "es": "Ella ha visitado a sus abuelos."
+        },
+        {
+          "sentence": "We have never eaten sushi.",
+          "es": "Nunca hemos comido sushi."
+        },
+        {
+          "sentence": "Have you ever seen a rainbow?",
+          "es": "¿Alguna vez has visto un arcoíris?"
+        },
+        {
+          "sentence": "He has already cleaned his room.",
+          "es": "Él ya ha limpiado su habitación."
+        },
+        {
+          "sentence": "They have not played tennis.",
+          "es": "Ellos no han jugado tenis."
+        },
+        {
+          "sentence": "My mother has just arrived home.",
+          "es": "Mi madre acaba de llegar a casa."
+        },
+        {
+          "sentence": "Have the students finished the exam yet?",
+          "es": "¿Los estudiantes ya han terminado el examen?"
+        }
+      ],
+      "dataB": [
+        {
+          "sentence": "My sister has learned French.",
+          "es": "Mi hermana ha aprendido francés."
+        },
+        {
+          "sentence": "We have watched that movie twice.",
+          "es": "Hemos visto esa película dos veces."
+        },
+        {
+          "sentence": "He has never traveled by plane.",
+          "es": "Él nunca ha viajado en avión."
+        },
+        {
+          "sentence": "Have they ever visited a museum?",
+          "es": "¿Alguna vez han visitado un museo?"
+        },
+        {
+          "sentence": "You have already answered the questions.",
+          "es": "Tú ya has respondido las preguntas."
+        },
+        {
+          "sentence": "The dog has not eaten its food.",
+          "es": "El perro no ha comido su comida."
+        },
+        {
+          "sentence": "I have just bought a notebook.",
+          "es": "Acabo de comprar un cuaderno."
+        },
+        {
+          "sentence": "Has your brother ridden a horse yet?",
+          "es": "¿Tu hermano ya ha montado a caballo?"
+        }
+      ]
+    },
+    {
+      "type": "emojiphrase",
+      "title": "7. Guess the Past Participle",
+      "instruction": "Observa cada emoji y escribe el participio pasado en inglés del verbo que representa. Utiliza la oración de ejemplo como pista.",
+      "dataA": [
+        {
+          "emojis": "🏃‍♂️",
+          "accept": [
+            "run"
+          ],
+          "example": "He has run in the park."
+        },
+        {
+          "emojis": "🧑‍🍳",
+          "accept": [
+            "cooked"
+          ],
+          "example": "She has cooked dinner."
+        },
+        {
+          "emojis": "🏊‍♀️",
+          "accept": [
+            "swum"
+          ],
+          "example": "They have swum in the pool."
+        },
+        {
+          "emojis": "✍️",
+          "accept": [
+            "written"
+          ],
+          "example": "I have written a letter."
+        },
+        {
+          "emojis": "🍎",
+          "accept": [
+            "eaten"
+          ],
+          "example": "The boy has eaten an apple."
+        },
+        {
+          "emojis": "🚗",
+          "accept": [
+            "driven"
+          ],
+          "example": "My father has driven a car."
+        },
+        {
+          "emojis": "🎤",
+          "accept": [
+            "sung"
+          ],
+          "example": "She has sung a beautiful song."
+        },
+        {
+          "emojis": "🧹",
+          "accept": [
+            "cleaned"
+          ],
+          "example": "We have cleaned the classroom."
+        }
+      ],
+      "dataB": [
+        {
+          "emojis": "😴",
+          "accept": [
+            "slept"
+          ],
+          "example": "The baby has slept all night."
+        },
+        {
+          "emojis": "📖",
+          "accept": [
+            "read"
+          ],
+          "example": "I have read three books."
+        },
+        {
+          "emojis": "🏗️",
+          "accept": [
+            "built"
+          ],
+          "example": "They have built a new house."
+        },
+        {
+          "emojis": "💃",
+          "accept": [
+            "danced"
+          ],
+          "example": "She has danced at the party."
+        },
+        {
+          "emojis": "✈️",
+          "accept": [
+            "flown"
+          ],
+          "example": "He has flown to another country."
+        },
+        {
+          "emojis": "🥤",
+          "accept": [
+            "drunk"
+          ],
+          "example": "We have drunk some juice."
+        },
+        {
+          "emojis": "🛍️",
+          "accept": [
+            "bought"
+          ],
+          "example": "My sister has bought new clothes."
+        },
+        {
+          "emojis": "🎨",
+          "accept": [
+            "painted"
+          ],
+          "example": "You have painted a picture."
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "doodle"
+  }
+});
+  </script>
+</body>
+</html>
