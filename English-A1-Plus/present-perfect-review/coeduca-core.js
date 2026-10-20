@@ -1802,13 +1802,19 @@
 
   // -------- Construye el tema "T" combinando defaults del diseño
   //          con los colores del usuario --------
+  function vibrantPdfColor(color, fallback) {
+    const low = Math.min.apply(null, color), high = Math.max.apply(null, color);
+    if (high - low < 20) return fallback.slice();
+    return color.map(function (channel) { return Math.round(24 + (channel - low) * 231 / (high - low)); });
+  }
+
   function buildThemeFromUserColors(design, colors) {
     const designDefaults = {
       'PopArt': {
         useStrokes: true,
         useHalftone: true,
         font: 'helvetica',
-        radius: 0,
+        radius: 3,
       },
       'PopArtVibrant': {
         useStrokes: true,
@@ -1848,7 +1854,7 @@
     const text    = hexToRgb(colors.text,    fallbackText);
     const opts = designDefaults[design] || designDefaults['PopArt'];
 
-    return Object.assign({}, opts, {
+    const theme = Object.assign({}, opts, {
       primary:   primary,
       accent:    accent,
       bg:        bg,
@@ -1862,16 +1868,42 @@
       mutedText: mix(text, cardBg, 0.45),
       softBg:    lighten(bg, 0.3),
     });
+    if (opts.useStripes) {
+      theme.primary = vibrantPdfColor(primary, [24, 128, 255]);
+      theme.accent = vibrantPdfColor(accent, [255, 45, 122]);
+      theme.text = theme.dark = [22, 20, 38];
+      theme.cardBg = [255, 255, 255];
+      theme.bg = [255, 252, 242];
+      theme.softBg = [255, 254, 249];
+      theme.onPrimary = vibrantTextOn(theme.primary);
+      theme.onAccent = vibrantTextOn(theme.accent);
+      theme.onCardBg = theme.text;
+      theme.divider = mix(theme.text, theme.cardBg, 0.65);
+      theme.mutedText = mix(theme.text, theme.cardBg, 0.24);
+      theme.vibrantYellow = [255, 220, 0];
+      theme.vibrantPink = [255, 45, 122];
+      theme.vibrantCyan = [0, 214, 234];
+    }
+    if (opts.useDashed) return prepareHollyTheme(theme);
+    if (opts.useSoft) return preparePastelTheme(theme);
+    if (opts.useCards) return prepareColoridoTheme(theme);
+    return theme;
   }
 
   // -------- Helpers de dibujo --------
   function makePdfHelpers(doc, T) {
+    function boxRadius(w, h, radius) {
+      const value = radius === undefined && T.useHalftone ? T.radius : (radius || 0);
+      return Math.min(value, w / 2, h / 2);
+    }
     function fillBox(x, y, w, h, color, radius) {
+      radius = boxRadius(w, h, radius);
       doc.setFillColor(color[0], color[1], color[2]);
       if (radius && radius > 0) doc.roundedRect(x, y, w, h, radius, radius, 'F');
       else doc.rect(x, y, w, h, 'F');
     }
     function borderedBox(x, y, w, h, fill, borderColor, lineW, radius) {
+      radius = boxRadius(w, h, radius);
       doc.setFillColor(fill[0], fill[1], fill[2]);
       doc.setDrawColor(borderColor[0], borderColor[1], borderColor[2]);
       doc.setLineWidth(lineW || 0.5);
@@ -1879,18 +1911,22 @@
       else doc.rect(x, y, w, h, 'FD');
     }
     function shadowBox(x, y, w, h, fill, radius) {
+      const offset = T.useStripes ? 2 : 1.5;
+      radius = boxRadius(w, h, radius);
       if (T.useStrokes) {
         doc.setFillColor(T.text[0], T.text[1], T.text[2]);
-        if (radius && radius > 0) doc.roundedRect(x + 1.5, y + 1.5, w, h, radius, radius, 'F');
-        else doc.rect(x + 1.5, y + 1.5, w, h, 'F');
+        if (radius && radius > 0) doc.roundedRect(x + offset, y + offset, w, h, radius, radius, 'F');
+        else doc.rect(x + offset, y + offset, w, h, 'F');
       }
       fillBox(x, y, w, h, fill, radius);
     }
     function shadowBorderedBox(x, y, w, h, fill, borderColor, lineW, radius) {
+      const offset = T.useStripes ? 2 : 1.5;
+      radius = boxRadius(w, h, radius);
       if (T.useStrokes) {
         doc.setFillColor(T.text[0], T.text[1], T.text[2]);
-        if (radius && radius > 0) doc.roundedRect(x + 1.5, y + 1.5, w, h, radius, radius, 'F');
-        else doc.rect(x + 1.5, y + 1.5, w, h, 'F');
+        if (radius && radius > 0) doc.roundedRect(x + offset, y + offset, w, h, radius, radius, 'F');
+        else doc.rect(x + offset, y + offset, w, h, 'F');
       }
       borderedBox(x, y, w, h, fill, borderColor, lineW, radius);
     }
@@ -1967,6 +2003,14 @@
   const PAGE = { W: 215.9, H: 279.4 };
 
   function renderExerciseRow(ctx, ex, idx, exNum, y, opts) {
+    if (ctx.T.useDashed) return renderHollyExercise(ctx, ex, idx, exNum, y,
+      Object.assign({}, opts, { exam: false }));
+    if (ctx.T.useSoft) return renderPastelExercise(ctx, ex, idx, exNum, y,
+      Object.assign({}, opts, { exam: false }));
+    if (ctx.T.useCards) return renderColoridoExercise(ctx, ex, idx, exNum, y,
+      Object.assign({}, opts, { exam: false }));
+    if (ctx.T.useStripes) return renderVibrantExercise(ctx, ex, idx, exNum, y,
+      Object.assign({}, opts, { exam: false }));
     const { doc, T, S, helpers, sanitize, state, cfg } = ctx;
     const { setText, fillBox, hline, dashedLine, borderedBox } = helpers;
     const M = opts.M, contentW = opts.contentW, right = opts.right;
@@ -1978,8 +2022,9 @@
     if (y > PAGE.H - 35) { doc.addPage(); y = 18; isNewPage = true; }
 
     if (exNum > 1 && !isNewPage) {
-      if (T.useDashed) dashedLine(M, y - 5, right, y - 5, T.divider, 0.3, 0.9);
-      else hline(M, right, y - 5, T.divider, 0.25);
+      const dividerY = y - (T.useHalftone ? 9 : 5);
+      if (T.useDashed) dashedLine(M, dividerY, right, dividerY, T.divider, 0.3, 0.9);
+      else hline(M, right, dividerY, T.divider, 0.25);
     }
 
     // Marcador de número: círculo en PopArt, cuadrado en PopArtVibrant,
@@ -2025,8 +2070,7 @@
     const by = y - 4.5;
     if (T.useStrokes) {
       // sombra dura
-      doc.setFillColor(T.text[0], T.text[1], T.text[2]);
-      doc.rect(bx + 1, by + 1, bw, bh, 'F');
+      fillBox(bx + 1, by + 1, bw, bh, T.text, T.radius);
     }
     if (T.radius && T.radius > 0) {
       doc.setFillColor(badgeColor[0], badgeColor[1], badgeColor[2]);
@@ -2037,9 +2081,14 @@
     setText(badgeTC, 'bold', 8);
     doc.text(badgeText, bx + bw / 2, by + 4.2, { align: 'center' });
 
-    y += 5;
+    y += T.useHalftone ? 7 : 5;
 
     if (ans && ans.details && Array.isArray(ans.details) && ans.details.length) {
+      if (T.useHalftone) {
+        return renderExerciseDetailsColumns(ctx, ans.details, y, {
+          M: M, contentW: contentW, exNum: exNum,
+        }) + 13;
+      }
       setText(T.mutedText, 'normal', 8);
       ans.details.forEach(function (d) {
         if (y > PAGE.H - 20) { doc.addPage(); y = 18; }
@@ -2050,10 +2099,1031 @@
       });
       y += 1;
     }
-    return y + 8;
+    return y + (T.useHalftone ? 13 : 8);
+  }
+
+  // Respuestas por pares: cada dato conserva su orden y su propio ajuste de líneas.
+  function renderExerciseDetailsColumns(ctx, details, y, opts) {
+    const { doc, T, helpers, sanitize } = ctx;
+    const columnCount = details.length > 1 && opts.contentW >= 140 ? 2 : 1;
+    const gutter = 8, inset = 9, lineH = 3.2, rowGap = 0.8;
+    const columnW = (opts.contentW - inset - gutter * (columnCount - 1)) / columnCount;
+    const bottom = PAGE.H - 20;
+    const detailText = T.useCards || T.useSoft || T.useDashed ? T.onBg : T.mutedText;
+    helpers.setText(detailText, 'normal', 8);
+    const blocks = details.map(function (detail) {
+      return doc.splitTextToSize(sanitize(detail) || '-', columnW);
+    });
+    function nextPage() {
+      if (T.useCards) coloridoPage(ctx, true);
+      else if (T.useSoft) pastelPage(ctx, true);
+      else if (T.useDashed) hollyPage(ctx, true);
+      else doc.addPage();
+      helpers.setText(detailText, 'italic', 8);
+      doc.text('Ejercicio ' + opts.exNum + ' (continuación)', opts.M + inset, 18);
+      helpers.setText(detailText, 'normal', 8);
+      y = 24;
+    }
+    for (let first = 0; first < blocks.length; first += columnCount) {
+      const row = blocks.slice(first, first + columnCount);
+      const lineCount = Math.max.apply(null, row.map(function (block) { return block.length; }));
+      let offset = 0;
+      while (offset < lineCount) {
+        if (y + lineH > bottom) nextPage();
+        const visibleLines = Math.min(lineCount - offset, Math.floor((bottom - y) / lineH));
+        row.forEach(function (block, column) {
+          const x = opts.M + inset + column * (columnW + gutter);
+          if (T.useCards && offset === 0 && block.length) {
+            coloridoDot(ctx, x - 2.5, y + 1.4, 0.65, T.coloridoConfetti[(first + column) % 4]);
+          }
+          block.slice(offset, offset + visibleLines).forEach(function (line, index) {
+            doc.text(line, x, y + index * lineH, { baseline: 'top' });
+          });
+        });
+        y += visibleLines * lineH;
+        offset += visibleLines;
+        if (offset < lineCount) nextPage();
+      }
+      y += rowGap;
+    }
+    return y;
+  }
+
+  // PopArt Vibrante: tinta oscura, bloques planos y sombras rectas.
+  function vibrantTextOn(color) {
+    const linear = color.map(function (channel) {
+      const value = channel / 255;
+      return value <= 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+    });
+    const light = 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+    return light > 0.19 ? [22, 20, 38] : [255, 255, 255];
+  }
+
+  function vibrantBox(ctx, x, y, w, h, color, lineW) {
+    ctx.helpers.shadowBox(x, y, w, h, color, 0);
+    ctx.helpers.borderedBox(x, y, w, h, color, ctx.T.text, lineW || 0.7, 0);
+  }
+
+  // El patrón se recorta al adorno y nunca cruza las zonas de texto.
+  function vibrantStripes(ctx, x, y, w, h, color) {
+    const doc = ctx.doc;
+    doc.saveGraphicsState();
+    doc.rect(x, y, w, h, null);
+    doc.clip();
+    doc.discardPath();
+    doc.setDrawColor(color[0], color[1], color[2]);
+    doc.setLineWidth(0.6);
+    for (let offset = -h; offset < w; offset += 3) {
+      doc.line(x + offset, y + h, x + offset + h, y);
+    }
+    doc.restoreGraphicsState();
+  }
+
+  function renderVibrantHeader(ctx, opts) {
+    const { doc, T, helpers, sanitize, cfg, today } = ctx;
+    const M = opts.M, w = opts.contentW;
+    [T.primary, T.vibrantPink, T.vibrantYellow, T.vibrantCyan].forEach(function (color, index) {
+      helpers.fillBox(index * PAGE.W / 4, 0, PAGE.W / 4, 3, color, 0);
+    });
+    helpers.fillBox(M, 9, w, 8, T.text, 0);
+    helpers.setText([255, 255, 255], 'bold', 8);
+    doc.text('COEDUCA / ENGLISH', M + 4, 13, { baseline: 'middle' });
+    helpers.setText(T.vibrantYellow, 'bold', 8);
+    doc.text(today, M + w - 4, 13, { baseline: 'middle', align: 'right' });
+
+    const title = sanitize(cfg.topic || (opts.exam ? 'Examen de Inglés' : 'Actividad de Inglés')).toUpperCase();
+    let fontSize = 22, titleLines;
+    do {
+      helpers.setText(T.onPrimary, 'bold', fontSize);
+      titleLines = doc.splitTextToSize(title, w - 42);
+      if (titleLines.length <= 4 || fontSize <= 12) break;
+      fontSize -= 2;
+    } while (true);
+    const lineH = fontSize / doc.internal.scaleFactor * 1.12;
+    const top = 21, height = Math.max(30, 16 + titleLines.length * lineH);
+    vibrantBox(ctx, M, top, w, height, T.primary, 0.9);
+    helpers.fillBox(M + w - 26, top, 26, height, T.vibrantYellow, 0);
+    vibrantStripes(ctx, M + w - 26, top, 26, height, T.text);
+    helpers.hline(M, M + w, top, T.text, 0.9);
+    helpers.hline(M, M + w, top + height, T.text, 0.9);
+    doc.setDrawColor(T.text[0], T.text[1], T.text[2]);
+    doc.line(M + w - 26, top, M + w - 26, top + height);
+    doc.line(M + w, top, M + w, top + height);
+    helpers.setText(T.onPrimary, 'bold', 8);
+    doc.text(opts.exam ? 'EXAMEN' : 'ACTIVIDAD', M + 5, top + 6);
+    helpers.setText(T.onPrimary, 'bold', fontSize);
+    titleLines.forEach(function (line, index) {
+      doc.text(line, M + 5, top + 11 + index * lineH, { baseline: 'top' });
+    });
+    return top + height + 9;
+  }
+
+  function renderVibrantSummary(ctx, y, opts) {
+    const { doc, T, helpers, score, state, today } = ctx;
+    const M = opts.M, w = opts.contentW, height = 32, mainW = 58, gap = 5;
+    if (y + height > PAGE.H - 20) { doc.addPage(); y = 18; }
+    if (opts.exam) {
+      vibrantBox(ctx, M, y, mainW, height, T.vibrantPink);
+      helpers.setText(vibrantTextOn(T.vibrantPink), 'bold', 8);
+      doc.text('EXAMEN', M + 5, y + 8);
+      helpers.setText(vibrantTextOn(T.vibrantPink), 'bold', 16);
+      doc.text('ENTREGADO', M + 5, y + 23);
+      vibrantBox(ctx, M + mainW + gap, y, w - mainW - gap, height, T.cardBg);
+      helpers.setText(T.text, 'bold', 8);
+      doc.text('COMPROBANTE DE ENTREGA', M + mainW + gap + 5, y + 8);
+      helpers.setText(T.text, 'bold', 13);
+      doc.text('Tarea entregada', M + mainW + gap + 5, y + 18);
+      helpers.setText(T.mutedText, 'normal', 9);
+      doc.text(today, M + mainW + gap + 5, y + 26);
+    } else {
+      vibrantBox(ctx, M, y, mainW, height, T.vibrantYellow);
+      helpers.setText(T.text, 'bold', 8);
+      doc.text('NOTA FINAL', M + 5, y + 7);
+      helpers.setText(T.text, 'bold', 32);
+      doc.text(String(score.grade), M + 5, y + 25);
+      helpers.setText(T.text, 'bold', 10);
+      doc.text('/ 10', M + mainW - 5, y + 25, { align: 'right' });
+      const stats = [
+        { label: 'ACIERTOS', value: score.earned + ' / ' + score.total, color: T.primary },
+        { label: 'NOTA BASE', value: score.baseGrade + ' / 10', color: T.accent },
+      ];
+      const extra = (Number(state.extraPoints) || 0) + (Number(state.balloonBonus) || 0);
+      if (extra > 0) stats.push({ label: 'PUNTOS EXTRA', value: '+' + extra.toFixed(1), color: T.vibrantCyan });
+      const available = w - mainW - gap;
+      const statW = (available - gap * (stats.length - 1)) / stats.length;
+      stats.forEach(function (stat, index) {
+        const x = M + mainW + gap + index * (statW + gap);
+        vibrantBox(ctx, x, y, statW, height, stat.color);
+        helpers.setText(vibrantTextOn(stat.color), 'bold', 7);
+        doc.text(stat.label, x + 4, y + 8);
+        helpers.setText(vibrantTextOn(stat.color), 'bold', 13);
+        const valueLines = doc.splitTextToSize(stat.value, statW - 8);
+        valueLines.forEach(function (line, lineIndex) {
+          doc.text(line, x + 4, y + 21 + lineIndex * 5);
+        });
+      });
+    }
+    return y + height + 10;
+  }
+
+  function renderVibrantDetailsHeader(ctx, y, opts) {
+    const { doc, T, helpers } = ctx;
+    const firstExercise = (ctx.cfg.exercises || []).find(function (ex) { return ex.type !== 'note'; });
+    helpers.setText(T.text, 'bold', 9.5);
+    const firstLines = firstExercise
+      ? doc.splitTextToSize(ctx.sanitize(firstExercise.title || 'Ejercicio 1'), opts.contentW - 54).length : 1;
+    const firstHeaderH = Math.max(10, firstLines * 4.2 + 4);
+    if (y + 18 + firstHeaderH + 10 > PAGE.H - 20) { doc.addPage(); y = 18; }
+    vibrantBox(ctx, opts.M, y, opts.contentW, 8, T.text);
+    helpers.fillBox(opts.M, y, 2, 8, T.vibrantYellow, 0);
+    helpers.fillBox(opts.M + opts.contentW - 22, y, 22, 8, T.vibrantCyan, 0);
+    vibrantStripes(ctx, opts.M + opts.contentW - 22, y, 22, 8, T.text);
+    helpers.setText([255, 255, 255], 'bold', 9);
+    doc.text('DETALLE POR EJERCICIO', opts.M + 6, y + 4, { baseline: 'middle' });
+    return y + 18;
+  }
+
+  function renderVibrantExercise(ctx, ex, idx, exNum, y, opts) {
+    const { doc, T, S, helpers, sanitize, state, cfg } = ctx;
+    const M = opts.M, w = opts.contentW, right = M + w;
+    const ans = state.answers['ex_' + idx];
+    helpers.setText(T.text, 'bold', 9.5);
+    const titleLines = doc.splitTextToSize(sanitize(ex.title || ('Ejercicio ' + exNum)), w - 54);
+    const lineH = 4.2, headerH = Math.max(10, titleLines.length * lineH + 4);
+    let newPage = false;
+    if (y + headerH + 10 > PAGE.H - 20) { doc.addPage(); y = 18; newPage = true; }
+    if (exNum > 1 && !newPage) helpers.hline(M, right, y - 7, T.divider, 0.3);
+
+    vibrantBox(ctx, M, y, w, headerH, T.cardBg, 0.5);
+    const numberColor = [T.primary, T.vibrantPink, T.vibrantYellow][(exNum - 1) % 3];
+    helpers.borderedBox(M, y, 8, headerH, numberColor, T.text, 0.5, 0);
+    helpers.setText(vibrantTextOn(numberColor), 'bold', 9);
+    doc.text(String(exNum), M + 4, y + headerH / 2, { baseline: 'middle', align: 'center' });
+    helpers.setText(T.text, 'bold', 9.5);
+    const firstY = y + headerH / 2 - (titleLines.length - 1) * lineH / 2;
+    titleLines.forEach(function (line, index) {
+      doc.text(line, M + 12, firstY + index * lineH, { baseline: 'middle' });
+    });
+
+    let badgeText = 'Pendiente', badgeColor = S.lightGray;
+    if (ans) {
+      if (opts.exam) {
+        badgeText = isCompletedAnswer(ex, ans) ? 'Completado' : 'En progreso';
+        badgeColor = T.vibrantYellow;
+      } else {
+        const fraction = ans.total > 0 ? ans.score / ans.total : 0;
+        badgeText = ans.score + ' / ' + ans.total;
+        badgeColor = fraction >= 0.7 ? S.green : (fraction >= 0.4 ? S.amber : S.red);
+      }
+    }
+    const badgeY = y + (headerH - 6) / 2;
+    helpers.borderedBox(right - 36, badgeY, 32, 6, badgeColor, T.text, 0.35, 0);
+    helpers.setText(vibrantTextOn(badgeColor), 'bold', 7.5);
+    doc.text(badgeText, right - 20, badgeY + 3, { baseline: 'middle', align: 'center' });
+    y += headerH + 6;
+    // En modo examen se conserva la ocultación de respuestas del comprobante.
+    if (!cfg.examMode && !cfg.pdfHideDetails && ans && Array.isArray(ans.details) && ans.details.length) {
+      y = renderExerciseDetailsColumns(ctx, ans.details, y, { M: M, contentW: w, exNum: exNum });
+    }
+    return y + 13;
+  }
+
+  function renderVibrantGame(ctx, y, opts) {
+    const { doc, T, helpers, sanitize } = ctx;
+    if (y + 18 > PAGE.H - 20) { doc.addPage(); y = 18; }
+    y += 4;
+    vibrantBox(ctx, opts.M, y, opts.contentW, 10, T.vibrantYellow);
+    helpers.fillBox(opts.M, y, 3, 10, T.vibrantPink, 0);
+    helpers.setText(T.text, 'bold', 9);
+    doc.text('JUEGO FINAL', opts.M + 7, y + 5, { baseline: 'middle' });
+    helpers.setText(T.text, 'bold', 8);
+    doc.text(sanitize(ctx.cfg.game.type).toUpperCase(), opts.M + opts.contentW - 5, y + 5,
+      { baseline: 'middle', align: 'right' });
+    return y + 16;
+  }
+
+  // Colorido hereda los fondos del tema y elige texto legible para cada relleno.
+  function coloridoTextOn(background, preferred) {
+    function light(color) {
+      const channels = color.map(function (channel) {
+        const value = channel / 255;
+        return value <= 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+      });
+      return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+    }
+    const bgLight = light(background);
+    function contrast(color) {
+      const value = light(color);
+      return (Math.max(value, bgLight) + 0.05) / (Math.min(value, bgLight) + 0.05);
+    }
+    if (preferred && contrast(preferred) >= 4.5) return preferred;
+    const ink = [24, 31, 52], white = [255, 255, 255];
+    return contrast(ink) >= contrast(white) ? ink : white;
+  }
+
+  function prepareColoridoTheme(theme) {
+    theme.radius = 5;
+    theme.bg = lighten(theme.bg, 0.2);
+    theme.onBg = coloridoTextOn(theme.bg, theme.text);
+    theme.onPrimary = coloridoTextOn(theme.primary, theme.text);
+    theme.onAccent = coloridoTextOn(theme.accent, theme.text);
+    theme.onCardBg = coloridoTextOn(theme.cardBg, theme.text);
+    theme.text = theme.onCardBg;
+    theme.mutedText = theme.onCardBg;
+    theme.coloridoSoft = mix(theme.cardBg, theme.primary, 0.18);
+    theme.coloridoRole = mix(theme.cardBg, theme.primary, 0.28);
+    theme.coloridoNie = mix(theme.cardBg, theme.accent, 0.2);
+    theme.coloridoBadge = mix(theme.cardBg, theme.accent, 0.25);
+    // Solo se usan en detalles pequeños: el tema sigue siendo protagonista.
+    theme.coloridoConfetti = [[255, 118, 131], [255, 195, 72], [45, 187, 157], [75, 150, 248]];
+    return theme;
+  }
+
+  function coloridoDot(ctx, x, y, radius, color) {
+    ctx.doc.setFillColor(color[0], color[1], color[2]);
+    ctx.doc.circle(x, y, radius, 'F');
+  }
+
+  function coloridoPage(ctx, addPage) {
+    if (addPage) ctx.doc.addPage();
+    ctx.helpers.fillBox(0, 0, PAGE.W, PAGE.H, ctx.T.bg, 0);
+    if (addPage) {
+      ctx.helpers.fillBox(14, 8, 20, 1.5, ctx.T.primary, 0.75);
+      ctx.helpers.fillBox(36, 8, 7, 1.5, ctx.T.accent, 0.75);
+      ctx.T.coloridoConfetti.slice(0, 3).forEach(function (color, index) {
+        coloridoDot(ctx, PAGE.W - 15 - index * 4, 8.75, 0.8, color);
+      });
+    }
+  }
+
+  function renderColoridoHeader(ctx, opts) {
+    const { doc, T, helpers, sanitize, cfg, today } = ctx;
+    const M = opts.M, w = opts.contentW, top = 17;
+    coloridoPage(ctx, false);
+    helpers.setText(T.onBg, 'bold', 8);
+    doc.text('COEDUCA / ENGLISH', M, 10);
+    helpers.setText(T.onBg, 'normal', 8);
+    doc.text(today, M + w, 10, { align: 'right' });
+
+    const title = sanitize(cfg.topic || (opts.exam ? 'Examen de Inglés' : 'Actividad de Inglés'));
+    let fontSize = 22, titleLines;
+    do {
+      helpers.setText(T.onPrimary, 'bold', fontSize);
+      titleLines = doc.splitTextToSize(title, w - 43);
+      if (titleLines.length <= 4 || fontSize <= 12) break;
+      fontSize -= 2;
+    } while (true);
+    const lineH = fontSize / doc.internal.scaleFactor * 1.14;
+    const height = Math.max(36, 20 + titleLines.length * lineH);
+    helpers.fillBox(M, top, w, height, T.primary, T.radius);
+    // Figuras recortadas en el extremo derecho, fuera de la columna del título.
+    doc.saveGraphicsState();
+    doc.roundedRect(M, top, w, height, T.radius, T.radius, null);
+    doc.clip();
+    doc.discardPath();
+    coloridoDot(ctx, M + w - 8, top + height - 7, 13, T.accent);
+    coloridoDot(ctx, M + w - 17, top + 10, 2.2, T.coloridoConfetti[1]);
+    coloridoDot(ctx, M + w - 7, top + 6, 1.4, T.coloridoConfetti[2]);
+    doc.restoreGraphicsState();
+    helpers.fillBox(M + 6, top + 5, 27, 6, T.accent, 3);
+    helpers.setText(T.onAccent, 'bold', 7.5);
+    doc.text(opts.exam ? 'EXAMEN' : 'ACTIVIDAD', M + 19.5, top + 8,
+      { baseline: 'middle', align: 'center' });
+    helpers.setText(T.onPrimary, 'bold', fontSize);
+    titleLines.forEach(function (line, index) {
+      doc.text(line, M + 6, top + 15 + index * lineH, { baseline: 'top' });
+    });
+    return top + height + 9;
+  }
+
+  function renderColoridoSummary(ctx, y, opts) {
+    const { doc, T, helpers, score, state, today } = ctx;
+    const M = opts.M, w = opts.contentW, h = 31, mainW = 52;
+    if (y + h > PAGE.H - 20) { coloridoPage(ctx, true); y = 18; }
+    helpers.fillBox(M, y, w, h, T.cardBg, T.radius);
+    doc.saveGraphicsState();
+    doc.roundedRect(M, y, w, h, T.radius, T.radius, null);
+    doc.clip();
+    doc.discardPath();
+    helpers.fillBox(M, y, mainW, h, T.accent, 0);
+    doc.restoreGraphicsState();
+    helpers.setText(T.onAccent, 'bold', 7.5);
+    doc.text(opts.exam ? 'ENTREGA' : 'NOTA FINAL', M + 6, y + 7);
+    if (opts.exam) {
+      helpers.setText(T.onAccent, 'bold', 15);
+      doc.text('RECIBIDA', M + 6, y + 23);
+      helpers.setText(T.onCardBg, 'bold', 8);
+      doc.text('COMPROBANTE DE ENTREGA', M + mainW + 7, y + 7);
+      helpers.setText(T.onCardBg, 'bold', 13);
+      doc.text('Tarea entregada', M + mainW + 7, y + 17);
+      helpers.setText(T.onCardBg, 'normal', 9);
+      doc.text(today, M + mainW + 7, y + 25);
+      coloridoDot(ctx, M + w - 7, y + 7, 1.5, T.coloridoConfetti[2]);
+    } else {
+      helpers.setText(T.onAccent, 'bold', 30);
+      doc.text(String(score.grade), M + 6, y + 24);
+      helpers.setText(T.onAccent, 'bold', 9);
+      doc.text('/ 10', M + mainW - 5, y + 24, { align: 'right' });
+      const stats = [
+        { label: 'ACIERTOS', value: score.earned + ' / ' + score.total },
+        { label: 'NOTA BASE', value: score.baseGrade + ' / 10' },
+      ];
+      const extra = (Number(state.extraPoints) || 0) + (Number(state.balloonBonus) || 0);
+      if (extra > 0) stats.push({ label: 'PUNTOS EXTRA', value: '+' + extra.toFixed(1) });
+      const columnW = (w - mainW - 12) / stats.length;
+      stats.forEach(function (stat, index) {
+        const x = M + mainW + 6 + index * columnW;
+        coloridoDot(ctx, x + 1, y + 7, 1, T.coloridoConfetti[index]);
+        helpers.setText(T.onCardBg, 'bold', 7);
+        doc.text(stat.label, x + 4, y + 7, { baseline: 'middle' });
+        helpers.setText(T.onCardBg, 'bold', 12);
+        const valueLines = doc.splitTextToSize(stat.value, columnW - 5);
+        valueLines.forEach(function (line, lineIndex) {
+          doc.text(line, x + 1, y + 19 + lineIndex * 4.5);
+        });
+      });
+    }
+    return y + h + 10;
+  }
+
+  function renderColoridoDetailsHeader(ctx, y, opts) {
+    const { doc, T, helpers } = ctx;
+    const firstExercise = (ctx.cfg.exercises || []).find(function (ex) { return ex.type !== 'note'; });
+    helpers.setText(T.onCardBg, 'bold', 9.5);
+    const count = firstExercise
+      ? doc.splitTextToSize(ctx.sanitize(firstExercise.title || 'Ejercicio 1'), opts.contentW - 55).length : 1;
+    if (y + 17 + Math.max(11, count * 4.2 + 4) + 10 > PAGE.H - 20) {
+      coloridoPage(ctx, true); y = 18;
+    }
+    helpers.setText(T.onBg, 'bold', 10);
+    doc.text('DETALLE POR EJERCICIO', opts.M, y + 3.5, { baseline: 'middle' });
+    helpers.fillBox(opts.M, y + 8, 22, 1.5, T.primary, 0.75);
+    helpers.fillBox(opts.M + 24, y + 8, 9, 1.5, T.accent, 0.75);
+    helpers.fillBox(opts.M + 35, y + 8, 4, 1.5, T.coloridoConfetti[0], 0.75);
+    return y + 17;
+  }
+
+  function renderColoridoExercise(ctx, ex, idx, exNum, y, opts) {
+    const { doc, T, helpers, sanitize, state, cfg, S } = ctx;
+    const M = opts.M, w = opts.contentW, right = M + w;
+    const ans = state.answers['ex_' + idx];
+    const headerText = coloridoTextOn(T.coloridoSoft, T.text);
+    helpers.setText(headerText, 'bold', 9.5);
+    const titleLines = doc.splitTextToSize(sanitize(ex.title || ('Ejercicio ' + exNum)), w - 55);
+    const lineH = 4.2, headerH = Math.max(11, titleLines.length * lineH + 4);
+    if (y + headerH + 10 > PAGE.H - 20) { coloridoPage(ctx, true); y = 18; }
+    helpers.fillBox(M, y, w, headerH, T.coloridoSoft, 4);
+    helpers.fillBox(M + 2, y + (headerH - 7) / 2, 8, 7, T.primary, 2.5);
+    helpers.setText(T.onPrimary, 'bold', 9);
+    doc.text(String(exNum), M + 6, y + headerH / 2, { baseline: 'middle', align: 'center' });
+    helpers.setText(headerText, 'bold', 9.5);
+    const firstY = y + headerH / 2 - (titleLines.length - 1) * lineH / 2;
+    titleLines.forEach(function (line, index) {
+      doc.text(line, M + 14, firstY + index * lineH, { baseline: 'middle' });
+    });
+
+    let badgeText = 'Pendiente', dotColor = S.gray;
+    if (ans) {
+      if (opts.exam) {
+        badgeText = isCompletedAnswer(ex, ans) ? 'Completado' : 'En progreso';
+        dotColor = T.primary;
+      } else {
+        badgeText = ans.score + ' / ' + ans.total;
+        const fraction = ans.total > 0 ? ans.score / ans.total : 0;
+        dotColor = fraction >= 0.7 ? S.green : (fraction >= 0.4 ? S.amber : S.red);
+      }
+    }
+    const badgeY = y + (headerH - 6) / 2;
+    helpers.fillBox(right - 36, badgeY, 32, 6, T.coloridoBadge, 3);
+    coloridoDot(ctx, right - 32.5, badgeY + 3, 0.8, dotColor);
+    helpers.setText(coloridoTextOn(T.coloridoBadge, T.text), 'bold', 7.5);
+    doc.text(badgeText, right - 19, badgeY + 3, { baseline: 'middle', align: 'center' });
+    y += headerH + 5;
+    if (!cfg.examMode && !cfg.pdfHideDetails && ans && Array.isArray(ans.details) && ans.details.length) {
+      y = renderExerciseDetailsColumns(ctx, ans.details, y, { M: M, contentW: w, exNum: exNum });
+    }
+    return y + 12;
+  }
+
+  function renderColoridoGame(ctx, y, opts) {
+    const { doc, T, helpers, sanitize } = ctx;
+    if (y + 19 > PAGE.H - 20) { coloridoPage(ctx, true); y = 18; }
+    y += 3;
+    helpers.fillBox(opts.M, y, opts.contentW, 12, T.coloridoSoft, 4);
+    coloridoDot(ctx, opts.M + 4.5, y + 6, 1.4, T.coloridoConfetti[1]);
+    helpers.setText(coloridoTextOn(T.coloridoSoft, T.text), 'bold', 9);
+    doc.text('JUEGO FINAL', opts.M + 9, y + 6, { baseline: 'middle' });
+    helpers.setText(coloridoTextOn(T.coloridoSoft, T.text), 'bold', 8);
+    doc.text(sanitize(ctx.cfg.game.type).toUpperCase(), opts.M + opts.contentW - 5, y + 6,
+      { baseline: 'middle', align: 'right' });
+    return y + 18;
+  }
+
+  // Pastel: papel marfil y tonos cálidos derivados del tema, sin sombras.
+  function preparePastelTheme(theme) {
+    theme.radius = 6;
+    theme.bg = mix(theme.bg, [255, 247, 235], 0.94);
+    theme.cardBg = mix(theme.cardBg, [255, 252, 247], 0.96);
+    theme.primary = mix(lighten(theme.primary, 0.55), [255, 225, 199], 0.12);
+    theme.accent = mix(lighten(theme.accent, 0.58), [255, 215, 204], 0.12);
+    theme.onBg = coloridoTextOn(theme.bg, theme.text);
+    theme.onCardBg = coloridoTextOn(theme.cardBg, theme.text);
+    theme.onPrimary = coloridoTextOn(theme.primary, theme.text);
+    theme.onAccent = coloridoTextOn(theme.accent, theme.text);
+    theme.text = theme.onCardBg;
+    theme.mutedText = coloridoTextOn(theme.bg, mix(theme.text, theme.bg, 0.25));
+    theme.pastelRow = mix(theme.cardBg, theme.primary, 0.38);
+    theme.pastelLine = mix(theme.text, theme.cardBg, 0.82);
+    theme.pastelHero = mix(theme.primary, theme.cardBg, 0.18);
+    return theme;
+  }
+
+  function pastelPage(ctx, addPage) {
+    const { doc, T, helpers } = ctx;
+    if (addPage) doc.addPage();
+    helpers.fillBox(0, 0, PAGE.W, PAGE.H, T.bg, 0);
+    if (addPage) {
+      helpers.setText(T.mutedText, 'normal', 7);
+      doc.text('COEDUCA / ENGLISH', 14, 10);
+      helpers.fillBox(PAGE.W - 38, 8, 24, 1.5, T.accent, 0.75);
+    }
+  }
+
+  function renderPastelHeader(ctx, opts) {
+    const { doc, T, helpers, sanitize, cfg, today } = ctx;
+    const M = opts.M, w = opts.contentW, center = M + w / 2, top = 16;
+    pastelPage(ctx, false);
+    helpers.setText(T.mutedText, 'bold', 7.5);
+    doc.text('COEDUCA / ENGLISH', center, 10, { align: 'center' });
+    const title = sanitize(cfg.topic || (opts.exam ? 'Examen de Inglés' : 'Actividad de Inglés'));
+    let fontSize = 21, titleLines;
+    do {
+      helpers.setText(T.text, 'bold', fontSize);
+      titleLines = doc.splitTextToSize(title, w - 24);
+      if (titleLines.length <= 4 || fontSize <= 13) break;
+      fontSize -= 2;
+    } while (true);
+    const lineH = fontSize / doc.internal.scaleFactor * 1.17;
+    const height = Math.max(41, 29 + titleLines.length * lineH);
+    helpers.fillBox(M, top, w, height, T.pastelHero, T.radius);
+    helpers.fillBox(center - 15, top + 5, 30, 6, T.accent, 3);
+    helpers.setText(T.onAccent, 'bold', 7);
+    doc.text(opts.exam ? 'EXAMEN' : 'ACTIVIDAD', center, top + 8,
+      { baseline: 'middle', align: 'center' });
+    helpers.setText(coloridoTextOn(T.pastelHero, T.text), 'bold', fontSize);
+    titleLines.forEach(function (line, index) {
+      doc.text(line, center, top + 15 + index * lineH, { baseline: 'top', align: 'center' });
+    });
+    helpers.setText(coloridoTextOn(T.pastelHero, T.mutedText), 'normal', 8);
+    doc.text('Prof. Jose Eliseo Martinez  /  ' + today, center, top + height - 6,
+      { align: 'center' });
+    return top + height + 9;
+  }
+
+  function renderPastelSummary(ctx, y, opts) {
+    const { doc, T, helpers, score, state, today } = ctx;
+    const M = opts.M, w = opts.contentW, center = M + w / 2, h = opts.exam ? 24 : 45;
+    if (y + h > PAGE.H - 20) { pastelPage(ctx, true); y = 18; }
+    helpers.borderedBox(M, y, w, h, T.cardBg, T.pastelLine, 0.25, T.radius);
+    helpers.setText(T.mutedText, 'bold', 7.5);
+    doc.text(opts.exam ? 'ESTADO DE LA ENTREGA' : 'NOTA FINAL', center, y + 6, { align: 'center' });
+    if (opts.exam) {
+      helpers.setText(T.text, 'bold', 13);
+      doc.text('Tarea entregada', center, y + 15, { align: 'center' });
+      helpers.setText(T.mutedText, 'normal', 8);
+      doc.text(today, M + w - 6, y + 18, { align: 'right' });
+    } else {
+      helpers.setText(T.text, 'bold', 30);
+      doc.text(String(score.grade), center, y + 21, { align: 'center' });
+      helpers.setText(T.mutedText, 'normal', 9);
+      doc.text('/ 10', center + 17, y + 21);
+      const stats = [
+        { label: 'ACIERTOS', value: score.earned + ' / ' + score.total },
+        { label: 'NOTA BASE', value: score.baseGrade + ' / 10' },
+      ];
+      const extra = (Number(state.extraPoints) || 0) + (Number(state.balloonBonus) || 0);
+      if (extra > 0) stats.push({ label: 'PUNTOS EXTRA', value: '+' + extra.toFixed(1) });
+      const gap = 4, chipW = (w - 12 - gap * (stats.length - 1)) / stats.length;
+      stats.forEach(function (stat, index) {
+        const x = M + 6 + index * (chipW + gap);
+        const fill = index % 2 ? T.accent : T.pastelRow;
+        helpers.fillBox(x, y + 28, chipW, 12, fill, 3);
+        helpers.setText(coloridoTextOn(fill, T.mutedText), 'bold', 7);
+        doc.text(stat.label, x + chipW / 2, y + 31.5, { baseline: 'middle', align: 'center' });
+        helpers.setText(coloridoTextOn(fill, T.text), 'bold', 10);
+        doc.text(stat.value, x + chipW / 2, y + 36.5, { baseline: 'middle', align: 'center' });
+      });
+    }
+    return y + h + 10;
+  }
+
+  function renderPastelDetailsHeader(ctx, y, opts) {
+    const { doc, T, helpers } = ctx;
+    const exercises = (ctx.cfg.exercises || []).filter(function (ex) { return ex.type !== 'note'; });
+    helpers.setText(T.text, 'bold', 9.5);
+    const count = exercises.length
+      ? doc.splitTextToSize(ctx.sanitize(exercises[0].title || 'Ejercicio 1'), opts.contentW - 55).length : 1;
+    if (y + 18 + Math.max(11, count * 4.2 + 4) + 10 > PAGE.H - 20) {
+      pastelPage(ctx, true); y = 18;
+    }
+    helpers.setText(T.onBg, 'bold', 12);
+    doc.text('Detalle de ejercicios', opts.M, y + 4, { baseline: 'middle' });
+    helpers.fillBox(opts.M + opts.contentW - 32, y + 1, 32, 6, T.primary, 3);
+    helpers.setText(T.onPrimary, 'normal', 8);
+    doc.text(exercises.length + (exercises.length === 1 ? ' ejercicio' : ' ejercicios'),
+      opts.M + opts.contentW - 16, y + 4, { baseline: 'middle', align: 'center' });
+    helpers.hline(opts.M, opts.M + opts.contentW, y + 10, T.pastelLine, 0.2);
+    return y + 18;
+  }
+
+  function renderPastelExercise(ctx, ex, idx, exNum, y, opts) {
+    const { doc, T, helpers, sanitize, state, cfg, S } = ctx;
+    const M = opts.M, w = opts.contentW, right = M + w;
+    const ans = state.answers['ex_' + idx];
+    helpers.setText(T.text, 'bold', 9.5);
+    const titleLines = doc.splitTextToSize(sanitize(ex.title || ('Ejercicio ' + exNum)), w - 55);
+    const lineH = 4.2, headerH = Math.max(11, titleLines.length * lineH + 4);
+    let newPage = false;
+    if (y + headerH + 10 > PAGE.H - 20) { pastelPage(ctx, true); y = 18; newPage = true; }
+    if (exNum > 1 && !newPage) helpers.hline(M + 12, right, y - 7, T.pastelLine, 0.2);
+    helpers.fillBox(M, y, w, headerH, T.cardBg, 4);
+    helpers.fillBox(M + 1.5, y + (headerH - 8) / 2, 8, 8, T.primary, 4);
+    helpers.setText(T.onPrimary, 'bold', 9);
+    doc.text(String(exNum), M + 5.5, y + headerH / 2, { baseline: 'middle', align: 'center' });
+    helpers.setText(T.text, 'bold', 9.5);
+    const firstY = y + headerH / 2 - (titleLines.length - 1) * lineH / 2;
+    titleLines.forEach(function (line, index) {
+      doc.text(line, M + 14, firstY + index * lineH, { baseline: 'middle' });
+    });
+    let badgeText = 'Pendiente', badgeFill = T.pastelRow;
+    if (ans) {
+      if (opts.exam) {
+        badgeText = isCompletedAnswer(ex, ans) ? 'Completado' : 'En progreso';
+        badgeFill = T.accent;
+      } else {
+        badgeText = ans.score + ' / ' + ans.total;
+        const fraction = ans.total > 0 ? ans.score / ans.total : 0;
+        const resultColor = fraction >= 0.7 ? S.green : (fraction >= 0.4 ? S.amber : S.red);
+        badgeFill = mix(T.cardBg, resultColor, 0.12);
+      }
+    }
+    const badgeY = y + (headerH - 6) / 2;
+    helpers.fillBox(right - 36, badgeY, 32, 6, badgeFill, 3);
+    helpers.setText(coloridoTextOn(badgeFill, T.text), 'bold', 7.5);
+    doc.text(badgeText, right - 20, badgeY + 3, { baseline: 'middle', align: 'center' });
+    y += headerH + 5;
+    if (!cfg.examMode && !cfg.pdfHideDetails && ans && Array.isArray(ans.details) && ans.details.length) {
+      y = renderExerciseDetailsColumns(ctx, ans.details, y, { M: M, contentW: w, exNum: exNum });
+    }
+    return y + 13;
+  }
+
+  function renderPastelGame(ctx, y, opts) {
+    const { doc, T, helpers, sanitize } = ctx;
+    if (y + 19 > PAGE.H - 20) { pastelPage(ctx, true); y = 18; }
+    y += 3;
+    helpers.borderedBox(opts.M, y, opts.contentW, 12, T.cardBg, T.pastelLine, 0.25, 4);
+    helpers.fillBox(opts.M + 3, y + 3, 6, 6, T.accent, 3);
+    helpers.setText(T.text, 'bold', 9);
+    doc.text('Juego final', opts.M + 12, y + 6, { baseline: 'middle' });
+    helpers.setText(T.mutedText, 'normal', 8);
+    doc.text(sanitize(ctx.cfg.game.type).toUpperCase(), opts.M + opts.contentW - 5, y + 6,
+      { baseline: 'middle', align: 'right' });
+    return y + 18;
+  }
+
+  // Holly Hobbie: papel crema, retazos de tela, flores y costuras.
+  function prepareHollyTheme(theme) {
+    theme.radius = 4;
+    theme.bg = mix(theme.bg, [255, 249, 235], 0.96);
+    theme.cardBg = mix(theme.cardBg, [255, 253, 245], 0.97);
+    theme.primary = mix(theme.primary, [124, 175, 199], 0.4);
+    theme.accent = mix(theme.accent, [223, 142, 157], 0.35);
+    theme.text = coloridoTextOn(theme.cardBg, mix(theme.text, [77, 59, 46], 0.5));
+    theme.onBg = coloridoTextOn(theme.bg, theme.text);
+    theme.onCardBg = theme.text;
+    theme.onPrimary = coloridoTextOn(theme.primary, theme.text);
+    theme.onAccent = coloridoTextOn(theme.accent, theme.text);
+    theme.mutedText = coloridoTextOn(theme.bg, mix(theme.text, theme.bg, 0.2));
+    theme.hollyBlue = [122, 168, 195];
+    theme.hollySage = [156, 183, 137];
+    theme.hollyGold = [239, 190, 93];
+    theme.hollyPalette = [theme.primary, theme.accent, theme.hollyBlue, theme.hollySage, theme.hollyGold];
+    theme.hollyThread = mix(theme.text, theme.bg, 0.48);
+    theme.hollyLine = mix(theme.text, theme.cardBg, 0.76);
+    theme.hollyShadow = mix(theme.bg, theme.text, 0.09);
+    return theme;
+  }
+
+  function hollyStitch(ctx, x, y, w, h, color, radius) {
+    const doc = ctx.doc;
+    doc.saveGraphicsState();
+    doc.setDrawColor(color[0], color[1], color[2]);
+    doc.setLineWidth(0.25);
+    doc.setLineDashPattern([1, 0.85], 0);
+    if (radius) doc.roundedRect(x, y, w, h, radius, radius, 'S');
+    else doc.rect(x, y, w, h, 'S');
+    doc.restoreGraphicsState();
+  }
+
+  function hollyPatch(ctx, x, y, w, h, color) {
+    ctx.helpers.fillBox(x + 0.8, y + 1.2, w, h, ctx.T.hollyShadow, 3);
+    ctx.helpers.fillBox(x, y, w, h, color, 3);
+    hollyStitch(ctx, x + 1.2, y + 1.2, w - 2.4, h - 2.4, ctx.T.hollyThread, 2);
+  }
+
+  // Cuadros de tela recortados al adorno; las zonas de texto quedan lisas.
+  function hollyFabric(ctx, x, y, w, h, color) {
+    const { doc, T, helpers } = ctx;
+    const base = mix(T.cardBg, color, 0.14);
+    const stripe = mix(T.cardBg, color, 0.35);
+    const cross = mix(T.cardBg, color, 0.58);
+    doc.saveGraphicsState();
+    doc.rect(x, y, w, h, null);
+    doc.clip();
+    doc.discardPath();
+    helpers.fillBox(x, y, w, h, base, 0);
+    for (let dx = 0; dx < w; dx += 5) helpers.fillBox(x + dx, y, 2.5, h, stripe, 0);
+    for (let dy = 0; dy < h; dy += 5) helpers.fillBox(x, y + dy, w, 2.5, stripe, 0);
+    for (let dx = 0; dx < w; dx += 5) {
+      for (let dy = 0; dy < h; dy += 5) helpers.fillBox(x + dx, y + dy, 2.5, 2.5, cross, 0);
+    }
+    doc.restoreGraphicsState();
+  }
+
+  function hollyFlower(ctx, x, y, size, color) {
+    const doc = ctx.doc;
+    doc.setFillColor(ctx.T.hollySage[0], ctx.T.hollySage[1], ctx.T.hollySage[2]);
+    doc.ellipse(x + size * 0.65, y + size * 0.75, size * 0.5, size * 0.2, 'F');
+    doc.setFillColor(color[0], color[1], color[2]);
+    for (let petal = 0; petal < 5; petal++) {
+      const angle = petal * Math.PI * 2 / 5 - Math.PI / 2;
+      doc.circle(x + Math.cos(angle) * size * 0.53, y + Math.sin(angle) * size * 0.53, size * 0.38, 'F');
+    }
+    doc.setFillColor(ctx.T.hollyGold[0], ctx.T.hollyGold[1], ctx.T.hollyGold[2]);
+    doc.circle(x, y, size * 0.27, 'F');
+  }
+
+  function hollyButton(ctx, x, y, radius, color) {
+    const { doc, T } = ctx;
+    doc.saveGraphicsState();
+    doc.setFillColor(color[0], color[1], color[2]);
+    doc.setDrawColor(T.hollyThread[0], T.hollyThread[1], T.hollyThread[2]);
+    doc.setLineWidth(0.2);
+    doc.circle(x, y, radius, 'FD');
+    doc.setFillColor(T.cardBg[0], T.cardBg[1], T.cardBg[2]);
+    [-1, 1].forEach(function (direction) {
+      doc.circle(x + direction * radius * 0.3, y, radius * 0.14, 'F');
+    });
+    doc.line(x - radius * 0.3, y, x + radius * 0.3, y);
+    doc.restoreGraphicsState();
+  }
+
+  function hollyPage(ctx, addPage) {
+    const { doc, T, helpers } = ctx;
+    if (addPage) doc.addPage();
+    helpers.fillBox(0, 0, PAGE.W, PAGE.H, T.bg, 0);
+    hollyFabric(ctx, 0, 0, PAGE.W, 5, T.hollyBlue);
+    hollyFabric(ctx, 0, PAGE.H - 5, PAGE.W, 5, T.accent);
+    if (addPage) {
+      helpers.setText(T.mutedText, 'italic', 8);
+      doc.text('COEDUCA / Cuaderno de inglés', 14, 12);
+      hollyFlower(ctx, PAGE.W - 18, 11.5, 2.7, T.accent);
+    }
+  }
+
+  function renderHollyHeader(ctx, opts) {
+    const { doc, T, helpers, sanitize, cfg, today } = ctx;
+    const M = opts.M, w = opts.contentW, center = M + w / 2, top = 20;
+    hollyPage(ctx, false);
+    helpers.setText(T.mutedText, 'italic', 9);
+    doc.text('COEDUCA / Cuaderno de inglés', center, 13, { align: 'center' });
+    const title = sanitize(cfg.topic || (opts.exam ? 'Examen de Inglés' : 'Actividad de Inglés'));
+    let fontSize = 23, titleLines;
+    do {
+      helpers.setText(T.text, 'bolditalic', fontSize);
+      titleLines = doc.splitTextToSize(title, w - 54);
+      if (titleLines.length <= 3 || fontSize <= 13) break;
+      fontSize -= 2;
+    } while (true);
+    const lineH = fontSize / doc.internal.scaleFactor * 1.15;
+    const height = Math.max(43, 32 + titleLines.length * lineH);
+    helpers.fillBox(M + 0.8, top + 1.2, w, height, T.hollyShadow, 4);
+    helpers.fillBox(M, top, w, height, T.cardBg, 4);
+    doc.saveGraphicsState();
+    doc.roundedRect(M, top, w, height, 4, 4, null);
+    doc.clip();
+    doc.discardPath();
+    hollyFabric(ctx, M, top, 20, height, T.hollyBlue);
+    hollyFabric(ctx, M + w - 20, top, 20, height, T.accent);
+    doc.restoreGraphicsState();
+    hollyStitch(ctx, M + 1.5, top + 1.5, w - 3, height - 3, T.hollyThread, 3);
+    hollyFlower(ctx, M + 10, top + height - 11, 4.5, T.accent);
+    hollyFlower(ctx, M + w - 10, top + 11, 4.5, T.hollyBlue);
+    hollyButton(ctx, M + 10, top + 10, 2.5, T.hollyGold);
+    hollyButton(ctx, M + w - 10, top + height - 10, 2.5, T.hollySage);
+    helpers.fillBox(center - 16, top + 5, 32, 7, mix(T.cardBg, T.hollyGold, 0.4), 2);
+    helpers.setText(T.text, 'bold', 8);
+    doc.text(opts.exam ? 'EXAMEN' : 'ACTIVIDAD', center, top + 8.5,
+      { baseline: 'middle', align: 'center' });
+    helpers.setText(T.text, 'bolditalic', fontSize);
+    titleLines.forEach(function (line, index) {
+      doc.text(line, center, top + 18 + index * lineH, { baseline: 'top', align: 'center' });
+    });
+    helpers.setText(T.mutedText, 'normal', 8);
+    doc.text('Prof. Jose Eliseo Martinez / ' + today, center, top + height - 6, { align: 'center' });
+    return top + height + 9;
+  }
+
+  function renderHollySummary(ctx, y, opts) {
+    const { doc, T, helpers, score, state, today } = ctx;
+    const M = opts.M, w = opts.contentW, h = 32, mainW = 51, gap = 5;
+    if (y + h + 2 > PAGE.H - 20) { hollyPage(ctx, true); y = 18; }
+    const noteFill = mix(T.cardBg, T.hollyGold, 0.4);
+    hollyPatch(ctx, M, y, mainW, h, noteFill);
+    helpers.setText(coloridoTextOn(noteFill, T.text), 'bold', 8);
+    doc.text(opts.exam ? 'EXAMEN' : 'NOTA FINAL', M + 6, y + 8);
+    if (opts.exam) {
+      helpers.setText(T.text, 'bold', 16);
+      doc.text('RECIBIDO', M + 6, y + 24);
+      const x = M + mainW + gap, width = w - mainW - gap;
+      hollyPatch(ctx, x, y, width, h, T.cardBg);
+      helpers.setText(T.mutedText, 'bold', 8);
+      doc.text('COMPROBANTE DE ENTREGA', x + 6, y + 8);
+      helpers.setText(T.text, 'bold', 14);
+      doc.text('Tarea entregada', x + 6, y + 18);
+      helpers.setText(T.mutedText, 'normal', 9);
+      doc.text(today, x + 6, y + 26);
+      hollyFlower(ctx, x + width - 10, y + 20, 3.5, T.accent);
+    } else {
+      helpers.setText(T.text, 'bold', 30);
+      doc.text(String(score.grade), M + 6, y + 25);
+      helpers.setText(T.mutedText, 'normal', 9);
+      doc.text('/ 10', M + mainW - 5, y + 25, { align: 'right' });
+      const stats = [
+        { label: 'ACIERTOS', value: score.earned + ' / ' + score.total, color: T.hollyBlue },
+        { label: 'NOTA BASE', value: score.baseGrade + ' / 10', color: T.accent },
+      ];
+      const extra = (Number(state.extraPoints) || 0) + (Number(state.balloonBonus) || 0);
+      if (extra > 0) stats.push({ label: 'PUNTOS EXTRA', value: '+' + extra.toFixed(1), color: T.hollySage });
+      const statW = (w - mainW - gap - gap * (stats.length - 1)) / stats.length;
+      stats.forEach(function (stat, index) {
+        const x = M + mainW + gap + index * (statW + gap);
+        const fill = mix(T.cardBg, stat.color, 0.35);
+        hollyPatch(ctx, x, y, statW, h, fill);
+        helpers.setText(coloridoTextOn(fill, T.text), 'bold', 7.5);
+        doc.text(stat.label, x + 5, y + 8);
+        helpers.setText(coloridoTextOn(fill, T.text), 'bold', 12);
+        doc.text(stat.value, x + 5, y + 23);
+      });
+    }
+    return y + h + 10;
+  }
+
+  function renderHollyDetailsHeader(ctx, y, opts) {
+    const { doc, T, helpers } = ctx;
+    const exercises = (ctx.cfg.exercises || []).filter(function (ex) { return ex.type !== 'note'; });
+    helpers.setText(T.text, 'bold', 10);
+    const lines = exercises.length
+      ? doc.splitTextToSize(ctx.sanitize(exercises[0].title || 'Ejercicio 1'), opts.contentW - 55).length : 1;
+    if (y + 19 + Math.max(12, lines * 4.2 + 5) + 10 > PAGE.H - 20) { hollyPage(ctx, true); y = 18; }
+    const fill = mix(T.cardBg, T.hollySage, 0.35);
+    hollyPatch(ctx, opts.M, y, opts.contentW, 10, fill);
+    hollyFlower(ctx, opts.M + 6, y + 5, 2.5, T.accent);
+    helpers.setText(coloridoTextOn(fill, T.text), 'bold', 11);
+    doc.text('Detalle de ejercicios', opts.M + 12, y + 5, { baseline: 'middle' });
+    helpers.setText(coloridoTextOn(fill, T.mutedText), 'normal', 8);
+    doc.text(exercises.length + (exercises.length === 1 ? ' ejercicio' : ' ejercicios'),
+      opts.M + opts.contentW - 6, y + 5, { baseline: 'middle', align: 'right' });
+    return y + 19;
+  }
+
+  function renderHollyExercise(ctx, ex, idx, exNum, y, opts) {
+    const { doc, T, helpers, sanitize, state, cfg, S } = ctx;
+    const M = opts.M, w = opts.contentW, right = M + w;
+    const ans = state.answers['ex_' + idx];
+    helpers.setText(T.text, 'bold', 10);
+    const titleLines = doc.splitTextToSize(sanitize(ex.title || ('Ejercicio ' + exNum)), w - 55);
+    const lineH = 4.2, headerH = Math.max(12, titleLines.length * lineH + 5);
+    if (y + headerH + 10 > PAGE.H - 20) { hollyPage(ctx, true); y = 18; }
+    hollyPatch(ctx, M, y, w, headerH, T.cardBg);
+    const marker = mix(T.cardBg, T.hollyPalette[(exNum - 1) % T.hollyPalette.length], 0.5);
+    helpers.fillBox(M + 2, y + (headerH - 8) / 2, 8, 8, marker, 2);
+    helpers.setText(coloridoTextOn(marker, T.text), 'bold', 10);
+    doc.text(String(exNum), M + 6, y + headerH / 2, { baseline: 'middle', align: 'center' });
+    helpers.setText(T.text, 'bold', 10);
+    const firstY = y + headerH / 2 - (titleLines.length - 1) * lineH / 2;
+    titleLines.forEach(function (line, index) {
+      doc.text(line, M + 14, firstY + index * lineH, { baseline: 'middle' });
+    });
+    let badgeText = 'Pendiente', badgeFill = mix(T.cardBg, T.hollyBlue, 0.18);
+    if (ans) {
+      if (opts.exam) {
+        badgeText = isCompletedAnswer(ex, ans) ? 'Completado' : 'En progreso';
+        badgeFill = mix(T.cardBg, T.hollySage, 0.35);
+      } else {
+        badgeText = ans.score + ' / ' + ans.total;
+        const fraction = ans.total > 0 ? ans.score / ans.total : 0;
+        const resultColor = fraction >= 0.7 ? S.green : (fraction >= 0.4 ? S.amber : S.red);
+        badgeFill = mix(T.cardBg, resultColor, 0.15);
+      }
+    }
+    const badgeY = y + (headerH - 6) / 2;
+    helpers.fillBox(right - 36, badgeY, 31, 6, badgeFill, 2);
+    helpers.setText(coloridoTextOn(badgeFill, T.text), 'bold', 8);
+    doc.text(badgeText, right - 20.5, badgeY + 3, { baseline: 'middle', align: 'center' });
+    y += headerH + 6;
+    if (!cfg.examMode && !cfg.pdfHideDetails && ans && Array.isArray(ans.details) && ans.details.length) {
+      y = renderExerciseDetailsColumns(ctx, ans.details, y, { M: M, contentW: w, exNum: exNum });
+    }
+    return y + 13;
+  }
+
+  function renderHollyGame(ctx, y, opts) {
+    const { doc, T, helpers, sanitize } = ctx;
+    if (y + 20 > PAGE.H - 20) { hollyPage(ctx, true); y = 18; }
+    y += 3;
+    const fill = mix(T.cardBg, T.hollySage, 0.3);
+    hollyPatch(ctx, opts.M, y, opts.contentW, 13, fill);
+    hollyButton(ctx, opts.M + 6, y + 6.5, 2.5, T.accent);
+    helpers.setText(coloridoTextOn(fill, T.text), 'bold', 10);
+    doc.text('Juego final', opts.M + 12, y + 6.5, { baseline: 'middle' });
+    helpers.setText(coloridoTextOn(fill, T.mutedText), 'normal', 9);
+    doc.text(sanitize(ctx.cfg.game.type).toUpperCase(), opts.M + opts.contentW - 6, y + 6.5,
+      { baseline: 'middle', align: 'right' });
+    return y + 19;
+  }
+
+  // Tabla común: filas compactas y paginación; cada diseño define sus rellenos.
+  function renderStudentTable(ctx, y, opts) {
+    const { doc, T, helpers, sanitize, stu, partners, cfg } = ctx;
+    const M = opts.M, w = opts.contentW, bottom = PAGE.H - 20;
+    const lineH = 4.2, padding = 4;
+    const headingColor = T.useStripes ? T.text : (T.useDashed ? mix(T.cardBg, T.primary, 0.5) : T.primary);
+    const headingText = T.useDashed ? coloridoTextOn(headingColor, T.text) : (T.useStripes ? [255, 255, 255] : T.onPrimary);
+    const gridColor = T.useSoft ? T.pastelLine : (T.useDashed ? T.hollyLine : T.text);
+    const gridWidth = T.useSoft || T.useDashed ? 0.2 : 0.5;
+    function lines(text, width, style, size) {
+      helpers.setText(T.text, style, size);
+      return doc.splitTextToSize(sanitize(text) || '-', width);
+    }
+    function centeredCell(textLines, x, top, height, factor, align) {
+      const step = doc.getFontSize() / doc.internal.scaleFactor * factor;
+      const firstY = top + height / 2 - (textLines.length - 1) * step / 2;
+      textLines.forEach(function (text, index) {
+        doc.text(text, x, firstY + index * step, { baseline: 'middle', align: align || 'left' });
+      });
+    }
+    let grade = sanitize(stu.grade || '-');
+    if (cfg.level) grade += ' / Nivel: ' + sanitize(cfg.level);
+    const gradeLines = lines(grade, w * 0.44, 'normal', 7.5);
+    const headingH = Math.max(8, gradeLines.length * 3.4 + padding);
+    const entries = [{ label: 'Estudiante', person: stu }].concat(partners.map(function (person, index) {
+      return { label: 'Compañero ' + (index + 1), person: person };
+    }));
+    const maxLines = Math.max(1, Math.floor((bottom - 18 - headingH - padding) / lineH));
+    const rows = [];
+    entries.forEach(function (entry) {
+      const names = lines(entry.person.name || '-', w - 79, 'bold', 9);
+      const nies = lines('NIE: ' + (entry.person.nie || '-'), 34, 'normal', 8);
+      const count = Math.max(names.length, nies.length);
+      for (let offset = 0; offset < count; offset += maxLines) {
+        const nameLines = names.slice(offset, offset + maxLines);
+        const nieLines = nies.slice(offset, offset + maxLines);
+        rows.push({ label: entry.label, nameLines: nameLines, nieLines: nieLines,
+          height: Math.max(10, Math.max(nameLines.length, nieLines.length) * lineH + padding) });
+      }
+    });
+    if (T.useStripes || T.useCards || T.useSoft || T.useDashed) {
+      const rowHeight = Math.max.apply(null, rows.map(function (row) { return row.height; }));
+      rows.forEach(function (row) { row.height = rowHeight; });
+    }
+
+    function nextTablePage() {
+      if (T.useCards) coloridoPage(ctx, true);
+      else if (T.useSoft) pastelPage(ctx, true);
+      else if (T.useDashed) hollyPage(ctx, true);
+      else doc.addPage();
+      y = 18;
+    }
+    let first = 0;
+    while (first < rows.length) {
+      if (y + headingH + rows[first].height > bottom) nextTablePage();
+      let end = first, tableH = headingH;
+      while (end < rows.length && y + tableH + rows[end].height <= bottom) {
+        tableH += rows[end].height;
+        end += 1;
+      }
+      if (T.useDashed) helpers.fillBox(M + 0.8, y + 1.2, w, tableH, T.hollyShadow, T.radius);
+      helpers.shadowBox(M, y, w, tableH, T.cardBg, T.radius);
+      doc.saveGraphicsState();
+      if (T.radius > 0) doc.roundedRect(M, y, w, tableH, T.radius, T.radius, null);
+      else doc.rect(M, y, w, tableH, null);
+      doc.clip();
+      doc.discardPath();
+      // El relleno del encabezado es plano dentro del contorno común.
+      helpers.fillBox(M, y, w, headingH, headingColor, 0);
+      if (T.useCards) {
+        let rowTop = y + headingH;
+        for (let index = first; index < end; index += 1) {
+          const rowHeight = rows[index].height;
+          helpers.fillBox(M, rowTop, w, rowHeight, index % 2 ? T.coloridoSoft : T.cardBg, 0);
+          helpers.fillBox(M, rowTop, 31, rowHeight, T.coloridoRole, 0);
+          helpers.fillBox(M + w - 41, rowTop, 41, rowHeight, T.coloridoNie, 0);
+          rowTop += rowHeight;
+        }
+      } else if (T.useStripes || T.useSoft || T.useDashed) {
+        let stripeY = y + headingH;
+        for (let index = first; index < end; index += 1) {
+          if (index % 2) helpers.fillBox(M, stripeY, w, rows[index].height,
+            T.useSoft ? T.pastelRow : (T.useDashed ? mix(T.cardBg, T.hollyBlue, 0.13) : lighten(T.primary, 0.94)), 0);
+          stripeY += rows[index].height;
+        }
+      }
+      doc.restoreGraphicsState();
+      if (T.useDashed) hollyButton(ctx, M + 4.5, y + headingH / 2, 1.6, T.hollyGold);
+      helpers.setText(headingText, 'bold', 8);
+      doc.text(partners.length ? 'EQUIPO DE TRABAJO' : 'DATOS DEL ESTUDIANTE', M + (T.useDashed ? 9 : 5), y + headingH / 2,
+        { baseline: 'middle' });
+      helpers.setText(T.useStripes ? T.vibrantYellow : headingText, 'normal', 7.5);
+      centeredCell(gradeLines, M + w - 5, y, headingH, 1.25, 'right');
+
+      if (!T.useCards) {
+        helpers.hline(M, M + w, y + headingH, gridColor, gridWidth);
+        doc.line(M + 31, y + headingH, M + 31, y + tableH);
+        doc.line(M + w - 41, y + headingH, M + w - 41, y + tableH);
+      }
+      let rowY = y + headingH;
+      for (let index = first; index < end; index += 1) {
+        const row = rows[index];
+        if (index > first && !T.useCards) helpers.hline(M, M + w, rowY, gridColor, T.useSoft || T.useDashed ? 0.2 : 0.35);
+        helpers.setText(T.useCards ? coloridoTextOn(T.coloridoRole, T.text) : T.text,
+          T.useCards ? 'bold' : 'normal', 8);
+        doc.text(row.label, M + 5, rowY + row.height / 2, { baseline: 'middle' });
+        helpers.setText(T.useCards ? coloridoTextOn(index % 2 ? T.coloridoSoft : T.cardBg, T.text) : T.text,
+          'bold', 9);
+        centeredCell(row.nameLines, M + 36, rowY, row.height, 1.3);
+        helpers.setText(T.useCards ? coloridoTextOn(T.coloridoNie, T.text) : T.text, 'normal', 8);
+        centeredCell(row.nieLines, M + w - 37, rowY, row.height, 1.45);
+        rowY += row.height;
+      }
+      if (T.useDashed) {
+        hollyStitch(ctx, M + 1, y + 1, w - 2, tableH - 2, T.hollyThread, 3);
+      } else if (!T.useCards) {
+        doc.setDrawColor(gridColor[0], gridColor[1], gridColor[2]);
+        doc.setLineWidth(T.useSoft ? 0.25 : 0.85);
+        if (T.radius > 0) doc.roundedRect(M, y, w, tableH, T.radius, T.radius, 'S');
+        else doc.rect(M, y, w, tableH, 'S');
+      }
+      y += tableH;
+      first = end;
+      if (first < rows.length) nextTablePage();
+    }
+    return y + 9;
   }
 
   function renderTeamLinear(ctx, y, opts) {
+    if (ctx.T.useHalftone || ctx.T.useStripes || ctx.T.useSoft || ctx.T.useDashed) return renderStudentTable(ctx, y, opts);
     const { T, S, helpers, sanitize, stu, partners, cfg } = ctx;
     const M = opts.M, contentW = opts.contentW;
     const { borderedBox, fillBox, setText, hline, dashedLine } = helpers;
@@ -2176,9 +3246,14 @@
 
     // ----- HEADER con halftone -----
     const headerH = 26;
-    shadowBox(0, 0, PAGE.W, headerH, T.primary);
+    shadowBox(0, 0, PAGE.W, headerH, T.primary, 0);
     // Puntos halftone arriba a la derecha en accent
+    doc.saveGraphicsState();
+    doc.rect(0, 0, PAGE.W, headerH, null);
+    doc.clip();
+    doc.discardPath();
     halftone(PAGE.W - 50, 0, 50, headerH, lighten(T.accent, 0.1), 2.8, 0.6);
+    doc.restoreGraphicsState();
 
     setText(T.onPrimary, 'bold', 20);
     doc.text(
@@ -2189,7 +3264,7 @@
     doc.text('COEDUCA  |  Prof. Jose Eliseo Martinez  |  ' + today, M, 22);
 
     // banda negra inferior con sello
-    fillBox(0, headerH, PAGE.W, 4, T.text);
+    fillBox(0, headerH, PAGE.W, 4, T.text, 0);
     let y = headerH + 12;
 
     // ----- HERO: nota gigante con burst pop-art -----
@@ -2215,10 +3290,11 @@
     y = renderTeamLinear(ctx, y, { M: M, contentW: contentW });
 
     // Detalle por ejercicio
+    if (y + 34 > PAGE.H - 20) { doc.addPage(); y = 18; }
     fillBox(M, y, contentW, 8, T.primary);
     setText(T.onPrimary, 'bold', 9);
     doc.text('DETALLE POR EJERCICIO', M + 5, y + 5.5);
-    y += 12;
+    y += 18;
 
     let exNum = 0;
     (cfg.exercises || []).forEach(function (ex, idx) {
@@ -2233,294 +3309,76 @@
     renderFooter(ctx, { M: M, right: right });
   }
 
-  // ----- DISEÑO 2: POP ART VIBRANTE (rayas diagonales sobre header) -----
+  // ----- DISEÑO 2: POP ART VIBRANTE (bloques saturados y tinta) -----
   function renderPopArtVibrant(ctx) {
-    const { doc, T, helpers, sanitize, cfg, score, today } = ctx;
-    const { fillBox, shadowBox, shadowBorderedBox, setText, stripes } = helpers;
     const M = 13, right = PAGE.W - M, contentW = right - M;
-
-    // Header bicolor con rayas
-    const headerH = 30;
-    fillBox(0, 0, PAGE.W, headerH, T.primary);
-    fillBox(PAGE.W * 0.6, 0, PAGE.W * 0.4, headerH, T.accent);
-    stripes(0, 0, PAGE.W, headerH, darken(T.primary, 0.3), 3.0, 0.5);
-    // banda negra inferior
-    fillBox(0, headerH, PAGE.W, 5, T.text);
-
-    setText(T.onPrimary, 'bold', 22);
-    doc.text(
-      sanitize(cfg.topic || 'Ejercicio de Ingles').toUpperCase(),
-      M, 16
-    );
-    setText(T.onPrimary, 'bold', 9);
-    doc.text('COEDUCA  |  ' + today, M, 24);
-
-    let y = headerH + 15;
-
-    // Hero
-    shadowBorderedBox(M, y, contentW, 36, T.cardBg, T.text, 1);
-    stripes(M + 2, y + 2, contentW - 4, 32, lighten(T.accent, 0.65), 4, 0.3);
-    setText(T.text, 'bold', 9);
-    doc.text('NOTA FINAL', M + contentW / 2, y + 9, { align: 'center' });
-    setText(T.accent, 'bold', 40);
-    doc.text(String(score.grade), M + contentW / 2, y + 27, { align: 'center' });
-    const gradeStrW = doc.getStringUnitWidth(String(score.grade)) * 40 / doc.internal.scaleFactor;
-    setText(T.text, 'normal', 10);
-    doc.text('/ 10', M + contentW / 2 + gradeStrW / 2 + 3, y + 27, { align: 'left' });
-    y += 42;
-
-    y = renderPills(ctx, y, { M: M, contentW: contentW });
-    y += 3;
-    y = renderTeamLinear(ctx, y, { M: M, contentW: contentW });
-
-    fillBox(M, y, contentW, 8, T.text);
-    setText(T.cardBg, 'bold', 9);
-    doc.text('DETALLE POR EJERCICIO', M + 5, y + 5.5);
-    y += 12;
-
+    const layout = { M: M, right: right, contentW: contentW, exam: false };
+    let y = renderVibrantHeader(ctx, layout);
+    y = renderVibrantSummary(ctx, y, layout);
+    y = renderStudentTable(ctx, y, layout);
+    y = renderVibrantDetailsHeader(ctx, y, layout);
     let exNum = 0;
-    (cfg.exercises || []).forEach(function (ex, idx) {
+    (ctx.cfg.exercises || []).forEach(function (ex, idx) {
       if (ex.type === 'note') return;
       exNum++;
-      y = renderExerciseRow(ctx, ex, idx, exNum, y, {
-        M: M, contentW: contentW, right: right
-      });
+      y = renderExerciseRow(ctx, ex, idx, exNum, y, layout);
     });
-
-    y = renderGameFinal(ctx, y, { M: M, contentW: contentW });
-    renderFooter(ctx, { M: M, right: right });
+    y = renderGameFinal(ctx, y, layout);
+    renderFooter(ctx, layout);
   }
 
-  // ----- DISEÑO 3: COLORIDO (cards modulares con avatares) -----
+  // ----- DISEÑO 3: COLORIDO (superficies del tema sin contornos) -----
   function renderColorido(ctx) {
-    const { doc, T, helpers, sanitize, cfg, score, today } = ctx;
-    const { fillBox, borderedBox, setText } = helpers;
     const M = 14, right = PAGE.W - M, contentW = right - M;
-
-    // Header tipo banner con 3 bloques
-    const headerH = 24;
-    fillBox(0, 0, PAGE.W * 0.35, headerH, T.primary);
-    fillBox(PAGE.W * 0.35, 0, PAGE.W * 0.35, headerH, T.accent);
-    fillBox(PAGE.W * 0.70, 0, PAGE.W * 0.30, headerH, T.text);
-
-    setText(T.onPrimary, 'bold', 9);
-    doc.text('COEDUCA', M, 9);
-    setText(T.onPrimary, 'bold', 16);
-    doc.text(sanitize(cfg.topic || 'Ejercicio').toUpperCase(), M, 18);
-    setText(T.cardBg, 'normal', 9);
-    doc.text(today, PAGE.W - M, 16, { align: 'right' });
-
-    let y = headerH + 10;
-
-    // Card de nota (con accent gigante a la izquierda)
-    if (T.radius > 0) {
-      doc.setFillColor(T.cardBg[0], T.cardBg[1], T.cardBg[2]);
-      doc.roundedRect(M, y, contentW, 32, T.radius, T.radius, 'F');
-      doc.setDrawColor(T.divider[0], T.divider[1], T.divider[2]);
-      doc.setLineWidth(0.4);
-      doc.roundedRect(M, y, contentW, 32, T.radius, T.radius);
-    } else {
-      borderedBox(M, y, contentW, 32, T.cardBg, T.divider, 0.4);
-    }
-    // bloque acento a la izquierda
-    doc.setFillColor(T.accent[0], T.accent[1], T.accent[2]);
-    doc.roundedRect(M, y, 50, 32, T.radius, T.radius, 'F');
-    setText(T.onAccent, 'bold', 7);
-    doc.text('NOTA', M + 25, y + 8, { align: 'center' });
-    setText(T.onAccent, 'bold', 32);
-    doc.text(String(score.grade), M + 25, y + 26, { align: 'center' });
-    // Stats a la derecha
-    setText(T.text, 'bold', 8);
-    doc.text('ACIERTOS', M + 58, y + 9);
-    setText(T.mutedText, 'normal', 11);
-    doc.text(score.earned + ' de ' + score.total, M + 58, y + 16);
-    setText(T.text, 'bold', 8);
-    doc.text('NOTA BASE', M + 58, y + 22);
-    setText(T.mutedText, 'normal', 11);
-    doc.text(score.baseGrade + ' / 10', M + 58, y + 29);
-    if ((state.extraPoints + state.balloonBonus) > 0) {
-      setText(T.text, 'bold', 8);
-      doc.text('EXTRA', M + contentW - 28, y + 9);
-      setText(T.accent, 'bold', 11);
-      doc.text('+' + (state.extraPoints + state.balloonBonus).toFixed(1), M + contentW - 28, y + 16);
-    }
-    y += 38;
-
-    // EQUIPO en cards (la firma distintiva de este diseño)
-    y = renderTeamCards(ctx, y, { M: M, contentW: contentW });
-
-    // Detalle
-    setText(T.text, 'bold', 11);
-    doc.text('EJERCICIOS', M, y);
-    setText(T.primary, 'bold', 11);
-    doc.text('—', M + 28, y);
-    y += 4;
-
+    const layout = { M: M, right: right, contentW: contentW, exam: false };
+    let y = renderColoridoHeader(ctx, layout);
+    y = renderColoridoSummary(ctx, y, layout);
+    y = renderStudentTable(ctx, y, layout);
+    y = renderColoridoDetailsHeader(ctx, y, layout);
     let exNum = 0;
-    (cfg.exercises || []).forEach(function (ex, idx) {
+    (ctx.cfg.exercises || []).forEach(function (ex, idx) {
       if (ex.type === 'note') return;
       exNum++;
-      y = renderExerciseRow(ctx, ex, idx, exNum, y, {
-        M: M, contentW: contentW, right: right
-      });
+      y = renderExerciseRow(ctx, ex, idx, exNum, y, layout);
     });
-
-    y = renderGameFinal(ctx, y, { M: M, contentW: contentW });
-    renderFooter(ctx, { M: M, right: right });
+    y = renderGameFinal(ctx, y, layout);
+    renderFooter(ctx, layout);
   }
 
   // ----- DISEÑO 4: PASTEL (minimal, esquinas redondeadas) -----
   function renderPastel(ctx) {
-    const { doc, T, helpers, sanitize, cfg, score, today } = ctx;
-    const { fillBox, setText } = helpers;
     const M = 14, right = PAGE.W - M, contentW = right - M;
-
-    // Banda decorativa superior fina
-    fillBox(0, 0, PAGE.W, 3, T.primary);
-
-    setText(T.mutedText, 'bold', 7);
-    doc.text('COEDUCA  ·  ENGLISH', M, 11);
-    setText(T.text, 'bold', 22);
-    doc.text(sanitize(cfg.topic || 'Ejercicio'), M, 21);
-    setText(T.mutedText, 'normal', 9);
-    doc.text(today + '  ·  Prof. Jose Eliseo Martinez', M, 26);
-
-    // Linea divisoria suave
-    doc.setDrawColor(T.divider[0], T.divider[1], T.divider[2]);
-    doc.setLineWidth(0.3);
-    doc.line(M, 30, right, 30);
-
-    let y = 38;
-
-    // Hero discreto
-    doc.setFillColor(T.cardBg[0], T.cardBg[1], T.cardBg[2]);
-    doc.roundedRect(M, y, contentW, 30, 4, 4, 'F');
-    doc.setDrawColor(T.divider[0], T.divider[1], T.divider[2]);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(M, y, contentW, 30, 4, 4);
-
-    setText(T.mutedText, 'bold', 7);
-    doc.text('NOTA FINAL', M + 6, y + 8);
-    setText(T.text, 'bold', 30);
-    doc.text(String(score.grade), M + 6, y + 24);
-    setText(T.mutedText, 'normal', 9);
-    doc.text('/ 10', M + 6 + 22, y + 24);
-
-    // pill accent a la derecha del hero
-    doc.setFillColor(T.accent[0], T.accent[1], T.accent[2]);
-    const pillX = right - 50, pillY = y + 9, pillW = 44, pillH = 12;
-    doc.roundedRect(pillX, pillY, pillW, pillH, 6, 6, 'F');
-    setText(T.onAccent, 'bold', 9);
-    doc.text(score.earned + ' / ' + score.total + ' aciertos',
-      pillX + pillW / 2, pillY + 7.5, { align: 'center' });
-
-    y += 36;
-
-    // Equipo: estilo lista limpia
-    y = renderTeamLinear(ctx, y, { M: M, contentW: contentW });
-
-    // Detalle: solo título con guion
-    setText(T.text, 'bold', 12);
-    doc.text('Detalle de ejercicios', M, y);
-    y += 5;
-
+    const layout = { M: M, right: right, contentW: contentW, exam: false };
+    let y = renderPastelHeader(ctx, layout);
+    y = renderStudentTable(ctx, y, layout);
+    y = renderPastelSummary(ctx, y, layout);
+    y = renderPastelDetailsHeader(ctx, y, layout);
     let exNum = 0;
-    (cfg.exercises || []).forEach(function (ex, idx) {
+    (ctx.cfg.exercises || []).forEach(function (ex, idx) {
       if (ex.type === 'note') return;
       exNum++;
-      y = renderExerciseRow(ctx, ex, idx, exNum, y, {
-        M: M, contentW: contentW, right: right
-      });
+      y = renderExerciseRow(ctx, ex, idx, exNum, y, layout);
     });
-
-    y = renderGameFinal(ctx, y, { M: M, contentW: contentW });
-    renderFooter(ctx, { M: M, right: right });
+    y = renderGameFinal(ctx, y, layout);
+    renderFooter(ctx, layout);
   }
 
-  // ----- DISEÑO 5: HOLLY HOBBIE (lineas discontinuas + cuadricula) -----
+  // ----- DISEÑO 5: HOLLY HOBBIE (telas, flores y costuras) -----
   function renderHollyHobbie(ctx) {
-    const { doc, T, helpers, sanitize, cfg, score, today } = ctx;
-    const { fillBox, setText, dashedRect, dashedLine, notebookGrid } = helpers;
     const M = 14, right = PAGE.W - M, contentW = right - M;
-
-    // Marco decorativo dashed alrededor del header
-    notebookGrid(0, 0, PAGE.W, 30, lighten(T.primary, 0.7), 6);
-    dashedLine(M - 2, 28, right + 2, 28, T.primary, 0.5, 1.2);
-
-    setText(T.text, 'italic', 9);
-    doc.text('COEDUCA - Cuaderno de Inglés', M, 9);
-    setText(T.text, 'bold', 21);
-    doc.text(sanitize(cfg.topic || 'Ejercicio'), M, 20);
-    setText(T.mutedText, 'italic', 9);
-    doc.text(today, right, 20, { align: 'right' });
-
-    let y = 36;
-
-    // Hero con borde dashed
-    dashedRect(M, y, contentW, 32, T.primary, 0.6, 1.4);
-    setText(T.text, 'bold', 8);
-    doc.text('· Nota final ·', M + contentW / 2, y + 9, { align: 'center' });
-    setText(T.accent, 'bold', 36);
-    doc.text(String(score.grade), M + contentW / 2, y + 26, { align: 'center' });
-    const gradeStrW = doc.getStringUnitWidth(String(score.grade)) * 36 / doc.internal.scaleFactor;
-    setText(T.text, 'italic', 10);
-    doc.text('/ 10', M + contentW / 2 + gradeStrW / 2 + 3, y + 26, { align: 'left' });
-    y += 38;
-
-    // Pills con borde dashed
-    y = renderPillsDashed(ctx, y, { M: M, contentW: contentW });
-    y += 3;
-
-    // Equipo: una tarjeta con marco dashed
-    const teamRows = 2 + ctx.partners.length;
-    const teamH = 10 + teamRows * 7 + 4;
-    dashedRect(M, y, contentW, teamH, T.primary, 0.5, 1.2);
-    setText(T.text, 'bold', 8);
-    doc.text('· EQUIPO ·', M + contentW / 2, y + 6, { align: 'center' });
-    let yy = y + 13;
-    const col1 = M + 8, col2 = M + 38;
-    setText(T.text, 'italic', 9.5);
-    doc.text('Estudiante:', col1, yy);
-    setText(T.mutedText, 'normal', 9);
-    doc.text(sanitize(ctx.stu.name) + '  (NIE: ' + sanitize(ctx.stu.nie) + ')', col2, yy);
-    yy += 7;
-    setText(T.text, 'italic', 9.5);
-    doc.text('Grado:', col1, yy);
-    setText(T.mutedText, 'normal', 9);
-    doc.text(sanitize(ctx.stu.grade), col2, yy);
-    yy += 7;
-    if (ctx.partners.length === 0) {
-      setText(T.mutedText, 'italic', 9);
-      doc.text('— Trabajo individual —', col1, yy);
-    } else {
-      ctx.partners.forEach(function (p, i) {
-        setText(T.text, 'italic', 9.5);
-        doc.text('Compañero ' + (i + 1) + ':', col1, yy);
-        setText(T.mutedText, 'normal', 9);
-        doc.text(sanitize(p.name) + '  (NIE: ' + sanitize(p.nie) + ')', col2, yy);
-        yy += 7;
-      });
-    }
-    y += teamH + 10;
-
-    // Detalle
-    setText(T.text, 'bold', 11);
-    doc.text('· Detalle por ejercicio ·', M + contentW / 2, y, { align: 'center' });
-    y += 4;
-    dashedLine(M, y, right, y, T.primary, 0.4, 1.0);
-    y += 4;
-
+    const layout = { M: M, right: right, contentW: contentW, exam: false };
+    let y = renderHollyHeader(ctx, layout);
+    y = renderStudentTable(ctx, y, layout);
+    y = renderHollySummary(ctx, y, layout);
+    y = renderHollyDetailsHeader(ctx, y, layout);
     let exNum = 0;
-    (cfg.exercises || []).forEach(function (ex, idx) {
+    (ctx.cfg.exercises || []).forEach(function (ex, idx) {
       if (ex.type === 'note') return;
       exNum++;
-      y = renderExerciseRow(ctx, ex, idx, exNum, y, {
-        M: M, contentW: contentW, right: right
-      });
+      y = renderExerciseRow(ctx, ex, idx, exNum, y, layout);
     });
-
-    y = renderGameFinal(ctx, y, { M: M, contentW: contentW });
-    renderFooter(ctx, { M: M, right: right });
+    y = renderGameFinal(ctx, y, layout);
+    renderFooter(ctx, layout);
   }
 
   // ---- Stats pills (linea de 2-3 pills horizontal) ----
@@ -2597,6 +3455,10 @@
 
   function renderGameFinal(ctx, y, opts) {
     if (!ctx.cfg.game) return y;
+    if (ctx.T.useDashed) return renderHollyGame(ctx, y, opts);
+    if (ctx.T.useSoft) return renderPastelGame(ctx, y, opts);
+    if (ctx.T.useCards) return renderColoridoGame(ctx, y, opts);
+    if (ctx.T.useStripes) return renderVibrantGame(ctx, y, opts);
     const { T, helpers, sanitize, doc } = ctx;
     const M = opts.M, contentW = opts.contentW;
     if (y > PAGE.H - 25) { doc.addPage(); y = 18; }
@@ -2605,7 +3467,8 @@
       helpers.dashedRect(M, y, contentW, 10, T.accent, 0.5, 1.0);
     } else {
       helpers.borderedBox(M, y, contentW, 10, T.cardBg, T.accent, 0.8, T.radius);
-      helpers.fillBox(M, y, 3, 10, T.accent);
+      if (T.useHalftone) helpers.fillBox(M + 2.5, y + 2.5, 3, 5, T.accent, 1.5);
+      else helpers.fillBox(M, y, 3, 10, T.accent);
     }
     helpers.setText(T.text, 'bold', 9);
     doc.text('JUEGO FINAL:', M + 8, y + 6.5);
@@ -2620,11 +3483,26 @@
     const footerY = PAGE.H - 8;
     for (let p = 1; p <= totalPages; p++) {
       doc.setPage(p);
-      if (T.useDashed) helpers.dashedLine(opts.M, footerY - 4, opts.right, footerY - 4, T.divider, 0.3, 0.8);
+      if (T.useSoft) {
+        helpers.hline(opts.M, opts.right, footerY - 4, T.pastelLine, 0.2);
+      } else if (T.useCards) {
+        helpers.fillBox(opts.M, footerY - 5, 17, 1.2, T.primary, 0.6);
+        helpers.fillBox(opts.M + 19, footerY - 5, 7, 1.2, T.accent, 0.6);
+        helpers.fillBox(opts.M + 28, footerY - 5, 3, 1.2, T.coloridoConfetti[0], 0.6);
+      } else if (T.useStripes) {
+        const width = (opts.right - opts.M) / 3;
+        [T.primary, T.vibrantPink, T.vibrantYellow].forEach(function (color, index) {
+          helpers.fillBox(opts.M + index * width, footerY - 4, width, 0.9, color, 0);
+        });
+      }
+      else if (T.useDashed) {
+        helpers.dashedLine(opts.M, footerY - 4, opts.right - 10, footerY - 4, T.hollyThread, 0.25, 1.1);
+        hollyFlower(ctx, opts.right - 3, footerY - 4, 2.5, T.accent);
+      }
       else helpers.hline(opts.M, opts.right, footerY - 4, T.divider, 0.3);
-      helpers.setText(T.mutedText, 'italic', 7);
+      helpers.setText(T.useCards ? T.onBg : T.mutedText, 'italic', 7);
       doc.text('COEDUCA · Prof. Jose Eliseo Martinez', opts.M, footerY);
-      helpers.setText(T.mutedText, 'normal', 7);
+      helpers.setText(T.useCards ? T.onBg : T.mutedText, 'normal', 7);
       doc.text('Pag. ' + p + ' de ' + totalPages, PAGE.W / 2, footerY, { align: 'center' });
     }
   }
