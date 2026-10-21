@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"09cfe410-8ff9-44c6-b396-c0631303cd85","token":"60d3a366-b94a-43ae-9465-f3f44cb65fd0"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · 5.4 Los derechos humanos - garantías para una vida digna</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="civica">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="civica-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "bea22dda-fc67-4b21-b63c-acaf6dc788a6",
+  "container": "#app",
+  "topic": "5.4 Los derechos humanos - garantías para una vida digna",
+  "unit": "Unidad 5 - Semana 4",
+  "subjectLabel": "Ciudadanía y Valores",
+  "book": {
+    "url": "https://drive.google.com/file/d/1g0eozDngz8M_5pGY2AC-Aqozhid4fLnn/view?usp=drivesdk",
+    "label": "Abrir Libro"
+  },
+  "colors": {
+    "primary": "#C9D9D7",
+    "accent": "#9DACA7",
+    "bg": "#F0F5F8",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "pdfDesign": "Default",
+  "sections": {
+    "explore": [
+      {
+        "type": "note",
+        "title": "Los derechos humanos: garantías para una vida digna",
+        "html": "\n              \u003carticle style=\"font-family:Arial,sans-serif;color:#1A1A1A;line-height:1.65;font-size:15px;\">\n                \u003cdiv style=\"background:linear-gradient(135deg,#C9D9D7,#F0F5F8);border-radius:16px;padding:20px;margin-bottom:16px;\">\n                  \u003ch2 style=\"margin:0 0 10px;font-size:21px;color:#344D4A;\">Los derechos humanos\u003c/h2>\n                  \u003cp style=\"margin:0;\">Todas las personas merecemos vivir con \u003cstrong>dignidad, libertad, igualdad y respeto\u003c/strong>. Los derechos humanos son garantías que protegen nuestra vida, nuestras libertades y nuestro bienestar, sin importar quiénes somos o de dónde venimos.\u003c/p>\n                \u003c/div>\n\n                \u003ch3 style=\"font-size:17px;color:#48635E;margin:18px 0 8px;\">¿Qué significa tener una vida digna?\u003c/h3>\n                \u003cp>Significa contar con oportunidades y condiciones que permitan satisfacer nuestras necesidades básicas y desarrollarnos plenamente.\u003c/p>\n\n                \u003cdiv style=\"display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0;\">\n                  \u003cdiv style=\"background:#E4F0F3;border-radius:12px;padding:12px;\">\u003cstrong>Educación\u003c/strong>\u003cp style=\"font-size:13px;margin:5px 0 0;\">Aprender y desarrollar nuestras capacidades.\u003c/p>\u003c/div>\n                  \u003cdiv style=\"background:#E4F0F3;border-radius:12px;padding:12px;\">\u003cstrong>Salud\u003c/strong>\u003cp style=\"font-size:13px;margin:5px 0 0;\">Recibir atención para nuestro bienestar físico y mental.\u003c/p>\u003c/div>\n                  \u003cdiv style=\"background:#E4F0F3;border-radius:12px;padding:12px;\">\u003cstrong>Alimentación y agua\u003c/strong>\u003cp style=\"font-size:13px;margin:5px 0 0;\">Acceder a recursos esenciales para vivir.\u003c/p>\u003c/div>\n                  \u003cdiv style=\"background:#E4F0F3;border-radius:12px;padding:12px;\">\u003cstrong>Trabajo y seguridad\u003c/strong>\u003cp style=\"font-size:13px;margin:5px 0 0;\">Contar con oportunidades justas y protección social.\u003c/p>\u003c/div>\n                \u003c/div>\n\n                \u003ch3 style=\"font-size:17px;color:#48635E;margin:18px 0 8px;\">Características importantes\u003c/h3>\n                \u003cp>Los derechos humanos son \u003cstrong>universales\u003c/strong>, porque pertenecen a todas las personas; \u003cstrong>irrenunciables\u003c/strong>, porque nadie puede renunciar a ellos; e \u003cstrong>indivisibles e interdependientes\u003c/strong>, porque todos son importantes y están relacionados.\u003c/p>\n\n                \u003ch3 style=\"font-size:17px;color:#48635E;margin:18px 0 8px;\">¿Quiénes deben garantizarlos?\u003c/h3>\n                \u003cp>El Estado y los organismos internacionales tienen responsabilidades fundamentales en su protección. La ciudadanía también debe conocerlos, exigir su cumplimiento y participar responsablemente en la sociedad.\u003c/p>\n\n                \u003cdiv style=\"background:#F0F5F8;border-left:4px solid #9DACA7;border-radius:8px;padding:13px;margin-top:16px;\">\n                  \u003cstrong>Idea clave\u003c/strong>\n                  \u003cp style=\"margin:6px 0 0;\">Una sociedad justa no solo reconoce los derechos humanos: también trabaja para que todas las personas puedan ejercerlos y disfrutar de una vida digna.\u003c/p>\n                \u003c/div>\n              \u003c/article>\n            "
+      },
+      {
+        "type": "note",
+        "title": "Actividad 1 - Documento 1: Discurso de Malala Yousafzai",
+        "html": "\n              \u003carticle style=\"font-family:Arial,sans-serif;line-height:1.65;color:#1A1A1A;font-size:15px;\">\n                \u003cdiv style=\"background:#E4F0F3;border-radius:12px;padding:12px 15px;margin-bottom:15px;\">\n                  \u003cstrong style=\"color:#48635E;\">1. Actividad con docente\u003c/strong>\n                  \u003cp style=\"margin:5px 0 0;\">Lean (Doc. 1).\u003c/p>\n                \u003c/div>\n                \u003cdiv style=\"border:2px solid #C9D9D7;border-radius:16px;padding:18px;background:#FFFFFF;\">\n                  \u003cdiv style=\"display:inline-block;background:#C9D9D7;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:bold;\">Doc. 1\u003c/div>\n                  \u003ch3 style=\"font-size:17px;text-align:center;margin:15px 0;\">Discurso de Malala Yousafzai sobre el derecho a la educación\u003c/h3>\n                  \u003cimg src=\"files/exploracion-doc1-malala-yousafzai.png\" alt=\"Ilustración de Malala Yousafzai que acompaña el Documento 1\" style=\"display:block;width:155px;max-width:60%;height:auto;margin:10px auto 18px;\">\n                  \u003cblockquote style=\"margin:0;border-left:4px solid #9DACA7;padding:5px 0 5px 15px;\">\n                    \u003cp>«Yo creo que la única solución es ¡educación, educación y más educación!\u003c/p>\n                    \u003cp>Con esta poderosa arma podemos combatir la violencia, el terrorismo, el trabajo infantil y la desigualdad.\u003c/p>\n                    \u003cp>[…]\u003c/p>\n                    \u003cp>Es fundamental que la educación sea su principal prioridad.\u003c/p>\n                    \u003cp>Quiero vivir en un mundo donde la educación obligatoria gratuita esté al alcance de todos los niños y niñas en todas partes.\u003c/p>\n                    \u003cp>Que nadie sea olvidado».\u003c/p>\n                  \u003c/blockquote>\n                  \u003cdiv style=\"background:#F0F5F8;padding:10px;border-radius:8px;font-size:12px;margin-top:15px;\">\n                    Fuente: Amnistía Internacional (2013). Discurso de Malala: «Que nadie sea olvidado».\n                  \u003c/div>\n                \u003c/div>\n              \u003c/article>\n            "
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "1. Actividad con docente - Derecho a la educación",
+        "instruction": "Después de leer el Documento 1, respondan las siguientes preguntas.",
+        "dataA": [
+          {
+            "q": "a. ¿Qué responsabilidad consideras que debe asumir el Estado en relación con el derecho a la educación?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "b. ¿Qué responsabilidades piensas que cada individuo debe asumir para el cumplimiento del derecho a la educación?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "c. ¿Cuál es el rol de los docentes y de los estudiantes para garantizar y ejercer el derecho a la educación?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "d. ¿Cómo el derecho a la educación contribuye a crear sociedades más equitativas?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "e. ¿Qué significa el derecho a la educación para la persona y la sociedad?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu respuesta..."
+          }
+        ]
+      },
+      {
+        "type": "cv_table",
+        "title": "2. Actividad individual - Una vida digna",
+        "instruction": "Completa la tabla con la información solicitada.",
+        "dataA": {
+          "columns": [
+            "¿Qué significa tener una vida digna?",
+            "¿Cuáles son las necesidades básicas que una persona necesita solventar para tener una vida digna?",
+            "¿Quiénes deben involucrarse para garantizar que todos tengan una vida digna?"
+          ],
+          "rows": [
+            [
+              {
+                "type": "input",
+                "placeholder": "Explica qué significa vivir con dignidad..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Describe las necesidades básicas..."
+              },
+              {
+                "type": "input",
+                "placeholder": "Explica quiénes deben participar..."
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "note",
+        "title": "Actividad 2 - Socialización de respuestas",
+        "html": "\n              \u003cdiv style=\"font-family:Arial,sans-serif;background:#E4F0F3;border-radius:12px;padding:16px;color:#1A1A1A;line-height:1.6;\">\n                \u003cstrong style=\"color:#48635E;\">2. Actividad individual - Literal a\u003c/strong>\n                \u003cp style=\"margin:8px 0 0;\">a. Comparte tus respuestas con el resto de la clase y formulen conclusiones a partir de cada pregunta.\u003c/p>\n              \u003c/div>\n            "
+      }
+    ],
+    "deepen": [
+      {
+        "type": "note",
+        "title": "Conceptualización y enfoques de los derechos humanos",
+        "html": "\n              \u003carticle style=\"font-family:Arial,sans-serif;font-size:15px;line-height:1.65;color:#1A1A1A;\">\n                \u003ch2 style=\"font-size:20px;color:#48635E;margin:0 0 12px;\">Conceptualización de los derechos humanos\u003c/h2>\n                \u003cp>Existen diversas definiciones de derechos humanos que responden al momento histórico o al enfoque desde el cual se aborden.\u003c/p>\n\n                \u003cdiv style=\"background:#F0F5F8;border-radius:12px;padding:15px;margin:12px 0;\">\n                  \u003cstrong>Oficina del Alto Comisionado de las Naciones Unidas\u003c/strong>\n                  \u003cp style=\"margin:8px 0 0;\">Los derechos humanos son derechos que tiene toda persona en virtud de su dignidad humana. Asimismo, los define como garantías jurídicas universales que protegen a los individuos y a los grupos frente a las acciones que menoscaban las libertades fundamentales y la dignidad humana.\u003c/p>\n                \u003c/div>\n\n                \u003cdiv style=\"background:#F0F5F8;border-radius:12px;padding:15px;margin:12px 0;\">\n                  \u003cstrong>Comisión Nacional de los Derechos Humanos de México\u003c/strong>\n                  \u003cp style=\"margin:8px 0 0;\">Los define como el conjunto de prerrogativas sustentadas en la dignidad humana, cuya realización efectiva resulta indispensable para el desarrollo integral de la persona.\u003c/p>\n                \u003c/div>\n\n                \u003ch3 style=\"font-size:18px;color:#48635E;margin:20px 0 8px;\">Enfoques de los derechos humanos\u003c/h3>\n                \u003cp>Existen diversos enfoques para abordar los derechos humanos y la principal diferencia entre ellos es la base filosófica. Entre estos se encuentran el positivismo, que se fundamenta en el derecho, y el iusnaturalismo, que se basa en la ética y la moral.\u003c/p>\n\n                \u003cdiv style=\"background:#E4EEF8;border-radius:13px;padding:16px;margin:12px 0;\">\n                  \u003ch4 style=\"margin:0 0 8px;color:#344D4A;font-size:16px;\">Positivismo\u003c/h4>\n                  \u003cp style=\"margin:0;\">Para este enfoque es necesario definir ciertas normas, reglas, mecanismos e instrumentos a nivel nacional e internacional para promover el respeto y garantía de los derechos. En este sentido, no basta solo con el compromiso ético, sino que es necesario establecer acuerdos.\u003c/p>\n                  \u003cimg src=\"files/profundizacion-enfoque-positivismo.png\" alt=\"Ilustración del enfoque positivista de los derechos humanos\" style=\"display:block;max-width:180px;width:70%;height:auto;margin:12px auto 0;\">\n                \u003c/div>\n\n                \u003cdiv style=\"background:#FFF0DC;border-radius:13px;padding:16px;margin:12px 0;\">\n                  \u003ch4 style=\"margin:0 0 8px;color:#6F5537;font-size:16px;\">Iusnaturalismo\u003c/h4>\n                  \u003cp style=\"margin:0;\">Para este enfoque, los derechos son parte de la naturaleza del ser humano. Se sustenta, sobre todo, en los principios éticos y morales que posibilitan el respeto a los derechos y es anterior a toda norma social.\u003c/p>\n                  \u003cimg src=\"files/profundizacion-enfoque-iusnaturalismo.png\" alt=\"Ilustración del enfoque iusnaturalista de los derechos humanos\" style=\"display:block;max-width:180px;width:70%;height:auto;margin:12px auto 0;\">\n                \u003c/div>\n\n                \u003caside style=\"border-left:4px solid #9DACA7;background:#EAF1EF;padding:14px;border-radius:8px;margin-top:16px;\">\n                  \u003cstrong>Conexión ciudadana\u003c/strong>\n                  \u003cp style=\"margin:6px 0 0;\">Los sistemas legales, en su mayoría, reconocen una combinación de enfoques. Es decir, que los derechos humanos están respaldados por legislación nacional e internacional y por principios como la dignidad humana.\u003c/p>\n                  \u003cimg src=\"files/profundizacion-conexion-ciudadana-legal.png\" alt=\"Imagen sobre legislación y derechos humanos\" style=\"display:block;max-width:220px;width:75%;height:auto;margin:12px auto 0;border-radius:8px;\">\n                \u003c/aside>\n              \u003c/article>\n            "
+      },
+      {
+        "type": "note",
+        "title": "Características de los derechos humanos",
+        "html": "\n              \u003carticle style=\"font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#1A1A1A;\">\n                \u003ch2 style=\"font-size:20px;color:#48635E;margin:0 0 12px;\">Características de los derechos humanos\u003c/h2>\n                \u003cp>Las características de los derechos humanos permiten comprender la importancia de cada uno de ellos, las garantías que conllevan y el significado de los mismos.\u003c/p>\n\n                \u003cimg src=\"files/profundizacion-caracteristicas-derechos-humanos.png\" alt=\"Diagrama circular de las ocho características de los derechos humanos\" style=\"display:block;width:100%;max-width:480px;height:auto;margin:15px auto;border-radius:12px;\">\n\n                \u003cdiv style=\"display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:15px;\">\n                  \u003cdiv style=\"padding:12px;background:#E5F1F8;border-radius:11px;\">\n                    \u003cstrong>Universales\u003c/strong>\n                    \u003cp style=\"font-size:13px;margin:6px 0 0;\">Los derechos aplican para todas las personas sin distinción alguna.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"padding:12px;background:#FBE3DD;border-radius:11px;\">\n                    \u003cstrong>Inviolables\u003c/strong>\n                    \u003cp style=\"font-size:13px;margin:6px 0 0;\">Los derechos deben ser respetados y protegidos por todos.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"padding:12px;background:#EAE2F2;border-radius:11px;\">\n                    \u003cstrong>Imprescriptibles\u003c/strong>\n                    \u003cp style=\"font-size:13px;margin:6px 0 0;\">No tienen caducidad o fecha de vencimiento, duran para toda la vida.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"padding:12px;background:#FDEED9;border-radius:11px;\">\n                    \u003cstrong>Irrenunciables\u003c/strong>\n                    \u003cp style=\"font-size:13px;margin:6px 0 0;\">Nadie puede renunciar a ellos ni siquiera por propia voluntad; por ello son también intransferibles.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"padding:12px;background:#E9F0DC;border-radius:11px;\">\n                    \u003cstrong>Progresivos\u003c/strong>\n                    \u003cp style=\"font-size:13px;margin:6px 0 0;\">Los avances en su reconocimiento no pueden eliminarse o restringirse posteriormente.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"padding:12px;background:#F4E3EB;border-radius:11px;\">\n                    \u003cstrong>Interdependientes\u003c/strong>\n                    \u003cp style=\"font-size:13px;margin:6px 0 0;\">El avance de uno favorece a los demás, mientras que la privación de uno perjudica al ejercicio del resto.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"padding:12px;background:#E0E9F9;border-radius:11px;\">\n                    \u003cstrong>Indivisibles\u003c/strong>\n                    \u003cp style=\"font-size:13px;margin:6px 0 0;\">Los derechos humanos no pueden jerarquizarse, todos son igualmente importantes.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"padding:12px;background:#FFF0DC;border-radius:11px;\">\n                    \u003cstrong>Intrínsecos\u003c/strong>\n                    \u003cp style=\"font-size:13px;margin:6px 0 0;\">Los tienen todas las personas desde el momento de la concepción y le acompañan toda su vida.\u003c/p>\n                  \u003c/div>\n                \u003c/div>\n              \u003c/article>\n            "
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "3. Actividad en pares - Derechos humanos",
+        "instruction": "Desarrollen la habilidad de convivencia e interacción social. Para ello, resuelvan:",
+        "dataA": [
+          {
+            "q": "a. Formulen una definición de derechos humanos con la información disponible y sus consideraciones.",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Escriban su definición..."
+          },
+          {
+            "q": "b. Argumenten la importancia de los enfoques de derechos humanos.",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Desarrollen su argumento..."
+          },
+          {
+            "q": "c. Indaguen e identifiquen casos que ejemplifiquen una de las características de los derechos humanos.",
+            "minLength": 16,
+            "rows": 6,
+            "placeholder": "Describan los casos investigados..."
+          }
+        ]
+      },
+      {
+        "type": "note",
+        "title": "Principios fundamentales de los derechos humanos",
+        "html": "\n              \u003carticle style=\"font-family:Arial,sans-serif;font-size:15px;line-height:1.65;color:#1A1A1A;\">\n                \u003ch2 style=\"font-size:20px;color:#48635E;margin:0 0 12px;\">Principios fundamentales de los derechos humanos\u003c/h2>\n                \u003cp>De acuerdo con la etapa histórica en que son reconocidos, los derechos humanos se clasifican en grupos o generaciones. Los derechos humanos se han basado en principios que conforman a cada uno de los grupos o generaciones.\u003c/p>\n\n                \u003cp>El grupo de derechos civiles y políticos tiene como antecedente la Revolución francesa; el grupo de derechos económicos, sociales y culturales tiene diferentes contextos de referencia, entre ellos, la Revolución mexicana y la Revolución rusa. Los derechos de tercera generación fundamentan su origen en la finalización de la Segunda Guerra Mundial. Con la creación del sistema internacional de promoción y protección que es la Organización de las Naciones Unidas (ONU), se promulga la Declaración Universal de los Derechos Humanos e inicia el reconocimiento a nivel internacional y nacional de los derechos. De la misma forma, los de cuarta generación obedecen al nuevo contexto de la era digital.\u003c/p>\n\n                \u003cdiv style=\"overflow-x:auto;margin:16px 0;\">\n                  \u003ctable style=\"width:100%;border-collapse:collapse;font-size:13px;min-width:500px;\">\n                    \u003cthead>\n                      \u003ctr style=\"background:#C9D9D7;\">\n                        \u003cth style=\"border:1px solid #9DACA7;padding:11px;text-align:left;\">Grupo de derechos\u003c/th>\n                        \u003cth style=\"border:1px solid #9DACA7;padding:11px;text-align:left;\">Principio\u003c/th>\n                        \u003cth style=\"border:1px solid #9DACA7;padding:11px;text-align:left;\">Fundamentación filosófica\u003c/th>\n                      \u003c/tr>\n                    \u003c/thead>\n                    \u003ctbody>\n                      \u003ctr>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;background:#F0F5F8;\">Derechos civiles y políticos\u003c/td>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;\">\u003cstrong>Libertad\u003c/strong>\u003c/td>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;\">Este grupo de derechos es de carácter individual. Por ello, el principio que los sustenta es la libertad en lo civil y en lo político. Este grupo representa la primera generación de derechos reconocidos.\u003c/td>\n                      \u003c/tr>\n                      \u003ctr>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;background:#F0F5F8;\">Derechos económicos, sociales y culturales\u003c/td>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;\">\u003cstrong>Igualdad\u003c/strong>\u003c/td>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;\">Corresponden a la segunda generación de derechos y son de carácter grupal. En función de ello, el principio que sustenta el ejercicio de estos derechos es el de igualdad.\u003c/td>\n                      \u003c/tr>\n                      \u003ctr>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;background:#F0F5F8;\">Derechos de solidaridad\u003c/td>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;\">\u003cstrong>Solidaridad\u003c/strong>\u003c/td>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;\">Este grupo de derechos tiene su base en la solidaridad y en la capacidad del diálogo entre naciones, grupos o pueblos de diversas culturas. Surgen en el contexto de recuperación después de la Segunda Guerra Mundial y también incorporan los derechos de grupos desfavorecidos, como las personas con discapacidad, las mujeres, la niñez, grupos étnicos, entre otros.\u003c/td>\n                      \u003c/tr>\n                      \u003ctr>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;background:#F0F5F8;\">Derechos de cuarta generación\u003c/td>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;\">\u003cstrong>Participación\u003c/strong>\u003c/td>\n                        \u003ctd style=\"border:1px solid #9DACA7;padding:10px;\">En la era de la información surge la necesidad de asegurar el acceso equitativo de todos al goce de los avances científicos en los diversos ámbitos.\u003c/td>\n                      \u003c/tr>\n                    \u003c/tbody>\n                  \u003c/table>\n                \u003c/div>\n\n                \u003cdiv style=\"background:#EAF1EF;border-left:4px solid #9DACA7;border-radius:8px;padding:14px;\">\n                  Esta división en generaciones o grupos es importante para comprender el contexto y las luchas sociales vinculadas en las cuales se reconocen los derechos humanos. En la práctica, los derechos humanos no pueden dividirse, categorizarse ni jerarquizarse porque todos responden a una garantía invulnerable para los individuos y las sociedades.\n                \u003c/div>\n              \u003c/article>\n            "
+      },
+      {
+        "type": "note",
+        "title": "Los derechos económicos, sociales y culturales",
+        "html": "\n              \u003carticle style=\"font-family:Arial,sans-serif;font-size:15px;line-height:1.65;color:#1A1A1A;\">\n                \u003ch2 style=\"font-size:20px;color:#48635E;margin:0 0 12px;\">Los derechos económicos, sociales y culturales\u003c/h2>\n\n                \u003cp>Al hablar de derechos económicos, sociales y culturales, la Declaración Universal de Derechos Humanos afirma que «la libertad, la justicia y la paz en un mundo tienen por base el reconocimiento de la dignidad intrínseca y de los derechos iguales a inalienables de todos los miembros de la familia humana». Estos principios son la base en la cual estos derechos humanos se sustentan.\u003c/p>\n\n                \u003cp>Los derechos económicos, sociales y culturales contemplan garantías para tener una vida digna. Entre los principales, se encuentran:\u003c/p>\n\n                \u003cdiv style=\"display:flex;flex-direction:column;gap:9px;margin:14px 0;\">\n                  \u003cdiv style=\"background:#EAF1EF;padding:12px;border-radius:10px;\">\n                    \u003cstrong>Derecho a la alimentación\u003c/strong>\n                    \u003cp style=\"margin:4px 0 0;\">Toda persona debe tener acceso a una alimentación de calidad y suficiente para su bienestar.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#EAF1EF;padding:12px;border-radius:10px;\">\n                    \u003cstrong>Derecho a la salud\u003c/strong>\n                    \u003cp style=\"margin:4px 0 0;\">Toda persona debe tener acceso a un sistema de atención médica para su bienestar físico y mental.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#EAF1EF;padding:12px;border-radius:10px;\">\n                    \u003cstrong>Derecho a la educación\u003c/strong>\n                    \u003cp style=\"margin:4px 0 0;\">Toda persona merece oportunidades de educación para su desarrollo.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#EAF1EF;padding:12px;border-radius:10px;\">\n                    \u003cstrong>Derecho a la seguridad social\u003c/strong>\n                    \u003cp style=\"margin:4px 0 0;\">Toda persona debe estar respaldada en momentos de necesidad como la vejez, ante accidentes, entre otros.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#EAF1EF;padding:12px;border-radius:10px;\">\n                    \u003cstrong>Derecho al agua\u003c/strong>\n                    \u003cp style=\"margin:4px 0 0;\">Toda persona debe tener garantizado el acceso a agua y saneamiento.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#EAF1EF;padding:12px;border-radius:10px;\">\n                    \u003cstrong>Derecho al trabajo\u003c/strong>\n                    \u003cp style=\"margin:4px 0 0;\">Toda persona tiene derecho a oportunidades y condiciones de trabajo justas.\u003c/p>\n                  \u003c/div>\n                \u003c/div>\n\n                \u003cp>Otros aspectos para tener una vida digna son: vivir en un ambiente saludable, participar de la vida cultural, la integración a la sociedad en igualdad de oportunidades, entre otras. Todos estos factores contribuyen a la conformación de sociedades más equitativas y prósperas.\u003c/p>\n\n                \u003cp>La responsabilidad que conllevan estas aspiraciones no solo se limita a los Gobiernos y los organismos internacionales, quienes son los principales garantes de cumplimiento; la ciudadanía debe conocer y exigir sus derechos, al tiempo que debe asumir sus responsabilidades. Esto quiere decir que cada uno debe contribuir y participar desde su entorno de incidencia, como la escuela, la localidad, la familia, entre otros, para construir una vida digna.\u003c/p>\n\n                \u003caside style=\"background:#E4F0F3;border-radius:12px;padding:14px;margin-top:15px;\">\n                  \u003cstrong>Conexión ciudadana\u003c/strong>\n                  \u003cp style=\"margin:7px 0;\">Según datos de la Unesco, para el año 2022 alrededor de 258 millones de niños no tenían acceso a la educación por causas sociales, económicas o culturales.\u003c/p>\n                  \u003cimg src=\"files/profundizacion-conexion-ciudadana-educacion.png\" alt=\"Imagen de estudiante trabajando en su cuaderno\" style=\"display:block;max-width:260px;width:100%;height:auto;object-fit:cover;border-radius:9px;margin:12px auto 0;\">\n                \u003c/aside>\n              \u003c/article>\n            "
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "4. Actividad con docente - Investigación sobre derechos",
+        "instruction": "Desarrollen la habilidad de participación activa y responsable. Para ello:",
+        "dataA": [
+          {
+            "q": "a. Organicen equipos y seleccionen un derecho de los mencionados.",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escriban el derecho seleccionado por el equipo..."
+          },
+          {
+            "q": "b. Indaguen sobre el derecho correspondiente:\n• Principales desafíos que enfrenta para su cumplimiento a nivel mundial.\n• Logros que se han alcanzado para el cumplimiento a nivel mundial.",
+            "minLength": 16,
+            "rows": 8,
+            "placeholder": "Presenten los principales desafíos y logros investigados..."
+          },
+          {
+            "q": "c. Elaboren propuestas para el cumplimiento del derecho desde su entorno inmediato y presenten los resultados a través de una producción audiovisual.",
+            "minLength": 16,
+            "rows": 8,
+            "placeholder": "Describan las propuestas que presentarán en su producción audiovisual..."
+          }
+        ]
+      },
+      {
+        "type": "note",
+        "title": "Indicadores de una mejor calidad de vida",
+        "html": "\n              \u003carticle style=\"font-family:Arial,sans-serif;font-size:15px;line-height:1.65;color:#1A1A1A;\">\n                \u003ch2 style=\"font-size:20px;color:#48635E;margin:0 0 12px;\">Indicadores de una mejor calidad de vida\u003c/h2>\n\n                \u003cp>Las personas mejoran su calidad de vida por medio de la satisfacción de sus necesidades básicas y el fortalecimiento de las capacidades que les permitan el bienestar duradero. Para que esto sea posible es necesario que se cumplan y garanticen los derechos humanos, ya que si un país quiere entrar en ese proceso de desarrollo es importante que la ciudadanía sea parte de los esfuerzos y que se incluya en los planes y acciones que el Estado establezca para tal fin, de modo que las condiciones sociales, culturales, políticas, económicas y ambientales sean favorables para todos.\u003c/p>\n\n                \u003ch3 style=\"font-size:18px;color:#48635E;margin:20px 0 10px;\">Índice de Desarrollo Humano (IDH)\u003c/h3>\n\n                \u003cp>El Índice de Desarrollo Humano (IDH) es un indicador elaborado por el Programa de las Naciones Unidas para el Desarrollo (PNUD) que busca medir el desarrollo humano de un país. Este parámetro mide varias dimensiones de cada nación, con el propósito de comprender el estado actual y que esto sirva para tomar decisiones que contribuyan a mejorar de la calidad de vida de la ciudadanía.\u003c/p>\n\n                \u003cdiv style=\"border:1px solid #C9D9D7;border-radius:13px;overflow:hidden;margin:15px 0;\">\n                  \u003cdiv style=\"background:#EAF2F9;padding:14px;\">\n                    \u003cimg src=\"files/profundizacion-idh-salud.png\" alt=\"Ilustración del área de salud en los indicadores de calidad de vida\" style=\"display:block;width:100%;max-width:250px;height:auto;margin:0 auto 12px;\">\n                    \u003cstrong style=\"color:#344D4A;\">Salud\u003c/strong>\n                    \u003cp style=\"margin:6px 0 0;\">Se destacan criterios como la esperanza de vida al nacer, la tasa de mortalidad materna, la desigualdad en la esperanza de vida, el acceso a servicios de salud, el control de enfermedades, entre otros.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#F0F5F8;padding:14px;\">\n                    \u003cimg src=\"files/profundizacion-idh-economia.png\" alt=\"Ilustración del área de economía\" style=\"display:block;width:100%;max-width:250px;height:auto;margin:0 auto 12px;\">\n                    \u003cstrong style=\"color:#344D4A;\">Economía\u003c/strong>\n                    \u003cp style=\"margin:6px 0 0;\">Se agrupan elementos como el ingreso per cápita y el índice de empleo y desempleo.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#EAF2F9;padding:14px;\">\n                    \u003cimg src=\"files/profundizacion-idh-educacion.png\" alt=\"Ilustración de libros y materiales educativos\" style=\"display:block;width:100%;max-width:250px;height:auto;margin:0 auto 12px;\">\n                    \u003cstrong style=\"color:#344D4A;\">Educación\u003c/strong>\n                    \u003cp style=\"margin:6px 0 0;\">Se evalúan aspectos como la tasa de escolaridad, los niveles de escolaridad alcanzados, el acceso a la educación, entre otros.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#F0F5F8;padding:14px;\">\n                    \u003cimg src=\"files/profundizacion-idh-ambiente.png\" alt=\"Ilustración del área ambiental\" style=\"display:block;width:100%;max-width:250px;height:auto;margin:0 auto 12px;\">\n                    \u003cstrong style=\"color:#344D4A;\">Ambiente\u003c/strong>\n                    \u003cp style=\"margin:6px 0 0;\">Se miden emisiones de dióxido de carbono, huella material, producción agroecológica, uso de energías alternativas, protección de los ecosistemas.\u003c/p>\n                  \u003c/div>\n                \u003c/div>\n\n                \u003caside style=\"background:#EAE4F0;border-left:4px solid #9DACA7;border-radius:9px;padding:14px;\">\n                  \u003cstrong>Glosario: Ingreso per cápita\u003c/strong>\n                  \u003cp>Es un indicador económico que sirve para medir los ingresos de la población. Usualmente se estima en términos anuales.\u003c/p>\n                  \u003cdiv style=\"background:#FFFFFF;border-radius:8px;padding:11px;text-align:center;font-weight:bold;font-size:13px;\">Ingreso per cápita = ingreso total / población\u003c/div>\n                \u003c/aside>\n              \u003c/article>\n            "
+      },
+      {
+        "type": "note",
+        "title": "El derecho a la educación como una dimensión necesaria para una vida digna",
+        "html": "\n              \u003carticle style=\"font-family:Arial,sans-serif;font-size:15px;line-height:1.65;color:#1A1A1A;\">\n                \u003ch2 style=\"font-size:20px;color:#48635E;margin:0 0 12px;\">El derecho a la educación como una dimensión necesaria para una vida digna\u003c/h2>\n\n                \u003cp>La educación es una herramienta que permite a niños, jóvenes y adultos generar cambios sustanciales en las condiciones de vida (Doc. 2). Para garantizar el derecho a la educación es necesario implementar un marco jurídico que proteja y vigile el cumplimiento de este derecho.\u003c/p>\n\n                \u003cdiv style=\"border:2px solid #C9D9D7;border-radius:13px;padding:16px;margin:16px 0;\">\n                  \u003cdiv style=\"display:inline-block;border-radius:20px;background:#C9D9D7;padding:5px 12px;font-size:12px;font-weight:bold;\">Doc. 2\u003c/div>\n                  \u003ch3 style=\"font-size:17px;text-align:center;margin:13px 0;\">La importancia del derecho a la educación\u003c/h3>\n\n                  \u003cp>La DUDH (Declaración Universal de los Derechos Humanos) […] le otorga a la educación una finalidad, la cual consiste, nada menos que, en el pleno desarrollo de la personalidad, el respeto a los derechos humanos y las libertades fundamentales. Si bien todos los derechos son indivisibles e interdependientes, la identificación de ciertos objetivos como parte integral del derecho a la educación lo convierte en un derecho que, más allá de su contenido específico, tiene importantes implicaciones para el disfrute de los demás derechos.\u003c/p>\n\n                  \u003cimg src=\"files/profundizacion-doc2-derecho-educacion.png\" alt=\"Fotografía de estudiantes en un salón de clases que acompaña al Documento 2\" style=\"display:block;width:100%;max-width:360px;height:auto;margin:12px auto;border-radius:10px;\">\n\n                  \u003cp style=\"font-size:12px;background:#F0F5F8;padding:9px;border-radius:7px;margin:12px 0 0;\">Fuente: Bolívar, L. (2010). El derecho a la educación.\u003c/p>\n                \u003c/div>\n\n                \u003cp>Para el cumplimiento de este derecho es necesario que la educación cuente con las siguientes garantías estatales:\u003c/p>\n\n                \u003cdiv style=\"display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:15px;\">\n                  \u003cdiv style=\"background:#FFF0DC;border-radius:12px;padding:13px;\">\n                    \u003ch4 style=\"font-size:15px;margin:0 0 8px;\">Disponibilidad\u003c/h4>\n                    \u003cp style=\"font-size:13px;margin:0;\">Implica la universalidad, la gratuidad y las condiciones necesarias.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#E5F0FC;border-radius:12px;padding:13px;\">\n                    \u003ch4 style=\"font-size:15px;margin:0 0 8px;\">Accesibilidad\u003c/h4>\n                    \u003cp style=\"font-size:13px;margin:0;\">Debe ser viable para todos: sin discriminación, al alcance de todas las personas y accesible desde la localidad o la virtualidad.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#E6E8F7;border-radius:12px;padding:13px;\">\n                    \u003ch4 style=\"font-size:15px;margin:0 0 8px;\">Aceptabilidad\u003c/h4>\n                    \u003cp style=\"font-size:13px;margin:0;\">Debe establecer estándares que aseguren la calidad de la educación.\u003c/p>\n                  \u003c/div>\n                  \u003cdiv style=\"background:#FBE3DD;border-radius:12px;padding:13px;\">\n                    \u003ch4 style=\"font-size:15px;margin:0 0 8px;\">Adaptabilidad\u003c/h4>\n                    \u003cp style=\"font-size:13px;margin:0;\">Implica la inclusión de niños con discapacidades, minorías, entre otros. Además, requiere abordar los derechos humanos de manera integral.\u003c/p>\n                  \u003c/div>\n                \u003c/div>\n              \u003c/article>\n            "
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "5. Actividad individual - Educación y vida digna",
+        "instruction": "Desarrolla la habilidad de convivencia e interacción social. Responde:",
+        "dataA": [
+          {
+            "q": "a. ¿Qué otras dimensiones deben incluirse para considerar el cumplimiento de los derechos económicos, sociales y culturales?",
+            "minLength": 16,
+            "rows": 6,
+            "placeholder": "Desarrolla tu respuesta..."
+          },
+          {
+            "q": "b. ¿Cuál es el impacto de la educación en el desarrollo de la persona?",
+            "minLength": 16,
+            "rows": 6,
+            "placeholder": "Explica el impacto de la educación..."
+          }
+        ]
+      }
+    ],
+    "consolidate": [
+      {
+        "type": "note",
+        "title": "Actividad 6 - Documento 3: Los derechos económicos, sociales y culturales en Kenia",
+        "html": "\n              \u003carticle style=\"font-family:Arial,sans-serif;font-size:15px;line-height:1.65;color:#1A1A1A;\">\n                \u003cdiv style=\"background:#FFF0DC;border-radius:12px;padding:13px;margin-bottom:15px;\">\n                  \u003cstrong style=\"color:#795D39;\">6. Actividad en pares\u003c/strong>\n                  \u003cp style=\"margin:5px 0 0;\">Lean (Doc. 3).\u003c/p>\n                \u003c/div>\n\n                \u003cdiv style=\"border:2px solid #E8D6B7;border-radius:16px;padding:18px;background:#FFFAF2;\">\n                  \u003cspan style=\"display:inline-block;background:#F0D6A2;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:bold;\">Doc. 3\u003c/span>\n\n                  \u003ch3 style=\"font-size:18px;text-align:center;margin:16px 0;\">Los derechos económicos, sociales y culturales en Kenia\u003c/h3>\n\n                  \u003cp>En agosto de 2010, la gran mayoría (casi dos tercios) de los participantes en el referéndum votaron a favor de la aprobación de una nueva Constitución. La declaración de derechos de esta Constitución garantiza los derechos económicos, sociales y culturales, entre ellos los derechos a alimentación, vivienda, saneamiento, agua, salud, educación y seguridad social en tanto que derechos exigibles. Por primera vez la ciudadanía tiene acceso en Kenia a recursos judiciales y puede hacer rendir cuentas al Gobierno por violaciones de esos derechos.\u003c/p>\n\n                  \u003cp>[…] Sin embargo, hubo un momento en que las posibilidades de conseguir su inclusión definitiva no fueron seguras. En enero de 2010, el comité parlamentario especial para la Constitución eliminó del proyecto los derechos económicos, sociales y culturales en tanto que derechos exigibles. […] Las organizaciones de la sociedad civil […] mostraron públicamente su enérgica protesta por este cambio. También captaron apoyos en el comité independiente de expertos encargado de revisar el proyecto tras los cambios del comité parlamentario especial. El comité de expertos decidió mantener los derechos económicos, sociales y culturales en la Constitución en tanto que derechos exigibles, y ningún legislador hizo ya ningún intento de eliminarlos.\u003c/p>\n\n                  \u003cdiv style=\"background:#FFFFFF;border-radius:9px;padding:11px;font-size:12px;border-left:4px solid #E8D6B7;margin-top:15px;\">\n                    Fuente: Amnistía Internacional (2014). «Kenia: garantías constitucionales», en \u003cem>Derechos humanos para la dignidad humana\u003c/em>.\n                  \u003c/div>\n                \u003c/div>\n              \u003c/article>\n            "
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "6. Actividad en pares - Análisis del caso de Kenia",
+        "instruction": "Después de leer el Documento 3, respondan las siguientes preguntas.",
+        "dataA": [
+          {
+            "q": "¿Qué significa que la ciudadanía en Kenia pueda contar con garantías constitucionales para los derechos económicos, sociales y culturales?",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Escriban su análisis..."
+          },
+          {
+            "q": "¿Cuál es la importancia de legitimar el cumplimiento de los derechos humanos a través de la legislación, tanto nacional como internacional?",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Expliquen su importancia..."
+          },
+          {
+            "q": "¿Qué beneficios conlleva para la población la garantía de estos derechos humanos?",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Describan los beneficios..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "7. Actividad con docente - Reflexión final",
+        "instruction": "Respondan:",
+        "dataA": [
+          {
+            "q": "a. ¿Qué relación existe entre los derechos humanos y las garantías de una vida digna?",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Explica la relación..."
+          },
+          {
+            "q": "b. ¿Cuáles son los principales desafíos que enfrenta el cumplimiento de los derechos humanos en la actualidad?",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Describe los principales desafíos..."
+          },
+          {
+            "q": "c. ¿Por qué es importante garantizar el cumplimiento de los derechos humanos desde las diferentes entidades que los protegen?",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Explica por qué es importante..."
+          },
+          {
+            "q": "d. ¿Qué iniciativas pueden impulsar para defender los derechos humanos en la vida cotidiana?",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Propón iniciativas para defender los derechos humanos..."
+          }
+        ]
+      }
+    ]
+  },
+  "game": {
+    "type": "pills",
+    "winScore": 300
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
