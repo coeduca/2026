@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"2c181e64-b2c9-461f-98ef-fafd2824befe","token":"22937264-2edf-4472-b5f2-e00d20663d12"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Present Perfect - For, Since, How long...</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "554bcd9c-6cb0-4ee4-8ec7-126d7dd0555d",
+  "container": "#app",
+  "topic": "Present Perfect - For, Since, How long...",
+  "level": "1er Año de Bach., 2do Año de Bach., Noveno",
+  "pdfDesign": "PopArt",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#146A5B",
+    "accent": "#43B069",
+    "bg": "#638AB5",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Grammar Time! Present Perfect",
+      "html": "\u003csection style=\"font-family:Arial,sans-serif;color:#1A1A1A;line-height:1.6;max-width:100%;\">\u003cheader style=\"background:#146A5B;color:#FFFFFF;padding:18px;border-radius:15px 15px 5px 5px;text-align:center;\">\u003cdiv style=\"font-size:12px;font-weight:700;letter-spacing:2px;color:#B9F5C7;\">ENGLISH GRAMMAR\u003c/div>\u003ch2 style=\"font-size:24px;line-height:1.2;margin:8px 0;\">Present Perfect\u003c/h2>\u003cp style=\"margin:5px 0;font-size:16px;font-weight:700;\">FOR · SINCE · HOW LONG\u003c/p>\u003c/header>\u003cdiv style=\"padding:15px 5px;\">\u003cp style=\"margin:0 0 12px;\">Usamos el \u003cstrong>Present Perfect\u003c/strong> para hablar de situaciones que comenzaron en el pasado y continúan en el presente.\u003c/p>\u003cdiv style=\"background:#C9DBE9;border-left:5px solid #146A5B;padding:12px;border-radius:8px;margin-bottom:15px;\">\u003cstrong>Structure\u003c/strong>\u003cdiv style=\"font-size:17px;font-weight:700;text-align:center;margin:8px 0;\">Subject + have/has + past participle\u003c/div>\u003cdiv style=\"font-size:13px;text-align:center;\">I / You / We / They → have\u003cbr>He / She / It → has\u003c/div>\u003c/div>\u003cdiv style=\"display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;\">\u003carticle style=\"flex:1 1 135px;min-width:0;background:#E7F7EB;border:2px solid #43B069;border-radius:12px;padding:12px;\">\u003ch3 style=\"color:#146A5B;margin:0 0 5px;font-size:19px;\">FOR\u003c/h3>\u003cstrong>Duration\u003c/strong>\u003cp style=\"font-size:13px;margin:5px 0;\">Indica cuánto tiempo ha durado una situación.\u003c/p>\u003cp style=\"margin:7px 0 0;font-size:14px;\">\u003cstrong>for two years\u003c/strong>\u003cbr>for three days\u003cbr>for an hour\u003c/p>\u003c/article>\u003carticle style=\"flex:1 1 135px;min-width:0;background:#E8F0F8;border:2px solid #638AB5;border-radius:12px;padding:12px;\">\u003ch3 style=\"color:#146A5B;margin:0 0 5px;font-size:19px;\">SINCE\u003c/h3>\u003cstrong>Starting point\u003c/strong>\u003cp style=\"font-size:13px;margin:5px 0;\">Indica desde cuándo comenzó una situación.\u003c/p>\u003cp style=\"margin:7px 0 0;font-size:14px;\">\u003cstrong>since 2022\u003c/strong>\u003cbr>since Monday\u003cbr>since January\u003c/p>\u003c/article>\u003c/div>\u003carticle style=\"background:#146A5B;color:#FFFFFF;padding:13px;border-radius:12px;margin-bottom:14px;\">\u003ch3 style=\"font-size:19px;margin:0 0 5px;\">HOW LONG...?\u003c/h3>\u003cp style=\"margin:0;font-size:14px;\">Significa \u003cstrong>¿Cuánto tiempo...?\u003c/strong> y sirve para preguntar por la duración.\u003c/p>\u003cp style=\"background:#FFFFFF;color:#146A5B;padding:9px;border-radius:7px;font-weight:700;font-size:14px;margin:10px 0 0;text-align:center;\">How long + have/has + subject + past participle...?\u003c/p>\u003c/article>\u003ch3 style=\"color:#146A5B;margin:12px 0 8px;font-size:18px;\">Examples\u003c/h3>\u003cdiv style=\"background:#F1F6FA;border-radius:10px;padding:12px;font-size:14px;\">\u003cp style=\"margin:0 0 10px;\">\u003cstrong>1. I have studied English for three years.\u003c/strong>\u003cbr>\u003cspan style=\"color:#526273;\">He estudiado inglés durante tres años.\u003c/span>\u003c/p>\u003cp style=\"margin:0 0 10px;\">\u003cstrong>2. She has lived here since 2022.\u003c/strong>\u003cbr>\u003cspan style=\"color:#526273;\">Ella vive aquí desde 2022.\u003c/span>\u003c/p>\u003cp style=\"margin:0;\">\u003cstrong>3. How long have you known your best friend?\u003c/strong>\u003cbr>\u003cspan style=\"color:#526273;\">¿Cuánto tiempo llevas conociendo a tu mejor amigo?\u003c/span>\u003c/p>\u003c/div>\u003cdiv style=\"background:#E7F7EB;border-radius:10px;padding:12px;margin-top:14px;font-size:14px;\">\u003cstrong style=\"color:#146A5B;\">Remember!\u003c/strong>\u003cp style=\"margin:5px 0 0;\">\u003cstrong>FOR\u003c/strong> = duración (two months).\u003cbr>\u003cstrong>SINCE\u003c/strong> = punto de inicio (May).\u003cbr>\u003cstrong>HOW LONG\u003c/strong> = pregunta por el tiempo.\u003c/p>\u003c/div>\u003c/div>\u003c/section>"
+    },
+    {
+      "type": "categorize",
+      "title": "1. For or Since?",
+      "instruction": "Clasifica las expresiones de tiempo. Recuerda: FOR indica duración y SINCE indica cuándo comenzó algo.",
+      "dataA": {
+        "categories": [
+          "FOR",
+          "SINCE"
+        ],
+        "items": [
+          {
+            "text": "two years",
+            "cat": 0
+          },
+          {
+            "text": "Monday",
+            "cat": 1
+          },
+          {
+            "text": "three months",
+            "cat": 0
+          },
+          {
+            "text": "2020",
+            "cat": 1
+          },
+          {
+            "text": "an hour",
+            "cat": 0
+          },
+          {
+            "text": "last summer",
+            "cat": 1
+          },
+          {
+            "text": "five days",
+            "cat": 0
+          },
+          {
+            "text": "January",
+            "cat": 1
+          },
+          {
+            "text": "a long time",
+            "cat": 0
+          },
+          {
+            "text": "yesterday",
+            "cat": 1
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "FOR",
+          "SINCE"
+        ],
+        "items": [
+          {
+            "text": "six weeks",
+            "cat": 0
+          },
+          {
+            "text": "2018",
+            "cat": 1
+          },
+          {
+            "text": "twenty minutes",
+            "cat": 0
+          },
+          {
+            "text": "Friday",
+            "cat": 1
+          },
+          {
+            "text": "ten years",
+            "cat": 0
+          },
+          {
+            "text": "last Christmas",
+            "cat": 1
+          },
+          {
+            "text": "four hours",
+            "cat": 0
+          },
+          {
+            "text": "September",
+            "cat": 1
+          },
+          {
+            "text": "seven days",
+            "cat": 0
+          },
+          {
+            "text": "this morning",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "matchimage",
+      "title": "2. Match the Pictures!",
+      "instruction": "Relaciona cada oración en Present Perfect con la imagen que representa la actividad descrita.",
+      "dataA": [
+        {
+          "word": "He has played basketball for three years.",
+          "image": "files/boy-playing-basketball.png"
+        },
+        {
+          "word": "She has read books since childhood.",
+          "image": "files/girl-reading-books.png"
+        },
+        {
+          "word": "He has cooked for his family for years.",
+          "image": "files/man-cooking-food.png"
+        },
+        {
+          "word": "She has played the guitar since 2021.",
+          "image": "files/woman-playing-guitar.png"
+        },
+        {
+          "word": "They have studied English for two years.",
+          "image": "files/students-learning-english.png"
+        },
+        {
+          "word": "They have lived in this house since 2019.",
+          "image": "files/family-in-front-of-house.png"
+        },
+        {
+          "word": "He has ridden a bicycle since he was six.",
+          "image": "files/child-riding-bicycle.png"
+        },
+        {
+          "word": "She has taken photos for five years.",
+          "image": "files/girl-taking-photos.png"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "They have practiced dancing for six months.",
+          "image": "files/students-practicing-dance.png"
+        },
+        {
+          "word": "He has swum since he was eight.",
+          "image": "files/boy-swimming-in-pool.png"
+        },
+        {
+          "word": "She has painted pictures for four years.",
+          "image": "files/woman-painting-picture.png"
+        },
+        {
+          "word": "He has run every morning since January.",
+          "image": "files/man-running-in-park.png"
+        },
+        {
+          "word": "She has played the piano for two years.",
+          "image": "files/child-playing-piano.png"
+        },
+        {
+          "word": "She has worked at a bakery since 2022.",
+          "image": "files/woman-working-in-bakery.png"
+        },
+        {
+          "word": "They have played chess for three hours.",
+          "image": "files/teenagers-playing-chess.png"
+        },
+        {
+          "word": "He has grown vegetables since last year.",
+          "image": "files/boy-gardening-vegetables.png"
+        }
+      ]
+    },
+    {
+      "type": "multiplechoice",
+      "title": "3. Choose the Correct Answer",
+      "instruction": "Lee cada oración o pregunta y selecciona la opción que completa correctamente la estructura.",
+      "dataA": [
+        {
+          "q": "She has lived here ___ 2021.",
+          "options": [
+            "for",
+            "since",
+            "how long"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "We have waited ___ thirty minutes.",
+          "options": [
+            "since",
+            "for",
+            "how long"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "___ have you known Ana?",
+          "options": [
+            "When",
+            "How long",
+            "What time"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "How long ___ he studied English?",
+          "options": [
+            "have",
+            "has",
+            "is"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "I ___ worked here for two years.",
+          "options": [
+            "has",
+            "am",
+            "have"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "They have been friends ___ childhood.",
+          "options": [
+            "since",
+            "for",
+            "during"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "My sister has had this phone ___ six months.",
+          "options": [
+            "since",
+            "for",
+            "from"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "___ your parents lived in San Miguel since 2019?",
+          "options": [
+            "Has",
+            "Do",
+            "Have"
+          ],
+          "answer": 2
+        }
+      ],
+      "dataB": [
+        {
+          "q": "He has owned his bicycle ___ March.",
+          "options": [
+            "since",
+            "for",
+            "how long"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "They have practiced ___ three weeks.",
+          "options": [
+            "since",
+            "for",
+            "from"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "___ has your cousin played chess?",
+          "options": [
+            "How long",
+            "Where",
+            "Who"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "How long ___ she worked at the bakery?",
+          "options": [
+            "has",
+            "have",
+            "does"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "You ___ studied for an hour.",
+          "options": [
+            "has",
+            "have",
+            "are"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "We have known our neighbor ___ 2020.",
+          "options": [
+            "during",
+            "since",
+            "for"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "They have stayed here ___ two days.",
+          "options": [
+            "since",
+            "from",
+            "for"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "___ your teacher taught at this school since 2018?",
+          "options": [
+            "Does",
+            "Has",
+            "Have"
+          ],
+          "answer": 1
+        }
+      ]
+    },
+    {
+      "type": "matchlines",
+      "title": "4. How Long? Match Questions and Answers",
+      "instruction": "Une cada pregunta con su respuesta correspondiente. Observa el sujeto, la actividad y las expresiones FOR y SINCE.",
+      "dataA": [
+        {
+          "left": "How long have you lived in this town?",
+          "right": "I have lived here for ten years."
+        },
+        {
+          "left": "How long has Sara studied French?",
+          "right": "She has studied French since 2022."
+        },
+        {
+          "left": "How long have they been married?",
+          "right": "They have been married for five years."
+        },
+        {
+          "left": "How long has David worked at the hospital?",
+          "right": "He has worked there since January."
+        },
+        {
+          "left": "How long have you had your laptop?",
+          "right": "I have had it for six months."
+        },
+        {
+          "left": "How long has your brother played the drums?",
+          "right": "He has played them since 2020."
+        }
+      ],
+      "dataB": [
+        {
+          "left": "How long has Maria lived in Santa Ana?",
+          "right": "She has lived there since 2018."
+        },
+        {
+          "left": "How long have you known Carlos?",
+          "right": "I have known him for four years."
+        },
+        {
+          "left": "How long have they studied mathematics?",
+          "right": "They have studied it since February."
+        },
+        {
+          "left": "How long has your father owned his car?",
+          "right": "He has owned it for seven years."
+        },
+        {
+          "left": "How long have you worked on this project?",
+          "right": "I have worked on it for three weeks."
+        },
+        {
+          "left": "How long has Emma played volleyball?",
+          "right": "She has played it since 2021."
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "5. Complete the Sentences",
+      "instruction": "Selecciona la palabra correcta del menú desplegable para completar cada oración.",
+      "dataA": [
+        {
+          "before": "My father has worked at this company ",
+          "options": [
+            "for",
+            "since",
+            "during"
+          ],
+          "answer": 1,
+          "after": " 2015."
+        },
+        {
+          "before": "We have studied for this exam ",
+          "options": [
+            "since",
+            "from",
+            "for"
+          ],
+          "answer": 2,
+          "after": " two hours."
+        },
+        {
+          "before": "How long ",
+          "options": [
+            "has",
+            "have",
+            "do"
+          ],
+          "answer": 1,
+          "after": " you lived in this city?"
+        },
+        {
+          "before": "She ",
+          "options": [
+            "have",
+            "is",
+            "has"
+          ],
+          "answer": 2,
+          "after": " studied music since she was a child."
+        },
+        {
+          "before": "They have played soccer ",
+          "options": [
+            "for",
+            "since",
+            "at"
+          ],
+          "answer": 0,
+          "after": " three hours."
+        },
+        {
+          "before": "I have known my teacher ",
+          "options": [
+            "for",
+            "since",
+            "during"
+          ],
+          "answer": 1,
+          "after": " last year."
+        },
+        {
+          "before": "",
+          "options": [
+            "What",
+            "When",
+            "How"
+          ],
+          "answer": 2,
+          "after": " long has your sister studied German?"
+        },
+        {
+          "before": "My grandparents have lived together ",
+          "options": [
+            "since",
+            "for",
+            "from"
+          ],
+          "answer": 1,
+          "after": " fifty years."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "My aunt has worked as a nurse ",
+          "options": [
+            "since",
+            "for",
+            "during"
+          ],
+          "answer": 0,
+          "after": " 2017."
+        },
+        {
+          "before": "The children have played outside ",
+          "options": [
+            "from",
+            "since",
+            "for"
+          ],
+          "answer": 2,
+          "after": " an hour."
+        },
+        {
+          "before": "How long ",
+          "options": [
+            "have",
+            "has",
+            "does"
+          ],
+          "answer": 1,
+          "after": " your mother owned this house?"
+        },
+        {
+          "before": "We ",
+          "options": [
+            "have",
+            "has",
+            "are"
+          ],
+          "answer": 0,
+          "after": " learned many new words since Monday."
+        },
+        {
+          "before": "He has practiced karate ",
+          "options": [
+            "since",
+            "for",
+            "at"
+          ],
+          "answer": 1,
+          "after": " eight months."
+        },
+        {
+          "before": "They have been classmates ",
+          "options": [
+            "for",
+            "during",
+            "since"
+          ],
+          "answer": 2,
+          "after": " seventh grade."
+        },
+        {
+          "before": "",
+          "options": [
+            "How",
+            "Why",
+            "Who"
+          ],
+          "answer": 0,
+          "after": " long have you had your backpack?"
+        },
+        {
+          "before": "My cousin has lived abroad ",
+          "options": [
+            "since",
+            "for",
+            "from"
+          ],
+          "answer": 1,
+          "after": " five years."
+        }
+      ]
+    },
+    {
+      "type": "spoterror",
+      "title": "6. Grammar Detective!",
+      "instruction": "Cada oración contiene una palabra incorrecta. Identifica el error y escribe la palabra que debería utilizarse.",
+      "dataA": [
+        {
+          "words": [
+            "I",
+            "have",
+            "lived",
+            "here",
+            "for",
+            "2020."
+          ],
+          "errorIndex": 4,
+          "fix": "since"
+        },
+        {
+          "words": [
+            "She",
+            "have",
+            "studied",
+            "English",
+            "for",
+            "four",
+            "years."
+          ],
+          "errorIndex": 1,
+          "fix": "has"
+        },
+        {
+          "words": [
+            "How",
+            "long",
+            "has",
+            "you",
+            "lived",
+            "here?"
+          ],
+          "errorIndex": 2,
+          "fix": "have"
+        },
+        {
+          "words": [
+            "He",
+            "has",
+            "work",
+            "here",
+            "since",
+            "January."
+          ],
+          "errorIndex": 2,
+          "fix": "worked"
+        },
+        {
+          "words": [
+            "They",
+            "have",
+            "been",
+            "friends",
+            "since",
+            "six",
+            "years."
+          ],
+          "errorIndex": 4,
+          "fix": "for"
+        },
+        {
+          "words": [
+            "How",
+            "many",
+            "have",
+            "you",
+            "known",
+            "her?"
+          ],
+          "errorIndex": 1,
+          "fix": "long"
+        },
+        {
+          "words": [
+            "We",
+            "has",
+            "had",
+            "this",
+            "dog",
+            "for",
+            "a",
+            "month."
+          ],
+          "errorIndex": 1,
+          "fix": "have"
+        },
+        {
+          "words": [
+            "My",
+            "mother",
+            "has",
+            "worked",
+            "here",
+            "for",
+            "2017."
+          ],
+          "errorIndex": 5,
+          "fix": "since"
+        }
+      ],
+      "dataB": [
+        {
+          "words": [
+            "They",
+            "have",
+            "practiced",
+            "volleyball",
+            "since",
+            "three",
+            "weeks."
+          ],
+          "errorIndex": 4,
+          "fix": "for"
+        },
+        {
+          "words": [
+            "My",
+            "uncle",
+            "have",
+            "lived",
+            "in",
+            "Mexico",
+            "since",
+            "2019."
+          ],
+          "errorIndex": 2,
+          "fix": "has"
+        },
+        {
+          "words": [
+            "How",
+            "long",
+            "have",
+            "your",
+            "sister",
+            "played",
+            "chess?"
+          ],
+          "errorIndex": 2,
+          "fix": "has"
+        },
+        {
+          "words": [
+            "We",
+            "have",
+            "study",
+            "together",
+            "for",
+            "two",
+            "hours."
+          ],
+          "errorIndex": 2,
+          "fix": "studied"
+        },
+        {
+          "words": [
+            "He",
+            "has",
+            "owned",
+            "his",
+            "motorcycle",
+            "for",
+            "last",
+            "summer."
+          ],
+          "errorIndex": 5,
+          "fix": "since"
+        },
+        {
+          "words": [
+            "How",
+            "much",
+            "has",
+            "Daniel",
+            "worked",
+            "here?"
+          ],
+          "errorIndex": 1,
+          "fix": "long"
+        },
+        {
+          "words": [
+            "I",
+            "has",
+            "known",
+            "my",
+            "neighbor",
+            "since",
+            "2021."
+          ],
+          "errorIndex": 1,
+          "fix": "have"
+        },
+        {
+          "words": [
+            "She",
+            "has",
+            "been",
+            "a",
+            "teacher",
+            "since",
+            "ten",
+            "years."
+          ],
+          "errorIndex": 5,
+          "fix": "for"
+        }
+      ]
+    },
+    {
+      "type": "reorder_sentences",
+      "title": "7. Put the Words in Order",
+      "instruction": "Ordena las palabras para formar oraciones y preguntas correctas en Present Perfect. Utiliza la traducción como pista.",
+      "dataA": [
+        {
+          "sentence": "How long have you studied English?",
+          "es": "¿Cuánto tiempo has estudiado inglés?"
+        },
+        {
+          "sentence": "I have studied English for three years.",
+          "es": "He estudiado inglés durante tres años."
+        }
+      ],
+      "dataB": [
+        {
+          "sentence": "How long has he played the guitar?",
+          "es": "¿Cuánto tiempo lleva él tocando la guitarra?"
+        },
+        {
+          "sentence": "He has played the guitar since 2019.",
+          "es": "Él toca la guitarra desde 2019."
+        }
+      ]
+    },
+    {
+      "type": "comicdialogue",
+      "title": "8. Real Conversations: How Long?",
+      "instruction": "Completa la conversación arrastrando las respuestas correctas a los espacios vacíos. Presta atención a FOR, SINCE y HOW LONG.",
+      "dataA": [
+        {
+          "title": "Two Friends Talking About School",
+          "bubbles": [
+            {
+              "author": "A",
+              "blank": false,
+              "text": "Hi, Leo! Are you new in this town?"
+            },
+            {
+              "author": "B",
+              "blank": false,
+              "text": "Not really. I have lived here for years."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "How long have you lived here?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "I have lived here for four years."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "And how long have you studied English?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "I have studied English since 2022."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "Have you known our teacher for long?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "Yes, I have known her for two years."
+            }
+          ],
+          "bank": [
+            "I study English yesterday.",
+            "Since three months.",
+            "She have lived here for days."
+          ]
+        }
+      ],
+      "dataB": [
+        {
+          "title": "Welcome to the Art Club",
+          "bubbles": [
+            {
+              "author": "A",
+              "blank": false,
+              "text": "Hello, Emma! Do you like painting?"
+            },
+            {
+              "author": "B",
+              "blank": false,
+              "text": "Yes! I have loved painting since childhood."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "How long have you been in the art club?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "I have been a member for two years."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "How long has your friend Anna painted?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "She has painted since 2020."
+            },
+            {
+              "author": "A",
+              "blank": false,
+              "text": "And how long have you known Anna?"
+            },
+            {
+              "author": "B",
+              "blank": true,
+              "answer": "I have known her for five years."
+            }
+          ],
+          "bank": [
+            "She have painted for last Monday.",
+            "I know her since five years.",
+            "I am a member since two years."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fillblank",
+      "title": "Rellenar espacios",
+      "instruction": "Instrucción: Escucha el audio y rellena los espacios faltantes. ",
+      "audio": "files/elevenlabs_2026-10-22t13_57_42_roger---laid-back-casual-resonant_pre_sp70_s50_sb75_v4.mp3",
+      "dataA": [
+        {
+          "text": "I have eaten an ___.",
+          "answer": [
+            "apple"
+          ]
+        },
+        {
+          "text": "Hey! Where ___ you been?",
+          "answer": [
+            "have"
+          ]
+        },
+        {
+          "text": "She has ___ basketball for two weeks.",
+          "answer": [
+            "played"
+          ]
+        },
+        {
+          "text": "We have been students ___ 2010.",
+          "answer": [
+            "since"
+          ]
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "snake",
+    "winScore": 5
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
