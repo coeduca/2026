@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"31922f9f-d8db-4bea-846f-bb33aa28ec8c","token":"89976b1d-d1f3-4bb1-ab7e-90a9c53eae27"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · 6.1 Participación ciudadana - acceso a la información pública y transparencia institucional</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="civica">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="civica-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "a07bc616-3704-4e97-9a72-2457ecd44c9b",
+  "container": "#app",
+  "topic": "6.1 Participación ciudadana - acceso a la información pública y transparencia institucional",
+  "unit": "Unidad 6 - Semana 1",
+  "subjectLabel": "Ciudadanía y Valores",
+  "book": {
+    "url": "https://drive.google.com/file/d/1bJI2YsY7_lZkUEC0hOmi-Nj4y0nPkDGF/view?usp=drivesdk",
+    "label": "Libro de Octavo"
+  },
+  "colors": {
+    "primary": "#D4AF37",
+    "accent": "#FBFABC",
+    "bg": "#B1CFDB",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "pdfDesign": "Pastel",
+  "sections": {
+    "explore": [
+      {
+        "type": "note",
+        "title": "Participación ciudadana, información pública y transparencia",
+        "html": "\n              \u003csection style=\"color:#1A1A1A;font-family:Arial,sans-serif;line-height:1.65;font-size:15px;\">\n\n                \u003cheader style=\"background:#FBFABC;border-left:5px solid #D4AF37;border-radius:12px;padding:16px;margin-bottom:18px;\">\n                  \u003ch2 style=\"font-size:21px;line-height:1.3;margin:0 0 8px 0;color:#654F12;\">\n                    Participación ciudadana y transparencia\n                  \u003c/h2>\n                  \u003cp style=\"margin:0;font-size:14px;color:#554A29;\">\n                    Unidad 6 · Semana 1 · Ciudadanía y Valores\n                  \u003c/p>\n                \u003c/header>\n\n                \u003cp style=\"margin:0 0 16px 0;\">\n                  En una sociedad democrática, \u003cstrong>la ciudadanía y las autoridades comparten la responsabilidad de mejorar el país.\u003c/strong> Para lograrlo, las personas necesitan participar, mantenerse informadas y conocer cómo se utilizan los recursos públicos.\n                \u003c/p>\n\n                \u003csection style=\"background:#F2F7FA;border-radius:12px;padding:15px;margin-bottom:12px;\">\n                  \u003ch3 style=\"font-size:16px;margin:0 0 8px 0;color:#886B14;\">\n                    1. Participación ciudadana\n                  \u003c/h3>\n                  \u003cp style=\"margin:0 0 9px 0;\">\n                    Es el involucramiento de las personas en los asuntos públicos y en las decisiones que afectan a su comunidad.\n                  \u003c/p>\n                  \u003cp style=\"margin:0;\">\n                    Podemos participar al votar, expresar opiniones, colaborar en proyectos comunitarios y proponer soluciones a los problemas.\n                  \u003c/p>\n                \u003c/section>\n\n                \u003csection style=\"background:#FFFBE8;border-radius:12px;padding:15px;margin-bottom:12px;\">\n                  \u003ch3 style=\"font-size:16px;margin:0 0 8px 0;color:#886B14;\">\n                    2. Acceso a la información pública\n                  \u003c/h3>\n                  \u003cp style=\"margin:0;\">\n                    Es el derecho de las personas a solicitar y recibir información sobre las actividades, decisiones y recursos de las instituciones públicas. En El Salvador, este derecho está reconocido en la \u003cstrong>Ley de Acceso a la Información Pública (LAIP)\u003c/strong>.\n                  \u003c/p>\n                \u003c/section>\n\n                \u003csection style=\"background:#F2F7FA;border-radius:12px;padding:15px;margin-bottom:12px;\">\n                  \u003ch3 style=\"font-size:16px;margin:0 0 8px 0;color:#886B14;\">\n                    3. Transparencia institucional\n                  \u003c/h3>\n                  \u003cp style=\"margin:0;\">\n                    Significa que las instituciones públicas permiten conocer sus actuaciones y explican cómo toman decisiones y utilizan los fondos públicos. Esto favorece la confianza ciudadana y ayuda a prevenir la corrupción.\n                  \u003c/p>\n                \u003c/section>\n\n                \u003csection style=\"background:#FFFBE8;border-radius:12px;padding:15px;margin-bottom:12px;\">\n                  \u003ch3 style=\"font-size:16px;margin:0 0 8px 0;color:#886B14;\">\n                    4. Contraloría social\n                  \u003c/h3>\n                  \u003cp style=\"margin:0;\">\n                    Es la participación de la ciudadanía para \u003cstrong>vigilar, evaluar y verificar\u003c/strong> que las autoridades cumplan sus obligaciones y utilicen adecuadamente los recursos públicos.\n                  \u003c/p>\n                \u003c/section>\n\n                \u003csection style=\"border:1px solid #D4AF37;border-radius:12px;padding:15px;margin-top:16px;\">\n                  \u003ch3 style=\"font-size:16px;margin:0 0 8px 0;color:#886B14;\">\n                    ¿Cómo se relacionan estos conceptos?\n                  \u003c/h3>\n                  \u003cp style=\"margin:0;\">\n                    Cuando las personas tienen acceso a la información, pueden participar con mayor conocimiento, supervisar la gestión del Gobierno y exigir transparencia. Así contribuyen al bienestar de toda la comunidad.\n                  \u003c/p>\n                \u003c/section>\n\n                \u003cfooter style=\"margin-top:15px;padding:12px;background:#E8F1F6;border-radius:10px;font-size:13px;\">\n                  \u003cstrong>Idea clave:\u003c/strong> Participar no significa solamente opinar. También implica informarse, actuar responsablemente y colaborar para mejorar la sociedad.\n                \u003c/footer>\n\n              \u003c/section>\n            "
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "1. Actividad en equipo",
+        "instruction": "Lean la información.\n\nMejorar la calidad de vida de los habitantes de un país es uno de los principales propósitos del Gobierno. Para que esto se cumpla, los ciudadanos deben dar a conocer a las autoridades cualquier situación que les parezca problemática. Así, escuchando a los ciudadanos, pueden resolver las dificultades que les aquejan.\n\nPor otro lado, la responsabilidad de los ciudadanos no solo consiste en informar, sino también en actuar conjuntamente con el Gobierno. Por eso se dice que en las sociedades actuales gobernar es una acción que ejecutan tanto los ciudadanos como las autoridades que son elegidas para representar los intereses de la población.\n\nRespondan.",
+        "image": "files/exploracion-actividad-1-manos-unidas.webp",
+        "dataA": [
+          {
+            "q": "a. ¿Por qué es importante que los ciudadanos informen a las autoridades sobre problemas que perciban en su comunidad?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "b. ¿Cómo puede ayudar la participación de la ciudadanía a resolver los problemas que surgen en su entorno?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "c. ¿Qué responsabilidades consideran que tienen los ciudadanos en una sociedad democrática?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "d. ¿Qué significa «gobernar es una acción que ejecutan tanto los ciudadanos como las autoridades»?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "Comenten sus respuestas con el resto de la clase y, a partir de sus conclusiones, elaboren una definición propia de participación ciudadana.",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escriban su definición de participación ciudadana..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "2. Actividad con docente",
+        "instruction": "Analicen la frase de Abraham Lincoln «el gobierno del pueblo, por el pueblo y para el pueblo».",
+        "dataA": [
+          {
+            "q": "a. Generen una lluvia de ideas acerca de cómo se relaciona esta frase con el acceso a la información y la transparencia institucional, como principios democráticos.",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Escriban las ideas que surjan durante la actividad..."
+          },
+          {
+            "q": "b. Escriban dos conclusiones. Conclusión 1:",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escriban la primera conclusión..."
+          },
+          {
+            "q": "b. Escriban dos conclusiones. Conclusión 2:",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escriban la segunda conclusión..."
+          }
+        ]
+      }
+    ],
+    "deepen": [
+      {
+        "type": "cv_textanswer",
+        "title": "3. Actividad en pares",
+        "instruction": "Desarrollen la habilidad de toma de decisiones. Para ello, respondan:",
+        "image": "files/profundizacion-actividad-3-personaje.webp",
+        "dataA": [
+          {
+            "q": "a. ¿Por qué es relevante que los ciudadanos se involucren en la toma de decisiones en el país?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escriban su respuesta..."
+          },
+          {
+            "q": "b. ¿De qué manera los adolescentes pueden involucrarse y participar de forma activa en su comunidad?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escriban su respuesta..."
+          },
+          {
+            "q": "c. ¿Qué acciones se pueden impulsar en el país para aumentar la participación ciudadana en la contraloría institucional?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escriban su respuesta..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "4. Actividad en equipo",
+        "instruction": "Desarrollen la habilidad de participación activa y responsable. Para ello, lean el siguiente caso:\n\nUn grupo de estudiantes está interesado en aprender sobre las prácticas de reciclaje en su comunidad y cómo pueden contribuir de manera más efectiva a la conservación del ambiente. Sin embargo, desconocen los procedimientos y recursos disponibles sobre las políticas de reciclaje en su localidad.",
+        "image": "files/profundizacion-actividad-4-personaje.webp",
+        "dataA": [
+          {
+            "q": "a. Investiguen el proceso de solicitud que deben realizar los estudiantes del caso para acceder a la información pública. Pueden orientarse a partir de estas preguntas: ¿A qué entidad o institución deben dirigirse para solicitar esta información? ¿Cuáles son los formularios o procedimientos necesarios para presentar la solicitud? ¿Qué habría que hacer si la solicitud es denegada?",
+            "minLength": 16,
+            "rows": 7,
+            "placeholder": "Escriban los resultados de su investigación..."
+          },
+          {
+            "q": "b. Socialicen los resultados de su investigación con el resto de los equipos y anoten las conclusiones.",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Anoten las conclusiones de la socialización..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "5. Actividad con docente",
+        "instruction": "Desarrollen la habilidad de convivencia e interacción social. Para ello:",
+        "image": "files/profundizacion-actividad-5-ciclo-contraloria.webp",
+        "dataA": [
+          {
+            "q": "a. Organicen equipos de trabajo e investiguen de qué manera la contraloría ciudadana busca promover el respeto a los derechos humanos en el país a partir de casos concretos.",
+            "minLength": 16,
+            "rows": 6,
+            "placeholder": "Escriban los hallazgos de su investigación y los casos concretos..."
+          },
+          {
+            "q": "b. Elaboren una presentación en donde compartan sus hallazgos e incluyan recomendaciones para fortalecer la aplicación de la contraloría ciudadana como un mecanismo efectivo que puede proteger los derechos de los grupos vulnerables, como las personas en situación de pobreza, minorías y personas con discapacidad.",
+            "minLength": 16,
+            "rows": 7,
+            "placeholder": "Escriban el contenido y las recomendaciones de su presentación..."
+          }
+        ]
+      }
+    ],
+    "consolidate": [
+      {
+        "type": "cv_textanswer",
+        "title": "6. Actividad individual",
+        "instruction": "Explica cuál es la relación entre los siguientes pares de conceptos.",
+        "dataA": [
+          {
+            "q": "Participación ciudadana - Transparencia institucional",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Explica la relación entre ambos conceptos..."
+          },
+          {
+            "q": "Acceso a la información - Contraloría social",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Explica la relación entre ambos conceptos..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "7. Actividad en pares",
+        "instruction": "Reflexionen en torno a las siguientes preguntas:",
+        "dataA": [
+          {
+            "q": "a. ¿Por qué es importante tener en cuenta a la sociedad civil y sus demandas en un sistema democrático?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escriban su reflexión..."
+          },
+          {
+            "q": "b. ¿A qué se refiere la idea de que la participación ciudadana, el acceso a la información pública y la transparencia institucional son pilares esenciales que contribuyen al funcionamiento eficaz del Gobierno y al bienestar de la población?",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Escriban su reflexión..."
+          },
+          {
+            "q": "c. Escriban un argumento en el que motiven a una persona que no quiere participar o involucrarse en las decisiones, proyectos o actividades que pueden ayudar al mejoramiento de su comunidad.",
+            "minLength": 16,
+            "rows": 6,
+            "placeholder": "Escriban su argumento..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "8. Actividad con docente",
+        "instruction": "Planifiquen una campaña de sensibilización sobre la importancia del uso de los mecanismos de acceso a la información pública y la contraloría ciudadana para fomentar la transparencia en la gestión pública. Tomen en cuenta los siguientes aspectos:",
+        "dataA": [
+          {
+            "q": "a. La información debe incluir, de manera clara y sencilla, cuál es el impacto de la participación ciudadana como un mecanismo de cambio que contribuye al mejoramiento de la sociedad.",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Escriban la información que incluirán en su campaña..."
+          },
+          {
+            "q": "b. Se deben diseñar materiales creativos, como carteles, folletos y videos cortos, compresibles para todas las personas.",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Describan los materiales creativos que diseñarán..."
+          },
+          {
+            "q": "c. Es necesario el uso de diferentes medios, espacios y recursos para difundir su campaña.",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escriban los medios, espacios y recursos que utilizarán..."
+          },
+          {
+            "q": "d. La campaña puede tener un lema o eslogan y un logo con el que resuman su objetivo principal.",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escriban el lema o eslogan y describan el logo de su campaña..."
+          }
+        ]
+      }
+    ]
+  },
+  "game": {
+    "type": "flappy"
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
