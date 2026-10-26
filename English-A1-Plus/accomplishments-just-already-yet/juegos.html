@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"ff387f3a-622d-41f3-b8f8-370db2c58376","token":"42324637-45f2-4829-836a-352bc314da42"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Accomplishments &amp; Just / Already / Yet</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "517cb9c1-6e16-4ed0-9af4-e6c2cc44f9b6",
+  "container": "#app",
+  "topic": "Accomplishments & Just / Already / Yet",
+  "level": "Noveno, 2do Año de Bach., 1er Año de Bach.",
+  "pdfDesign": "Colorido",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#007DFF",
+    "accent": "#87B8E3",
+    "bg": "#FFF7DB",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#FFF3DB",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Learn: Accomplishments & Just / Already / Yet",
+      "html": "\n            \u003carticle style=\"color:#1A1A1A;font-family:Arial,sans-serif;line-height:1.6;\">\n\n              \u003cheader style=\"background:#007DFF;color:#FFFFFF;padding:18px;border-radius:14px;margin-bottom:16px;\">\n                \u003ch2 style=\"margin:0 0 6px;font-size:23px;\">My Accomplishments\u003c/h2>\n                \u003cp style=\"margin:0;font-size:14px;opacity:0.95;\">Present Perfect + Just / Already / Yet\u003c/p>\n              \u003c/header>\n\n              \u003csection style=\"margin-bottom:18px;\">\n                \u003ch3 style=\"color:#007DFF;font-size:18px;margin:0 0 8px;\">1. What are accomplishments?\u003c/h3>\n                \u003cp style=\"margin:0 0 10px;\">An \u003cstrong>accomplishment\u003c/strong> is something important or positive that you have achieved through effort, practice, or learning.\u003c/p>\n                \u003cp style=\"margin:0;background:#FFF3DB;padding:12px;border-radius:10px;font-size:14px;\">\n                  \u003cstrong>En español:\u003c/strong> Un logro es algo que has conseguido, como ganar una competencia, aprender una habilidad o terminar un proyecto.\n                \u003c/p>\n              \u003c/section>\n\n              \u003csection style=\"margin-bottom:18px;\">\n                \u003ch3 style=\"color:#007DFF;font-size:18px;margin:0 0 8px;\">2. Present Perfect\u003c/h3>\n                \u003cp style=\"margin:0 0 10px;\">We use the \u003cstrong>Present Perfect\u003c/strong> to talk about experiences, achievements, and actions connected to the present.\u003c/p>\n\n                \u003cdiv style=\"background:#EAF4FF;border-left:4px solid #007DFF;padding:13px;border-radius:8px;text-align:center;margin-bottom:10px;\">\n                  \u003cstrong style=\"color:#0055AE;font-size:15px;\">Subject + have / has + past participle\u003c/strong>\n                \u003c/div>\n\n                \u003cp style=\"margin:0 0 5px;\">\u003cstrong>Have:\u003c/strong> I, You, We, They\u003c/p>\n                \u003cp style=\"margin:0 0 10px;\">\u003cstrong>Has:\u003c/strong> He, She, It\u003c/p>\n\n                \u003cp style=\"margin:0;font-size:13px;color:#444444;\">Common participles: \u003cstrong>finished, learned, won, written, made, built, passed, received.\u003c/strong>\u003c/p>\n              \u003c/section>\n\n              \u003csection style=\"margin-bottom:18px;\">\n                \u003ch3 style=\"color:#007DFF;font-size:18px;margin:0 0 12px;\">3. Just, Already & Yet\u003c/h3>\n\n                \u003cdiv style=\"background:#EAF4FF;border-radius:12px;padding:13px;margin-bottom:10px;border-left:5px solid #007DFF;\">\n                  \u003ch4 style=\"margin:0 0 6px;color:#0055AE;font-size:17px;\">JUST — Acabar de\u003c/h4>\n                  \u003cp style=\"margin:0 0 7px;font-size:14px;\">An action happened a very short time ago.\u003c/p>\n                  \u003cp style=\"margin:0 0 5px;font-weight:bold;\">She has just won a prize.\u003c/p>\n                  \u003cp style=\"margin:0;font-size:13px;color:#555555;\">Ella acaba de ganar un premio.\u003c/p>\n                \u003c/div>\n\n                \u003cdiv style=\"background:#FFF3DB;border-radius:12px;padding:13px;margin-bottom:10px;border-left:5px solid #E6A300;\">\n                  \u003ch4 style=\"margin:0 0 6px;color:#996400;font-size:17px;\">ALREADY — Ya\u003c/h4>\n                  \u003cp style=\"margin:0 0 7px;font-size:14px;\">An action has happened before now, sometimes sooner than expected.\u003c/p>\n                  \u003cp style=\"margin:0 0 5px;font-weight:bold;\">I have already finished my project.\u003c/p>\n                  \u003cp style=\"margin:0;font-size:13px;color:#555555;\">Ya he terminado mi proyecto.\u003c/p>\n                \u003c/div>\n\n                \u003cdiv style=\"background:#F1F2F5;border-radius:12px;padding:13px;border-left:5px solid #777E91;\">\n                  \u003ch4 style=\"margin:0 0 6px;color:#50586E;font-size:17px;\">YET — Ya / Todavía\u003c/h4>\n                  \u003cp style=\"margin:0 0 7px;font-size:14px;\">Usually appears at the end of questions and negative sentences.\u003c/p>\n                  \u003cp style=\"margin:0 0 5px;font-weight:bold;\">Have you finished your homework yet?\u003c/p>\n                  \u003cp style=\"margin:0;font-size:13px;color:#555555;\">¿Ya terminaste tu tarea?\u003c/p>\n                \u003c/div>\n              \u003c/section>\n\n              \u003csection style=\"background:#FFFFFF;border:1px solid #D5E7F8;padding:14px;border-radius:12px;margin-bottom:14px;\">\n                \u003ch3 style=\"color:#007DFF;margin:0 0 10px;font-size:17px;\">Remember the position!\u003c/h3>\n\n                \u003cp style=\"margin:0 0 8px;font-size:14px;\">\n                  \u003cstrong>JUST:\u003c/strong> have / has + just + participle\n                \u003c/p>\n\n                \u003cp style=\"margin:0 0 8px;font-size:14px;\">\n                  \u003cstrong>ALREADY:\u003c/strong> have / has + already + participle\n                \u003c/p>\n\n                \u003cp style=\"margin:0;font-size:14px;\">\n                  \u003cstrong>YET:\u003c/strong> usually at the end of questions and negatives\n                \u003c/p>\n              \u003c/section>\n\n              \u003cfooter style=\"background:#007DFF;color:#FFFFFF;border-radius:10px;padding:12px;text-align:center;font-size:14px;\">\n                \u003cstrong>Think about your achievements!\u003c/strong>\n                \u003cp style=\"margin:4px 0 0;\">What have you accomplished this year?\u003c/p>\n              \u003c/footer>\n\n            \u003c/article>\n          "
+    },
+    {
+      "type": "multiplechoice",
+      "title": "1. Grammar Explorer",
+      "instruction": "Lee cuidadosamente y selecciona la respuesta correcta sobre los logros, el Present Perfect y el uso de Just, Already y Yet.",
+      "dataA": [
+        {
+          "q": "¿Qué expresa JUST en Present Perfect?",
+          "options": [
+            "Una acción que acaba de ocurrir",
+            "Una acción que nunca ocurrió",
+            "Una acción que ocurrirá mañana",
+            "Una acción que ocurre diariamente"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Complete: She ___ already completed the course.",
+          "options": [
+            "have",
+            "has",
+            "is",
+            "do"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Which sentence correctly uses YET?",
+          "options": [
+            "I have yet finished the test.",
+            "I yet have finished the test.",
+            "I have not finished the test yet.",
+            "I have finished yet the test."
+          ],
+          "answer": 2
+        },
+        {
+          "q": "What is the past participle of WIN?",
+          "options": [
+            "winned",
+            "winning",
+            "wins",
+            "won"
+          ],
+          "answer": 3
+        },
+        {
+          "q": "What does ALREADY usually mean in Spanish?",
+          "options": [
+            "Todavía no",
+            "Ya",
+            "Nunca",
+            "Después"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Choose the correct Present Perfect sentence.",
+          "options": [
+            "They has learned a new skill.",
+            "They have learn a new skill.",
+            "They have learned a new skill.",
+            "They learning a new skill."
+          ],
+          "answer": 2
+        },
+        {
+          "q": "Where is YET usually placed in negative sentences?",
+          "options": [
+            "Before the subject",
+            "Between have and the participle",
+            "At the beginning",
+            "At the end"
+          ],
+          "answer": 3
+        },
+        {
+          "q": "Which sentence describes an accomplishment?",
+          "options": [
+            "I have earned a certificate.",
+            "I am sitting on a chair.",
+            "The sky is blue.",
+            "It is raining outside."
+          ],
+          "answer": 0
+        }
+      ],
+      "dataB": [
+        {
+          "q": "Which word indicates that something happened sooner than expected?",
+          "options": [
+            "yet",
+            "never",
+            "already",
+            "tomorrow"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "Complete: We ___ just finished our presentation.",
+          "options": [
+            "has",
+            "are",
+            "does",
+            "have"
+          ],
+          "answer": 3
+        },
+        {
+          "q": "Which question uses Present Perfect correctly?",
+          "options": [
+            "Has you received the prize yet?",
+            "Have you received the prize yet?",
+            "Have you receive the prize yet?",
+            "Did you received the prize yet?"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "What is the past participle of WRITE?",
+          "options": [
+            "written",
+            "writed",
+            "writing",
+            "writes"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "What does YET mean in a negative Present Perfect sentence?",
+          "options": [
+            "Hace un momento",
+            "Siempre",
+            "Ya terminado",
+            "Todavía no"
+          ],
+          "answer": 3
+        },
+        {
+          "q": "Choose the grammatically correct sentence.",
+          "options": [
+            "He have already passed the exam.",
+            "He has already passed the exam.",
+            "He has already pass the exam.",
+            "He already passing the exam."
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Where is JUST normally placed in a Present Perfect sentence?",
+          "options": [
+            "After the past participle",
+            "Before the subject",
+            "Between have/has and the participle",
+            "At the end of every sentence"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "Which activity is an accomplishment?",
+          "options": [
+            "Winning a school competition",
+            "Sleeping every night",
+            "Waiting for the bus",
+            "Looking at the clock"
+          ],
+          "answer": 0
+        }
+      ]
+    },
+    {
+      "type": "matchlines",
+      "title": "2. Connect the Meaning",
+      "instruction": "Relaciona cada oración en inglés con su traducción correcta al español. Observa el significado de los adverbios.",
+      "dataA": [
+        {
+          "left": "I have just finished the test.",
+          "right": "Acabo de terminar el examen."
+        },
+        {
+          "left": "She has already learned to swim.",
+          "right": "Ella ya aprendió a nadar."
+        },
+        {
+          "left": "We have not won a medal yet.",
+          "right": "Todavía no hemos ganado una medalla."
+        },
+        {
+          "left": "Have they presented the project yet?",
+          "right": "¿Ya presentaron el proyecto?"
+        },
+        {
+          "left": "He has already written his speech.",
+          "right": "Él ya escribió su discurso."
+        }
+      ],
+      "dataB": [
+        {
+          "left": "They have just received their certificates.",
+          "right": "Acaban de recibir sus certificados."
+        },
+        {
+          "left": "I have already read the book.",
+          "right": "Ya he leído el libro."
+        },
+        {
+          "left": "She has not completed the course yet.",
+          "right": "Ella todavía no ha completado el curso."
+        },
+        {
+          "left": "Have you learned the song yet?",
+          "right": "¿Ya aprendiste la canción?"
+        },
+        {
+          "left": "We have just built a model.",
+          "right": "Acabamos de construir una maqueta."
+        }
+      ]
+    },
+    {
+      "type": "memory",
+      "title": "Memorama / Pareja",
+      "instruction": "Instrucción: une la palabra con su imagen correspondiente, ejemplo: Apple - 🍏",
+      "dataA": [
+        {
+          "left": "🍏",
+          "right": "apple"
+        },
+        {
+          "left": "🚩",
+          "right": "flag"
+        },
+        {
+          "left": "☀️",
+          "right": "sun"
+        },
+        {
+          "left": "🌸",
+          "right": "flower"
+        },
+        {
+          "left": "🛻",
+          "right": "car"
+        },
+        {
+          "left": "🔥",
+          "right": "fire"
+        },
+        {
+          "left": "📙",
+          "right": "book"
+        },
+        {
+          "left": "✏️",
+          "right": "pencil"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "🖋️",
+          "right": "pen"
+        },
+        {
+          "left": "🍏",
+          "right": "apple"
+        },
+        {
+          "left": "🛻",
+          "right": "car"
+        },
+        {
+          "left": "🌸",
+          "right": "flower"
+        },
+        {
+          "left": "🌟",
+          "right": "star"
+        },
+        {
+          "left": "📙",
+          "right": "book"
+        },
+        {
+          "left": "💦",
+          "right": "water"
+        },
+        {
+          "left": "🚩",
+          "right": "flag"
+        }
+      ]
+    },
+    {
+      "type": "categorize",
+      "title": "3. Sort the Expressions",
+      "instruction": "Clasifica cada oración según el adverbio que utiliza: JUST, ALREADY o YET.",
+      "dataA": {
+        "categories": [
+          "JUST",
+          "ALREADY",
+          "YET"
+        ],
+        "items": [
+          {
+            "text": "She has just finished her speech.",
+            "cat": 0
+          },
+          {
+            "text": "I have already passed the test.",
+            "cat": 1
+          },
+          {
+            "text": "Have you completed the project yet?",
+            "cat": 2
+          },
+          {
+            "text": "They have just won the game.",
+            "cat": 0
+          },
+          {
+            "text": "We have already studied the lesson.",
+            "cat": 1
+          },
+          {
+            "text": "He has not received his prize yet.",
+            "cat": 2
+          },
+          {
+            "text": "My brother has just sent his application.",
+            "cat": 0
+          },
+          {
+            "text": "Ana has already learned the new words.",
+            "cat": 1
+          },
+          {
+            "text": "I have not written my report yet.",
+            "cat": 2
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "JUST",
+          "ALREADY",
+          "YET"
+        ],
+        "items": [
+          {
+            "text": "We have just completed the experiment.",
+            "cat": 0
+          },
+          {
+            "text": "He has already prepared his presentation.",
+            "cat": 1
+          },
+          {
+            "text": "Have they finished the activity yet?",
+            "cat": 2
+          },
+          {
+            "text": "I have just received good news.",
+            "cat": 0
+          },
+          {
+            "text": "They have already built their robot.",
+            "cat": 1
+          },
+          {
+            "text": "She has not learned the song yet.",
+            "cat": 2
+          },
+          {
+            "text": "Our teacher has just checked the projects.",
+            "cat": 0
+          },
+          {
+            "text": "My friends have already earned their medals.",
+            "cat": 1
+          },
+          {
+            "text": "We have not finished the poster yet.",
+            "cat": 2
+          }
+        ]
+      }
+    },
+    {
+      "type": "dropdown",
+      "title": "4. Choose the Correct Word",
+      "instruction": "Completa cada oración seleccionando la palabra correcta. Presta atención al auxiliar, al significado y a la posición de Just, Already y Yet.",
+      "dataA": [
+        {
+          "before": "She has ",
+          "options": [
+            "already",
+            "yet"
+          ],
+          "answer": 0,
+          "after": " earned a certificate."
+        },
+        {
+          "before": "I have ",
+          "options": [
+            "yet",
+            "just"
+          ],
+          "answer": 1,
+          "after": " submitted my assignment a moment ago."
+        },
+        {
+          "before": "We have not finished our science model ",
+          "options": [
+            "yet",
+            "already"
+          ],
+          "answer": 0,
+          "after": "."
+        },
+        {
+          "before": "",
+          "options": [
+            "Have",
+            "Has",
+            "Did"
+          ],
+          "answer": 0,
+          "after": " you completed the online course yet?"
+        },
+        {
+          "before": "He ",
+          "options": [
+            "has",
+            "have"
+          ],
+          "answer": 0,
+          "after": " already learned five new songs."
+        },
+        {
+          "before": "They have ",
+          "options": [
+            "yet",
+            "already"
+          ],
+          "answer": 1,
+          "after": " won their first competition."
+        },
+        {
+          "before": "Has Ana received her diploma ",
+          "options": [
+            "yet",
+            "just"
+          ],
+          "answer": 0,
+          "after": "?"
+        },
+        {
+          "before": "My brother has ",
+          "options": [
+            "yet",
+            "just"
+          ],
+          "answer": 1,
+          "after": " sent the email; he clicked Send seconds ago."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "Our classmates have ",
+          "options": [
+            "yet",
+            "already"
+          ],
+          "answer": 1,
+          "after": " prepared the presentation."
+        },
+        {
+          "before": "Laura has ",
+          "options": [
+            "just",
+            "yet"
+          ],
+          "answer": 0,
+          "after": " finished the painting; the paint is still wet."
+        },
+        {
+          "before": "He has not written his essay ",
+          "options": [
+            "already",
+            "yet"
+          ],
+          "answer": 1,
+          "after": "."
+        },
+        {
+          "before": "",
+          "options": [
+            "Have",
+            "Has",
+            "Does"
+          ],
+          "answer": 1,
+          "after": " your sister won an award yet?"
+        },
+        {
+          "before": "My friends ",
+          "options": [
+            "has",
+            "have"
+          ],
+          "answer": 1,
+          "after": " already joined the school club."
+        },
+        {
+          "before": "I have ",
+          "options": [
+            "already",
+            "yet"
+          ],
+          "answer": 0,
+          "after": " completed the reading activity."
+        },
+        {
+          "before": "Have we received the exam results ",
+          "options": [
+            "yet",
+            "just"
+          ],
+          "answer": 0,
+          "after": "?"
+        },
+        {
+          "before": "They have ",
+          "options": [
+            "yet",
+            "just"
+          ],
+          "answer": 1,
+          "after": " arrived with their medals; they came in seconds ago."
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Unir con imagen",
+      "instruction": "Instrucción: Arrastra la frase a la imagen correcta.",
+      "dataA": [
+        {
+          "word": "I have finished my homework",
+          "image": "files/split_1793029714756_014_r1c2_file_00000000f97082308315c2fddf93382c.png"
+        },
+        {
+          "word": "I have read a book",
+          "image": "files/split_1793029714756_013_r1c3_file_00000000f97082308315c2fddf93382c.png"
+        },
+        {
+          "word": "I have learned English words",
+          "image": "files/split_1793029714756_009_r3c1_file_00000000f97082308315c2fddf93382c.png"
+        },
+        {
+          "word": "I have made a project",
+          "image": "files/split_1793029714756_008_r3c2_file_00000000f97082308315c2fddf93382c.png"
+        },
+        {
+          "word": "I have won a medal",
+          "image": "files/split_1793029714756_015_r1c1_file_00000000f97082308315c2fddf93382c.png"
+        },
+        {
+          "word": "I have visited another country",
+          "image": "files/split_1793029714756_007_r3c3_file_00000000f97082308315c2fddf93382c.png"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "I have won a medal",
+          "image": "files/split_1793029714756_015_r1c1_file_00000000f97082308315c2fddf93382c.png"
+        },
+        {
+          "word": "I have finished my homework",
+          "image": "files/split_1793029714756_014_r1c2_file_00000000f97082308315c2fddf93382c.png"
+        },
+        {
+          "word": "I have made a project",
+          "image": "files/split_1793029714756_008_r3c2_file_00000000f97082308315c2fddf93382c.png"
+        },
+        {
+          "word": "I have learned English words",
+          "image": "files/split_1793029714756_009_r3c1_file_00000000f97082308315c2fddf93382c.png"
+        },
+        {
+          "word": "I have visited another country",
+          "image": "files/split_1793029714756_007_r3c3_file_00000000f97082308315c2fddf93382c.png"
+        },
+        {
+          "word": "I have read a book",
+          "image": "files/split_1793029714756_013_r1c3_file_00000000f97082308315c2fddf93382c.png"
+        }
+      ]
+    },
+    {
+      "type": "spoterror",
+      "title": "5. Grammar Detective",
+      "instruction": "Cada oración tiene una palabra incorrecta. Identifica el error y escribe la palabra correcta para reparar la oración.",
+      "dataA": [
+        {
+          "words": [
+            "She",
+            "have",
+            "already",
+            "passed",
+            "the",
+            "exam."
+          ],
+          "errorIndex": 1,
+          "fix": "has"
+        },
+        {
+          "words": [
+            "I",
+            "have",
+            "not",
+            "finished",
+            "my",
+            "poster",
+            "already."
+          ],
+          "errorIndex": 6,
+          "fix": "yet"
+        },
+        {
+          "words": [
+            "They",
+            "have",
+            "just",
+            "write",
+            "their",
+            "names."
+          ],
+          "errorIndex": 3,
+          "fix": "written"
+        },
+        {
+          "words": [
+            "Have",
+            "you",
+            "finish",
+            "the",
+            "homework",
+            "yet?"
+          ],
+          "errorIndex": 2,
+          "fix": "finished"
+        },
+        {
+          "words": [
+            "My",
+            "friends",
+            "has",
+            "just",
+            "built",
+            "a",
+            "robot."
+          ],
+          "errorIndex": 2,
+          "fix": "have"
+        },
+        {
+          "words": [
+            "She",
+            "has",
+            "already",
+            "make",
+            "a",
+            "video."
+          ],
+          "errorIndex": 3,
+          "fix": "made"
+        },
+        {
+          "words": [
+            "We",
+            "have",
+            "already",
+            "took",
+            "the",
+            "test."
+          ],
+          "errorIndex": 3,
+          "fix": "taken"
+        },
+        {
+          "words": [
+            "I",
+            "have",
+            "see",
+            "the",
+            "results",
+            "already."
+          ],
+          "errorIndex": 2,
+          "fix": "seen"
+        }
+      ],
+      "dataB": [
+        {
+          "words": [
+            "He",
+            "have",
+            "just",
+            "received",
+            "his",
+            "certificate."
+          ],
+          "errorIndex": 1,
+          "fix": "has"
+        },
+        {
+          "words": [
+            "They",
+            "have",
+            "not",
+            "completed",
+            "the",
+            "activity",
+            "already."
+          ],
+          "errorIndex": 6,
+          "fix": "yet"
+        },
+        {
+          "words": [
+            "She",
+            "has",
+            "just",
+            "win",
+            "a",
+            "competition."
+          ],
+          "errorIndex": 3,
+          "fix": "won"
+        },
+        {
+          "words": [
+            "Has",
+            "your",
+            "team",
+            "build",
+            "the",
+            "model",
+            "yet?"
+          ],
+          "errorIndex": 3,
+          "fix": "built"
+        },
+        {
+          "words": [
+            "We",
+            "has",
+            "already",
+            "finished",
+            "the",
+            "experiment."
+          ],
+          "errorIndex": 1,
+          "fix": "have"
+        },
+        {
+          "words": [
+            "My",
+            "brother",
+            "has",
+            "already",
+            "wrote",
+            "his",
+            "essay."
+          ],
+          "errorIndex": 4,
+          "fix": "written"
+        },
+        {
+          "words": [
+            "I",
+            "have",
+            "just",
+            "send",
+            "the",
+            "application."
+          ],
+          "errorIndex": 3,
+          "fix": "sent"
+        },
+        {
+          "words": [
+            "Have",
+            "you",
+            "learn",
+            "the",
+            "new",
+            "vocabulary",
+            "yet?"
+          ],
+          "errorIndex": 2,
+          "fix": "learned"
+        }
+      ]
+    },
+    {
+      "type": "reorder_sentences",
+      "title": "7. Build the Sentence",
+      "instruction": "Ordena las palabras para formar oraciones correctas en Present Perfect. Utiliza la traducción como pista y observa la posición de Just, Already y Yet.",
+      "dataA": [
+        {
+          "sentence": "I have just finished my homework.",
+          "es": "Acabo de terminar mi tarea."
+        },
+        {
+          "sentence": "She has already passed the final exam.",
+          "es": "Ella ya aprobó el examen final."
+        }
+      ],
+      "dataB": [
+        {
+          "sentence": "We have just received our results.",
+          "es": "Acabamos de recibir nuestros resultados."
+        },
+        {
+          "sentence": "I have already written my essay.",
+          "es": "Ya escribí mi ensayo."
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "flappy"
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
