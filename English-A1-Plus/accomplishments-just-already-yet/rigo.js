@@ -1,5 +1,5 @@
 /**
- * RIGO THE CHAMELEON v2 - Mascota oficial del ecosistema de inglés
+ * RIGO THE CHAMELEON v2 - Ghost Costume Refinement - Mascota oficial del ecosistema de inglés
  * Estilo: Kawaii realista (silueta de camaleón con cresta, cola enrollada, 4 patas)
  *
  * Uso:  <script src="rigo.js"></script>
@@ -268,6 +268,185 @@
         : '';
 
 
+      // ===== DISFRAZ DE OCTUBRE: FANTASMA + CALABAZA =====
+      // Se activa en la emoción neutral. El resto de las emociones no cambia.
+      // Para desactivar el disfraz, cambia esta condición a false.
+      const ghost = emotion === 'neutral';
+
+      // Cola ÚNICA para el disfraz: se dibuja antes de la sábana, de manera
+      // que el borde del vestido la tapa de verdad. No hay cola superpuesta.
+      const ghostTail = ghost
+        ? `<g id="rigo-ghost-tail">
+             <!-- Trazo externo y volumen verde; la raíz queda oculta bajo la tela -->
+             <path d="M 49 155 C 29 166, 15 157, 13 140
+                      C 10 125, 13 111, 25 107
+                      C 39 102, 44 115, 38 125
+                      C 32 136, 20 128, 22 118
+                      Q 25 112 30 117"
+                   fill="none" stroke="#1a1a1a" stroke-width="18"
+                   stroke-linecap="round" stroke-linejoin="round"/>
+             <path d="M 49 155 C 29 166, 15 157, 13 140
+                      C 10 125, 13 111, 25 107
+                      C 39 102, 44 115, 38 125
+                      C 32 136, 20 128, 22 118
+                      Q 25 112 30 117"
+                   fill="none" class="rigo-skin-stroke" stroke-width="12"
+                   stroke-linecap="round" stroke-linejoin="round"/>
+             <path d="M 15 136 Q 15 127 18 122"
+                   fill="none" stroke="#D1F39B" stroke-width="2.2"
+                   stroke-linecap="round" opacity="0.65"/>
+           </g>`
+        : '';
+
+      // La sábana es una sola silueta continua y tiene pliegues discretos.
+      // Los ojos de Rigo asoman por dos aberturas, sin tapar su expresión.
+      const ghostSheet = ghost
+        ? `<g id="rigo-ghost-sheet">
+             <ellipse cx="102" cy="187" rx="69" ry="5" fill="#1a1a1a" opacity="0.10"/>
+             <path d="M 100 38
+                      C 67 37, 41 52, 32 78
+                      C 24 99, 31 120, 31 138
+                      C 31 153, 26 164, 23 175
+                      Q 31 186 41 176
+                      Q 52 188 64 177
+                      Q 76 187 88 177
+                      Q 100 188 112 177
+                      Q 124 187 136 177
+                      Q 148 188 159 176
+                      Q 169 185 177 175
+                      C 174 163, 169 151, 169 137
+                      C 169 119, 177 99, 168 78
+                      C 159 52, 133 37, 100 38 Z"
+                   fill="url(#ghostSheet)" stroke="#1a1a1a"
+                   stroke-width="3.4" stroke-linejoin="round"/>
+             <!-- Zonas suaves de sombra para dar caída a la tela -->
+             <path d="M 33 112 Q 41 126 38 152 L 32 169 Q 46 167 49 150
+                      Q 46 128 43 116 Z" fill="#BCCADC" opacity="0.20"/>
+             <path d="M 164 114 Q 157 132 160 154 L 169 169
+                      Q 174 151 169 133 Z" fill="#A7B8CC" opacity="0.20"/>
+             <g fill="none" stroke="#B9C7D9" stroke-linecap="round" opacity="0.78">
+               <path d="M 42 129 Q 43 150 36 172" stroke-width="2"/>
+               <path d="M 61 148 Q 60 164 62 174" stroke-width="1.8"/>
+               <path d="M 100 150 Q 97 164 100 177" stroke-width="1.5"/>
+               <path d="M 139 147 Q 138 165 140 174" stroke-width="1.8"/>
+               <path d="M 159 128 Q 158 150 165 172" stroke-width="2"/>
+             </g>
+             <path d="M 42 73 Q 57 49 81 48" fill="none"
+                   stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.72"/>
+             <!-- Borde oscuro interior de los huecos: los ojos quedan delante -->
+             <ellipse cx="55" cy="88" rx="21.7" ry="20.7" fill="#1a1a1a"/>
+             <ellipse cx="145" cy="88" rx="21.7" ry="20.7" fill="#1a1a1a"/>
+           </g>`
+        : '';
+
+      // Cresta reconocible de Rigo asomando por una abertura del disfraz.
+      const ghostCrest = ghost
+        ? `<g id="rigo-ghost-crest">
+             <ellipse cx="100" cy="49" rx="30" ry="5" fill="#252C35"/>
+             <path d="M 71 51 L 78 38 L 85 49 L 92 32 L 100 48
+                      L 108 30 L 116 48 L 123 38 L 129 51 Z"
+                   class="rigo-skin" stroke="#1a1a1a" stroke-width="2.8"
+                   stroke-linejoin="round"/>
+             <path d="M 72 52 Q 100 47 128 52" fill="none"
+                   stroke="#E9EFF5" stroke-width="3" stroke-linecap="round"/>
+           </g>`
+        : '';
+
+      // Dos piecitos con deditos visibles por debajo del disfraz.
+      const ghostFeet = ghost
+        ? `<g id="rigo-ghost-feet" fill="none">
+             <path d="M 59 177 Q 57 183 59 185 Q 69 193 79 185 L 81 177 Z"
+                   class="rigo-skin" stroke="#1a1a1a" stroke-width="2.3"/>
+             <path d="M 119 177 L 121 185 Q 131 193 141 185 Q 143 183 141 177 Z"
+                   class="rigo-skin" stroke="#1a1a1a" stroke-width="2.3"/>
+             <g stroke="#1a1a1a" stroke-width="1.4" stroke-linecap="round">
+               <path d="M 65 184 L 64 188 M 73 184 L 74 188"/>
+               <path d="M 126 184 L 125 188 M 134 184 L 135 188"/>
+             </g>
+           </g>`
+        : '';
+
+      // Brazito parcialmente descubierto, detrás de la calabaza.
+      // El puño blanco de la sábana remata la salida del brazo.
+      const ghostArm = ghost
+        ? `<g id="rigo-ghost-arm" fill="none" stroke-linecap="round">
+             <path d="M 155 129 Q 165 133 164 147"
+                   stroke="#1a1a1a" stroke-width="13.5"/>
+             <path d="M 155 129 Q 165 133 164 147"
+                   class="rigo-skin-stroke" stroke-width="8.5"/>
+           </g>`
+        : '';
+
+      // Jack-o'-lantern junto a Rigo, sin mano, un poco más grande.
+      const pumpkin = ghost
+        ? `<g id="rigo-pumpkin">
+             <ellipse cx="176" cy="152" rx="21" ry="19.5"
+                      fill="#EC720E" stroke="#1a1a1a" stroke-width="3"/>
+             <ellipse cx="176" cy="152" rx="14.2" ry="18.5" fill="#FFA329"/>
+             <path d="M 166 135 Q 155 152 166 169 M 186 135 Q 197 152 186 169"
+                   fill="none" stroke="#C75B0B" stroke-width="2.5" stroke-linecap="round"/>
+             <path d="M 176 134 Q 171 152 176 170" fill="none"
+                   stroke="#EC790F" stroke-width="1.7" opacity="0.78"/>
+             <ellipse cx="169" cy="141" rx="4.2" ry="2.8" fill="#FFE3AA" opacity="0.55"/>
+             <!-- Tallo curvo y pequeña hoja -->
+             <path d="M 174 135 Q 172 129 175 124 Q 179 120 183 124
+                      Q 179 129 181 135 Z"
+                   fill="#5C9E36" stroke="#1a1a1a" stroke-width="2"
+                   stroke-linejoin="round"/>
+             <path d="M 178 125 Q 186 118 192 124 Q 184 130 178 125 Z"
+                   fill="#7AC64B" stroke="#1a1a1a" stroke-width="1.5"/>
+             <!-- Ojos y boca de la calabaza iluminada -->
+             <path d="M 164 147.5 L 171.5 147.5 L 168 141.2 Z
+                      M 180.5 147.5 L 188 147.5 L 184.5 141.2 Z"
+                   fill="#FFE16A" stroke="#81401C" stroke-width="1.5"
+                   stroke-linejoin="round"/>
+             <path d="M 164 156 L 168 154.2 L 171.5 158.1 L 176 155.2
+                      L 180.5 158.1 L 184 154.2 L 188 156
+                      Q 184 166 176 164 Q 168 166 164 156 Z"
+                   fill="#FFE16A" stroke="#81401C" stroke-width="1.5"
+                   stroke-linejoin="round"/>
+           </g>`
+        : '';
+
+      // Mano: palma + pulgar + dedos curvados a ambos lados de la calabaza.
+      // Al pintarlos ENCIMA de la calabaza, se aprecia que la está agarrando.
+      const ghostHand = ghost
+        ? `<g id="rigo-ghost-hand" stroke="#1a1a1a"
+              stroke-linecap="round" stroke-linejoin="round">
+             <!-- Palma a la izquierda de la calabaza -->
+             <path d="M 158 144 Q 163 140 168 144 Q 171 149 168 155
+                      Q 166 160 161 159 Q 156 157 156 150 Z"
+                   class="rigo-skin" stroke-width="2.5"/>
+             <!-- Pulgar por encima de la curva superior -->
+             <path d="M 162 146 Q 165 141 170 142 Q 174 142 174 146"
+                   fill="none" stroke-width="6.5"/>
+             <path d="M 162 146 Q 165 141 170 142 Q 174 142 174 146"
+                   fill="none" class="rigo-skin-stroke" stroke-width="3.9"/>
+             <!-- Dedos inferiores sujetando por debajo -->
+             <path d="M 164 152 Q 167 156 171 154"
+                   fill="none" stroke-width="6"/>
+             <path d="M 164 152 Q 167 156 171 154"
+                   fill="none" class="rigo-skin-stroke" stroke-width="3.5"/>
+             <path d="M 161 158 Q 165 163 171 161"
+                   fill="none" stroke-width="5.5"/>
+             <path d="M 161 158 Q 165 163 171 161"
+                   fill="none" class="rigo-skin-stroke" stroke-width="3.1"/>
+             <path d="M 159 146 Q 159 150 161 153"
+                   fill="none" stroke="#DDF7B5" stroke-width="1.5"/>
+           </g>`
+        : '';
+
+      const ghostSleeve = ghost
+        ? `<g id="rigo-ghost-sleeve">
+             <path d="M 152 129 Q 161 129 164 136
+                      Q 162 140 158 138 Q 154 134 150 133 Z"
+                   fill="url(#ghostSheet)" stroke="#1a1a1a"
+                   stroke-width="2.2" stroke-linejoin="round"/>
+             <path d="M 154 132 Q 159 133 160 136" fill="none"
+                   stroke="#B9C7D9" stroke-width="1.5" stroke-linecap="round"/>
+           </g>`
+        : '';
+
       return `
         <svg viewBox="0 0 200 200" width="100%" height="100%" ${bodyAnim}>
           <defs>
@@ -275,14 +454,19 @@
               <stop offset="0%" stop-color="#FF6B9D" stop-opacity="0.9"/>
               <stop offset="100%" stop-color="#FF6B9D" stop-opacity="0"/>
             </radialGradient>
+            <linearGradient id="ghostSheet" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/>
+              <stop offset="54%" stop-color="#F7FAFF"/>
+              <stop offset="100%" stop-color="#DAE4F0"/>
+            </linearGradient>
             <radialGradient id="belly" cx="50%" cy="30%">
               <stop offset="0%" stop-color="#D4F5A8" stop-opacity="0.9"/>
               <stop offset="100%" stop-color="#B8E986" stop-opacity="0.6"/>
             </radialGradient>
           </defs>
 
-          <!-- COLA ENROLLADA (se anima en welcome) -->
-          <g class="${tailClass}" style="transform-origin: 55px 150px;">
+          <!-- Cola: detrás de la sábana cuando hay disfraz; original en otras emociones -->
+          ${ghost ? ghostTail : `<g class="${tailClass}" style="transform-origin: 55px 150px;">
             <path d="M 55 150 Q 35 150, 25 135 Q 15 120, 20 105 Q 25 92, 38 92 Q 48 92, 48 102 Q 48 108, 42 108 Q 37 108, 37 103"
                   fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
             <path d="M 55 150 Q 35 150, 25 135 Q 15 120, 20 105 Q 25 92, 38 92 Q 48 92, 48 102 Q 48 108, 42 108 Q 37 108, 37 103"
@@ -292,7 +476,7 @@
               <path d="M 38 144 Q 35 147 33 144" fill="none"/>
               <path d="M 28 130 Q 25 130 24 127" fill="none"/>
             </g>
-          </g>
+          </g>`}
 
           <!-- PATAS TRASERAS -->
           <ellipse cx="70" cy="168" rx="14" ry="9" class="rigo-skin" stroke="#1a1a1a" stroke-width="3"/>
@@ -344,19 +528,28 @@
             <circle cx="65" cy="145" r="1.5"/>
           </g>
 
+          ${ghostSheet}
+          ${ghostCrest}
+
           <!-- OJOS -->
           ${face.leftEye}
           ${face.rightEye}
 
-          <!-- MEJILLAS -->
-          <ellipse cx="48" cy="108" rx="11" ry="7" fill="url(#cheek)"/>
-          <ellipse cx="152" cy="108" rx="11" ry="7" fill="url(#cheek)"/>
+          <!-- MEJILLAS (visibles solo sin la sábana) -->
+          ${ghost ? '' : `<ellipse cx="48" cy="108" rx="11" ry="7" fill="url(#cheek)"/>
+          <ellipse cx="152" cy="108" rx="11" ry="7" fill="url(#cheek)"/>`}
 
           <!-- FOSAS NASALES -->
-          <circle cx="94" cy="108" r="1.5" fill="#1a1a1a"/>
-          <circle cx="106" cy="108" r="1.5" fill="#1a1a1a"/>
+          ${ghost ? '' : `<circle cx="94" cy="108" r="1.5" fill="#1a1a1a"/>
+          <circle cx="106" cy="108" r="1.5" fill="#1a1a1a"/>`}
 
-          ${face.mouth}
+          ${ghost
+            ? `<path d="M 89 122 Q 100 135 111 122 Q 100 142 89 122 Z"
+                     fill="#30323C" stroke="#1a1a1a" stroke-width="1.6"
+                     stroke-linejoin="round"/>
+               <path d="M 96 131 Q 100 129 104 131" fill="none"
+                     stroke="#F29CAC" stroke-width="2" stroke-linecap="round"/>`
+            : face.mouth}
           ${gameGlasses}
           ${questionMark}
           ${thoughtBubble}
@@ -366,8 +559,11 @@
           ${musicalMark}
           ${elderMark}
 
+          ${ghostFeet}
+          ${pumpkin}
+
           <!-- BRILLO SUPERIOR -->
-          <ellipse cx="85" cy="58" rx="14" ry="6" fill="#fff" opacity="0.3"/>
+          ${ghost ? '' : `<ellipse cx="85" cy="58" rx="14" ry="6" fill="#fff" opacity="0.3"/>`}
         </svg>
       `;
     }
@@ -462,7 +658,7 @@
         default:
           leftEye = this.bigEye(LE_CX, LE_CY);
           rightEye = this.bigEye(RE_CX, RE_CY);
-          mouth = `<path d="M 90 124 Q 100 130 110 124" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>`;
+          mouth = `<path d="M 88 125 Q 100 133 112 125" fill="none" stroke="#1a1a1a" stroke-width="3.2" stroke-linecap="round"/>`;
       }
       return { leftEye, rightEye, mouth };
     }
