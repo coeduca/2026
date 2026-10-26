@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"736d5e3e-6f24-435e-aa1f-7f4edcfb94a2","token":"5245078e-9d63-4d6d-8c31-98614de40e18"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · 5-5 Acciones Ciudadanas
+derechos de las poblaciones vulnerables </title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="civica">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="civica-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "27161614-155d-403b-95db-76f08e08e89e",
+  "container": "#app",
+  "topic": "5-5 Acciones Ciudadanas\nderechos de las poblaciones vulnerables ",
+  "unit": "Unidad 5 - Semana 5",
+  "subjectLabel": "Ciudadanía y Valores",
+  "book": {
+    "url": "https://drive.google.com/file/d/1L9bPsfp8K0gBJVO5QCiBmaIJOF3YrJ7w/view?usp=sharing",
+    "label": "Libro de Octavo"
+  },
+  "colors": {
+    "primary": "#3763D4",
+    "accent": "#5995B6",
+    "bg": "#F5E7B2",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#E9E5C9",
+    "text": "#1A1A1A"
+  },
+  "pdfDesign": "Pastel",
+  "sections": {
+    "explore": [
+      {
+        "type": "note",
+        "title": "Conozcamos el tema",
+        "html": "\u003carticle style=\"font-family:Arial,sans-serif;color:#1A1A1A;line-height:1.65;font-size:15px;\">\u003cheader style=\"background:#3763D4;color:#FFFFFF;padding:17px;border-radius:13px 13px 0 0;\">\u003ch2 style=\"font-size:21px;line-height:1.3;margin:0;color:#FFFFFF;\">Acciones ciudadanas y derechos humanos\u003c/h2>\u003cp style=\"font-size:13px;margin:7px 0 0;color:#FFFFFF;\">Unidad 5 · Semana 5 · Octavo grado\u003c/p>\u003c/header>\u003cdiv style=\"border:1px solid #E9E5C9;border-top:0;border-radius:0 0 13px 13px;background:#FFFFFF;padding:17px;\">\u003ch3 style=\"font-size:17px;color:#3763D4;margin:0 0 8px;\">¿Qué es la vulnerabilidad?\u003c/h3>\u003cp style=\"margin:0 0 13px;\">Una persona o un grupo se encuentra en \u003cstrong>situación de vulnerabilidad\u003c/strong> cuando enfrenta condiciones que dificultan su desarrollo pleno y el ejercicio de sus derechos humanos. Estas dificultades pueden relacionarse con la discriminación, la pobreza, la exclusión o las condiciones de su entorno.\u003c/p>\u003ch3 style=\"font-size:17px;color:#3763D4;margin:15px 0 8px;\">Tipos de vulnerabilidad\u003c/h3>\u003cul style=\"padding-left:21px;margin:0 0 14px;\">\u003cli>\u003cstrong>Social:\u003c/strong> exclusión relacionada con la edad, el género, la etnia o la situación migratoria.\u003c/li>\u003cli>\u003cstrong>Económica:\u003c/strong> pobreza, desempleo e inseguridad alimentaria.\u003c/li>\u003cli>\u003cstrong>Cultural:\u003c/strong> dificultades vinculadas con la religión, el idioma o la identidad.\u003c/li>\u003cli>\u003cstrong>Ambiental:\u003c/strong> exposición a desastres naturales y otros riesgos del territorio.\u003c/li>\u003c/ul>\u003ch3 style=\"font-size:17px;color:#3763D4;margin:15px 0 8px;\">¿Qué poblaciones necesitan especial atención?\u003c/h3>\u003cp style=\"margin:0 0 13px;\">Entre los grupos estudiados se encuentran \u003cstrong>la niñez y adolescencia, las mujeres, las personas con discapacidad, las personas mayores, quienes viven en extrema pobreza, las minorías étnicas y las personas migrantes y refugiadas.\u003c/strong>\u003c/p>\u003cp style=\"margin:0 0 14px;\">Todas las personas tienen los mismos derechos. Sin embargo, algunas necesitan medidas específicas para superar las dificultades que impiden ejercerlos plenamente.\u003c/p>\u003cdiv style=\"background:#F5E7B2;border-left:4px solid #3763D4;border-radius:8px;padding:12px 14px;margin:14px 0;\">\u003ch3 style=\"font-size:16px;margin:0 0 7px;color:#1A1A1A;\">Valores fundamentales\u003c/h3>\u003cp style=\"margin:0;\">\u003cstrong>Inclusión:\u003c/strong> crear oportunidades de participación.\u003cbr>\u003cstrong>Igualdad:\u003c/strong> reconocer los mismos derechos para todas las personas.\u003cbr>\u003cstrong>Equidad:\u003c/strong> atender las necesidades particulares para lograr igualdad en el ejercicio de los derechos.\u003cbr>\u003cstrong>Justicia:\u003c/strong> crear condiciones para el desarrollo individual y social.\u003c/p>\u003c/div>\u003ch3 style=\"font-size:17px;color:#3763D4;margin:16px 0 8px;\">¿Qué podemos hacer como ciudadanos?\u003c/h3>\u003cul style=\"padding-left:21px;margin:0 0 13px;\">\u003cli>Denunciar las violaciones a los derechos humanos.\u003c/li>\u003cli>Conocer y promover los mecanismos de protección de los derechos.\u003c/li>\u003cli>Participar en proyectos escolares o locales en beneficio de las poblaciones vulnerables.\u003c/li>\u003cli>Generar espacios de convivencia y participación ciudadana para difundir los derechos humanos.\u003c/li>\u003c/ul>\u003cp style=\"background:#E9E5C9;border-radius:9px;padding:12px;margin:14px 0 0;\">\u003cstrong>Recuerda:\u003c/strong> proteger a las personas en situación de vulnerabilidad no significa considerarlas incapaces, sino reconocer sus derechos, eliminar barreras y contribuir a una sociedad más justa, equitativa, inclusiva e igualitaria.\u003c/p>\u003c/div>\u003c/article>"
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "1. Actividad en pares — Respondan",
+        "instruction": "Respondan:",
+        "image": "files/istockphoto-2193857088-612x612.jpg",
+        "dataA": [
+          {
+            "q": "a. ¿Qué significa estar en una situación de vulnerabilidad?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "b. ¿Qué se puede hacer para prevenir esas situaciones?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu respuesta..."
+          }
+        ]
+      },
+      {
+        "type": "cv_table",
+        "title": "1. Actividad en pares — Identificación de grupos",
+        "instruction": "Identifiquen cuatro grupos de personas en situación de vulnerabilidad y escriban dos características de cada uno.",
+        "dataA": {
+          "columns": [
+            "Grupo",
+            "Nombre del grupo y dos características"
+          ],
+          "rows": [
+            [
+              {
+                "type": "text",
+                "value": "1"
+              },
+              {
+                "type": "input",
+                "placeholder": "Grupo y dos características..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "2"
+              },
+              {
+                "type": "input",
+                "placeholder": "Grupo y dos características..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "3"
+              },
+              {
+                "type": "input",
+                "placeholder": "Grupo y dos características..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "4"
+              },
+              {
+                "type": "input",
+                "placeholder": "Grupo y dos características..."
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "1. Actividad en pares — Reflexión",
+        "instruction": "a. Reflexionen a partir de las preguntas.",
+        "dataA": [
+          {
+            "q": "¿Cómo se pueden prevenir las situaciones de vulnerabilidad que han identificado?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu reflexión..."
+          },
+          {
+            "q": "¿Qué acciones ciudadanas conoces en las que se promuevan los derechos humanos de las poblaciones vulnerables?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu reflexión..."
+          },
+          {
+            "q": "¿Cómo pueden ayudar a una persona que está siendo tratada de forma injusta en la escuela?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu reflexión..."
+          },
+          {
+            "q": "¿Cómo se puede prevenir las situaciones de injusticia en el entorno?",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escribe tu reflexión..."
+          }
+        ]
+      },
+      {
+        "type": "cv_table",
+        "title": "1. Actividad en pares — Compartir",
+        "instruction": "b. Compartan con sus compañeros.",
+        "dataA": {
+          "columns": [
+            "Actividad",
+            "Realizada"
+          ],
+          "rows": [
+            [
+              {
+                "type": "text",
+                "value": "b. Compartan con sus compañeros."
+              },
+              {
+                "type": "check",
+                "answer": true
+              }
+            ]
+          ]
+        }
+      }
+    ],
+    "deepen": [
+      {
+        "type": "cv_textanswer",
+        "title": "2. Actividad individual",
+        "instruction": "Desarrolla la habilidad de convivencia e interacción social. Para ello, responde:",
+        "image": "files/poblaci-n-vulnerable-3.jpg",
+        "dataA": [
+          {
+            "q": "a. ¿Cómo se puede velar por el cumplimiento de los derechos humanos de las personas en situaciones de vulnerabilidad?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "b. ¿Cuáles son las condiciones que evidencian el cumplimiento de los derechos humanos de la niñez y la adolescencia?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu respuesta..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "3. Actividad individual — Selección del grupo",
+        "instruction": "Desarrolla la habilidad de convivencia e interacción social. Para ello, resuelve:",
+        "dataA": [
+          {
+            "q": "a. Selecciona un grupo en situación de vulnerabilidad.",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe el grupo seleccionado..."
+          }
+        ]
+      },
+      {
+        "type": "cv_table",
+        "title": "3. Actividad individual — Tres propuestas",
+        "instruction": "b. Diseña tres propuestas para contribuir a que se cumplan los derechos humanos del grupo seleccionado.",
+        "dataA": {
+          "columns": [
+            "Propuesta",
+            "Descripción"
+          ],
+          "rows": [
+            [
+              {
+                "type": "text",
+                "value": "1"
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe tu primera propuesta..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "2"
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe tu segunda propuesta..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "3"
+              },
+              {
+                "type": "input",
+                "placeholder": "Escribe tu tercera propuesta..."
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "4. Actividad individual",
+        "instruction": "Desarrolla la habilidad de participación activa y responsable. Para ello, responde:",
+        "dataA": [
+          {
+            "q": "a. ¿Qué otras acciones ciudadanas pueden llevarse a cabo en la localidad para promover la defensa de los derechos de las personas vulnerables?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "b. ¿De qué manera la juventud puede aportar en el reconocimiento y cumplimiento de los derechos humanos de los sectores vulnerables?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu respuesta..."
+          },
+          {
+            "q": "c. ¿De qué manera los diferentes actores pueden contribuir a crear sociedades más justas, equitativas, igualitarias e inclusivas?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escribe tu respuesta..."
+          }
+        ]
+      }
+    ],
+    "consolidate": [
+      {
+        "type": "cv_table",
+        "title": "5. Actividad en equipo — Investigación",
+        "instruction": "Indaguen sobre una lucha social para el reconocimiento y cumplimiento de los derechos humanos de las poblaciones vulnerables a escala nacional o internacional. a. Completen la tabla a partir de sus hallazgos.",
+        "image": "files/nynpmx0qshktecn0zn01_i2vea2n7rtyn7dgak219_protests.jpg",
+        "dataA": {
+          "columns": [
+            "",
+            ""
+          ],
+          "rows": [
+            [
+              {
+                "type": "text",
+                "value": "Nombre de la iniciativa o lucha social"
+              },
+              {
+                "type": "input",
+                "placeholder": "Escriban el nombre de la iniciativa o lucha social..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "Población vulnerable a la que benefician"
+              },
+              {
+                "type": "input",
+                "placeholder": "Escriban la población beneficiada..."
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "Acciones concretas que ejecutan para la defensa de los derechos humanos"
+              },
+              {
+                "type": "input",
+                "placeholder": "Describan las acciones concretas..."
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "5. Actividad en equipo — Análisis",
+        "instruction": "b. Respondan:",
+        "dataA": [
+          {
+            "q": "¿Qué mecanismos se emplean para la promoción de los derechos humanos de los grupos vulnerables?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escriban su respuesta..."
+          },
+          {
+            "q": "¿Cómo estas acciones ciudadanas o luchas sociales contribuyen a construir sociedades más equitativas?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escriban su respuesta..."
+          },
+          {
+            "q": "¿Cuáles son los actores que deben intervenir para garantizar el cumplimiento de los derechos humanos de la población seleccionada?",
+            "minLength": 16,
+            "rows": 4,
+            "placeholder": "Escriban su respuesta..."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "6. Actividad con docente — Preparación de la campaña",
+        "instruction": "Organicen una campaña de concientización sobre las personas en condición de vulnerabilidad y la importancia de garantizar sus derechos humanos.",
+        "dataA": [
+          {
+            "q": "a. Seleccionen un grupo en situación de vulnerabilidad. Puede ser uno de los estudiados u otro grupo que consideren importante visibilizar.",
+            "minLength": 16,
+            "rows": 3,
+            "placeholder": "Escriban el grupo seleccionado..."
+          },
+          {
+            "q": "b. Indaguen sobre la situación del grupo seleccionado en la actualidad a escala nacional y regional.",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Registren los hallazgos de su investigación..."
+          },
+          {
+            "q": "c. Destaquen los principales logros y los desafíos en materia de derechos humanos para estos grupos.",
+            "minLength": 16,
+            "rows": 5,
+            "placeholder": "Escriban los principales logros y desafíos..."
+          }
+        ]
+      },
+      {
+        "type": "cv_table",
+        "title": "6. Actividad con docente — Presentación y concientización",
+        "instruction": "Continúen con la organización de la campaña de concientización.",
+        "dataA": {
+          "columns": [
+            "Actividad",
+            "Realizada"
+          ],
+          "rows": [
+            [
+              {
+                "type": "text",
+                "value": "d. Presenten los resultados de su indagación en afiches. Colóquenlos en lugares visibles de la institución."
+              },
+              {
+                "type": "check",
+                "answer": true
+              }
+            ],
+            [
+              {
+                "type": "text",
+                "value": "e. Organicen una jornada de concientización para los miembros de la comunidad educativa."
+              },
+              {
+                "type": "check",
+                "answer": true
+              }
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  "game": {
+    "type": "hangman",
+    "winScore": 3,
+    "words": [
+      {
+        "word": "EQUIDAD",
+        "hint": "Apoyos según las necesidades para lograr condiciones justas."
+      },
+      {
+        "word": "REFUGIADOS",
+        "hint": "Personas obligadas a huir de conflictos o peligros."
+      },
+      {
+        "word": "LEYES",
+        "hint": "Normas que regulan la sociedad y protegen a las personas."
+      },
+      {
+        "word": "ACCESIBILIDAD",
+        "hint": "Posibilidad de utilizar espacios y servicios sin barreras."
+      },
+      {
+        "word": "MUJERES",
+        "hint": "Grupo que busca igualdad en los espacios de decisión."
+      },
+      {
+        "word": "DESIGUALDAD",
+        "hint": "Diferencia injusta en las oportunidades de las personas."
+      },
+      {
+        "word": "CULTURA",
+        "hint": "Costumbres y expresiones compartidas por una comunidad."
+      },
+      {
+        "word": "VULNERABILIDAD",
+        "hint": "Condición que aumenta el riesgo de sufrir privaciones de derechos."
+      },
+      {
+        "word": "INFANCIA",
+        "hint": "Primera etapa de la vida humana."
+      },
+      {
+        "word": "COMPROMISO",
+        "hint": "Responsabilidad asumida para contribuir al bienestar común."
+      },
+      {
+        "word": "RESPETO",
+        "hint": "Trato digno que reconoce las diferencias entre las personas."
+      },
+      {
+        "word": "ORGANIZACIONES",
+        "hint": "Agrupaciones que trabajan por objetivos sociales comunes."
+      },
+      {
+        "word": "POBREZA",
+        "hint": "Situación de falta de recursos para cubrir necesidades básicas."
+      },
+      {
+        "word": "JUSTICIA",
+        "hint": "Valor que busca garantizar un trato y condiciones adecuados."
+      },
+      {
+        "word": "MIGRANTES",
+        "hint": "Personas que se trasladan de un territorio a otro."
+      },
+      {
+        "word": "INCLUSIVA",
+        "hint": "Característica de una sociedad que integra a todas las personas."
+      },
+      {
+        "word": "DERECHOS",
+        "hint": "Garantías fundamentales que corresponden a todos los seres humanos."
+      },
+      {
+        "word": "ETNIAS",
+        "hint": "Comunidades que comparten tradiciones e identidad."
+      },
+      {
+        "word": "SOLIDARIDAD",
+        "hint": "Valor que impulsa a ayudar a quienes enfrentan dificultades."
+      },
+      {
+        "word": "IGUALDAD",
+        "hint": "Principio según el cual todos poseen las mismas garantías."
+      },
+      {
+        "word": "PROTEGER",
+        "hint": "Actuar para evitar daños, injusticias o abusos."
+      },
+      {
+        "word": "CONVIVENCIA",
+        "hint": "Relación cotidiana basada en el trato pacífico entre personas."
+      },
+      {
+        "word": "DISCAPACIDAD",
+        "hint": "Condición que puede requerir la eliminación de barreras para participar plenamente."
+      },
+      {
+        "word": "DENUNCIA",
+        "hint": "Comunicación formal de un abuso o una violación de derechos."
+      },
+      {
+        "word": "ADOLESCENCIA",
+        "hint": "Etapa de desarrollo entre la niñez y la vida adulta."
+      }
+    ]
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
