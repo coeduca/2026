@@ -101,15 +101,53 @@
   // =====================================================================
   function setupAntiCopy() {
     const block = e => { e.preventDefault(); return false; };
-    ['contextmenu', 'copy', 'cut', 'paste', 'selectstart', 'dragstart']
+    ['contextmenu', 'copy', 'cut', 'selectstart', 'dragstart']
       .forEach(evt => document.addEventListener(evt, block, { passive: false }));
 
-    // Permitir copy/paste solo en inputs específicos del login
-    document.addEventListener('copy', e => {
-      const t = e.target;
-      if (t && t.classList && t.classList.contains('coeduca-input-allow-copy')) return;
+    // Solo los campos de respuesta: las fichas usan el arrastre propio del framework.
+    function isAnswerField(target) {
+      const field = target && target.closest
+        ? target.closest('input, textarea, [contenteditable]') : null;
+      if (!field || field.disabled || field.readOnly) return false;
+      if (field.matches('input') && !['text', 'search', 'email', 'url', 'tel', 'number', 'password'].includes(field.type)) return false;
+      if (field.hasAttribute('contenteditable') && !field.isContentEditable) return false;
+      return !!field.closest('.coeduca-exercise-body, .civica-exercise-body');
+    }
+
+    function warnCheating() {
+      const rigo = global.rigo || document.querySelector('rigo-mascot');
+      if (!rigo) return;
+      if (typeof rigo.warnCheating === 'function') rigo.warnCheating();
+      else {
+        if (typeof rigo.setEmotion === 'function') rigo.setEmotion('sad');
+        if (typeof rigo.say === 'function') rigo.say('Oops, no puedes hacer trampa aquí', 4500);
+      }
+    }
+
+    const capture = { capture: true, passive: false };
+    const rejectAnswerInsertion = e => {
       e.preventDefault();
-    }, true);
+      e.stopPropagation();
+      warnCheating();
+    };
+    document.addEventListener('paste', e => {
+      // Conserva el bloqueo general de pegado y avisa en los ejercicios.
+      e.preventDefault();
+      if (isAnswerField(e.target)) rejectAnswerInsertion(e);
+    }, capture);
+    document.addEventListener('dragover', e => {
+      // Permite recibir drop para cancelarlo antes de que el navegador inserte texto.
+      if (isAnswerField(e.target)) e.preventDefault();
+    }, capture);
+    document.addEventListener('drop', e => {
+      if (isAnswerField(e.target)) rejectAnswerInsertion(e);
+    }, capture);
+    document.addEventListener('beforeinput', e => {
+      // También cubre pegado desde menús móviles y las rutas nativas de inserción.
+      if (/^insertFrom(?:Paste|Drop)/.test(e.inputType || '') && isAnswerField(e.target)) {
+        rejectAnswerInsertion(e);
+      }
+    }, capture);
   }
 
   // =====================================================================

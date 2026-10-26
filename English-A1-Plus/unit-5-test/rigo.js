@@ -9,6 +9,7 @@
  * API pública:
  *   rigo.welcome()        -> saludo inicial antes del NIE
  *   rigo.loginSuccess(n)  -> celebración al ingresar
+ *   rigo.warnCheating()  -> avisa al intentar pegar o arrastrar respuestas
  *   rigo.setGrade(grade)  -> filtra hints al grado actual
  *   rigo.inviteGame()     -> invita al juego final
  *   rigo.cheer()          -> festeja una respuesta correcta
@@ -22,6 +23,9 @@
 (function () {
   'use strict';
 
+  // Se configura al generar el proyecto. Sin selección, Rigo conserva su apariencia.
+  const RIGO_COSTUME = 'ghost';
+
   const EMOTIONS = [
     'neutral', 'welcome', 'happy', 'confused', 'thinking',
     'sneaky', 'sad', 'excited', 'game', 'love', 'angry',
@@ -34,6 +38,71 @@
   //   - emotion: emoción forzada al mostrar el mensaje (opcional)
   //              Si no se define, usa la emoción por defecto del contexto.
   const RANDOM_MESSAGES = [
+    { text: "Todos aprendemos algo nuevo cada día", grade: null, emotion: 'happy' },
+    { text: "Es mejor trabajar pensando", grade: null, emotion: 'happy' },
+    { text: "Soy el más hermosos del salón", grade: null, emotion: 'happy' },
+    { text: "Ok, pero mi novia", grade: null, emotion: 'love' },
+    { text: "Entra al cuarto, subele el volumen al radio...", grade: null, emotion: 'musical' },
+    { text: "Aquí ya no hay postes", grade: null, emotion: 'dizzy' },
+    { text: "No soy tu compañero, soy tu compañere", grade: null, emotion: 'angry' },
+    { text: "Hoy no me bañé", grade: null, emotion: 'happy' },
+    { text: "No le tengo miedo a las cucarachas", grade: null, emotion: 'happy' },
+    { text: "El pasado ya pasó", grade: null, emotion: 'happy' },
+    { text: "No me asusta ni la siguanaba", grade: null, emotion: 'dizzy' },
+    { text: "Me gusta el sushi", grade: null, emotion: 'happy' },
+    { text: "Dime con quien andas y te diré quien eres", grade: null, emotion: 'happy' },
+    { text: "Trabajar en equipo puede hacer el trabajo más fácil", grade: null, emotion: 'happy' },
+    { text: "Practicar inglés no hace daño.", grade: null, emotion: 'happy' },
+    { text: "Puedes terminarlo a tu ritmo", grade: null, emotion: 'happy' },
+    { text: "¡Abueloo tlalooc! Ayudanos", grade: null, emotion: 'happy' },
+    { text: "我是里戈", grade: null, emotion: 'happy' },
+    { text: "Todo me recuerda a ella", grade: null, emotion: 'sad' },
+    { text: "Todo lo que necesitas es amor", grade: null, emotion: 'happy' },
+    { text: "Cuando sea grande quiero ser bombero", grade: null, emotion: 'happy' },
+    { text: "Todo es mejor cuando estudias", grade: null, emotion: 'happy' },
+    { text: "2 + 2 = 4", grade: null, emotion: 'sneaky' },
+    { text: "¿Vas a trabajar o a perder el tiempo?", grade: null, emotion: 'neutral' },
+    { text: "¿Como has estado?", grade: null, emotion: 'happy' },
+    { text: "Relajate", grade: null, emotion: 'happy' },
+    { text: "¿Hoy si terminarás?", grade: null, emotion: 'excited' },
+    { text: "Que miedo no saber inglés", grade: null, emotion: 'sad' },
+    { text: "Mi familia es muy grande", grade: null, emotion: 'sneaky' },
+    { text: "Un nuevo día, nuevas oportunidades", grade: null, emotion: 'neutral' },
+    { text: "Me haces sentir orgulloso", grade: null, emotion: 'happy' },
+    { text: "Manten la calma", grade: null, emotion: 'happy' },
+    { text: "¿Todo bien?", grade: null, emotion: 'neutral' },
+    { text: "Pongan cumbia", grade: null, emotion: 'sneaky' },
+    { text: "Estamos para ayudar", grade: null, emotion: 'elder' },
+    { text: "Six Seven", grade: ["Octavo", "Séptimo"], emotion: 'game' },
+    { text: "Raios", grade: null, emotion: 'dizzy' },
+    { text: "Compremos un ventilador entre todos", grade: null, emotion: 'excited' },
+    { text: "Ya casi terminas... Las ganas", grade: null, emotion: 'thinking' },
+    { text: "El inglés no es tan difícil", grade: null, emotion: 'sneaky' },
+    { text: "Hace calor por aquí", grade: null, emotion: 'confused' },
+    { text: "Tranqui", grade: null, emotion: 'thinking' },
+    { text: "Respira y continúa", grade: null, emotion: 'neutral' },
+    { text: "Learning is cool", grade: null, emotion: 'happy' },
+    { text: "You\'re doing great!", grade: null, emotion: 'excited' },
+    { text: "¡No te rindas!", grade: null, emotion: 'excited' },
+    { text: "I believe in you!", grade: null, emotion: 'love' },
+    { text: "Practice makes perfect", grade: null, emotion: 'thinking' },
+    { text: "Keep going, friend!", grade: null, emotion: 'happy' },
+    { text: "¡Tú puedes!", grade: null, emotion: 'excited' },
+    { text: "Vamos por ese 10!", grade: null, emotion: 'love' },
+    { text: "Estamos de regreso", grade: null, emotion: 'happy' },
+    { text: "Cuanta nostalgia", grade: null, emotion: 'happy' },
+    { text: "Octubre ya está aquí", grade: null, emotion: 'happy' },
+    { text: "Hello my buddy", grade: null, emotion: 'happy' },
+    { text: "¡Pilas con los datos públicos, muchachos!", grade: ["Octavo"], emotion: 'excited' },
+    { text: "I am voting for transparency, because secrets are boring.", grade: null, emotion: 'happy' },
+    { text: "El que calla otorga... ¡pero el ciudadano informado exige la factura!", grade: null, emotion: 'angry' },
+    { text: "Easter egg desbloqueado: los expedientes secretos de la clase de cívica.", grade: null, emotion: 'easterEgg' },
+    { text: "Citizen power on max level today, eighth grade!", grade: ["Octavo"], emotion: 'game' },
+    { text: "Señor, sácame de esta duda fiscal y llévame a comer pupusas.", grade: null, emotion: 'dizzy' },
+    { text: "El secreto mejor guardado de la alcaldía es dónde quedó la bicicleta del parque.", grade: null, emotion: 'sneaky' },
+    { text: "Esto me recuerda a cuando mi abuelita guardaba los galletas en la lata de costura.", grade: null, emotion: 'elder' },
+    { text: "Houston, tenemos un problema: ¡alguien olvidó publicar el presupuesto!", grade: null, emotion: 'confused' },
+    { text: "Ay, mi amor, más claro ni el agua de machacal.", grade: null, emotion: 'love' },
     { text: "For y since entraron a una pupusería. Uno pidió duración y el otro fecha de inicio.", grade: null, emotion: 'happy' },
     { text: "How long have you been here? ¡Desde que empezó el sufrimiento académico, teacher!", grade: null, emotion: 'dizzy' },
     { text: "¡Noveno! Si llevan cinco minutos viendo la misma pregunta, ya tienen experiencia laboral.", grade: ["Noveno"], emotion: 'sneaky' },
@@ -48,20 +117,13 @@
     { text: "Plot twist: el reloj no está atrasado. ¡Vos llevás demasiado tiempo pensando!", grade: null, emotion: 'thinking' },
     { text: "¡Ay, qué nervios! Hasta la Rosa de Guadalupe necesita un ventilador para esta pregunta.", grade: null, emotion: 'dizzy' },
     { text: "¡Noveno! El verbo está trabajando horas extras. ¡Que le paguen el ISSS!", grade: ["Noveno"], emotion: 'angry' },
-    { text: "Es mejor trabajar pensando", grade: null, emotion: 'happy' },
     { text: "Creo en ti", grade: null, emotion: 'happy' },
-    { text: "Todos aprendemos algo nuevo cada día", grade: null, emotion: 'happy' },
     { text: "Es suficiente Present Perfect", grade: null, emotion: 'happy' },
     { text: "I\'ve been sad", grade: null, emotion: 'sad' },
     { text: "Estas que echas chsipas", grade: null, emotion: 'happy' },
-    { text: "Soy el más hermosos del salón", grade: null, emotion: 'happy' },
-    { text: "Ok, pero mi novia", grade: null, emotion: 'love' },
     { text: "What a beautiful thing is to study", grade: null, emotion: 'excited' },
     { text: "Que hermoso es estudiar", grade: null, emotion: 'excited' },
     { text: "I\'m the most beautiful person in the classroom", grade: null, emotion: 'happy' },
-    { text: "Entra al cuarto, subele el volumen al radio...", grade: null, emotion: 'musical' },
-    { text: "Aquí ya no hay postes", grade: null, emotion: 'dizzy' },
-    { text: "No soy tu compañero, soy tu compañere", grade: null, emotion: 'angry' },
     { text: "Relajate un ratito", grade: null, emotion: 'happy' },
     { text: "Recuerda aprenderte la tarea", grade: null, emotion: 'happy' },
     { text: "Estos ejercicios están sencillos", grade: null, emotion: 'happy' },
@@ -95,16 +157,11 @@
     { text: "Séptimo, hoy el verbo viene con guardaespaldas: do y does.", grade: ["Séptimo"], emotion: 'sneaky' },
     { text: "Don\'t por aquí, doesn\'t por allá… y nadie entra en pánico.", grade: null, emotion: 'happy' },
     { text: "Rigo reportándose: hoy venimos a ponerle el NO al verbo.", grade: null, emotion: 'welcome' },
-    { text: "Hoy no me bañé", grade: null, emotion: 'happy' },
     { text: "Mejor tarde que nunca", grade: null, emotion: 'happy' },
     { text: "¿Y mis hotwheels?", grade: null, emotion: 'happy' },
-    { text: "No le tengo miedo a las cucarachas", grade: null, emotion: 'happy' },
     { text: "Have you ever fallen in love?", grade: null, emotion: 'happy' },
     { text: "I missed English", grade: null, emotion: 'confused' },
-    { text: "El pasado ya pasó", grade: null, emotion: 'happy' },
     { text: "Toma nota", grade: null, emotion: 'sneaky' },
-    { text: "No me asusta ni la siguanaba", grade: null, emotion: 'dizzy' },
-    { text: "Me gusta el sushi", grade: null, emotion: 'happy' },
     { text: "Hace mucho calor", grade: null, emotion: 'sad' },
     { text: "Peliculas? Que tema es este?", grade: null, emotion: 'thinking' },
     { text: "No puedo hacer milagros", grade: null, emotion: 'angry' },
@@ -112,25 +169,18 @@
     { text: "Guíate con el libro", grade: null, emotion: 'happy' },
     { text: "Puedes hacer mucho con tu conocimiento", grade: null, emotion: 'happy' },
     { text: "Avanza sin mirar atrás", grade: null, emotion: 'happy' },
-    { text: "Dime con quien andas y te diré quien eres", grade: null, emotion: 'happy' },
     { text: "Eres muy inteligente", grade: null, emotion: 'happy' },
     { text: "Lo haces como un sabedor", grade: null, emotion: 'happy' },
     { text: "Solo tu puedes hacerlo", grade: null, emotion: 'happy' },
-    { text: "Trabajar en equipo puede hacer el trabajo más fácil", grade: null, emotion: 'happy' },
     { text: "Inglés es fácil", grade: null, emotion: 'sneaky' },
     { text: "Creo en ti", grade: null, emotion: 'happy' },
-    { text: "Practicar inglés no hace daño.", grade: null, emotion: 'happy' },
     { text: "Yo sí creo en ti.", grade: null, emotion: 'happy' },
     { text: "\"How many?\" es \"¿Cuantos?\"", grade: null, emotion: 'happy' },
-    { text: "Puedes terminarlo a tu ritmo", grade: null, emotion: 'happy' },
     { text: "Tranqui, no hay prisa.", grade: null, emotion: 'happy' },
     { text: "继续工作", grade: null, emotion: 'happy' },
     { text: "Keep it cool", grade: null, emotion: 'happy' },
-    { text: "¡Abueloo tlalooc! Ayudanos", grade: null, emotion: 'happy' },
     { text: "Vamos, vamos", grade: null, emotion: 'happy' },
     { text: "Let\'s go", grade: null, emotion: 'happy' },
-    { text: "我是里戈", grade: null, emotion: 'happy' },
-    { text: "Todo me recuerda a ella", grade: null, emotion: 'sad' },
     { text: "Pienso mucho", grade: null, emotion: 'thinking' },
     { text: "Let me belooong", grade: null, emotion: 'musical' },
     { text: "Tu tranqui", grade: null, emotion: 'happy' },
@@ -152,10 +202,8 @@
     { text: "¿Sabías que durante mucho tiempo muchas mujeres no podían votar?", grade: null, emotion: 'happy' },
     { text: "Las mujeres también tienen voz", grade: null, emotion: 'happy' },
     { text: "It\'s all in your head", grade: null, emotion: 'happy' },
-    { text: "Todo lo que necesitas es amor", grade: null, emotion: 'happy' },
     { text: "Hazlo con paciencia", grade: null, emotion: 'happy' },
     { text: "Demuestra lo que sabes", grade: null, emotion: 'happy' },
-    { text: "Cuando sea grande quiero ser bombero", grade: null, emotion: 'happy' },
     { text: "Ánimos, ánimos", grade: null, emotion: 'happy' },
     { text: "Vamos, primer año nos espera", grade: ["Noveno"], emotion: 'happy' },
     { text: "Vamos, segundo año nos espera", grade: ["Primer Año"], emotion: 'happy' },
@@ -165,14 +213,12 @@
     { text: "Estudia y ganarás", grade: null, emotion: 'happy' },
     { text: "Una preposición indica el lugar donde algo está posicionando", grade: null, emotion: 'sneaky' },
     { text: "Vamos, sigue así", grade: null, emotion: 'happy' },
-    { text: "Todo es mejor cuando estudias", grade: null, emotion: 'happy' },
     { text: "Todo está en la mente", grade: null, emotion: 'happy' },
     { text: "No puedo ayudarte", grade: null, emotion: 'happy' },
     { text: "¿Estas bien?", grade: null, emotion: 'confused' },
     { text: "Nos volvemos a ver", grade: null, emotion: 'happy' },
     { text: "Espero que te encuentres bien", grade: null, emotion: 'happy' },
     { text: "Todo parece estar bien por aquí", grade: null, emotion: 'happy' },
-    { text: "2 + 2 = 4", grade: null, emotion: 'sneaky' },
     { text: "Esto es fácil de hacer", grade: null, emotion: 'happy' },
     { text: "Hello", grade: null, emotion: 'happy' },
     { text: "Your dreams may come true", grade: null, emotion: 'happy' },
@@ -182,25 +228,19 @@
     { text: "Creo que hoy va a llover", grade: null, emotion: 'happy' },
     { text: "It\'s good to be here again", grade: null, emotion: 'happy' },
     { text: "How much is it?", grade: null, emotion: 'happy' },
-    { text: "¿Vas a trabajar o a perder el tiempo?", grade: null, emotion: 'neutral' },
     { text: "Vamos, sigue trabajando", grade: null, emotion: 'neutral' },
-    { text: "¿Como has estado?", grade: null, emotion: 'happy' },
     { text: "Hoy no hace tanto frío", grade: null, emotion: 'excited' },
     { text: "Hello Hello", grade: null, emotion: 'happy' },
     { text: "¿Todo bien?", grade: null, emotion: 'excited' },
-    { text: "Relajate", grade: null, emotion: 'happy' },
     { text: "Hazlo con calma", grade: null, emotion: 'happy' },
     { text: "Hello there", grade: null, emotion: 'happy' },
     { text: "Hey you", grade: null, emotion: 'happy' },
-    { text: "¿Hoy si terminarás?", grade: null, emotion: 'excited' },
     { text: "Sigue adelante", grade: null, emotion: 'happy' },
     { text: "Hazlo, tu puedes", grade: null, emotion: 'happy' },
     { text: "Great day", grade: null, emotion: 'happy' },
     { text: "Listen! Keep it cool", grade: null, emotion: 'happy' },
     { text: "We are ready", grade: null, emotion: 'happy' },
     { text: "¿Estás bien?", grade: null, emotion: 'thinking' },
-    { text: "Que miedo no saber inglés", grade: null, emotion: 'sad' },
-    { text: "Mi familia es muy grande", grade: null, emotion: 'sneaky' },
     { text: "Tu puedes hacerlo", grade: null, emotion: 'happy' },
     { text: "You can do it!", grade: null, emotion: 'happy' },
     { text: "Nos vemos otra vez", grade: null, emotion: 'happy' },
@@ -218,38 +258,16 @@
     { text: "Welcome my friend", grade: null, emotion: 'neutral' },
     { text: "Nos vemos de nuevo", grade: null, emotion: 'happy' },
     { text: "Sigue adelante", grade: null, emotion: 'sneaky' },
-    { text: "Un nuevo día, nuevas oportunidades", grade: null, emotion: 'neutral' },
     { text: "Hola una vez más", grade: null, emotion: 'welcome' },
-    { text: "Me haces sentir orgulloso", grade: null, emotion: 'happy' },
-    { text: "Manten la calma", grade: null, emotion: 'happy' },
-    { text: "¿Todo bien?", grade: null, emotion: 'neutral' },
-    { text: "Pongan cumbia", grade: null, emotion: 'sneaky' },
-    { text: "Estamos para ayudar", grade: null, emotion: 'elder' },
     { text: "Hola", grade: null, emotion: 'welcome' },
     { text: "Terminarás rápido", grade: null, emotion: 'excited' },
     { text: "¿Todo va bien?", grade: null, emotion: 'sneaky' },
     { text: "Sigue así", grade: null, emotion: 'happy' },
     { text: "Es fácil ¿verdad?", grade: null, emotion: 'happy' },
     { text: "No olvides subirlo a Classroom", grade: null, emotion: 'thinking' },
-    { text: "Six Seven", grade: ["Octavo", "Séptimo"], emotion: 'game' },
-    { text: "Raios", grade: null, emotion: 'dizzy' },
     { text: "Con calma 🎶", grade: null, emotion: 'musical' },
-    { text: "Compremos un ventilador entre todos", grade: null, emotion: 'excited' },
-    { text: "Ya casi terminas... Las ganas", grade: null, emotion: 'thinking' },
     { text: "Let\'s go!", grade: null, emotion: 'neutral' },
-    { text: "El inglés no es tan difícil", grade: null, emotion: 'sneaky' },
-    { text: "Hace calor por aquí", grade: null, emotion: 'confused' },
     { text: "Hola my friend", grade: null, emotion: 'happy' },
-    { text: "Tranqui", grade: null, emotion: 'thinking' },
-    { text: "Respira y continúa", grade: null, emotion: 'neutral' },
-    { text: "Learning is cool", grade: null, emotion: 'happy' },
-    { text: "You\'re doing great!", grade: null, emotion: 'excited' },
-    { text: "¡No te rindas!", grade: null, emotion: 'excited' },
-    { text: "I believe in you!", grade: null, emotion: 'love' },
-    { text: "Practice makes perfect", grade: null, emotion: 'thinking' },
-    { text: "Keep going, friend!", grade: null, emotion: 'happy' },
-    { text: "¡Tú puedes!", grade: null, emotion: 'excited' },
-    { text: "Vamos por ese 10!", grade: null, emotion: 'love' },
     { text: "Quizz time!", grade: null, emotion: 'happy' }
   ];
 
@@ -261,6 +279,25 @@
   //                        dizzy, musical, elder
   // Grados válidos: "Séptimo", "Octavo", "Noveno", "Primer Año", "Segundo Año", "Prueba"
   const HINT_MESSAGES = [
+    { text: "Nunca sabrás quien soy", grade: null, emotion: 'happy' },
+    { text: "Comamos ayote en miel", grade: null, emotion: 'neutral' },
+    { text: "Lo que más me asusta es el participio de Mantener", grade: null, emotion: 'neutral' },
+    { text: "Todo es mejor con chistes", grade: null, emotion: 'neutral' },
+    { text: "¿Dulce o Truco?", grade: null, emotion: 'neutral' },
+    { text: "Thriller 🎶", grade: null, emotion: 'musical' },
+    { text: "Ijuelule", grade: null, emotion: 'dizzy' },
+    { text: "Me encariñé contigo", grade: null, emotion: 'welcome' },
+    { text: "El otro año probablemente no nos veamos", grade: null, emotion: 'sad' },
+    { text: "Estamos cerca de despedirnos", grade: null, emotion: 'love' },
+    { text: "Jugamos amigo secreto", grade: null, emotion: 'happy' },
+    { text: "Para Halloween me disfrazaré de Don Eliseo", grade: null, emotion: 'neutral' },
+    { text: "Piensa en cómo revisar las cuentas sin que te duerma el profe.", grade: ["Octavo"], emotion: 'thinking' },
+    { text: "Como cuando buscas en TikTok el tutorial para farmear aura.", grade: null, emotion: 'happy' },
+    { text: "Mi ex más inestable que el Wi-Fi de la escuela.", grade: ["Octavo"], emotion: 'game' },
+    { text: "Oigan la música del misterio: tun, tun...", grade: null, emotion: 'musical' },
+    { text: "No te hagas el loco, busca la palabra \'transparencia\' en tu mente.", grade: ["Octavo"], emotion: 'dizzy' },
+    { text: "¡Esa respuesta está más clara que sopa de gallina india!", grade: null, emotion: 'excited' },
+    { text: "Apuesto a que no adivinas quien soy", grade: null, emotion: 'happy' },
     { text: "¡Pilas, bichos! El tiempo tiene dos formas de contarse en esta fiesta.", grade: null, emotion: 'excited' },
     { text: "Mirá las palabras que acompañan al tiempo. ¡Ahí anda el chismecito!", grade: null, emotion: 'sneaky' },
     { text: "Pensá si estás hablando de una duración o de un momento específico.", grade: null, emotion: 'thinking' },
@@ -631,6 +668,19 @@
   ];
 
   const CHEER_MESSAGES = [
+    "Las brujas salieron corriendo",
+    "Demuestra todo tu poder",
+    "Así es como se hace",
+    "¡Imparable! Tienes el poder ciudadano al 100%.",
+    "¡Bien hecho! La transparencia te agradece.",
+    "¡Perfecto! Sube el nivel de esta clase.",
+    "¡Así se hace, con elegancia y conocimiento!",
+    "¡Eso, campeón! ¡Punto para la democracia!",
+    "¡Tremendo datazo, le atinaste con todo!",
+    "¡Súper bien! Hasta el profe aplaudió.",
+    "¡Golazo cívico de octavo año!",
+    "¡Brillante! Ni Sherlock Holmes lo habría hecho mejor.",
+    "¡Exacto! Te ganaste una estrella dorada virtual.",
     "¡Qué nivel! ¡Ni la NASA calcula así el tiempo!",
     "¡Correctísimo! ¡Ese cerebro anda en modo leyenda!",
     "¡Así se hace! ¡Hasta Don Francisco te daría premio!",
@@ -743,6 +793,21 @@
   ];
 
   const COMFORT_MESSAGES = [
+    "Ten un dulce y continúa",
+    "No amiguito",
+    "Puedes hacerlo mejor",
+    "Calabaza, calabaza, esa no es la respuesta",
+    "Casi lo cazas",
+    "Tranquilo, de los errores se aprende en la guía.",
+    "No pasa nada, la próxima vez le damos vuelta a la tortilla.",
+    "Casi, casi, ¡no te desanimes!",
+    "Fallar es parte del show, ¡a seguir intentando!",
+    "Respira hondo, la democracia tiene su misterio.",
+    "No te preocupes, ni los políticos le atinan a la primera.",
+    "Ánimo, compañero, la práctica hace al maestro.",
+    "Un pequeño traspié y volvemos a la cancha.",
+    "Estuvo cerquita, ¡vamos de nuevo!",
+    "No hay problema, ¡el conocimiento se construye poco a poco!",
     "¡Ese intento cuenta! Ahora probá otro camino.",
     "Keep trying! You\'re closer than you think!",
     "¡Tranqui! Hasta los relojes se equivocan de hora.",
@@ -1051,6 +1116,10 @@
         : '';
 
 
+      if (RIGO_COSTUME === 'ghost') {
+        return this.getGhostSVG(emotion, face, bodyAnim, tailClass,
+          gameGlasses + questionMark + thoughtBubble + tear + angryMark + dizzyMark + musicalMark + elderMark);
+      }
       return `
         <svg viewBox="0 0 200 200" width="100%" height="100%" ${bodyAnim}>
           <defs>
@@ -1151,6 +1220,167 @@
 
           <!-- BRILLO SUPERIOR -->
           <ellipse cx="85" cy="58" rx="14" ry="6" fill="#fff" opacity="0.3"/>
+        </svg>
+      `;
+    }
+
+    // El vestuario reutiliza la cara y los accesorios de cada emoción.
+    // La sábana reemplaza el cuerpo; no se superponen dos colas ni más patas.
+    getGhostSVG(emotion, face, bodyAnim, tailClass, accessories) {
+      const ghostTail = `<g id="rigo-ghost-tail">
+             <!-- Trazo externo y volumen verde; la raíz queda oculta bajo la tela -->
+             <path d="M 49 155 C 29 166, 15 157, 13 140
+                      C 10 125, 13 111, 25 107
+                      C 39 102, 44 115, 38 125
+                      C 32 136, 20 128, 22 118
+                      Q 25 112 30 117"
+                   fill="none" stroke="#1a1a1a" stroke-width="18"
+                   stroke-linecap="round" stroke-linejoin="round"/>
+             <path d="M 49 155 C 29 166, 15 157, 13 140
+                      C 10 125, 13 111, 25 107
+                      C 39 102, 44 115, 38 125
+                      C 32 136, 20 128, 22 118
+                      Q 25 112 30 117"
+                   fill="none" class="rigo-skin-stroke" stroke-width="12"
+                   stroke-linecap="round" stroke-linejoin="round"/>
+             <path d="M 15 136 Q 15 127 18 122"
+                   fill="none" stroke="#D1F39B" stroke-width="2.2"
+                   stroke-linecap="round" opacity="0.65"/>
+           </g>`;
+      const ghostSheet = `<g id="rigo-ghost-sheet">
+             <ellipse cx="102" cy="187" rx="69" ry="5" fill="#1a1a1a" opacity="0.10"/>
+             <path d="M 100 38
+                      C 67 37, 41 52, 32 78
+                      C 24 99, 31 120, 31 138
+                      C 31 153, 26 164, 23 175
+                      Q 31 186 41 176
+                      Q 52 188 64 177
+                      Q 76 187 88 177
+                      Q 100 188 112 177
+                      Q 124 187 136 177
+                      Q 148 188 159 176
+                      Q 169 185 177 175
+                      C 174 163, 169 151, 169 137
+                      C 169 119, 177 99, 168 78
+                      C 159 52, 133 37, 100 38 Z"
+                   fill="url(#ghostSheet)" stroke="#1a1a1a"
+                   stroke-width="3.4" stroke-linejoin="round"/>
+             <!-- Zonas suaves de sombra para dar caída a la tela -->
+             <path d="M 33 112 Q 41 126 38 152 L 32 169 Q 46 167 49 150
+                      Q 46 128 43 116 Z" fill="#BCCADC" opacity="0.20"/>
+             <path d="M 164 114 Q 157 132 160 154 L 169 169
+                      Q 174 151 169 133 Z" fill="#A7B8CC" opacity="0.20"/>
+             <g fill="none" stroke="#B9C7D9" stroke-linecap="round" opacity="0.78">
+               <path d="M 42 129 Q 43 150 36 172" stroke-width="2"/>
+               <path d="M 61 148 Q 60 164 62 174" stroke-width="1.8"/>
+               <path d="M 100 150 Q 97 164 100 177" stroke-width="1.5"/>
+               <path d="M 139 147 Q 138 165 140 174" stroke-width="1.8"/>
+               <path d="M 159 128 Q 158 150 165 172" stroke-width="2"/>
+             </g>
+             <path d="M 42 73 Q 57 49 81 48" fill="none"
+                   stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.72"/>
+             <!-- Borde oscuro interior de los huecos: los ojos quedan delante -->
+             <ellipse cx="55" cy="88" rx="21.7" ry="20.7" fill="#1a1a1a"/>
+             <ellipse cx="145" cy="88" rx="21.7" ry="20.7" fill="#1a1a1a"/>
+           </g>`;
+      const ghostCrest = `<g id="rigo-ghost-crest">
+             <ellipse cx="100" cy="49" rx="30" ry="5" fill="#252C35"/>
+             <path d="M 71 51 L 78 38 L 85 49 L 92 32 L 100 48
+                      L 108 30 L 116 48 L 123 38 L 129 51 Z"
+                   class="rigo-skin" stroke="#1a1a1a" stroke-width="2.8"
+                   stroke-linejoin="round"/>
+             <path d="M 72 52 Q 100 47 128 52" fill="none"
+                   stroke="#E9EFF5" stroke-width="3" stroke-linecap="round"/>
+           </g>`;
+      const ghostFeet = `<g id="rigo-ghost-feet" fill="none">
+             <path d="M 59 177 Q 57 183 59 185 Q 69 193 79 185 L 81 177 Z"
+                   class="rigo-skin" stroke="#1a1a1a" stroke-width="2.3"/>
+             <path d="M 119 177 L 121 185 Q 131 193 141 185 Q 143 183 141 177 Z"
+                   class="rigo-skin" stroke="#1a1a1a" stroke-width="2.3"/>
+             <g stroke="#1a1a1a" stroke-width="1.4" stroke-linecap="round">
+               <path d="M 65 184 L 64 188 M 73 184 L 74 188"/>
+               <path d="M 126 184 L 125 188 M 134 184 L 135 188"/>
+             </g>
+           </g>`;
+      // Calabaza apoyada junto a Rigo, con volumen y sin mano ni brazo.
+      const pumpkinMouth = emotion === 'sad'
+        ? 'M 150 170 Q 166 155 182 170 Q 166 163 150 170 Z'
+        : emotion === 'angry'
+          ? 'M 149 165 L 156 161 L 162 166 L 170 166 L 177 161 L 183 165 Q 178 180 166 178 Q 154 180 149 165 Z'
+          : 'M 149 164 L 155 167 L 159 163 L 163 167 L 169 167 L 173 163 L 177 167 L 183 164 Q 178 180 166 178 Q 154 180 149 164 Z';
+      const pumpkinEyes = emotion === 'angry'
+        ? 'M 147 148 L 160 153 L 149 157 Z M 172 153 L 185 148 L 183 157 Z'
+        : 'M 147 155 L 154 144 L 161 155 Z M 172 155 L 179 144 L 186 155 Z';
+      const pumpkin = `<g id="rigo-pumpkin">
+             <defs>
+               <radialGradient id="pumpkinSkin" cx="35%" cy="24%" r="80%">
+                 <stop offset="0%" stop-color="#FFC04D"/>
+                 <stop offset="52%" stop-color="#F58A19"/>
+                 <stop offset="100%" stop-color="#CE510B"/>
+               </radialGradient>
+               <linearGradient id="pumpkinGlow" x1="0" y1="0" x2="0" y2="1">
+                 <stop offset="0%" stop-color="#FFF4A8"/>
+                 <stop offset="100%" stop-color="#FFB52E"/>
+               </linearGradient>
+             </defs>
+             <ellipse cx="166" cy="187" rx="29" ry="3.5" fill="#1a1a1a" opacity="0.15"/>
+             <!-- Silueta lobulada y costillas que siguen el volumen. -->
+             <path d="M 166 136 C 158 131 149 132 143 139
+                      C 135 142 132 152 136 163
+                      C 137 177 148 185 158 184
+                      Q 166 188 174 184
+                      C 185 185 195 177 196 164
+                      C 199 152 194 140 184 136
+                      C 178 132 172 133 166 136 Z"
+                   fill="url(#pumpkinSkin)" stroke="#1a1a1a" stroke-width="2.8" stroke-linejoin="round"/>
+             <path d="M 159 137 C 148 147 147 172 158 182
+                      M 174 137 C 185 148 185 172 175 182"
+                   fill="none" stroke="#BA4B0C" stroke-width="2" opacity="0.65" stroke-linecap="round"/>
+             <path d="M 145 141 C 137 152 140 171 149 178
+                      M 185 140 C 194 152 192 170 184 179"
+                   fill="none" stroke="#D5610D" stroke-width="1.8" stroke-linecap="round"/>
+             <path d="M 166 139 Q 161 161 166 182" fill="none"
+                   stroke="#E57410" stroke-width="1.6" opacity="0.7"/>
+             <path d="M 143 148 Q 145 141 152 139" fill="none"
+                   stroke="#FFE0A0" stroke-width="3.4" stroke-linecap="round" opacity="0.75"/>
+             <!-- Tallo curvado, hoja y zarcillo. -->
+             <path d="M 168 124 Q 179 114 190 121 Q 181 131 168 124 Z"
+                   fill="#7FBD42" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="round"/>
+             <path d="M 173 124 L 184 121" fill="none" stroke="#4E812E" stroke-width="1.4" stroke-linecap="round"/>
+             <path d="M 162 137 C 158 130 160 123 165 119
+                      Q 169 116 173 120 C 168 124 167 130 171 137 Z"
+                   fill="#658C32" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="round"/>
+             <path d="M 166 122 Q 163 129 166 133" fill="none"
+                   stroke="#A4CE62" stroke-width="1.7" stroke-linecap="round"/>
+             <path d="M 174 134 Q 187 128 187 135 Q 186 139 183 136"
+                   fill="none" stroke="#587E2F" stroke-width="1.8" stroke-linecap="round"/>
+             <!-- Huecos tallados, con luz cálida en su interior. -->
+             <path d="${pumpkinEyes}" fill="url(#pumpkinGlow)" stroke="#6B3015"
+                   stroke-width="2.1" stroke-linejoin="round"/>
+             <path d="${pumpkinMouth}" fill="url(#pumpkinGlow)" stroke="#6B3015"
+                   stroke-width="2" stroke-linejoin="round"/>
+           </g>`;
+      const themedAccessories = accessories.replace(/#FF6B9D|#4ECDC4/g, '#EC790F').replace(/#A8E6CF/g, '#A482D5');
+      return `
+        <svg viewBox="0 0 200 200" width="100%" height="100%" data-costume="ghost" ${bodyAnim}>
+          <defs>
+            <linearGradient id="ghostSheet" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/>
+              <stop offset="54%" stop-color="#F7FAFF"/>
+              <stop offset="100%" stop-color="#DAE4F0"/>
+            </linearGradient>
+          </defs>
+          <g class="${tailClass}" style="transform-origin: 49px 155px;">${ghostTail}</g>
+          ${ghostFeet}
+          ${ghostSheet}
+          ${ghostCrest}
+          <g id="rigo-ghost-expression">
+            ${face.leftEye}
+            ${face.rightEye}
+            ${face.mouth}
+          </g>
+          ${themedAccessories}
+          ${pumpkin}
         </svg>
       `;
     }
@@ -1713,7 +1943,8 @@
             const emotion = msg.emotion || 'happy';
             this.setEmotion(emotion);
             this.say(msg.text, 3500);
-            setTimeout(() => this.setEmotion(prev), 3500);
+            if (this.emotionTimer) clearTimeout(this.emotionTimer);
+            this.emotionTimer = setTimeout(() => this.setEmotion(prev), 3500);
           }
           schedule();
         }, delay);
@@ -1733,6 +1964,14 @@
     }
 
     // ======================= API PÚBLICA =======================
+    // Aviso fijo, independiente de los paquetes de mensajes personalizados.
+    warnCheating() {
+      if (this.emotionTimer) clearTimeout(this.emotionTimer);
+      this.setEmotion('sad');
+      this.say('Oops, no puedes hacer trampa aquí', 4500);
+      this.emotionTimer = setTimeout(() => this.setEmotion('neutral'), 4500);
+    }
+
     setGrade(grade) {
       this.grade = grade || null;
       this.setAttribute('grade', grade || '');
@@ -1747,7 +1986,8 @@
       this.setEmotion('excited');
       const msg = name ? `¡Hola ${name}! ¡A estudiar!` : "¡Bienvenido! ¡A estudiar!";
       this.say(msg, 4000);
-      setTimeout(() => this.setEmotion('neutral'), 4000);
+      if (this.emotionTimer) clearTimeout(this.emotionTimer);
+      this.emotionTimer = setTimeout(() => this.setEmotion('neutral'), 4000);
     }
 
     inviteGame() {
@@ -1768,7 +2008,8 @@
       this.setEmotion('sad');
       const msg = COMFORT_MESSAGES[Math.floor(Math.random() * COMFORT_MESSAGES.length)];
       this.say(msg, 3000);
-      setTimeout(() => this.setEmotion('neutral'), 3000);
+      if (this.emotionTimer) clearTimeout(this.emotionTimer);
+      this.emotionTimer = setTimeout(() => this.setEmotion('neutral'), 3000);
     }
   }
 
