@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"6f7c880d-99e4-45fb-a3d2-de7b6468e8e8","token":"1722476a-2ff1-4f59-8b10-b40093290ee7"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Preferences Vocabulary: Food &amp; Fruit</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "5f89edb6-2e40-4ba6-8e64-9edd6f7e47e8",
+  "container": "#app",
+  "topic": "Preferences Vocabulary: Food & Fruit",
+  "level": "Octavo, Séptimo",
+  "pdfDesign": "Pastel",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#C0F781",
+    "accent": "#43B069",
+    "bg": "#FFF1F8",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9E9C9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Let’s Talk About Food!",
+      "html": "\u003csection style='font-family:Arial,sans-serif;color:#1A1A1A;line-height:1.6;max-width:100%;'>\u003cheader style='background:#C0F781;border-radius:16px;padding:18px;text-align:center;margin-bottom:16px;'>\u003ch2 style='margin:0;font-size:23px;color:#1A1A1A;'>🍎 Food, Fruit & Preferences 🍕\u003c/h2>\u003cp style='margin:7px 0 0;font-size:14px;'>Learn to talk about the foods you like and dislike!\u003c/p>\u003c/header>\u003csection style='margin-bottom:17px;'>\u003ch3 style='font-size:18px;color:#287A48;margin:0 0 8px;'>🍓 Food Vocabulary\u003c/h3>\u003cp style='margin:0 0 8px;'>We use \u003cstrong>food\u003c/strong> to talk about what we eat. \u003cstrong>Fruit\u003c/strong> is one type of food.\u003c/p>\u003cdiv style='background:#F1FBE9;padding:12px;border-radius:12px;'>\u003cp style='margin:0 0 7px;'>\u003cstrong>🍌 Fruits (frutas):\u003c/strong> apple, banana, mango, orange, grapes, strawberry, pineapple, watermelon.\u003c/p>\u003cp style='margin:0;'>\u003cstrong>🍕 Other foods (otros alimentos):\u003c/strong> pizza, rice, bread, chicken, cheese, eggs, soup, sandwich.\u003c/p>\u003c/div>\u003c/section>\u003csection style='margin-bottom:17px;'>\u003ch3 style='font-size:18px;color:#287A48;margin:0 0 8px;'>❤️ Expressing Preferences\u003c/h3>\u003cp style='margin:0 0 9px;'>Use these expressions to talk about your favorite foods and fruits.\u003c/p>\u003cdiv style='background:#FFF1F8;border-radius:12px;padding:12px;'>\u003cp style='margin:0 0 6px;'>😍 \u003cstrong>I love...\u003c/strong> = Me encanta(n)...\u003c/p>\u003cp style='margin:0 0 6px;'>😊 \u003cstrong>I like...\u003c/strong> = Me gusta(n)...\u003c/p>\u003cp style='margin:0 0 6px;'>😋 \u003cstrong>I prefer...\u003c/strong> = Prefiero...\u003c/p>\u003cp style='margin:0 0 6px;'>🙁 \u003cstrong>I don't like...\u003c/strong> = No me gusta(n)...\u003c/p>\u003cp style='margin:0;'>😖 \u003cstrong>I hate...\u003c/strong> = Odio...\u003c/p>\u003c/div>\u003c/section>\u003csection style='margin-bottom:17px;'>\u003ch3 style='font-size:18px;color:#287A48;margin:0 0 8px;'>✏️ Grammar Tips\u003c/h3>\u003cdiv style='border-left:4px solid #43B069;padding:4px 0 4px 12px;'>\u003cp style='margin:0 0 8px;'>\u003cstrong>I / You / We / They\u003c/strong> → like, love, prefer, don't like.\u003c/p>\u003cp style='margin:0 0 8px;'>\u003cstrong>He / She\u003c/strong> → likes, loves, prefers, doesn't like.\u003c/p>\u003cp style='margin:0 0 8px;'>\u003cstrong>Questions:\u003c/strong> Do you like...? / Does she like...?\u003c/p>\u003cp style='margin:0;'>\u003cstrong>Short answers:\u003c/strong> Yes, I do. / No, I don't. / Yes, she does. / No, she doesn't.\u003c/p>\u003c/div>\u003cp style='background:#F1FBE9;padding:10px;border-radius:10px;font-size:14px;margin:10px 0 0;'>💡 After \u003cstrong>does\u003c/strong> or \u003cstrong>doesn't\u003c/strong>, use \u003cstrong>like\u003c/strong>, not \u003cstrong>likes\u003c/strong>.\u003c/p>\u003c/section>\u003csection>\u003ch3 style='font-size:18px;color:#287A48;margin:0 0 10px;'>💬 Examples\u003c/h3>\u003cdiv style='background:#F4FBEF;border-radius:12px;padding:12px;margin-bottom:8px;'>\u003cstrong>1. I love mangoes. 🥭\u003c/strong>\u003cp style='margin:3px 0 0;font-size:13px;color:#495749;'>Me encantan los mangos.\u003c/p>\u003c/div>\u003cdiv style='background:#F4FBEF;border-radius:12px;padding:12px;margin-bottom:8px;'>\u003cstrong>2. She doesn't like onions. 🧅\u003c/strong>\u003cp style='margin:3px 0 0;font-size:13px;color:#495749;'>A ella no le gustan las cebollas.\u003c/p>\u003c/div>\u003cdiv style='background:#F4FBEF;border-radius:12px;padding:12px;'>\u003cstrong>3. Do you like apples? 🍎\u003c/strong>\u003cp style='margin:4px 0 0;'>Yes, I do. / No, I don't.\u003c/p>\u003cp style='margin:4px 0 0;font-size:13px;color:#495749;'>¿Te gustan las manzanas? Sí. / No.\u003c/p>\u003c/div>\u003c/section>\u003cp style='text-align:center;background:#C0F781;border-radius:12px;padding:12px;margin:17px 0 0;font-weight:bold;'>🌟 Now it's your turn! Practice your English.\u003c/p>\u003c/section>"
+    },
+    {
+      "type": "matchimage",
+      "title": "1. Food & Fruit Vocabulary",
+      "instruction": "Relaciona cada palabra en inglés con el emoji que representa el alimento o la fruta.",
+      "dataA": [
+        {
+          "word": "Apple",
+          "emoji": "🍎"
+        },
+        {
+          "word": "Banana",
+          "emoji": "🍌"
+        },
+        {
+          "word": "Orange",
+          "emoji": "🍊"
+        },
+        {
+          "word": "Grapes",
+          "emoji": "🍇"
+        },
+        {
+          "word": "Watermelon",
+          "emoji": "🍉"
+        },
+        {
+          "word": "Strawberry",
+          "emoji": "🍓"
+        },
+        {
+          "word": "Pizza",
+          "emoji": "🍕"
+        },
+        {
+          "word": "Bread",
+          "emoji": "🍞"
+        }
+      ],
+      "dataB": [
+        {
+          "word": "Mango",
+          "emoji": "🥭"
+        },
+        {
+          "word": "Pineapple",
+          "emoji": "🍍"
+        },
+        {
+          "word": "Pear",
+          "emoji": "🍐"
+        },
+        {
+          "word": "Cherries",
+          "emoji": "🍒"
+        },
+        {
+          "word": "Lemon",
+          "emoji": "🍋"
+        },
+        {
+          "word": "Rice",
+          "emoji": "🍚"
+        },
+        {
+          "word": "Cheese",
+          "emoji": "🧀"
+        },
+        {
+          "word": "Egg",
+          "emoji": "🥚"
+        }
+      ]
+    },
+    {
+      "type": "categorize",
+      "title": "2. Fruit or Other Food?",
+      "instruction": "Clasifica las palabras en inglés. Coloca las frutas en Fruit y los demás alimentos en Other Food.",
+      "dataA": {
+        "categories": [
+          "Fruit",
+          "Other Food"
+        ],
+        "items": [
+          {
+            "text": "Apple",
+            "cat": 0
+          },
+          {
+            "text": "Rice",
+            "cat": 1
+          },
+          {
+            "text": "Banana",
+            "cat": 0
+          },
+          {
+            "text": "Chicken",
+            "cat": 1
+          },
+          {
+            "text": "Strawberry",
+            "cat": 0
+          },
+          {
+            "text": "Bread",
+            "cat": 1
+          },
+          {
+            "text": "Grapes",
+            "cat": 0
+          },
+          {
+            "text": "Cheese",
+            "cat": 1
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "Fruit",
+          "Other Food"
+        ],
+        "items": [
+          {
+            "text": "Mango",
+            "cat": 0
+          },
+          {
+            "text": "Pizza",
+            "cat": 1
+          },
+          {
+            "text": "Pineapple",
+            "cat": 0
+          },
+          {
+            "text": "Soup",
+            "cat": 1
+          },
+          {
+            "text": "Orange",
+            "cat": 0
+          },
+          {
+            "text": "Eggs",
+            "cat": 1
+          },
+          {
+            "text": "Watermelon",
+            "cat": 0
+          },
+          {
+            "text": "Sandwich",
+            "cat": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "matchlines",
+      "title": "3. Understanding Preferences",
+      "instruction": "Une cada oración en inglés con su traducción correcta al español.",
+      "dataA": [
+        {
+          "left": "I like apples.",
+          "right": "Me gustan las manzanas."
+        },
+        {
+          "left": "She loves strawberries.",
+          "right": "A ella le encantan las fresas."
+        },
+        {
+          "left": "I don't like onions.",
+          "right": "No me gustan las cebollas."
+        },
+        {
+          "left": "He hates lemons.",
+          "right": "Él odia los limones."
+        },
+        {
+          "left": "We prefer chicken.",
+          "right": "Preferimos el pollo."
+        },
+        {
+          "left": "My favorite food is pizza.",
+          "right": "Mi comida favorita es la pizza."
+        }
+      ],
+      "dataB": [
+        {
+          "left": "I love bananas.",
+          "right": "Me encantan los bananos."
+        },
+        {
+          "left": "He likes grapes.",
+          "right": "A él le gustan las uvas."
+        },
+        {
+          "left": "She doesn't like cheese.",
+          "right": "A ella no le gusta el queso."
+        },
+        {
+          "left": "We prefer rice.",
+          "right": "Preferimos el arroz."
+        },
+        {
+          "left": "Do you like mangoes?",
+          "right": "¿Te gustan los mangos?"
+        },
+        {
+          "left": "My favorite fruit is pineapple.",
+          "right": "Mi fruta favorita es la piña."
+        }
+      ]
+    },
+    {
+      "type": "memory",
+      "title": "Memorama / Pareja",
+      "instruction": "Instrucción: ",
+      "dataA": [
+        {
+          "left": "🥭",
+          "right": "🥭"
+        },
+        {
+          "left": "🍉",
+          "right": "🍉"
+        },
+        {
+          "left": "🍎",
+          "right": "🍎"
+        },
+        {
+          "left": "🍇",
+          "right": "🍇"
+        },
+        {
+          "left": "🥒",
+          "right": "🥒"
+        },
+        {
+          "left": "🥑",
+          "right": "🥑"
+        },
+        {
+          "left": "🥥",
+          "right": "🥥"
+        },
+        {
+          "left": "🍋",
+          "right": "🍋"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "🍈",
+          "right": "🍈"
+        },
+        {
+          "left": "🍉",
+          "right": "🍉"
+        },
+        {
+          "left": "🍎",
+          "right": "🍎"
+        },
+        {
+          "left": "🍇",
+          "right": "🍇"
+        },
+        {
+          "left": "🥒",
+          "right": "🥒"
+        },
+        {
+          "left": "🥑",
+          "right": "🥑"
+        },
+        {
+          "left": "🥥",
+          "right": "🥥"
+        },
+        {
+          "left": "🍋",
+          "right": "🍋"
+        }
+      ]
+    },
+    {
+      "type": "wordsearch",
+      "title": "Sopa de letras",
+      "instruction": "Instrucción: ",
+      "dataA": {
+        "words": [
+          "MANGO",
+          "GRAPES",
+          "APPLE",
+          "MELON",
+          "LEMON",
+          "KIWI"
+        ],
+        "gridSize": 12
+      }
+    },
+    {
+      "type": "multiplechoice",
+      "title": "4. Choose the Correct Answer",
+      "instruction": "Lee cada pregunta u oración en inglés y selecciona la única respuesta correcta.",
+      "dataA": [
+        {
+          "q": "Which of these is a fruit?",
+          "options": [
+            "Bread",
+            "Apple",
+            "Cheese",
+            "Rice"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Which of these is NOT a fruit?",
+          "options": [
+            "Grapes",
+            "Pineapple",
+            "Rice",
+            "Banana"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "I ___ apples.",
+          "options": [
+            "likes",
+            "like",
+            "liking",
+            "is like"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "She ___ mangoes.",
+          "options": [
+            "like",
+            "likes",
+            "don't like",
+            "liking"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "I ___ like onions.",
+          "options": [
+            "doesn't",
+            "am",
+            "don't",
+            "is"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "He ___ like lemons.",
+          "options": [
+            "don't",
+            "doesn't",
+            "not",
+            "isn't"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "___ you like strawberries?",
+          "options": [
+            "Does",
+            "Are",
+            "Do",
+            "Is"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "Do you like bananas? Yes, I ___.",
+          "options": [
+            "does",
+            "am",
+            "do",
+            "is"
+          ],
+          "answer": 2
+        }
+      ],
+      "dataB": [
+        {
+          "q": "Which of these is a fruit?",
+          "options": [
+            "Soup",
+            "Chicken",
+            "Pineapple",
+            "Pizza"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "Which of these is NOT a fruit?",
+          "options": [
+            "Watermelon",
+            "Orange",
+            "Mango",
+            "Bread"
+          ],
+          "answer": 3
+        },
+        {
+          "q": "They ___ pizza.",
+          "options": [
+            "likes",
+            "does like",
+            "like",
+            "liking"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "He ___ bananas.",
+          "options": [
+            "likes",
+            "like",
+            "don't like",
+            "liking"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "We ___ like chicken.",
+          "options": [
+            "doesn't",
+            "don't",
+            "not",
+            "isn't"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "She ___ like cheese.",
+          "options": [
+            "don't",
+            "is not",
+            "doesn't",
+            "not"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "___ she like grapes?",
+          "options": [
+            "Do",
+            "Does",
+            "Is",
+            "Are"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Does she like apples? No, she ___.",
+          "options": [
+            "don't",
+            "isn't",
+            "doesn't",
+            "not"
+          ],
+          "answer": 2
+        }
+      ]
+    },
+    {
+      "type": "spoterror",
+      "title": "5. Find and Correct the Mistake",
+      "instruction": "Cada oración contiene una palabra incorrecta. Identifícala y escribe su forma correcta para expresar las preferencias adecuadamente.",
+      "dataA": [
+        {
+          "words": [
+            "She",
+            "like",
+            "mangoes."
+          ],
+          "errorIndex": 1,
+          "fix": "likes"
+        },
+        {
+          "words": [
+            "I",
+            "likes",
+            "apples."
+          ],
+          "errorIndex": 1,
+          "fix": "like"
+        },
+        {
+          "words": [
+            "He",
+            "don't",
+            "like",
+            "lemons."
+          ],
+          "errorIndex": 1,
+          "fix": "doesn't"
+        },
+        {
+          "words": [
+            "We",
+            "doesn't",
+            "like",
+            "onions."
+          ],
+          "errorIndex": 1,
+          "fix": "don't"
+        },
+        {
+          "words": [
+            "Does",
+            "you",
+            "like",
+            "bananas?"
+          ],
+          "errorIndex": 0,
+          "fix": "Do"
+        },
+        {
+          "words": [
+            "Do",
+            "she",
+            "like",
+            "grapes?"
+          ],
+          "errorIndex": 0,
+          "fix": "Does"
+        },
+        {
+          "words": [
+            "My",
+            "favorite",
+            "fruit",
+            "are",
+            "mango."
+          ],
+          "errorIndex": 3,
+          "fix": "is"
+        },
+        {
+          "words": [
+            "They",
+            "likes",
+            "pizza."
+          ],
+          "errorIndex": 1,
+          "fix": "like"
+        }
+      ],
+      "dataB": [
+        {
+          "words": [
+            "He",
+            "like",
+            "pineapple."
+          ],
+          "errorIndex": 1,
+          "fix": "likes"
+        },
+        {
+          "words": [
+            "They",
+            "doesn't",
+            "like",
+            "soup."
+          ],
+          "errorIndex": 1,
+          "fix": "don't"
+        },
+        {
+          "words": [
+            "I",
+            "doesn't",
+            "like",
+            "lemons."
+          ],
+          "errorIndex": 1,
+          "fix": "don't"
+        },
+        {
+          "words": [
+            "Does",
+            "we",
+            "like",
+            "rice?"
+          ],
+          "errorIndex": 0,
+          "fix": "Do"
+        },
+        {
+          "words": [
+            "Do",
+            "he",
+            "like",
+            "strawberries?"
+          ],
+          "errorIndex": 0,
+          "fix": "Does"
+        },
+        {
+          "words": [
+            "She",
+            "prefer",
+            "bananas."
+          ],
+          "errorIndex": 1,
+          "fix": "prefers"
+        },
+        {
+          "words": [
+            "My",
+            "favorite",
+            "food",
+            "am",
+            "pizza."
+          ],
+          "errorIndex": 3,
+          "fix": "is"
+        },
+        {
+          "words": [
+            "You",
+            "likes",
+            "cherries."
+          ],
+          "errorIndex": 1,
+          "fix": "like"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "flappy"
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
