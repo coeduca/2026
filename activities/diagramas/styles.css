@@ -1,0 +1,114 @@
+/* S12 Game Logic — personalización sobre COEDUCA Framework v1 */
+:root {
+  --ink: #18263b;
+  --muted: #65738a;
+  --night: #151f36;
+  --bright: #b7fa75;
+  --blue: #455bda;
+  --outline: #dbe4ef;
+}
+html { scroll-behavior: smooth; }
+body { background:#f4f7fb !important; color:var(--ink); font-family:Arial,Helvetica,sans-serif !important; }
+body::before { background-image:linear-gradient(rgba(31,61,105,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(31,61,105,.028) 1px,transparent 1px) !important;background-size:28px 28px !important; }
+body::after { display:none!important; }
+.topbar { z-index:2; position:relative; background:var(--night); color:#fff; padding:17px 20px; }
+.topbar-inner { display:flex; justify-content:space-between; align-items:center; gap:14px; width:min(100%,1020px); margin:auto; }
+.brand { display:flex; gap:10px;align-items:center; font-size:14px;letter-spacing:1.2px;font-weight:900; }
+.brand strong{font-weight:500;opacity:.65;}
+.brand-mark{background:var(--bright);border-radius:9px;color:#152036;width:32px;height:32px;display:grid;place-items:center;font-size:24px;font-weight:800}
+.topbar-tag {display:inline-flex;gap:9px;align-items:center;color:#dce7f6;font-size:11px;font-weight:bold;letter-spacing:1.5px;}
+.topbar-dot,.live-dot{display:inline-block;width:9px;height:9px;background:#92e58e;border-radius:100%;box-shadow:0 0 0 4px #84dc9040}
+.coeduca-app{max-width:1020px !important;padding:32px 20px 100px!important;}
+.coeduca-header{padding:35px 36px 30px!important;text-align:left!important;border:0!important;border-radius:24px!important;box-shadow:0 20px 50px #152d4930!important;background:radial-gradient(circle at 88% 8%,#596e94 0,#3c5277 21%,transparent 40%),linear-gradient(135deg,#18243a 0%,#263854 100%)!important;color:#fff!important;overflow:hidden}
+.coeduca-header::before{width:180px;height:180px;left:auto;right:-55px;bottom:-110px;background:#b7fa75!important;opacity:.13!important;border:0!important;box-shadow:none!important}
+.coeduca-header::after{content:'◇';width:auto;height:auto;inset:24px 40px auto auto;font-size:110px;color:#b7fa75;background:none!important;border:0!important;box-shadow:none!important;opacity:.25!important;}
+.coeduca-header h1{font-family:Arial,Helvetica,sans-serif!important;text-transform:none!important;font-weight:900!important;letter-spacing:-1.3px!important;font-size:clamp(30px,5.5vw,52px)!important;line-height:1.08!important;margin:0 0 13px!important;color:#f9fcff!important;max-width:680px}
+.coeduca-header p{font-family:Arial,Helvetica,sans-serif!important;color:#c6d7ed!important;font-size:13px!important;letter-spacing:.1px!important;}
+.coeduca-header-students{justify-content:flex-start!important;gap:7px!important;flex-wrap:wrap!important}
+.coeduca-header-student-pill{background:#ffffff24!important;color:#fff!important;border:1px solid #ffffff44!important;border-radius:8px!important;padding:6px 10px!important;box-shadow:none!important;font-family:Arial,Helvetica,sans-serif!important}
+.coeduca-header-actions{justify-content:flex-start!important;flex-wrap:wrap!important;gap:9px!important;}
+.coeduca-btn{font-family:Arial,Helvetica,sans-serif!important;font-weight:800!important;border-radius:10px!important;box-shadow:0 3px 0 #13203822!important;transition:transform .15s ease,box-shadow .15s ease!important}
+.coeduca-btn:hover{transform:translateY(-1px)!important;box-shadow:0 6px 14px #15233c28!important}
+.coeduca-header .coeduca-btn{background:#ffffff17!important;color:#fff!important;border:1px solid #ffffff40!important;}
+.coeduca-exercise{border:1px solid var(--outline)!important;background:#fff!important;border-radius:20px!important;box-shadow:0 8px 24px #1d395312!important;margin:23px 0!important;padding:26px!important;}
+.coeduca-exercise::before,.coeduca-exercise::after{display:none!important}
+.coeduca-exercise-title{font:900 clamp(20px,3vw,25px)/1.2 Arial,Helvetica,sans-serif!important;letter-spacing:-.5px!important;color:#182a47!important;text-transform:none!important;margin-bottom:10px!important;}
+.coeduca-exercise-instruction{background:#eef4fe!important;border-left:4px solid var(--blue)!important;color:#3c506d!important;font:500 14px/1.6 Arial,Helvetica,sans-serif!important;border-radius:9px!important;padding:12px 14px!important;box-shadow:none!important;}
+.coeduca-item-card,.coeduca-item-card.mc-question{font-family:Arial,Helvetica,sans-serif!important;background:#f7f9fd!important;border:1px solid #e1e8f3!important;border-radius:14px!important;padding:18px!important;box-shadow:none!important;}
+.coeduca-choice-card.mc-option{background:#fff!important;border:1.5px solid #dbe4f0!important;border-radius:10px!important;box-shadow:none!important;transition:background .15s,border-color .15s,transform .15s!important;font:600 14px/1.5 Arial,Helvetica,sans-serif!important;min-height:48px!important;}
+.coeduca-choice-card.mc-option.is-correct{background:#dff7e9!important;border-color:#28a66a!important;}
+.coeduca-choice-card.mc-option.is-wrong{background:#ffe8e5!important;border-color:#d96b61!important;}
+.coeduca-choice-card.mc-option.is-muted{background:#f3f5f8!important;opacity:.65!important;}
+.coeduca-choice-card.mc-option.is-selected{background:#e9eeff!important;border-color:#455bda!important;}
+.coeduca-choice-card input[type=radio]{accent-color:#455bda}
+.coeduca-exercise-body .tf-btn { border:0!important;border-radius:9px!important;min-height:42px!important;font:800 13px Arial,Helvetica,sans-serif!important;box-shadow:none!important; }
+.coeduca-exercise-body .tf-btn[data-v=true]{background:#189365!important;}
+.coeduca-exercise-body .tf-btn[data-v=false]{background:#de5d5d!important;}
+.coeduca-note{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:25px 0!important;}
+.coeduca-note::before,.coeduca-note::after{display:none!important}
+.coeduca-final-score{background:linear-gradient(135deg,#e7fbd6,#ecf6ff)!important;border:1px solid #c8dfcb!important;border-radius:20px!important;box-shadow:0 12px 30px #1a543c14!important;margin:28px 0 20px!important;}
+.coeduca-final-score::before,.coeduca-final-score::after{display:none!important}
+.coeduca-final-score h2,.coeduca-final-score p{font-family:Arial,Helvetica,sans-serif!important;color:#234733!important;}
+.coeduca-final-score .score-number{font-family:Arial,Helvetica,sans-serif!important;color:#174e38!important;font-weight:900!important;}
+.coeduca-pdf-actions {padding:10px 0 22px}
+.coeduca-pdf-actions .coeduca-btn-accent{background:#455bda!important;color:#fff!important;border:0!important;padding:14px 24px!important;}
+.coeduca-pdf-view-btn{border:1px solid #bac8e1!important;border-radius:12px!important;font-family:Arial,Helvetica,sans-serif!important;}
+.coeduca-login-modal{font-family:Arial,Helvetica,sans-serif!important;border-radius:22px!important;}
+.coeduca-login-modal *{font-family:Arial,Helvetica,sans-serif!important}
+.site-footer{position:relative;z-index:1;background:#152036;color:#bbcadb;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:24px max(20px,calc((100% - 980px)/2));font:12px Arial,Helvetica,sans-serif;}
+.site-footer b{color:#b7fa75;letter-spacing:1px;}
+
+/* Mini lección visual antes de los retos */
+.lesson-cover{padding:37px 36px 30px;border-radius:22px;color:#fff;background:linear-gradient(125deg,#313e76 0%,#23305e 62%,#1c2746 100%);position:relative;overflow:hidden;}
+.lesson-cover::after{content:'↗';position:absolute;right:14px;top:0;color:#b7fa75;font-size:165px;line-height:1;opacity:.10;pointer-events:none;}
+.lesson-intro-kicker{display:flex;gap:12px;align-items:center;font-size:11px;font-weight:900;letter-spacing:2px;color:#bdebbd;margin-bottom:18px;}
+.lesson-cover h2{font:900 clamp(28px,5vw,45px)/1.08 Arial,Helvetica,sans-serif;letter-spacing:-1.1px;margin:0 0 16px;}
+.lesson-cover h2 em{color:#b7fa75;font-style:normal;}
+.lesson-cover p{font:15px/1.7 Arial,Helvetica,sans-serif;color:#dce5fa;max-width:660px;margin:0 0 23px;}
+.lesson-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px;}
+.lesson-tags span{background:#ffffff16;border:1px solid #ffffff2e;color:#eef3ff;padding:7px 12px;font:700 12px Arial;border-radius:999px}
+.four-pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+.pillar{padding:15px 13px;background:#ffffff13;border:1px solid #ffffff24;border-radius:12px;display:flex;flex-direction:column;gap:9px;}
+.pillar b{color:#b7fa75;font-size:12px;letter-spacing:1.6px}.pillar span{font-size:14px;font-weight:750}
+.symbols-wrap{margin-top:17px;background:white;border:1px solid #dfe7f1;border-radius:20px;padding:26px;}
+.symbols-wrap h3,.diagram-note h3,.recap-note h3{font:900 23px Arial,Helvetica,sans-serif;color:#192b49;letter-spacing:-.4px;margin:0 0 9px;}
+.symbols-wrap > p,.diagram-note p,.recap-note p{font:14px/1.7 Arial,Helvetica,sans-serif;color:#586a82;max-width:760px;margin:0 0 21px;}
+.symbols-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+.symbol-box{text-align:center;background:#f7f9fc;border:1px solid #e5ecf4;border-radius:14px;min-height:162px;padding:20px 5px 14px;display:flex;align-items:center;flex-direction:column;justify-content:space-between;}
+.symbol-box strong{font-size:14px;color:#1f3152}.symbol-box small{font-size:12px;color:#718097}
+.symbol-sample{display:grid;place-items:center;color:#3154a0;font:800 13px Arial,Helvetica,sans-serif;}
+.symbol-oval{border:2px solid #5593c6;background:#e0f1ff;width:112px;height:52px;border-radius:40px}
+.symbol-rect{border:2px solid #7c6bd3;background:#efebff;width:112px;height:52px;border-radius:6px}
+.symbol-diamond{background:#ffe9bd;border:2px solid #bd8528;transform:rotate(45deg);width:53px;height:53px;margin:0 0 3px;}
+.symbol-diamond span{transform:rotate(-45deg);font-size:11px;color:#85601b}
+.symbol-arrow{font-size:48px;line-height:1;color:#167c62;}
+.mission-tip{padding:13px 16px;background:#eaf7ec;border-left:4px solid #66b97a;border-radius:9px;margin-top:21px;font:14px/1.6 Arial;color:#31583c;}
+.diagram-note{background:#fff;border:1px solid #dfe7f1;border-radius:21px;padding:27px;}
+.note-index{font:900 11px Arial;letter-spacing:1.8px;color:#4964b3;display:block;margin-bottom:12px;}
+.flow-svg{display:block;width:100%;max-width:700px;margin:0 auto 14px;height:auto;background:#f8fafc;border-radius:14px;}
+.mini-scenes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mini-scenes div{display:flex;flex-direction:column;gap:8px;border:1px solid #e4eaf2;border-radius:11px;padding:13px;background:#f7f9fc;}
+.mini-scenes b{font:900 11px Arial;color:#35488d;letter-spacing:.5px;}
+.mini-scenes span{font:13px/1.5 Arial;color:#52657d}
+.recap-note{border:1px solid #dae5ef;background:linear-gradient(125deg,#f2fff0,#f0f5ff);border-radius:21px;padding:27px;}
+.recap-list{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:17px 0;}
+.recap-list span{border-radius:7px;background:#fff;border:1px solid #d0dceb;padding:9px 12px;font:900 11px Arial;color:#314d71;letter-spacing:.4px}.recap-list b{color:#7992c5}
+.recap-note p{margin-bottom:0}
+@media(max-width:700px){
+  .topbar-tag{display:none}
+  .topbar{padding:12px 16px}
+  .coeduca-app{padding:18px 12px 80px!important}
+  .coeduca-header{padding:28px 22px!important;border-radius:17px!important}
+  .coeduca-header::after{font-size:65px;right:15px;top:15px}
+  .coeduca-exercise{padding:17px!important;border-radius:15px!important}
+  .coeduca-item-card,.coeduca-item-card.mc-question{padding:13px!important}
+  .lesson-cover{padding:26px 21px 24px;border-radius:17px}
+  .lesson-intro-kicker{font-size:9px;letter-spacing:1px}
+  .symbols-wrap,.diagram-note,.recap-note{padding:19px;border-radius:16px}
+  .symbols-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .symbol-box{min-height:155px}
+  .four-pillars{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mini-scenes{grid-template-columns:1fr}
+  .site-footer{padding:23px 16px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
