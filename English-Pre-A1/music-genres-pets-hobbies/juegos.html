@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"b13423a9-3170-4cda-b7ed-089cdd2f5b40","token":"85b7cb07-c39d-46d8-aa36-0ae494490233"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Music Genres, Pets &amp; Hobbies</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="coeduca">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "c247a75a-6598-496d-b4cd-58df54815c1a",
+  "container": "#app",
+  "topic": "Music Genres, Pets & Hobbies",
+  "level": "Séptimo, Octavo",
+  "pdfDesign": "HollyHobbie",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#F791F7",
+    "accent": "#D700AD",
+    "bg": "#FFF1F8",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#E4C9E9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Music Genres, Pets & Hobbies",
+      "html": "\n            \u003carticle style=\"font-family:Arial,sans-serif;color:#1A1A1A;line-height:1.65;max-width:760px;margin:auto;\">\n\n              \u003cheader style=\"background:#FFF1F8;border-radius:16px;padding:18px 16px;text-align:center;margin-bottom:18px;\">\n                \u003cdiv style=\"font-size:34px;margin-bottom:8px;\">🎵 🐶 🎨\u003c/div>\n                \u003ch2 style=\"color:#D700AD;font-size:23px;line-height:1.3;margin:0 0 8px;\">\n                  Music Genres, Pets &amp; Hobbies\n                \u003c/h2>\n                \u003cp style=\"margin:0;font-size:14px;\">\n                  Aprende a hablar en inglés sobre tu música favorita, tus mascotas y tus pasatiempos.\n                \u003c/p>\n              \u003c/header>\n\n              \u003csection style=\"margin-bottom:20px;\">\n                \u003ch3 style=\"font-size:18px;color:#D700AD;margin:0 0 9px;\">\n                  🎵 1. Music Genres\n                \u003c/h3>\n                \u003cp style=\"margin:0 0 10px;\">\n                  \u003cstrong>Music genres\u003c/strong> son los diferentes géneros musicales.\n                \u003c/p>\n                \u003cdiv style=\"background:#FFF1F8;border-left:4px solid #D700AD;border-radius:10px;padding:12px 14px;\">\n                  \u003cp style=\"margin:0 0 6px;\">\u003cstrong>Pop\u003c/strong> — Música pop\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">\u003cstrong>Rock\u003c/strong> — Música rock\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">\u003cstrong>Reggae\u003c/strong> — Reggae\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">\u003cstrong>Jazz\u003c/strong> — Jazz\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">\u003cstrong>Hip-hop\u003c/strong> — Hip-hop\u003c/p>\n                  \u003cp style=\"margin:0;\">\u003cstrong>Classical music\u003c/strong> — Música clásica\u003c/p>\n                \u003c/div>\n                \u003cp style=\"margin:10px 0 3px;font-weight:bold;color:#D700AD;\">Example:\u003c/p>\n                \u003cp style=\"margin:0;background:#FFFFFF;border:1px solid #E4C9E9;padding:10px;border-radius:9px;\">\n                  I like pop music.\u003cbr>\n                  \u003cspan style=\"font-size:13px;color:#555555;\">Me gusta la música pop.\u003c/span>\n                \u003c/p>\n              \u003c/section>\n\n              \u003csection style=\"margin-bottom:20px;\">\n                \u003ch3 style=\"font-size:18px;color:#D700AD;margin:0 0 9px;\">\n                  🐾 2. Pets\n                \u003c/h3>\n                \u003cp style=\"margin:0 0 10px;\">\n                  \u003cstrong>Pets\u003c/strong> significa mascotas. Son animales que podemos tener en casa.\n                \u003c/p>\n                \u003cdiv style=\"background:#FFF1F8;border-left:4px solid #D700AD;border-radius:10px;padding:12px 14px;\">\n                  \u003cp style=\"margin:0 0 6px;\">🐶 \u003cstrong>Dog\u003c/strong> — Perro\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">🐱 \u003cstrong>Cat\u003c/strong> — Gato\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">🐰 \u003cstrong>Rabbit\u003c/strong> — Conejo\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">🐹 \u003cstrong>Hamster\u003c/strong> — Hámster\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">🐢 \u003cstrong>Turtle\u003c/strong> — Tortuga\u003c/p>\n                  \u003cp style=\"margin:0;\">🐟 \u003cstrong>Fish\u003c/strong> — Pez\u003c/p>\n                \u003c/div>\n                \u003cp style=\"margin:10px 0 3px;font-weight:bold;color:#D700AD;\">Example:\u003c/p>\n                \u003cp style=\"margin:0;background:#FFFFFF;border:1px solid #E4C9E9;padding:10px;border-radius:9px;\">\n                  I have a cat.\u003cbr>\n                  \u003cspan style=\"font-size:13px;color:#555555;\">Tengo un gato.\u003c/span>\n                \u003c/p>\n              \u003c/section>\n\n              \u003csection style=\"margin-bottom:20px;\">\n                \u003ch3 style=\"font-size:18px;color:#D700AD;margin:0 0 9px;\">\n                  🎨 3. Hobbies\n                \u003c/h3>\n                \u003cp style=\"margin:0 0 10px;\">\n                  \u003cstrong>Hobbies\u003c/strong> son actividades que hacemos por diversión en nuestro tiempo libre.\n                \u003c/p>\n                \u003cdiv style=\"background:#FFF1F8;border-left:4px solid #D700AD;border-radius:10px;padding:12px 14px;\">\n                  \u003cp style=\"margin:0 0 6px;\">📚 \u003cstrong>Reading\u003c/strong> — Leer\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">🎨 \u003cstrong>Drawing\u003c/strong> — Dibujar\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">💃 \u003cstrong>Dancing\u003c/strong> — Bailar\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">🎤 \u003cstrong>Singing\u003c/strong> — Cantar\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">🏊 \u003cstrong>Swimming\u003c/strong> — Nadar\u003c/p>\n                  \u003cp style=\"margin:0 0 6px;\">🚴 \u003cstrong>Cycling\u003c/strong> — Andar en bicicleta\u003c/p>\n                  \u003cp style=\"margin:0;\">⚽ \u003cstrong>Playing soccer\u003c/strong> — Jugar fútbol\u003c/p>\n                \u003c/div>\n                \u003cp style=\"margin:10px 0 3px;font-weight:bold;color:#D700AD;\">Example:\u003c/p>\n                \u003cp style=\"margin:0;background:#FFFFFF;border:1px solid #E4C9E9;padding:10px;border-radius:9px;\">\n                  I enjoy drawing after school.\u003cbr>\n                  \u003cspan style=\"font-size:13px;color:#555555;\">Disfruto dibujar después de clases.\u003c/span>\n                \u003c/p>\n              \u003c/section>\n\n              \u003csection style=\"background:#E4C9E9;border-radius:14px;padding:15px;margin-bottom:16px;\">\n                \u003ch3 style=\"color:#7D0067;font-size:17px;margin:0 0 9px;\">\n                  💬 Useful Expressions\n                \u003c/h3>\n                \u003cp style=\"margin:0 0 8px;\">\n                  \u003cstrong>What kind of music do you like?\u003c/strong>\u003cbr>\n                  \u003cspan style=\"font-size:13px;\">¿Qué tipo de música te gusta?\u003c/span>\n                \u003c/p>\n                \u003cp style=\"margin:0 0 8px;\">\n                  \u003cstrong>Do you have a pet?\u003c/strong>\u003cbr>\n                  \u003cspan style=\"font-size:13px;\">¿Tienes una mascota?\u003c/span>\n                \u003c/p>\n                \u003cp style=\"margin:0;\">\n                  \u003cstrong>What is your favorite hobby?\u003c/strong>\u003cbr>\n                  \u003cspan style=\"font-size:13px;\">¿Cuál es tu pasatiempo favorito?\u003c/span>\n                \u003c/p>\n              \u003c/section>\n\n              \u003csection style=\"border:1px solid #E4C9E9;border-radius:12px;padding:14px;margin-bottom:14px;\">\n                \u003ch3 style=\"color:#D700AD;font-size:17px;margin:0 0 8px;\">\n                  ✏️ Grammar Tip\n                \u003c/h3>\n                \u003cp style=\"margin:0 0 9px;\">\n                  Para hablar de pasatiempos podemos usar \u003cstrong>like, love o enjoy\u003c/strong> seguidos de un verbo terminado en \u003cstrong>-ing\u003c/strong>.\n                \u003c/p>\n                \u003cp style=\"margin:0 0 6px;\">\u003cstrong>I like swimming.\u003c/strong>\u003c/p>\n                \u003cp style=\"margin:0 0 6px;\">\u003cstrong>She loves dancing.\u003c/strong>\u003c/p>\n                \u003cp style=\"margin:0 0 12px;\">\u003cstrong>He enjoys reading.\u003c/strong>\u003c/p>\n                \u003cp style=\"margin:0 0 6px;\">\n                  Recuerda que con \u003cstrong>he\u003c/strong> y \u003cstrong>she\u003c/strong> usamos \u003cstrong>likes, loves, enjoys\u003c/strong> y \u003cstrong>has\u003c/strong>.\n                \u003c/p>\n                \u003cp style=\"margin:0 0 6px;\">\u003cstrong>She likes rock music.\u003c/strong>\u003c/p>\n                \u003cp style=\"margin:0;\">\u003cstrong>He has a rabbit.\u003c/strong>\u003c/p>\n              \u003c/section>\n\n              \u003cfooter style=\"text-align:center;background:#FFF1F8;border-radius:12px;padding:12px;\">\n                \u003cp style=\"margin:0;font-weight:bold;color:#D700AD;\">\n                  🌟 Ready to practice?\n                \u003c/p>\n                \u003cp style=\"margin:4px 0 0;font-size:13px;\">\n                  ¡Ahora demuestra lo que aprendiste!\n                \u003c/p>\n              \u003c/footer>\n\n            \u003c/article>\n          "
+    },
+    {
+      "type": "matchlines",
+      "title": "Connect the Words",
+      "instruction": "Une cada palabra en inglés con su significado en español.",
+      "dataA": [
+        {
+          "left": "Pop",
+          "right": "Música pop"
+        },
+        {
+          "left": "Rock",
+          "right": "Música rock"
+        },
+        {
+          "left": "Jazz",
+          "right": "Jazz"
+        },
+        {
+          "left": "Dog",
+          "right": "Perro"
+        },
+        {
+          "left": "Rabbit",
+          "right": "Conejo"
+        },
+        {
+          "left": "Swimming",
+          "right": "Nadar"
+        }
+      ],
+      "dataB": [
+        {
+          "left": "Reggae",
+          "right": "Reggae"
+        },
+        {
+          "left": "Classical music",
+          "right": "Música clásica"
+        },
+        {
+          "left": "Hip-hop",
+          "right": "Hip-hop"
+        },
+        {
+          "left": "Hamster",
+          "right": "Hámster"
+        },
+        {
+          "left": "Turtle",
+          "right": "Tortuga"
+        },
+        {
+          "left": "Drawing",
+          "right": "Dibujar"
+        }
+      ]
+    },
+    {
+      "type": "categorize",
+      "title": "Music, Pets or Hobbies?",
+      "instruction": "Clasifica las palabras en la categoría correcta: géneros musicales, mascotas o pasatiempos.",
+      "dataA": {
+        "categories": [
+          "Music Genres",
+          "Pets",
+          "Hobbies"
+        ],
+        "items": [
+          {
+            "text": "Pop",
+            "cat": 0
+          },
+          {
+            "text": "Rock",
+            "cat": 0
+          },
+          {
+            "text": "Jazz",
+            "cat": 0
+          },
+          {
+            "text": "Cat",
+            "cat": 1
+          },
+          {
+            "text": "Rabbit",
+            "cat": 1
+          },
+          {
+            "text": "Fish",
+            "cat": 1
+          },
+          {
+            "text": "Reading",
+            "cat": 2
+          },
+          {
+            "text": "Dancing",
+            "cat": 2
+          },
+          {
+            "text": "Swimming",
+            "cat": 2
+          }
+        ]
+      },
+      "dataB": {
+        "categories": [
+          "Music Genres",
+          "Pets",
+          "Hobbies"
+        ],
+        "items": [
+          {
+            "text": "Reggae",
+            "cat": 0
+          },
+          {
+            "text": "Hip-hop",
+            "cat": 0
+          },
+          {
+            "text": "Classical music",
+            "cat": 0
+          },
+          {
+            "text": "Dog",
+            "cat": 1
+          },
+          {
+            "text": "Hamster",
+            "cat": 1
+          },
+          {
+            "text": "Turtle",
+            "cat": 1
+          },
+          {
+            "text": "Drawing",
+            "cat": 2
+          },
+          {
+            "text": "Cycling",
+            "cat": 2
+          },
+          {
+            "text": "Singing",
+            "cat": 2
+          }
+        ]
+      }
+    },
+    {
+      "type": "multiplechoice",
+      "title": "Choose the Correct Answer",
+      "instruction": "Lee cada pregunta y selecciona la única respuesta correcta.",
+      "dataA": [
+        {
+          "q": "Which of these is a music genre?",
+          "options": [
+            "Rabbit",
+            "Jazz",
+            "Drawing"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "What does \"pet\" mean in Spanish?",
+          "options": [
+            "Pasatiempo",
+            "Canción",
+            "Mascota"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "Which animal is a pet?",
+          "options": [
+            "Rock",
+            "Hamster",
+            "Swimming"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "What does \"reading\" mean?",
+          "options": [
+            "Leer",
+            "Bailar",
+            "Nadar"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Choose the correct sentence.",
+          "options": [
+            "She likes pop music.",
+            "She like pop music.",
+            "She liking pop music."
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Which word means \"conejo\"?",
+          "options": [
+            "Turtle",
+            "Rabbit",
+            "Fish"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Which activity is a hobby?",
+          "options": [
+            "Dog",
+            "Classical music",
+            "Cycling"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "How do you say \"Me gusta nadar\" in English?",
+          "options": [
+            "I like swim.",
+            "I likes swimming.",
+            "I like swimming."
+          ],
+          "answer": 2
+        }
+      ],
+      "dataB": [
+        {
+          "q": "Which of these is a music genre?",
+          "options": [
+            "Reggae",
+            "Turtle",
+            "Singing"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "What does \"hobby\" mean in Spanish?",
+          "options": [
+            "Mascota",
+            "Pasatiempo",
+            "Género musical"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Which animal is a pet?",
+          "options": [
+            "Dancing",
+            "Hip-hop",
+            "Cat"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "What does \"drawing\" mean?",
+          "options": [
+            "Dibujar",
+            "Cantar",
+            "Leer"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Choose the correct sentence.",
+          "options": [
+            "He have a dog.",
+            "He has a dog.",
+            "He having a dog."
+          ],
+          "answer": 1
+        },
+        {
+          "q": "Which word means \"tortuga\"?",
+          "options": [
+            "Rabbit",
+            "Hamster",
+            "Turtle"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "Which activity is a hobby?",
+          "options": [
+            "Playing soccer",
+            "Rock",
+            "Fish"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "How do you say \"Ella disfruta bailar\" in English?",
+          "options": [
+            "She enjoy dance.",
+            "She enjoys dancing.",
+            "She enjoying dancing."
+          ],
+          "answer": 1
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "title": "Complete the Sentences",
+      "instruction": "Selecciona la palabra correcta para completar cada oración en inglés.",
+      "dataA": [
+        {
+          "before": "My favorite music genre ",
+          "options": [
+            "are",
+            "is",
+            "am"
+          ],
+          "answer": 1,
+          "after": " jazz."
+        },
+        {
+          "before": "She ",
+          "options": [
+            "have",
+            "having",
+            "has"
+          ],
+          "answer": 2,
+          "after": " a pet cat."
+        },
+        {
+          "before": "I enjoy ",
+          "options": [
+            "listening",
+            "listen",
+            "listens"
+          ],
+          "answer": 0,
+          "after": " to music."
+        },
+        {
+          "before": "They like ",
+          "options": [
+            "play",
+            "playing",
+            "plays"
+          ],
+          "answer": 1,
+          "after": " soccer."
+        },
+        {
+          "before": "A hamster ",
+          "options": [
+            "am",
+            "are",
+            "is"
+          ],
+          "answer": 2,
+          "after": " a small pet."
+        },
+        {
+          "before": "He ",
+          "options": [
+            "likes",
+            "like",
+            "liking"
+          ],
+          "answer": 0,
+          "after": " reggae music."
+        },
+        {
+          "before": "We ",
+          "options": [
+            "has",
+            "have",
+            "having"
+          ],
+          "answer": 1,
+          "after": " two pets at home."
+        },
+        {
+          "before": "My sister enjoys ",
+          "options": [
+            "draw",
+            "draws",
+            "drawing"
+          ],
+          "answer": 2,
+          "after": "."
+        }
+      ],
+      "dataB": [
+        {
+          "before": "My favorite hobby ",
+          "options": [
+            "is",
+            "are",
+            "am"
+          ],
+          "answer": 0,
+          "after": " cycling."
+        },
+        {
+          "before": "He ",
+          "options": [
+            "have",
+            "has",
+            "having"
+          ],
+          "answer": 1,
+          "after": " a pet turtle."
+        },
+        {
+          "before": "I love ",
+          "options": [
+            "swim",
+            "swims",
+            "swimming"
+          ],
+          "answer": 2,
+          "after": " in the pool."
+        },
+        {
+          "before": "She likes ",
+          "options": [
+            "reading",
+            "read",
+            "reads"
+          ],
+          "answer": 0,
+          "after": " books."
+        },
+        {
+          "before": "Hip-hop ",
+          "options": [
+            "are",
+            "is",
+            "am"
+          ],
+          "answer": 1,
+          "after": " a music genre."
+        },
+        {
+          "before": "My brother ",
+          "options": [
+            "like",
+            "liking",
+            "likes"
+          ],
+          "answer": 2,
+          "after": " rock music."
+        },
+        {
+          "before": "They ",
+          "options": [
+            "have",
+            "has",
+            "having"
+          ],
+          "answer": 0,
+          "after": " a dog and a cat."
+        },
+        {
+          "before": "She enjoys ",
+          "options": [
+            "sing",
+            "singing",
+            "sings"
+          ],
+          "answer": 1,
+          "after": " songs."
+        }
+      ]
+    },
+    {
+      "type": "wordsearch",
+      "title": "Sopa de letras",
+      "instruction": "Instrucción: ",
+      "dataA": {
+        "words": [
+          "RABBIT",
+          "HAMSTER",
+          "TURTLE",
+          "SNAKE",
+          "HORSE",
+          "DOG"
+        ],
+        "gridSize": 12
+      }
+    },
+    {
+      "type": "multiplechoice",
+      "title": "Opción múltiple",
+      "instruction": "Instrucción: selecciona la el nombre del emoji.",
+      "dataA": [
+        {
+          "q": "🐰",
+          "options": [
+            "rabbit",
+            "cat",
+            "dog",
+            "melon"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "🍉",
+          "options": [
+            "cat",
+            "study",
+            "watermelon",
+            "penguin"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "😺 ",
+          "options": [
+            "banana",
+            "kiwi",
+            "cat",
+            "dog"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "🍇",
+          "options": [
+            "shell",
+            "horse",
+            "tangerine",
+            "grapes"
+          ],
+          "answer": 3
+        }
+      ]
+    },
+    {
+      "type": "matchimage",
+      "title": "Unir con imagen",
+      "instruction": "Instrucción: ",
+      "dataA": [
+        {
+          "word": "fish",
+          "image": "files/edited_1793128058494_file_0000000042d481f4b851739249a2d0cc.png"
+        },
+        {
+          "word": "cooking",
+          "image": "files/edited_1793128108236_file_0000000042d481f4b851739249a2d0cc.png"
+        },
+        {
+          "word": "dog",
+          "image": "files/edited_1793128050342_file_0000000042d481f4b851739249a2d0cc.png"
+        },
+        {
+          "word": "jazz",
+          "image": "files/edited_1793128025819_file_0000000042d481f4b851739249a2d0cc.png"
+        },
+        {
+          "word": "country",
+          "image": "files/edited_1793128045725_file_0000000042d481f4b851739249a2d0cc.png"
+        },
+        {
+          "word": "reading",
+          "image": "files/edited_1793128118522_file_0000000042d481f4b851739249a2d0cc.png"
+        },
+        {
+          "word": "sandwich",
+          "image": "files/edited_1793128072027_file_0000000042d481f4b851739249a2d0cc.png"
+        },
+        {
+          "word": "salad",
+          "image": "files/edited_1793128079009_file_0000000042d481f4b851739249a2d0cc.png"
+        }
+      ]
+    }
+  ],
+  "game": {
+    "type": "snake",
+    "winScore": 5
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
