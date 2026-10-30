@@ -20,8 +20,5 @@ const STUDENTS = {
   "19929938": { name: "Elizabeth Sophia Quinteros Miranda", grade: "2do Año de Bach." },
   "4210277": { name: "Josué Leonel Rivera Montano", grade: "2do Año de Bach." },
 
-  // CUENTAS FIJAS
-  "1999": { name: "Eliseo", grade: "Maestro" },
-  "12379": { name: "Rigo", grade: "Mascota" },
 };
 const COEDUCA_AVAILABLE_GRADES = ["1er Año de Bach.", "2do Año de Bach.", "Noveno", "Octavo", "Séptimo"];
