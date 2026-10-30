@@ -4,12 +4,9 @@
   const config = global.COEDUCA_FEEDBACK_CONFIG;
   const app = document.getElementById('app');
   const questions = config.exercises || [];
-  const transport = config.deliveryMode === 'local' ? null : global.COEDUCA_CLASSROOM;
-  const connected = Boolean(transport) && !config.preview;
+  // Actividad independiente: no usa Classroom, sesiones remotas ni cuentas fijas.
   let student = null, letter = null, state = null;
-  let reviewAccount = null, reviewRecipients = null;
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const fixed = nie => nie === '1999' || nie === '12379';
   const draftKey = () => 'worksheets-feedback:' + (config.id || 'feedback') + ':' + student.nie;
   const data = question => question.dataA;
   const icon = path => `<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
@@ -54,79 +51,25 @@
   global.addEventListener('resize', keepRigoInView);
   function celebrate() { const rigo = document.querySelector('rigo-mascot'); if (rigo?.cheer) rigo.cheer(); }
   function loginView() {
-    transport?.unmount?.();
     student = letter = state = null;
-    reviewAccount = reviewRecipients = null;
     document.body.className = 'login-view';
-    app.innerHTML = `<section class="card access-card" aria-labelledby="welcome-title">${welcomeEnvelope}<div class="tiny-overline">TU VOZ IMPORTA</div><h1 id="welcome-title">${escape(config.title)}</h1><p class="welcome-copy">${escape(config.introduction)}</p><form id="login-form"><label for="student-nie">NIE del estudiante</label><div class="input-line"><input id="student-nie" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="Escribe tu NIE" required><button class="primary-btn" type="submit">Entrar ${icon('<path d="M5 12h14m-5-5 5 5-5 5"/>')}</button></div><p id="login-error" class="form-error" role="alert"></p></form><p class="welcome-signoff">Un espacio para recordar, agradecer y escucharte.</p>${config.preview ? '<p class="preview-note">Vista previa de Worksheets: los envíos están desactivados.</p>' : ''}</section>`;
-    document.getElementById('login-form').addEventListener('submit', async event => {
+    app.innerHTML = `<section class="card access-card" aria-labelledby="welcome-title">${welcomeEnvelope}<div class="tiny-overline">TU VOZ IMPORTA</div><h1 id="welcome-title">${escape(config.title)}</h1><p class="welcome-copy">${escape(config.introduction)}</p><form id="login-form"><label for="student-nie">NIE del estudiante</label><div class="input-line"><input id="student-nie" type="text" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="Escribe tu NIE" required><button class="primary-btn" type="submit">Entrar ${icon('<path d="M5 12h14m-5-5 5 5-5 5"/>')}</button></div><p id="login-error" class="form-error" role="alert" aria-live="polite"></p></form><p class="welcome-signoff">No necesitas Classroom ni contraseña. Ingresa tu NIE para abrir tu carta y responder.</p></section>`;
+    const form = document.getElementById('login-form');
+    form.addEventListener('submit', event => {
       event.preventDefault();
       const nie = document.getElementById('student-nie').value.trim();
-      const button = event.currentTarget.querySelector('button');
       const error = document.getElementById('login-error');
-      button.disabled = true;
-      try {
-        if (fixed(nie)) {
-          if (!global.COEDUCA_FIXED_AUTH?.requestLogin || !await global.COEDUCA_FIXED_AUTH.requestLogin(nie)) return;
-          reviewAccount = nie;
-          reviewRecipients = null;
-          await teacherPreview();
-          return;
-        }
-        let person;
-        if (connected) person = await transport.lookup(nie);
-        else {
-          const roster = typeof STUDENTS === 'object' ? STUDENTS : {};
-          if (!fixed(nie) && !config.recipientNies?.includes(nie)) throw new Error('Este NIE no está seleccionado para este Feedback.');
-          if (Object.prototype.hasOwnProperty.call(roster, nie)) person = Object.assign({nie}, roster[nie]);
-        }
-        if (!person) throw new Error('NIE no encontrado entre los destinatarios.');
-        student = person;
-        letter = person.feedbackLetter || config.letters?.[nie] || null;
-        render();
-      } catch (err) { error.textContent = err.message || 'No se pudo abrir el Feedback.'; }
-      finally { button.disabled = false; }
-    });
-  }
-  async function teacherPreview() {
-    transport?.unmount?.();
-    student = letter = state = null;
-    document.body.className = 'login-view';
-    const roster = typeof STUDENTS === 'object' ? STUDENTS : {};
-    const account = reviewAccount;
-    app.innerHTML = `<section class="card preview-card"><div class="tiny-overline">${account === '12379' ? 'RIGO' : 'MI CUENTA'} · REVISIÓN</div><h1>Elige un estudiante</h1><p>Revisa sus cartas y preguntas. Esta vista no guarda respuestas ni envía participación.</p><label for="preview-student">Estudiante</label><select id="preview-student" disabled><option value="">Cargando estudiantes…</option></select><p id="preview-error" class="form-error" role="alert"></p><button id="retry-preview" class="text-link" type="button" hidden>Reintentar</button><button id="exit-preview" class="text-link" type="button">Volver al inicio</button></section>`;
-    const select = document.getElementById('preview-student');
-    const error = document.getElementById('preview-error');
-    document.getElementById('exit-preview').addEventListener('click', loginView);
-    document.getElementById('retry-preview').addEventListener('click', teacherPreview);
-    try {
-      const recipients = reviewRecipients || (connected
-        ? await transport.feedbackRecipients(account)
-        : (config.recipientNies || []).filter(nie => !fixed(nie)).map(nie => Object.assign({nie}, roster[nie])));
-      if (!select.isConnected || reviewAccount !== account) return;
-      reviewRecipients = recipients;
-      select.innerHTML = `<option value="">${reviewRecipients.length ? 'Seleccionar estudiante' : 'Sin destinatarios disponibles'}</option>` + reviewRecipients.map(person => `<option value="${escape(person.nie)}">${escape(person.name || person.nie)} · ${escape(person.grade || person.nie)}</option>`).join('');
-      select.disabled = !reviewRecipients.length;
-    } catch (failure) {
-      if (!select.isConnected || reviewAccount !== account) return;
-      error.textContent = failure.message || 'No se pudo cargar el selector.';
-      document.getElementById('retry-preview').hidden = false;
-    }
-    select.addEventListener('change', async event => {
-      const nie = event.target.value;
-      if (!nie) return;
-      select.disabled = true;
       error.textContent = '';
-      try {
-        const person = connected ? await transport.lookup(nie) : reviewRecipients.find(person => person.nie === nie);
-        if (!select.isConnected || reviewAccount !== account) return;
-        if (!person) throw new Error('No se pudo abrir este estudiante.');
-        student = person;
-        letter = person.feedbackLetter || config.letters?.[nie] || null;
-        render();
-      } catch (failure) {
-        if (select.isConnected) error.textContent = failure.message || 'No se pudo abrir la carta.';
-      } finally { if (select.isConnected) select.disabled = false; }
+      const roster = typeof STUDENTS === 'object' ? STUDENTS : {};
+      // Solo los destinatarios de estas cartas pueden abrir su actividad.
+      if (!Array.isArray(config.recipientNies) || !config.recipientNies.includes(nie) ||
+          !Object.prototype.hasOwnProperty.call(roster, nie)) {
+        error.textContent = 'No encontramos ese NIE en esta actividad. Revisa los números o consulta con tu docente.';
+        return;
+      }
+      student = Object.assign({nie}, roster[nie]);
+      letter = config.letters?.[nie] || null;
+      render();
     });
   }
   function questionMarkup(question, index) {
@@ -164,25 +107,18 @@
     </div></section>`;
   }
   function render() {
-    const classroomActive = connected && !reviewAccount;
     const mascot = document.querySelector('rigo-mascot');
     if (mascot) mascot.setAttribute('grade', student.grade || '');
     document.body.className = letter ? '' : 'opened-letter';
     state = {student, poolVersion:'A', answers:{}, gameResult:null};
-    const deliveryInstructions = reviewAccount ? 'Vista de revisión. Puedes generar un PDF de ejemplo; las respuestas no se guardan ni se envían a Classroom.' : classroomActive
-      ? 'Descarga tu comprobante y adjúntalo a la tarea en Classroom. Después pulsa Entregar allí.'
-      : 'Descarga y guarda tu carta y tus respuestas en un PDF. Puedes compartirlo con tu docente.';
+    const deliveryInstructions = 'Tus respuestas se guardan en este navegador. Descarga tu carta y encuesta en PDF para conservarlas o compartirlas con tu docente. No se envían automáticamente.';
     app.innerHTML = `<header class="activity-header"><div class="header-toolbar"><div class="ribbon"><span class="ribbon-dot" aria-hidden="true"></span><span>FEEDBACK · TU OPINIÓN CUENTA</span></div><button class="account-switch-btn" id="switch-student" type="button" aria-label="Cambiar de cuenta" title="Cambiar de cuenta"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PgoNPCEtLSBVcGxvYWRlZCB0bzogU1ZHIFJlcG8sIHd3dy5zdmdyZXBvLmNvbSwgR2VuZXJhdG9yOiBTVkcgUmVwbyBNaXhlciBUb29scyAtLT4KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB2ZXJzaW9uPSIxLjEiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgoNPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCgkuc3Qwe2ZpbGw6IzMzMzMzMzt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMzMzMzMzM7c3Ryb2tlLXdpZHRoOjMyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPgoNPGcgaWQ9IkxheWVyXzEiLz4KDTxnIGlkPSJMYXllcl8yIj4KDTxnPgoNPGc+Cg08ZWxsaXBzZSBjbGFzcz0ic3QwIiBjeD0iMTM5LjYxIiBjeT0iMjczLjciIHJ4PSI2My45NiIgcnk9IjYzLjk2IiB0cmFuc2Zvcm09Im1hdHJpeCgwLjkyMzkgLTAuMzgyNyAwLjM4MjcgMC45MjM5IC05NC4xMTE4IDc0LjI2MSkiLz4KDTwvZz4KDTxnPgoNPHBhdGggY2xhc3M9InN0MCIgZD0iTTE1MS44LDM4NS4yMmgtMjQuMzdjLTQ2LjM1LDAtODMuOTMsMzcuNTctODMuOTMsODMuOTNsMCwwaDE5Mi4yMmwwLDAgICAgIEMyMzUuNzIsNDIyLjc5LDE5OC4xNSwzODUuMjIsMTUxLjgsMzg1LjIyeiIvPgoNPC9nPgoNPGc+Cg08ZWxsaXBzZSBjbGFzcz0ic3QwIiBjeD0iMzcyLjM5IiBjeT0iMTA2LjgyIiByeD0iNjMuOTYiIHJ5PSI2My45NiIgdHJhbnNmb3JtPSJtYXRyaXgoMC44NTA3IC0wLjUyNTcgMC41MjU3IDAuODUwNyAtMC41NDA4IDIxMS43MjkyKSIvPgoNPC9nPgoNPGc+Cg08cGF0aCBjbGFzcz0ic3QwIiBkPSJNMzg0LjU3LDIxOC4zNEgzNjAuMmMtNDYuMzUsMC04My45MywzNy41Ny04My45Myw4My45M3YwSDQ2OC41djBDNDY4LjUsMjU1LjkxLDQzMC45MywyMTguMzQsMzg0LjU3LDIxOC4zNCAgICAgeiIvPgoNPC9nPgoNPGc+Cg08cGF0aCBjbGFzcz0ic3QwIiBkPSJNMzgzLjcxLDM0OS42MWMtMC4zOC0wLjM4LTAuNzctMC43My0xLjE4LTEuMDdjLTAuMTgtMC4xNC0wLjM2LTAuMjctMC41NC0wLjQxICAgICBjLTAuMjQtMC4xOC0wLjQ3LTAuMzYtMC43MS0wLjUzYy0wLjIyLTAuMTUtMC40NS0wLjI4LTAuNjgtMC40MWMtMC4yMi0wLjEzLTAuNDQtMC4yNy0wLjY2LTAuMzljLTAuMjMtMC4xMi0wLjQ3LTAuMjMtMC43MS0wLjM0ICAgICBjLTAuMjQtMC4xMS0wLjQ3LTAuMjMtMC43MS0wLjMzYy0wLjIzLTAuMS0wLjQ3LTAuMTctMC43LTAuMjZjLTAuMjYtMC4wOS0wLjUxLTAuMTktMC43OC0wLjI3Yy0wLjIzLTAuMDctMC40Ny0wLjEyLTAuNy0wLjE4ICAgICBjLTAuMjctMC4wNy0wLjU0LTAuMTQtMC44Mi0wLjJjLTAuMjYtMC4wNS0wLjUzLTAuMDgtMC44LTAuMTJjLTAuMjUtMC4wNC0wLjUtMC4wOC0wLjc1LTAuMTFjLTAuNDgtMC4wNS0wLjk1LTAuMDctMS40My0wLjA3ICAgICBjLTAuMDUsMC0wLjEtMC4wMS0wLjE0LTAuMDFjLTAuMDYsMC0wLjExLDAuMDEtMC4xNywwLjAxYy0wLjQ3LDAtMC45NCwwLjAzLTEuNDEsMC4wN2MtMC4yNiwwLjAzLTAuNTEsMC4wNy0wLjc3LDAuMTEgICAgIGMtMC4yNiwwLjA0LTAuNTIsMC4wNy0wLjc4LDAuMTJjLTAuMjgsMC4wNi0wLjU2LDAuMTMtMC44NCwwLjJjLTAuMjMsMC4wNi0wLjQ2LDAuMTEtMC42OCwwLjE4Yy0wLjI3LDAuMDgtMC41MywwLjE4LTAuOCwwLjI4ICAgICBjLTAuMjMsMC4wOC0wLjQ2LDAuMTYtMC42OCwwLjI1Yy0wLjI1LDAuMS0wLjQ4LDAuMjItMC43MywwLjM0Yy0wLjIzLDAuMTEtMC40NywwLjIxLTAuNywwLjMzYy0wLjIzLDAuMTItMC40NSwwLjI2LTAuNjcsMC40ICAgICBjLTAuMjIsMC4xMy0wLjQ1LDAuMjYtMC42NywwLjQxYy0wLjI1LDAuMTYtMC40OCwwLjM1LTAuNzEsMC41MmMtMC4xOCwwLjE0LTAuMzcsMC4yNi0wLjU1LDAuNDFjLTAuNDEsMC4zNC0wLjgsMC42OS0xLjE3LDEuMDYgICAgIGwtMjkuNDQsMjkuNDRjLTYuMjUsNi4yNS02LjI1LDE2LjM4LDAsMjIuNjNjMy4xMiwzLjEyLDcuMjIsNC42OSwxMS4zMSw0LjY5YzQuMDksMCw4LjE5LTEuNTYsMTEuMzEtNC42OWwyLjEzLTIuMTN2MzYuOTYgICAgIGgtNzYuNzVjLTguODQsMC0xNiw3LjE2LTE2LDE2czcuMTYsMTYsMTYsMTZoOTIuNzVjOC44NCwwLDE2LTcuMTYsMTYtMTZ2LTUyLjk2bDIuMTMsMi4xM2MzLjEyLDMuMTIsNy4yMiw0LjY5LDExLjMxLDQuNjkgICAgIGM0LjA5LDAsOC4xOS0xLjU2LDExLjMxLTQuNjljNi4yNS02LjI1LDYuMjUtMTYuMzgsMC0yMi42M0wzODMuNzEsMzQ5LjYxeiIvPgoNPC9nPgoNPGc+Cg08cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjMyLjQxLDQ1LjAyaC05Mi43NWMtOC44NCwwLTE2LDcuMTYtMTYsMTZ2NTIuOTZsLTIuMTMtMi4xM2MtNi4yNS02LjI1LTE2LjM4LTYuMjUtMjIuNjMsMCAgICAgYy02LjI1LDYuMjUtNi4yNSwxNi4zOCwwLDIyLjYzbDI5LjQzLDI5LjQzYzAuMzgsMC4zOCwwLjc3LDAuNzMsMS4xOCwxLjA3YzAuMTgsMC4xNSwwLjM2LDAuMjcsMC41NSwwLjQxICAgICBjMC4yNCwwLjE4LDAuNDcsMC4zNiwwLjcxLDAuNTJjMC4yMiwwLjE1LDAuNDYsMC4yOCwwLjY4LDAuNDJjMC4yMiwwLjEzLDAuNDMsMC4yNywwLjY2LDAuMzljMC4yNCwwLjEzLDAuNDgsMC4yMywwLjcyLDAuMzUgICAgIGMwLjIzLDAuMTEsMC40NiwwLjIzLDAuNywwLjMyYzAuMjQsMC4xLDAuNDgsMC4xOCwwLjcxLDAuMjZjMC4yNSwwLjA5LDAuNSwwLjE5LDAuNzYsMC4yN2MwLjI0LDAuMDcsMC40OCwwLjEzLDAuNzIsMC4xOSAgICAgYzAuMjYsMC4wNywwLjUzLDAuMTQsMC44LDAuMTljMC4yOCwwLjA2LDAuNTYsMC4wOSwwLjg0LDAuMTNjMC4yNCwwLjAzLDAuNDcsMC4wOCwwLjcxLDAuMWMwLjUyLDAuMDUsMS4wNSwwLjA4LDEuNTgsMC4wOCAgICAgczEuMDUtMC4wMywxLjU4LTAuMDhjMC4yNC0wLjAyLDAuNDctMC4wNywwLjcxLTAuMWMwLjI4LTAuMDQsMC41Ni0wLjA3LDAuODQtMC4xM2MwLjI3LTAuMDUsMC41My0wLjEzLDAuNzktMC4xOSAgICAgYzAuMjQtMC4wNiwwLjQ4LTAuMTEsMC43Mi0wLjE5YzAuMjYtMC4wOCwwLjUxLTAuMTgsMC43Ni0wLjI3YzAuMjQtMC4wOSwwLjQ4LTAuMTYsMC43MS0wLjI2YzAuMjQtMC4xLDAuNDctMC4yMSwwLjctMC4zMiAgICAgYzAuMjQtMC4xMSwwLjQ4LTAuMjIsMC43Mi0wLjM1YzAuMjItMC4xMiwwLjQ0LTAuMjYsMC42Ni0wLjM5YzAuMjMtMC4xNCwwLjQ2LTAuMjcsMC42OS0wLjQyYzAuMjQtMC4xNiwwLjQ3LTAuMzUsMC43MS0wLjUyICAgICBjMC4xOC0wLjE0LDAuMzctMC4yNiwwLjU1LTAuNDFjMC40MS0wLjM0LDAuODEtMC42OSwxLjE4LTEuMDdsMjkuNDMtMjkuNDNjNi4yNS02LjI1LDYuMjUtMTYuMzgsMC0yMi42MyAgICAgYy02LjI1LTYuMjUtMTYuMzgtNi4yNS0yMi42MywwbC0yLjEzLDIuMTNWNzcuMDJoNzYuNzVjOC44NCwwLDE2LTcuMTYsMTYtMTZTMjQxLjI0LDQ1LjAyLDIzMi40MSw0NS4wMnoiLz4KDTwvZz4KDTwvZz4KDTwvZz4KDTwvc3ZnPg==" alt="" aria-hidden="true"></button></div><div class="student-heading"><span>ESTA EXPERIENCIA ES DE</span><strong>${escape(student.name)}</strong></div><div class="hero"><h1>${escape(config.title)}</h1><p>${escape(config.introduction)}</p></div></header>
       ${letter ? `${internalEnvelope(student.name)}<section id="letter" class="parchment-frame" tabindex="-1" hidden><div class="parchment-curl top"></div><article class="parchment"><div class="letter-heading"><div><span class="letter-eyebrow">PARA TI, CON CARIÑO</span><span class="letter-stamp">Una carta de Rigo</span></div><div class="letter-postmark" aria-hidden="true"><span>ENTREGA ESPECIAL</span><strong>R</strong><small>HECHA PARA TI</small></div></div><div class="letter-rule" aria-hidden="true">${icon('<path d="m12 4 5 8-5 8-5-8Z"/><path d="M3 12h4m10 0h4"/>')}</div><h2>${escape(letter.greeting)}</h2><div class="letter-body">${letter.paragraphs.map(p => `<p>${escape(p)}</p>`).join('')}</div><div class="letter-closing"><p class="letter-signature">${escape(letter.signature)}</p><div class="letter-seal" aria-hidden="true"><span>R</span></div></div></article><div class="parchment-curl bottom"></div></section>` : ''}
-      <section id="survey" class="survey-shell" ${letter ? 'hidden' : ''}><div class="section-label">TU EXPERIENCIA, EN TUS PALABRAS</div><h2>Ahora Rigo <em>te escucha.</em></h2><p class="survey-intro">Todas las opiniones son válidas. Completa las preguntas obligatorias ${classroomActive ? 'para registrar tu participación.' : 'y descarga tu carta y encuesta en PDF.'}</p><div class="survey-progress"><div><span>Tu recorrido</span><span id="completion" role="status" aria-live="polite"></span></div><progress id="feedback-progress" aria-label="Preguntas obligatorias completas" max="1" value="0"></progress></div><form id="feedback-form" class="feedback-form">
+      <section id="survey" class="survey-shell" ${letter ? 'hidden' : ''}><div class="section-label">TU EXPERIENCIA, EN TUS PALABRAS</div><h2>Ahora Rigo <em>te escucha.</em></h2><p class="survey-intro">Todas las opiniones son válidas. Completa las preguntas obligatorias y descarga tu carta y encuesta en PDF.</p><div class="survey-progress"><div><span>Tu recorrido</span><span id="completion" role="status" aria-live="polite"></span></div><progress id="feedback-progress" aria-label="Preguntas obligatorias completas" max="1" value="0"></progress></div><form id="feedback-form" class="feedback-form">
       ${questions.map(questionMarkup).join('')}
-      <section class="submission-box"><div class="submission-symbol">${downloadIcon}</div><h3>Gracias por compartir tu experiencia</h3><p>${deliveryInstructions}</p><div><button type="button" class="primary-btn download-btn" id="coeduca-pdf-btn">${downloadIcon} Descargar PDF</button></div><p id="pdf-status" class="download-message" role="status"></p>${config.preview || reviewAccount ? '<p>Vista previa: no se guardan respuestas ni se envían a Classroom.</p>' : ''}</section></form></section><footer class="site-footer">UN CIERRE DE AÑO PARA RECORDAR · CON CARIÑO, RIGO</footer>`;
+      <section class="submission-box"><div class="submission-symbol">${downloadIcon}</div><h3>Gracias por compartir tu experiencia</h3><p>${deliveryInstructions}</p><div><button type="button" class="primary-btn download-btn" id="coeduca-pdf-btn">${downloadIcon} Descargar PDF</button></div><p id="pdf-status" class="download-message" role="status"></p>${config.preview ? '<p>Vista previa: los datos no se guardan.</p>' : ''}</section></form></section><footer class="site-footer">UN CIERRE DE AÑO PARA RECORDAR · CON CARIÑO, RIGO</footer>`;
     const switchButton = document.getElementById('switch-student');
-    if (reviewAccount) {
-      switchButton.title = 'Seleccionar otro estudiante';
-      switchButton.setAttribute('aria-label', switchButton.title);
-    }
-    switchButton.addEventListener('click', () => reviewAccount ? teacherPreview() : loginView());
+    switchButton.addEventListener('click', loginView);
     if (letter) document.getElementById('open-letter').addEventListener('click', () => {
       const stage = document.getElementById('envelope-stage');
       const button = document.getElementById('open-letter');
@@ -205,7 +141,7 @@
     });
     const form = document.getElementById('feedback-form');
     let draft = {};
-    if (!config.preview && !reviewAccount && !fixed(student.nie)) {
+    if (!config.preview) {
       try { const saved = JSON.parse(localStorage.getItem(draftKey()) || '{}'); if (saved && typeof saved === 'object' && !Array.isArray(saved)) draft = saved; } catch (_) {}
     }
     questions.forEach((q, i) => {
@@ -222,7 +158,7 @@
         saved[key] = value;
         state.answers[key] = {userAnswer:value};
       });
-      if (!config.preview && !reviewAccount && !fixed(student.nie)) { try { localStorage.setItem(draftKey(), JSON.stringify(saved)); } catch (_) {} }
+      if (!config.preview) { try { localStorage.setItem(draftKey(), JSON.stringify(saved)); } catch (_) {} }
       const required = questions.filter(q => data(q).required).length;
       const completed = questions.filter((q, i) => data(q).required && answered(q, state.answers['ex_' + i].userAnswer)).length;
       document.getElementById('completion').textContent = `${completed} de ${required} preguntas obligatorias completas`;
@@ -242,12 +178,11 @@
       const status = document.getElementById('pdf-status');
       try {
         validate(); downloadPDF(); celebrate();
-        status.textContent = classroomActive ? 'PDF generado. Adjunta el archivo y pulsa Entregar en Classroom.' : 'PDF generado. Guárdalo o compártelo con tu docente.';
+        status.textContent = 'PDF generado. Guárdalo o compártelo con tu docente.';
       }
       catch (error) { status.textContent = error.message; }
     });
     refresh();
-    if (classroomActive) transport.mount(state, validate);
   }
   function answered(question, value) {
     return data(question).type === 'choice' ? Number.isInteger(value) && value >= 0 && value < data(question).options.length : typeof value === 'string' && value.trim().length > 0;
@@ -271,9 +206,7 @@
       write(`${i + 1}. ${q.title}`, true);
       write(data(q).type === 'choice' ? data(q).options[value] || 'Sin respuesta (opcional)' : value || 'Sin respuesta (opcional)');
     });
-    write(connected && !reviewAccount
-      ? 'Adjunta este PDF a la tarea y pulsa Entregar en Google Classroom. El envío de participación y la entrega del archivo son pasos independientes.'
-      : 'Guarda este PDF con tu carta y tus respuestas. Puedes compartirlo con tu docente.');
+    write('Guarda este PDF con tu carta y tus respuestas. Puedes compartirlo con tu docente.');
     doc.save('Feedback_' + student.nie.replace(/[^0-9]/g, '') + '.pdf');
   }
   loginView();
