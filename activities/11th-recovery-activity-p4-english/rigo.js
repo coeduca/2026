@@ -951,10 +951,12 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
+            position: relative;
+            display: block;
+            width: 140px;
+            height: 140px;
+            margin: 75px 28px 20px auto;
+            z-index: 1;
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
@@ -1185,8 +1187,8 @@
           }
 
           @media (max-width: 480px) {
-            :host { bottom: 10px; right: 10px; }
-            #rigo-wrapper { width: 110px; height: 110px; }
+            :host { width: 84px; height: 84px; margin: 80px 18px 18px auto; }
+            #rigo-wrapper { width: 84px; height: 84px; }
             #speech-bubble { font-size: 12px; max-width: 160px; }
           }
         </style>
