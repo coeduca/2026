@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8ef54">
+  <meta name="description" content="Guía visual para el álbum de recuperación sobre interfaces de usuario.">
+  <title>Laboratorio de interfaces · Recuperación P4</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#inicio">COEDUCA <span>///</span> LAB UI</a>
+    <span class="topbar-tag">CIENCIAS DE LA COMPUTACIÓN · P4</span>
+  </header>
+  <main id="inicio">
+    <section class="hero frame" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <span class="eyebrow">RECUPERACIÓN ORDINARIA / 2.º BACHILLERATO</span>
+        <h1 id="hero-title">EL ÁLBUM DE LAS <em>8 INTERFACES</em></h1>
+        <p>Una guía para imaginar cómo puede verse tu trabajo en papel bond. Investiga, observa, explica con tus propias palabras y dibuja cada estilo.</p>
+        <a class="cta" href="#album">MIRA EL ÁLBUM <span aria-hidden="true">↘</span></a>
+      </div>
+      <div class="hero-rigo">
+        <div class="sticker">GUÍA VISUAL<br>NO ES LA RESPUESTA</div>
+        <img src="rigo-tech.png" alt="Rigo Tech, mascota de la actividad" width="380" height="380">
+      </div>
+    </section>
+
+    <section class="notice frame" aria-labelledby="notice-title">
+      <div class="notice-icon" aria-hidden="true">!</div>
+      <div>
+        <h2 id="notice-title">Rigo te avisa</h2>
+        <p><strong>Esta web solo muestra el aspecto de un álbum.</strong> Sus pistas son intencionalmente breves e incompletas. Si copias la información tal cual, tu trabajo tendrá un puntaje muy bajo. Investiga y redacta tus propias explicaciones. <strong>De la IA solo puedes usar imágenes</strong> para ilustrar los ocho estilos.</p>
+      </div>
+    </section>
+
+    <section class="album-section" id="album" aria-labelledby="album-title">
+      <div class="section-heading"><span class="section-no">01 / EL FORMATO</span><h2 id="album-title">ASÍ SE ARMA TU ÁLBUM</h2></div>
+      <div class="album-grid">
+        <article class="paper paper-cover">
+          <div class="paper-spine" aria-hidden="true"></div>
+          <span class="paper-kicker">PORTADA · PÁGINA 01</span>
+          <div class="paper-cover-middle"><span class="paper-scribble">UI / 08</span><h3>INTERFACES<br>DE USUARIO</h3><p>Ocho estilos. Ocho formas de diseñar.</p></div>
+          <div class="paper-rule"></div>
+          <p class="paper-fields">NOMBRE: ___________________________<br>GRADO: ______________________________<br>MATERIA: Ciencias de la Computación</p>
+        </article>
+        <article class="paper paper-inside">
+          <span class="paper-kicker">PÁGINA 02 · TU INVESTIGACIÓN</span>
+          <h3>¿QUÉ ES UNA INTERFAZ DE USUARIO?</h3>
+          <div class="placeholder-lines" aria-label="Espacio ilustrativo para escribir una definición propia"><i></i><i></i><i></i><i></i></div>
+          <span class="paper-stamp">ESCRÍBELO CON TUS PALABRAS</span>
+          <div class="paper-bottom">Luego dedica <strong>una página a cada estilo</strong>. Escribe qué es, tres rasgos visuales, un ejemplo real y añade una ilustración.</div>
+        </article>
+      </div>
+      <div class="strip"><span>PORTADA</span><span>+</span><span>DEFINICIÓN PROPIA</span><span>+</span><span>8 PÁGINAS DE ESTILOS</span><span>+</span><span>FUENTES CONSULTADAS</span></div>
+    </section>
+
+    <section class="styles-section" id="estilos" aria-labelledby="styles-title">
+      <div class="section-heading"><span class="section-no">02 / LAS PISTAS VISUALES</span><h2 id="styles-title">EXPLORA LOS 8 ESTILOS</h2></div>
+      <p class="section-intro">Toca un nombre para ver una miniatura. La pista te ayuda a reconocerlo; tu investigación debe completar la explicación.</p>
+      <div class="explorer frame">
+        <div class="style-menu" role="group" aria-label="Seleccionar estilo de interfaz"></div>
+        <article class="style-panel" aria-live="polite">
+          <div class="style-panel-heading"><span id="style-number">01 / 08</span><h3 id="style-name">Skeuomorfismo</h3></div>
+          <div class="specimen specimen-skeuo" id="specimen" aria-label="Miniatura visual de un estilo de interfaz">
+            <div class="sample-window">
+              <div class="sample-top"><span class="sample-dot"></span><span class="sample-dot"></span><span class="sample-dot"></span><span>MI APLICACIÓN</span></div>
+              <div class="sample-content"><div class="sample-symbol" aria-hidden="true">★</div><div class="sample-copy"><b>Mi panel</b><small>Un ejemplo visual</small><button type="button" tabindex="-1">ABRIR</button></div></div>
+            </div>
+          </div>
+          <div class="clue-row"><div><span>PISTA VISUAL</span><p id="style-clue">Imita la apariencia de un objeto real.</p></div><div><span>INVESTIGA</span><p id="style-question">¿Qué objetos inspira su apariencia?</p></div></div>
+          <p class="micro-warning">La miniatura es una ilustración creada para esta guía, no una definición completa.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="finish frame" aria-labelledby="finish-title">
+      <div><span class="section-no">03 / ANTES DE ENTREGAR</span><h2 id="finish-title">TU ÁLBUM ESTÁ LISTO CUANDO...</h2></div>
+      <ul>
+        <li><span>01</span> Tiene portada con tus datos.</li>
+        <li><span>02</span> Explicas con tus palabras qué es una interfaz de usuario.</li>
+        <li><span>03</span> Incluye los ocho estilos, cada uno con explicación e ilustración.</li>
+        <li><span>04</span> Anotas al menos dos fuentes que consultaste.</li>
+      </ul>
+    </section>
+  </main>
+  <footer><span>COEDUCA / LABORATORIO DE INTERFACES</span><span>INVESTIGA · DISEÑA · EXPLICA</span></footer>
+</body>
+</html>
