@@ -59,38 +59,12 @@
   //                        dizzy, musical, elder, tired, easterEgg
   // Grados válidos: "Séptimo", "Octavo", "Noveno", "Primer Año", "Segundo Año", "Prueba"
   const HINT_MESSAGES = [
-    { text: "Psst... piensa", grade: null, emotion: 'sneaky' },
-    { text: "Lo estás haciendo bien", grade: null, emotion: 'thinking' },
-    { text: "Una pista: revisa el cuaderno", grade: null, emotion: 'sneaky' },
-    { text: "Hoy es un buen día", grade: null, emotion: 'happy' },
-    { text: "Seguro 10", grade: null, emotion: 'excited' },
-	{ text: "Soy camaleón, no rana", grade: null, emotion: 'angry' },
-	{ text: "Ani ayuwoki 🎶", grade: null, emotion: 'musical' },
-    { text: "Shhh no le digas al teacher", grade: null, emotion: 'sneaky' },
-	{ text: "Duolingo me hace los mandados", grade: null, emotion: 'game' },
-    { text: "¿Necesitas ayuda?", grade: null, emotion: 'confused' },
-    { text: "La respuesta está en tu corazón", grade: null, emotion: 'love' },
-    { text: "Deja de tocarme", grade: null, emotion: 'angry' },
-    { text: "No te distraigas", grade: null, emotion: 'angry' },
-    { text: "No sé inglés", grade: null, emotion: 'sad' },
-    { text: "Necesito recreo ya!", grade: null, emotion: 'sad' },
-    { text: "Vamos séptimo grado", grade: ["Séptimo"], emotion: 'sneaky' },
-	{ text: "Osiel quería que me llamara Terri", grade: ["Octavo"], emotion: 'angry' },
-    { text: "¿Todavía no has terminado?", grade: null, emotion: 'elder' },
-    { text: "Yo ya hubiera terminado", grade: null, emotion: 'sneaky' },
-    { text: "¿Ya viste el nuevo capítulo de la Rosa de Guadalupe?", grade: null, emotion: 'excited' },
-    { text: "Google Translate está llorando", grade: null, emotion: 'sneaky' },
-    { text: "Si fallas, te convierto en sopa de letras", grade: null, emotion: 'angry' },
-    { text: "Respira, no es matemática", grade: null, emotion: 'neutral' },
-    { text: "El inglés es como yo: guapo", grade: null, emotion: 'love' },
-    { text: "Yo solo soy un camaleón, no un traductor", grade: null, emotion: 'sad' },
-    { text: "Estoy solito, no hay nadie aquí a mi lado", grade: null, emotion: 'sad' },
-    { text: "Ojo por ojo...", grade: null, emotion: 'sneaky' },
-    { text: "Esta pregunta la sabe hasta mi abuela", grade: null, emotion: 'sneaky' },
-	{ text: "Han pasado 84 años", grade: null, emotion: 'elder' },
-	{ text: "¿Ya vas a terminar?", grade: null, emotion: 'dizzy' },
-	{ text: "Tranqui! yo perreo sola 🎶", grade: null, emotion: 'musical' },
-    { text: "¿Y si mejor estudias? (broma, sigue)", grade: null, emotion: 'sneaky' }
+    { text: "Busca have o has y luego el participio.", grade: ["Segundo Año"], emotion: 'thinking' },
+    { text: "Un error es una pista para volver a intentar.", grade: ["Segundo Año"], emotion: 'happy' },
+    { text: "Ever pregunta por experiencias; never dice que aún no han pasado.", grade: ["Segundo Año"], emotion: 'thinking' },
+    { text: "Para los verbos irregulares, recuerda la tercera forma.", grade: ["Segundo Año"], emotion: 'sneaky' },
+    { text: "Tómate tu tiempo. Cada palabra te acerca a la frase.", grade: ["Segundo Año"], emotion: 'love' },
+    { text: "For indica duración; since marca el punto de inicio.", grade: ["Segundo Año"], emotion: 'thinking' }
   ];
 
   const CHEER_MESSAGES = [
