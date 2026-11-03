@@ -193,7 +193,7 @@
         };
         button.addEventListener('click', () => tryMatch(selected));
         button.addEventListener('dragover', event => event.preventDefault());
-        button.addEventListener('drop', event => { event.preventDefault(); tryMatch(event.dataTransfer.getData('text/plain')); });
+        button.addEventListener('drop', event => { event.preventDefault(); tryMatch(event.dataTransfer.getData('text/plain') || selected); });
         targets.appendChild(button);
       });
       grid.append(images, targets);
