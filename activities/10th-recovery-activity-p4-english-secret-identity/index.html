@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#e9eef7">
+  <meta name="description" content="Investiga las experiencias de Rigo y descubre una pista del impostor.">
+  <title>Rigo's Secret Identity · Recuperación de Inglés</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="#inicio">RIGO / CASE FILE</a><span>ENGLISH · PERIOD 4 · 1.º BACH.</span></header>
+  <main id="inicio">
+    <section class="hero surface">
+      <div class="hero-text">
+        <span class="eyebrow">RECUPERACIÓN ORDINARIA / MISIÓN 01</span>
+        <h1>RIGO'S<br><em>SECRET</em><br>IDENTITY</h1>
+        <p>Rigo ha perdido la memoria. Resuelve los retos de <strong>Present Perfect</strong>, reúne nueve pistas y reconstruye su identidad en el pasaporte de papel.</p>
+        <div class="case-data"><span>INVESTIGADOR/A</span><strong id="student-name">Selecciona tu expediente</strong><small id="case-number">CASO --</small></div>
+        <a class="primary" href="#evidence">INVESTIGAR PISTAS <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="hero-portrait"><div class="portrait-disc"><img id="hero-rigo" src="images/rigo-goku.webp" alt="Rigo disfrazado" width="420" height="420"></div><span class="portrait-caption">FOTOGRAFÍA DEL EXPEDIENTE · ¿DISFRAZ O IDENTIDAD?</span></div>
+    </section>
+
+    <section class="instructions surface" aria-labelledby="how-title">
+      <div class="how-heading"><span class="step-label">01 / INSTRUCCIONES</span><h2 id="how-title">Cómo resolver el caso</h2></div>
+      <div class="how-grid">
+        <div><span class="how-no">01</span><h3>Resuelve</h3><p>Elige el participio correcto. Puedes intentarlo de nuevo sin perder puntos.</p></div>
+        <div><span class="how-no">02</span><h3>Registra</h3><p>Cada respuesta revela una pista. Anota la información en tu pasaporte.</p></div>
+        <div><span class="how-no">03</span><h3>Compara</h3><p>Una pista contradice las fotos y los demás registros. Señálala y explica por qué.</p></div>
+        <div><span class="how-no">04</span><h3>Crea</h3><p>Al final, inventa un personaje y escribe tres experiencias suyas en Present Perfect.</p></div>
+      </div>
+      <p class="team-note">Pueden conversar en equipo y comparar expedientes. Cada persona entrega su propio pasaporte y su explicación.</p>
+    </section>
+
+    <section id="evidence" class="evidence-section" aria-labelledby="evidence-title">
+      <div class="section-head"><div><span class="step-label">02 / TABLERO DE INVESTIGACIÓN</span><h2 id="evidence-title">Las nueve pistas</h2></div><div class="progress-box surface"><strong id="progress-count">0 / 9</strong><span>DESCUBIERTAS</span><div class="progress-track"><div id="progress-fill"></div></div></div></div>
+      <p class="section-intro">Las pistas aparecen en distinto orden en cada expediente. Busca hechos sobre la apariencia, el hogar, la comida, las aficiones y las experiencias de Rigo.</p>
+      <div id="clue-grid" class="clue-grid"></div>
+    </section>
+
+    <section class="report surface" aria-labelledby="report-title">
+      <span class="step-label">03 / INFORME FINAL</span><h2 id="report-title">¿Quién es el impostor?</h2>
+      <p>Después de descubrir las nueve pistas, selecciona el registro que no coincide. En tu pasaporte escribe <strong>dos pruebas</strong> tomadas de las fotos o de otras pistas.</p>
+      <div id="suspect-list" class="suspect-list" role="group" aria-label="Elegir la pista del impostor"></div>
+      <p id="report-feedback" class="report-feedback">Aún faltan pistas para completar el informe.</p>
+    </section>
+  </main>
+  <aside class="floating-rigo" aria-label="Rigo comenta la investigación"><div id="rigo-speech" class="speech">¿Quién soy?</div><button id="rigo-button" type="button" aria-label="Escuchar otra frase de Rigo"><img id="floating-image" src="images/rigo-goku.webp" alt="" width="120" height="120"></button></aside>
+  <footer><span>COEDUCA / RIGO'S SECRET IDENTITY</span><span>HAVE / HAS + PAST PARTICIPLE</span></footer>
+</body>
+</html>
+
