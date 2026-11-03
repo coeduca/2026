@@ -1,0 +1,322 @@
+{
+  "clips": [
+    {
+      "id": 1,
+      "emoji": "🥭",
+      "audio": "audio/clip-01.mp3"
+    },
+    {
+      "id": 2,
+      "emoji": "🍊",
+      "audio": "audio/clip-02.mp3"
+    },
+    {
+      "id": 3,
+      "emoji": "🍗",
+      "audio": "audio/clip-03.mp3"
+    },
+    {
+      "id": 4,
+      "emoji": "🍔",
+      "audio": "audio/clip-04.mp3"
+    },
+    {
+      "id": 5,
+      "emoji": "🌭",
+      "audio": "audio/clip-05.mp3"
+    },
+    {
+      "id": 6,
+      "emoji": "🍩",
+      "audio": "audio/clip-06.mp3"
+    },
+    {
+      "id": 7,
+      "emoji": "🍉",
+      "audio": "audio/clip-07.mp3"
+    },
+    {
+      "id": 8,
+      "emoji": "🍍",
+      "audio": "audio/clip-08.mp3"
+    },
+    {
+      "id": 9,
+      "emoji": "🥪",
+      "audio": "audio/clip-09.mp3"
+    },
+    {
+      "id": 10,
+      "emoji": "🍝",
+      "audio": "audio/clip-10.mp3"
+    },
+    {
+      "id": 11,
+      "emoji": "🥗",
+      "audio": "audio/clip-11.mp3"
+    },
+    {
+      "id": 12,
+      "emoji": "🍓",
+      "audio": "audio/clip-12.mp3"
+    },
+    {
+      "id": 13,
+      "emoji": "🍇",
+      "audio": "audio/clip-13.mp3"
+    },
+    {
+      "id": 14,
+      "emoji": "🧅",
+      "audio": "audio/clip-14.mp3"
+    },
+    {
+      "id": 15,
+      "emoji": "🥥",
+      "audio": "audio/clip-15.mp3"
+    },
+    {
+      "id": 16,
+      "emoji": "🥑",
+      "audio": "audio/clip-16.mp3"
+    },
+    {
+      "id": 17,
+      "emoji": "🍎",
+      "audio": "audio/clip-17.mp3"
+    },
+    {
+      "id": 18,
+      "emoji": "🐟",
+      "audio": "audio/clip-18.mp3"
+    },
+    {
+      "id": 19,
+      "emoji": "🍌",
+      "audio": "audio/clip-19.mp3"
+    },
+    {
+      "id": 20,
+      "emoji": "🍕",
+      "audio": "audio/clip-20.mp3"
+    }
+  ],
+  "students": {
+    "20316949": {
+      "name": "Edwar Bladimir Córdova Martínez",
+      "avatar": "rigo-goku.webp",
+      "order": [
+        20,
+        18,
+        19,
+        6,
+        3,
+        13,
+        16,
+        17,
+        14,
+        9,
+        8,
+        4,
+        2,
+        15,
+        10,
+        5,
+        11,
+        7,
+        12,
+        1
+      ]
+    },
+    "20298185": {
+      "name": "Víctor José Flores Varela",
+      "avatar": "rigo-elegante.webp",
+      "order": [
+        7,
+        15,
+        20,
+        19,
+        6,
+        14,
+        12,
+        11,
+        13,
+        16,
+        4,
+        5,
+        17,
+        3,
+        1,
+        9,
+        18,
+        2,
+        10,
+        8
+      ]
+    },
+    "20199089": {
+      "name": "Alessandro Ariel Fuentes Ramos",
+      "avatar": "rigo-payaso.webp",
+      "order": [
+        12,
+        15,
+        18,
+        7,
+        20,
+        6,
+        3,
+        9,
+        13,
+        1,
+        11,
+        10,
+        4,
+        5,
+        17,
+        2,
+        19,
+        16,
+        14,
+        8
+      ]
+    },
+    "20182722": {
+      "name": "Daniela Alejandra Henríquez Córdova",
+      "avatar": "rigo-granjero.webp",
+      "order": [
+        16,
+        3,
+        18,
+        11,
+        2,
+        13,
+        12,
+        1,
+        14,
+        17,
+        8,
+        6,
+        4,
+        20,
+        5,
+        15,
+        19,
+        7,
+        10,
+        9
+      ]
+    },
+    "20062488": {
+      "name": "Fredis Antonio Maravilla Esquivel",
+      "avatar": "rigo-emo.webp",
+      "order": [
+        7,
+        13,
+        12,
+        5,
+        19,
+        18,
+        10,
+        8,
+        3,
+        2,
+        9,
+        14,
+        11,
+        16,
+        15,
+        4,
+        1,
+        17,
+        6,
+        20
+      ]
+    },
+    "20298191": {
+      "name": "Luis Enrique Paredes Chirino",
+      "avatar": "rigo-billy.webp",
+      "order": [
+        6,
+        14,
+        15,
+        1,
+        3,
+        5,
+        8,
+        2,
+        7,
+        12,
+        16,
+        11,
+        4,
+        9,
+        19,
+        18,
+        10,
+        13,
+        20,
+        17
+      ]
+    },
+    "10000395": {
+      "name": "Nathaly Valeria Portillo Cruz",
+      "avatar": "rigo-goku.webp",
+      "order": [
+        18,
+        8,
+        16,
+        12,
+        20,
+        6,
+        19,
+        10,
+        17,
+        11,
+        14,
+        7,
+        4,
+        2,
+        3,
+        9,
+        13,
+        15,
+        5,
+        1
+      ]
+    },
+    "20176670": {
+      "name": "Azariel de Jesús Rivas Barrera",
+      "avatar": "rigo-payaso.webp",
+      "order": [
+        13,
+        7,
+        20,
+        17,
+        8,
+        2,
+        15,
+        18,
+        5,
+        19,
+        3,
+        12,
+        9,
+        10,
+        14,
+        16,
+        4,
+        11,
+        1,
+        6
+      ]
+    }
+  },
+  "avatars": [
+    "rigo-billy.webp",
+    "rigo-elegante.webp",
+    "rigo-goku.webp",
+    "rigo-granjero.webp",
+    "rigo-emo.webp",
+    "rigo-payaso.webp"
+  ]
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#eaf0fb">
+  <meta name="description" content="Sound Detective: escucha veinte palabras de Fruit and Food y completa tu tablero.">
+  <title>Sound Detective · Fruit & Food</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="#inicio">🔊 SOUND DETECTIVE</a><span>ENGLISH · 7.º GRADO · PERIODO 4</span></header>
+  <main id="inicio">
+    <section class="hero surface">
+      <div class="hero-art"><div class="rigo-disc"><img id="cover-rigo" src="images/rigo-payaso.webp" alt="Rigo acompaña al detective" width="330" height="330"></div><span class="case-badge">FRUIT<br>+ FOOD</span></div>
+      <div class="hero-copy"><span class="eyebrow">RECUPERACIÓN ORDINARIA / LABORATORIO DE SONIDOS</span><h1>Escucha.<br><em>Descubre.</em><br>Dibuja.</h1><p>Cada pista tiene un audio y un emoji. Escucha la palabra en inglés, escríbela en la casilla con el mismo número de tu tablero y haz un dibujo.</p><div class="student-tag"><span>DETECTIVE</span><strong id="student-name">Selecciona tu expediente</strong><small id="student-id">CASO --</small></div></div>
+    </section>
+
+    <section id="case-picker" class="picker surface" hidden aria-labelledby="picker-title"><h2 id="picker-title">Elige tu nombre</h2><p>Abre tu expediente para que el orden de los audios coincida con tu tablero.</p><div id="student-list" class="student-list"></div></section>
+
+    <section id="mission" hidden>
+      <div class="intro-strip"><div><span class="eyebrow">TU MISIÓN</span><h2>20 sonidos, 20 dibujos</h2></div><p>Avanza en orden. Puedes repetir cada audio todas las veces que necesites. La palabra escrita solo va en tu tablero de papel.</p></div>
+      <section class="player surface" aria-labelledby="clue-heading">
+        <div class="player-top"><span id="clue-heading" class="clue-heading">PISTA 01 / 20</span><span class="sound-label">AUDIO EN INGLÉS</span></div>
+        <div class="player-main"><div id="emoji-hint" class="emoji-hint" role="img" aria-label="Pista con emoji">🥭</div><div class="audio-panel"><p class="prompt">¿Qué palabra escuchas?</p><div class="sound-waves" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><button id="play-button" class="play-button" type="button"><span aria-hidden="true">▶</span> ESCUCHAR PALABRA</button><p id="audio-status" class="audio-status" aria-live="polite">Toca el botón para escuchar.</p></div></div>
+        <div class="write-note"><span aria-hidden="true">✏️</span><p>En la <strong>casilla <span id="board-number">01</span></strong> del tablero: escribe el nombre en inglés y dibuja lo que escuchaste.</p></div>
+        <div id="step-dots" class="step-dots" role="group" aria-label="Progreso de pistas"></div>
+        <div class="navigation"><button id="previous-button" type="button">← ANTERIOR</button><div class="progress-text"><strong id="heard-count">0 / 20</strong><span>ESCUCHADAS</span></div><button id="next-button" type="button">SIGUIENTE →</button></div>
+        <audio id="word-audio" preload="none"></audio>
+      </section>
+      <section id="completion" class="completion surface" hidden><span class="eyebrow">MISIÓN COMPLETADA</span><h2>¡Buen trabajo, detective!</h2><p>Revisa que tus veinte casillas tengan una palabra en inglés y un dibujo. Entrega tu tablero al docente.</p><button id="review-button" type="button">REVISAR MIS PISTAS</button></section>
+    </section>
+  </main>
+  <aside id="floating-rigo" class="floating-rigo" hidden><div id="rigo-speech" class="speech">¿Qué sonido será?</div><button id="rigo-button" type="button" aria-label="Cambiar la frase de Rigo"><img id="floating-image" src="images/rigo-payaso.webp" alt="" width="95" height="95"></button></aside>
+  <footer><span>COEDUCA / SOUND DETECTIVE</span><span>LISTEN · WRITE · DRAW</span></footer>
+</body>
+</html>
