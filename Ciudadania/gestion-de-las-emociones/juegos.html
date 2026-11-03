@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"62c06eed-2804-4656-8454-4517e24d612a","token":"714db8a4-306b-499d-82c3-23f99c9567b1"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Centro de juegos · Gestion de las emociones</title>
+  <link rel="stylesheet" href="civica-core.css">
+  <link rel="stylesheet" href="game-center.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body data-framework="civica">
+  <main class="gc-shell">
+    <header class="gc-hero">
+      <div class="gc-hero-top">
+        <span class="gc-brand"><span aria-hidden="true">🎮</span> COEDUCA ARCADE</span>
+        <div class="gc-hero-actions">
+          <button class="gc-info-button" id="gc-info-button" type="button" aria-label="Cómo funciona el Centro de Juegos" aria-haspopup="dialog" title="Cómo funciona el Centro de Juegos">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
+          </button>
+          <a class="gc-back-button" href="index.html" aria-label="Volver a la actividad">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver a la actividad</span>
+          </a>
+        </div>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-hero-copy">
+          <h1>Centro de <span>juegos</span></h1>
+          <p id="gc-project-title"></p>
+          <div class="gc-student" id="gc-student" hidden></div>
+        </div>
+        <div class="gc-hero-art" aria-hidden="true">
+          <img class="gc-hero-art-one" src="flappy.webp" alt="">
+          <img class="gc-hero-art-two" src="dino-runner.webp" alt="">
+          <img class="gc-hero-art-three" src="salto-infinito.webp" alt="">
+        </div>
+      </div>
+    </header>
+
+    <section class="gc-section gc-catalog-section" aria-label="Catálogo de juegos">
+      <div class="gc-section-heading gc-section-heading-compact">
+        <h2 id="gc-catalog-title" hidden>Catálogo de juegos</h2>
+        <span class="gc-count" id="gc-count"></span>
+      </div>
+      <div class="gc-grid" id="gc-catalog"></div>
+    </section>
+
+    <section class="gc-section gc-login" id="gc-login" aria-labelledby="gc-login-title" hidden>
+      <h2 id="gc-login-title">Ingresa tu NIE para jugar</h2>
+      <p>Así podremos guardar tu puntuación en el ranking de tu grado.</p>
+      <form id="gc-login-form">
+        <label for="gc-nie">NIE del estudiante</label>
+        <div class="gc-login-row">
+          <input id="gc-nie" name="nie" type="text" inputmode="numeric" autocomplete="off" required>
+          <button type="submit">Continuar</button>
+        </div>
+      </form>
+      <p class="gc-message" id="gc-login-error" role="alert"></p>
+    </section>
+
+    <section class="gc-section gc-play" id="gc-play" aria-labelledby="gc-play-title" hidden>
+      <div class="gc-section-heading">
+        <div>
+          <span class="gc-eyebrow">JUEGA Y REVISA TU RANKING</span>
+          <h2 id="gc-play-title"></h2>
+        </div>
+        <div class="gc-play-actions">
+          <a class="gc-section-button" href="juegos.html">
+            <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+            <span>Volver al centro de juegos</span>
+          </a>
+          <div class="gc-sound-slot" id="gc-sound-slot" hidden></div>
+        </div>
+      </div>
+      <p class="gc-message" id="gc-result" aria-live="polite"></p>
+      <div id="gc-game"></div>
+    </section>
+  </main>
+
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="civica-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="civica-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>window.GAME_CENTER_CONFIG = {
+  "id": "d8acf9e3-e886-4460-8c74-9337257a7576",
+  "container": "#app",
+  "topic": "Gestion de las emociones",
+  "unit": "",
+  "subjectLabel": "Ciudadanía y Valores",
+  "colors": {
+    "primary": "#C0392B",
+    "accent": "#34495E",
+    "bg": "#FDFEFE",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "pdfDesign": "Default",
+  "examMode": true,
+  "sections": {
+    "explore": [
+      {
+        "type": "note",
+        "title": "Aprendamos sobre nuestras emociones",
+        "instruction": "Lee con atención esta explicación antes de responder los ejercicios.",
+        "html": "\u003carticle style=\"font-family:Arial,sans-serif;color:#1A1A1A;font-size:15px;line-height:1.65;\">\u003cheader style=\"background:#C0392B;color:#FFFFFF;border-radius:14px;padding:18px;text-align:center;margin-bottom:15px;\">\u003ch2 style=\"margin:0;font-size:23px;\">🧠❤️ Gestión de las emociones\u003c/h2>\u003cp style=\"margin:8px 0 0;\">¡Aprender a manejar lo que sentimos nos ayuda a vivir mejor!\u003c/p>\u003c/header>\u003csection style=\"margin-bottom:16px;\">\u003ch3 style=\"color:#C0392B;margin-bottom:8px;\">💭 ¿Qué son las emociones?\u003c/h3>\u003cp>Las \u003cstrong>emociones\u003c/strong> son respuestas naturales que sentimos ante diferentes situaciones. Nos ayudan a expresar lo que vivimos y a comprender nuestras necesidades.\u003c/p>\u003cp>\u003cstrong>Todas las emociones son válidas.\u003c/strong> Lo importante es aprender a expresarlas sin lastimarnos ni lastimar a los demás.\u003c/p>\u003c/section>\u003csection style=\"background:#F1F5F9;border-radius:12px;padding:15px;margin-bottom:16px;\">\u003ch3 style=\"color:#34495E;margin:0 0 10px;\">😊 Conoce algunas emociones\u003c/h3>\u003cp>😊 \u003cstrong>Alegría:\u003c/strong> aparece cuando vivimos algo agradable.\u003c/p>\u003cp>😢 \u003cstrong>Tristeza:\u003c/strong> podemos sentirla cuando perdemos algo importante.\u003c/p>\u003cp>😡 \u003cstrong>Enojo:\u003c/strong> surge cuando algo nos molesta o parece injusto.\u003c/p>\u003cp>😨 \u003cstrong>Miedo:\u003c/strong> nos alerta ante posibles peligros.\u003c/p>\u003cp>😲 \u003cstrong>Sorpresa:\u003c/strong> aparece cuando sucede algo inesperado.\u003c/p>\u003cp>😰 \u003cstrong>Ansiedad:\u003c/strong> puede aparecer cuando estamos preocupados por el futuro.\u003c/p>\u003c/section>\u003csection style=\"margin-bottom:16px;\">\u003ch3 style=\"color:#C0392B;\">🌱 ¿Qué significa gestionar las emociones?\u003c/h3>\u003cp>Significa \u003cstrong>reconocer lo que sentimos, comprender por qué lo sentimos y elegir cómo actuar\u003c/strong> de manera responsable.\u003c/p>\u003cp>Por ejemplo, sentir enojo es normal, pero insultar o golpear no es una forma adecuada de expresarlo.\u003c/p>\u003c/section>\u003csection style=\"background:#FFF2EF;border-left:5px solid #C0392B;border-radius:10px;padding:15px;margin-bottom:16px;\">\u003ch3 style=\"color:#C0392B;margin:0 0 10px;\">🛑 Cuatro pasos para manejar tus emociones\u003c/h3>\u003cp>\u003cstrong>1. ✋ DETENTE:\u003c/strong> evita actuar sin pensar.\u003c/p>\u003cp>\u003cstrong>2. 🌬️ RESPIRA:\u003c/strong> respira lentamente para recuperar la calma.\u003c/p>\u003cp>\u003cstrong>3. 💬 IDENTIFICA:\u003c/strong> reconoce y nombra lo que sientes.\u003c/p>\u003cp>\u003cstrong>4. 🤝 ACTÚA:\u003c/strong> elige una respuesta respetuosa y responsable.\u003c/p>\u003c/section>\u003csection style=\"margin-bottom:16px;\">\u003ch3 style=\"color:#34495E;\">🤝 La empatía y el respeto\u003c/h3>\u003cp>La \u003cstrong>empatía\u003c/strong> consiste en intentar comprender cómo se sienten las demás personas.\u003c/p>\u003cp>Podemos demostrar empatía escuchando, respetando las emociones ajenas y ofreciendo apoyo a quienes lo necesitan.\u003c/p>\u003cp>Si una emoción es difícil de manejar, podemos buscar ayuda de familiares, docentes o personas de confianza.\u003c/p>\u003c/section>\u003caside style=\"background:#34495E;color:#FFFFFF;border-radius:12px;padding:16px;text-align:center;\">\u003ch3 style=\"margin:0 0 8px;\">✨ ¡Recuerda!\u003c/h3>\u003cp style=\"margin:0;\">No siempre podemos controlar lo que sentimos, pero podemos aprender a elegir cómo respondemos. ¡Sentir está bien y actuar con respeto es nuestra responsabilidad!\u003c/p>\u003c/aside>\u003c/article>"
+      },
+      {
+        "type": "multiplechoice",
+        "title": "Ejercicio 1. Reconoce tus emociones",
+        "instruction": "Selecciona la respuesta correcta en cada pregunta.",
+        "dataA": [
+          {
+            "q": "¿Qué emoción sentimos cuando recibimos una buena noticia?",
+            "options": [
+              "Tristeza",
+              "Alegría",
+              "Miedo"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿Qué emoción podemos sentir cuando perdemos algo importante?",
+            "options": [
+              "Tristeza",
+              "Sorpresa",
+              "Alegría"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Qué podemos hacer cuando estamos muy enojados?",
+            "options": [
+              "Gritar",
+              "Golpear",
+              "Respirar lentamente"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "¿Qué significa gestionar nuestras emociones?",
+            "options": [
+              "No sentir nada",
+              "Reconocerlas y responder adecuadamente",
+              "Ocultarlas siempre"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿Qué es la empatía?",
+            "options": [
+              "Comprender los sentimientos de otros",
+              "Burlarse de los demás",
+              "Ignorar sus problemas"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Qué debemos hacer antes de actuar impulsivamente?",
+            "options": [
+              "Insultar",
+              "Discutir",
+              "Detenernos y pensar"
+            ],
+            "answer": 2
+          }
+        ],
+        "dataB": [
+          {
+            "q": "¿Qué emoción nos alerta ante un posible peligro?",
+            "options": [
+              "Alegría",
+              "Miedo",
+              "Orgullo"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿Qué emoción aparece cuando ocurre algo inesperado?",
+            "options": [
+              "Sorpresa",
+              "Tristeza",
+              "Enojo"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Qué debemos hacer si un amigo está triste?",
+            "options": [
+              "Reírnos",
+              "Ignorarlo",
+              "Escucharlo con respeto"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "¿Cuál es una manera adecuada de expresar el enojo?",
+            "options": [
+              "Gritar a todos",
+              "Hablar con calma",
+              "Romper objetos"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿Qué significa identificar una emoción?",
+            "options": [
+              "Reconocer lo que sentimos",
+              "Olvidarla inmediatamente",
+              "Fingir alegría"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿A quién podemos acudir cuando necesitamos apoyo emocional?",
+            "options": [
+              "A nadie",
+              "Solo a desconocidos",
+              "A una persona de confianza"
+            ],
+            "answer": 2
+          }
+        ],
+        "dataC": [
+          {
+            "q": "¿Qué emoción podemos sentir al alcanzar una meta?",
+            "options": [
+              "Alegría",
+              "Miedo",
+              "Tristeza"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Qué podemos hacer cuando sentimos ansiedad antes de un examen?",
+            "options": [
+              "Gritar",
+              "Respirar y prepararnos",
+              "Rendirnos"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿Cuál de estas acciones demuestra respeto?",
+            "options": [
+              "Burlarse",
+              "Interrumpir",
+              "Escuchar atentamente"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "¿Qué significa actuar impulsivamente?",
+            "options": [
+              "Actuar sin pensar",
+              "Reflexionar primero",
+              "Dialogar con calma"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Qué emoción puede surgir cuando algo nos parece injusto?",
+            "options": [
+              "Alegría",
+              "Enojo",
+              "Diversión"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿Qué debemos recordar sobre las emociones?",
+            "options": [
+              "Solo debemos sentir alegría",
+              "Está prohibido tener miedo",
+              "Todas son naturales"
+            ],
+            "answer": 2
+          }
+        ],
+        "dataD": [
+          {
+            "q": "¿Qué emoción puede aparecer después de una decepción?",
+            "options": [
+              "Entusiasmo",
+              "Diversión",
+              "Tristeza"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "¿Qué acción puede ayudarnos a recuperar la calma?",
+            "options": [
+              "Respirar profundamente",
+              "Insultar",
+              "Golpear"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Qué es demostrar empatía?",
+            "options": [
+              "Obligar a todos a pensar igual",
+              "Comprender cómo se sienten otros",
+              "Ignorar los sentimientos ajenos"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "¿Qué debemos hacer al sentir una emoción intensa?",
+            "options": [
+              "Atacar",
+              "Gritar",
+              "Elegir una respuesta responsable"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "¿Qué emoción aparece ante un posible peligro?",
+            "options": [
+              "Miedo",
+              "Alegría",
+              "Orgullo"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "¿Cómo podemos resolver un desacuerdo de forma adecuada?",
+            "options": [
+              "Con amenazas",
+              "Mediante el diálogo",
+              "Con insultos"
+            ],
+            "answer": 1
+          }
+        ]
+      },
+      {
+        "type": "truefalse",
+        "title": "Ejercicio 2. Verdadero o falso",
+        "instruction": "Lee cada afirmación e indica si es verdadera o falsa.",
+        "dataA": [
+          {
+            "statement": "Todas las personas experimentamos emociones.",
+            "answer": true
+          },
+          {
+            "statement": "Sentir tristeza significa que somos débiles.",
+            "answer": false
+          },
+          {
+            "statement": "Respirar lentamente puede ayudarnos a calmarnos.",
+            "answer": true
+          },
+          {
+            "statement": "Insultar es una buena manera de expresar el enojo.",
+            "answer": false
+          },
+          {
+            "statement": "La empatía nos ayuda a comprender a otras personas.",
+            "answer": true
+          },
+          {
+            "statement": "Debemos sentir alegría durante todo el día.",
+            "answer": false
+          }
+        ],
+        "dataB": [
+          {
+            "statement": "El miedo puede alertarnos de un peligro.",
+            "answer": true
+          },
+          {
+            "statement": "Burlarse de alguien triste es una muestra de empatía.",
+            "answer": false
+          },
+          {
+            "statement": "Identificar nuestras emociones nos ayuda a comprenderlas.",
+            "answer": true
+          },
+          {
+            "statement": "Golpear a alguien es una forma saludable de expresar el enojo.",
+            "answer": false
+          },
+          {
+            "statement": "Podemos expresar nuestras emociones con respeto.",
+            "answer": true
+          },
+          {
+            "statement": "Pedir ayuda cuando estamos preocupados siempre está mal.",
+            "answer": false
+          }
+        ],
+        "dataC": [
+          {
+            "statement": "La alegría puede surgir cuando logramos una meta.",
+            "answer": true
+          },
+          {
+            "statement": "La tristeza es una emoción que debemos prohibirnos sentir.",
+            "answer": false
+          },
+          {
+            "statement": "Escuchar a los demás demuestra respeto.",
+            "answer": true
+          },
+          {
+            "statement": "Los problemas siempre deben resolverse con gritos.",
+            "answer": false
+          },
+          {
+            "statement": "Hacer una pausa puede ayudarnos a evitar una reacción impulsiva.",
+            "answer": true
+          },
+          {
+            "statement": "Nuestras emociones no tienen ninguna relación con nuestras decisiones.",
+            "answer": false
+          }
+        ],
+        "dataD": [
+          {
+            "statement": "La sorpresa puede aparecer ante un acontecimiento inesperado.",
+            "answer": true
+          },
+          {
+            "statement": "Gestionar las emociones significa ocultarlas siempre.",
+            "answer": false
+          },
+          {
+            "statement": "Expresar cómo nos sentimos puede mejorar la comunicación.",
+            "answer": true
+          },
+          {
+            "statement": "Cuando estamos molestos ya no necesitamos respetar a nadie.",
+            "answer": false
+          },
+          {
+            "statement": "Comprender las emociones de otras personas favorece la convivencia.",
+            "answer": true
+          },
+          {
+            "statement": "Es mejor actuar inmediatamente sin pensar en las consecuencias.",
+            "answer": false
+          }
+        ]
+      }
+    ],
+    "deepen": [
+      {
+        "type": "matchlines",
+        "title": "Ejercicio 3. Relaciona los conceptos",
+        "instruction": "Une cada palabra con la descripción que le corresponde.",
+        "dataA": [
+          {
+            "left": "Alegría",
+            "right": "Felicidad por algo agradable"
+          },
+          {
+            "left": "Tristeza",
+            "right": "Pena ante una pérdida"
+          },
+          {
+            "left": "Miedo",
+            "right": "Alerta ante un peligro"
+          },
+          {
+            "left": "Enojo",
+            "right": "Molestia por una situación"
+          },
+          {
+            "left": "Sorpresa",
+            "right": "Reacción ante algo inesperado"
+          },
+          {
+            "left": "Empatía",
+            "right": "Comprender sentimientos ajenos"
+          }
+        ],
+        "dataB": [
+          {
+            "left": "Respirar",
+            "right": "Ayudar a recuperar la calma"
+          },
+          {
+            "left": "Escuchar",
+            "right": "Prestar atención a alguien"
+          },
+          {
+            "left": "Dialogar",
+            "right": "Conversar para resolver problemas"
+          },
+          {
+            "left": "Identificar",
+            "right": "Reconocer lo que sentimos"
+          },
+          {
+            "left": "Respetar",
+            "right": "Tratar bien a los demás"
+          },
+          {
+            "left": "Reflexionar",
+            "right": "Pensar antes de actuar"
+          }
+        ],
+        "dataC": [
+          {
+            "left": "Ansiedad",
+            "right": "Preocupación por algo futuro"
+          },
+          {
+            "left": "Calma",
+            "right": "Estado de tranquilidad"
+          },
+          {
+            "left": "Frustración",
+            "right": "Malestar cuando algo no sale bien"
+          },
+          {
+            "left": "Gratitud",
+            "right": "Agradecimiento por algo recibido"
+          },
+          {
+            "left": "Orgullo",
+            "right": "Satisfacción por un logro"
+          },
+          {
+            "left": "Vergüenza",
+            "right": "Incomodidad ante una situación social"
+          }
+        ],
+        "dataD": [
+          {
+            "left": "Autocontrol",
+            "right": "Regular nuestras reacciones"
+          },
+          {
+            "left": "Comprensión",
+            "right": "Intentar entender a los demás"
+          },
+          {
+            "left": "Comunicación",
+            "right": "Expresar ideas y sentimientos"
+          },
+          {
+            "left": "Apoyo",
+            "right": "Ayudar a quien lo necesita"
+          },
+          {
+            "left": "Responsabilidad",
+            "right": "Asumir consecuencias de nuestros actos"
+          },
+          {
+            "left": "Paciencia",
+            "right": "Esperar sin actuar impulsivamente"
+          }
+        ]
+      },
+      {
+        "type": "categorize",
+        "title": "Ejercicio 4. Acciones positivas y negativas",
+        "instruction": "Clasifica las acciones según ayuden o dificulten el manejo saludable de las emociones.",
+        "dataA": {
+          "categories": [
+            "Ayuda a gestionar las emociones",
+            "Dificulta gestionar las emociones"
+          ],
+          "items": [
+            {
+              "text": "Respirar profundamente",
+              "cat": 0
+            },
+            {
+              "text": "Insultar a un compañero",
+              "cat": 1
+            },
+            {
+              "text": "Hablar con calma",
+              "cat": 0
+            },
+            {
+              "text": "Golpear objetos por enojo",
+              "cat": 1
+            },
+            {
+              "text": "Reconocer lo que sentimos",
+              "cat": 0
+            },
+            {
+              "text": "Actuar sin pensar",
+              "cat": 1
+            }
+          ]
+        },
+        "dataB": {
+          "categories": [
+            "Acción respetuosa",
+            "Acción irrespetuosa"
+          ],
+          "items": [
+            {
+              "text": "Escuchar a un compañero triste",
+              "cat": 0
+            },
+            {
+              "text": "Burlarse de los sentimientos ajenos",
+              "cat": 1
+            },
+            {
+              "text": "Pedir disculpas después de un error",
+              "cat": 0
+            },
+            {
+              "text": "Interrumpir con insultos",
+              "cat": 1
+            },
+            {
+              "text": "Expresar un desacuerdo con calma",
+              "cat": 0
+            },
+            {
+              "text": "Humillar a alguien frente al grupo",
+              "cat": 1
+            }
+          ]
+        },
+        "dataC": {
+          "categories": [
+            "Respuesta saludable",
+            "Respuesta perjudicial"
+          ],
+          "items": [
+            {
+              "text": "Hacer una pausa antes de responder",
+              "cat": 0
+            },
+            {
+              "text": "Gritar para intimidar",
+              "cat": 1
+            },
+            {
+              "text": "Expresar lo que sentimos con palabras",
+              "cat": 0
+            },
+            {
+              "text": "Romper materiales por frustración",
+              "cat": 1
+            },
+            {
+              "text": "Buscar soluciones mediante el diálogo",
+              "cat": 0
+            },
+            {
+              "text": "Culpar a otros sin escucharlos",
+              "cat": 1
+            }
+          ]
+        },
+        "dataD": {
+          "categories": [
+            "Favorece la convivencia",
+            "Perjudica la convivencia"
+          ],
+          "items": [
+            {
+              "text": "Mostrar empatía ante la tristeza",
+              "cat": 0
+            },
+            {
+              "text": "Hacer bromas crueles sobre alguien",
+              "cat": 1
+            },
+            {
+              "text": "Escuchar antes de responder",
+              "cat": 0
+            },
+            {
+              "text": "Empujar durante una discusión",
+              "cat": 1
+            },
+            {
+              "text": "Ofrecer ayuda a quien la necesita",
+              "cat": 0
+            },
+            {
+              "text": "Insultar cuando algo sale mal",
+              "cat": 1
+            }
+          ]
+        }
+      }
+    ],
+    "consolidate": [
+      {
+        "type": "dropdown",
+        "title": "Ejercicio 5. Completa las ideas",
+        "instruction": "Selecciona la palabra correcta para completar cada oración.",
+        "dataA": [
+          {
+            "before": "La ",
+            "options": [
+              "tristeza",
+              "alegría",
+              "ansiedad"
+            ],
+            "answer": 1,
+            "after": " es una emoción que sentimos cuando sucede algo agradable."
+          },
+          {
+            "before": "Cuando estamos enojados podemos ",
+            "options": [
+              "respirar",
+              "gritar",
+              "golpear"
+            ],
+            "answer": 0,
+            "after": " lentamente para calmarnos."
+          },
+          {
+            "before": "La ",
+            "options": [
+              "violencia",
+              "indiferencia",
+              "empatía"
+            ],
+            "answer": 2,
+            "after": " nos ayuda a comprender los sentimientos de los demás."
+          },
+          {
+            "before": "Antes de actuar es importante hacer una ",
+            "options": [
+              "amenaza",
+              "pausa",
+              "burla"
+            ],
+            "answer": 1,
+            "after": "."
+          },
+          {
+            "before": "El ",
+            "options": [
+              "miedo",
+              "orgullo",
+              "entusiasmo"
+            ],
+            "answer": 0,
+            "after": " puede alertarnos de un peligro."
+          },
+          {
+            "before": "Para resolver un desacuerdo podemos utilizar el ",
+            "options": [
+              "insulto",
+              "castigo",
+              "diálogo"
+            ],
+            "answer": 2,
+            "after": " respetuoso."
+          }
+        ],
+        "dataB": [
+          {
+            "before": "La ",
+            "options": [
+              "alegría",
+              "tristeza",
+              "diversión"
+            ],
+            "answer": 1,
+            "after": " puede aparecer cuando perdemos algo importante."
+          },
+          {
+            "before": "Al escuchar a una persona triste demostramos ",
+            "options": [
+              "burla",
+              "rechazo",
+              "empatía"
+            ],
+            "answer": 2,
+            "after": "."
+          },
+          {
+            "before": "Cuando sentimos enojo debemos evitar responder con ",
+            "options": [
+              "violencia",
+              "respeto",
+              "calma"
+            ],
+            "answer": 0,
+            "after": "."
+          },
+          {
+            "before": "La ",
+            "options": [
+              "paciencia",
+              "sorpresa",
+              "responsabilidad"
+            ],
+            "answer": 1,
+            "after": " aparece cuando sucede algo inesperado."
+          },
+          {
+            "before": "Para expresar nuestras emociones podemos utilizar las ",
+            "options": [
+              "amenazas",
+              "agresiones",
+              "palabras"
+            ],
+            "answer": 2,
+            "after": "."
+          },
+          {
+            "before": "Pensar antes de actuar nos ayuda a tomar mejores ",
+            "options": [
+              "decisiones",
+              "excusas",
+              "venganzas"
+            ],
+            "answer": 0,
+            "after": "."
+          }
+        ],
+        "dataC": [
+          {
+            "before": "La ",
+            "options": [
+              "calma",
+              "amenaza",
+              "agresión"
+            ],
+            "answer": 0,
+            "after": " es un estado de tranquilidad."
+          },
+          {
+            "before": "Cuando estamos preocupados por el futuro podemos sentir ",
+            "options": [
+              "orgullo",
+              "diversión",
+              "ansiedad"
+            ],
+            "answer": 2,
+            "after": "."
+          },
+          {
+            "before": "Escuchar a los demás es una muestra de ",
+            "options": [
+              "indiferencia",
+              "respeto",
+              "violencia"
+            ],
+            "answer": 1,
+            "after": "."
+          },
+          {
+            "before": "Hacer una pausa puede evitar una reacción ",
+            "options": [
+              "impulsiva",
+              "reflexiva",
+              "respetuosa"
+            ],
+            "answer": 0,
+            "after": "."
+          },
+          {
+            "before": "Cuando alcanzamos una meta importante sentimos ",
+            "options": [
+              "miedo",
+              "tristeza",
+              "alegría"
+            ],
+            "answer": 2,
+            "after": "."
+          },
+          {
+            "before": "Si lastimamos a alguien podemos pedir ",
+            "options": [
+              "castigos",
+              "disculpas",
+              "premios"
+            ],
+            "answer": 1,
+            "after": "."
+          }
+        ],
+        "dataD": [
+          {
+            "before": "La ",
+            "options": [
+              "indiferencia",
+              "agresión",
+              "empatía"
+            ],
+            "answer": 2,
+            "after": " permite comprender cómo se sienten otras personas."
+          },
+          {
+            "before": "Cuando estamos molestos debemos ",
+            "options": [
+              "pensar",
+              "amenazar",
+              "golpear"
+            ],
+            "answer": 0,
+            "after": " antes de responder."
+          },
+          {
+            "before": "El ",
+            "options": [
+              "entusiasmo",
+              "enojo",
+              "alivio"
+            ],
+            "answer": 1,
+            "after": " puede surgir cuando algo nos parece injusto."
+          },
+          {
+            "before": "Una forma adecuada de resolver problemas es mediante la ",
+            "options": [
+              "violencia",
+              "burla",
+              "comunicación"
+            ],
+            "answer": 2,
+            "after": "."
+          },
+          {
+            "before": "Las emociones son respuestas ",
+            "options": [
+              "naturales",
+              "prohibidas",
+              "inexistentes"
+            ],
+            "answer": 0,
+            "after": " de los seres humanos."
+          },
+          {
+            "before": "La respiración lenta puede ayudarnos a recuperar la ",
+            "options": [
+              "agresión",
+              "calma",
+              "venganza"
+            ],
+            "answer": 1,
+            "after": "."
+          }
+        ]
+      },
+      {
+        "type": "cv_textanswer",
+        "title": "Ejercicio 6. ¿Qué harías tú?",
+        "instruction": "Responde cada pregunta con tus propias palabras. Escribe una oración de al menos 16 caracteres por respuesta.",
+        "dataA": [
+          {
+            "q": "😡 Un compañero te hace enojar. ¿Qué puedes hacer para tranquilizarte?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe cómo recuperarías la calma..."
+          },
+          {
+            "q": "😢 Tu mejor amigo está triste. ¿Cómo puedes demostrarle empatía?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe cómo lo ayudarías..."
+          },
+          {
+            "q": "😨 Sientes miedo antes de hablar frente a la clase. ¿Qué puedes hacer?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Explica cómo manejarías ese miedo..."
+          },
+          {
+            "q": "😊 Recibes una buena noticia. ¿Cómo puedes expresar tu alegría?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Describe cómo expresarías tu felicidad..."
+          },
+          {
+            "q": "💬 ¿Por qué es importante hablar con respeto cuando estamos molestos?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Explica tu opinión..."
+          },
+          {
+            "q": "🧠 ¿Qué significa para ti gestionar correctamente tus emociones?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe lo que aprendiste..."
+          }
+        ],
+        "dataB": [
+          {
+            "q": "😡 Pierdes en un juego y sientes enojo. ¿Cómo puedes reaccionar respetuosamente?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe qué harías..."
+          },
+          {
+            "q": "😢 Una compañera está llorando. ¿Qué podrías decirle para apoyarla?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe una frase de apoyo..."
+          },
+          {
+            "q": "😰 Estás preocupado por un examen. ¿Qué puedes hacer para sentirte tranquilo?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Explica cómo manejarías tu preocupación..."
+          },
+          {
+            "q": "😲 Recibes una sorpresa inesperada. ¿Cómo puedes expresar lo que sientes?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Describe tu reacción..."
+          },
+          {
+            "q": "🤝 ¿Por qué es importante escuchar a los demás cuando tienen problemas?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Explica por qué debemos escuchar..."
+          },
+          {
+            "q": "🌱 ¿Qué acción puedes practicar para mejorar tu autocontrol?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe una acción positiva..."
+          }
+        ],
+        "dataC": [
+          {
+            "q": "😡 Alguien toma tus materiales sin permiso y te molestas. ¿Qué puedes hacer?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Describe una respuesta respetuosa..."
+          },
+          {
+            "q": "😢 No logras alcanzar una meta y sientes tristeza. ¿Cómo puedes animarte?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Explica cómo manejarías esa situación..."
+          },
+          {
+            "q": "😨 Te preocupa participar en clase. ¿Qué puedes hacer para sentir confianza?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe una estrategia sencilla..."
+          },
+          {
+            "q": "😊 Un compañero logra algo importante. ¿Cómo puedes compartir su alegría?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Explica cómo lo felicitarías..."
+          },
+          {
+            "q": "💬 ¿Por qué es importante pensar antes de responder cuando estamos enojados?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe tu explicación..."
+          },
+          {
+            "q": "❤️ ¿Cómo puedes demostrar empatía hacia alguien que está pasando un mal momento?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe una acción de apoyo..."
+          }
+        ],
+        "dataD": [
+          {
+            "q": "😡 Discutes con un amigo y ambos están molestos. ¿Qué puedes hacer para solucionar el problema?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Explica cómo resolverías la discusión..."
+          },
+          {
+            "q": "😢 Extrañas a una persona importante. ¿Cómo puedes expresar tu tristeza de forma saludable?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe una manera adecuada..."
+          },
+          {
+            "q": "😰 Tienes varias tareas pendientes y te sientes preocupado. ¿Qué podrías hacer?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Describe una estrategia para sentirte mejor..."
+          },
+          {
+            "q": "😊 Ayudas a un compañero y te sientes feliz. ¿Por qué crees que ayudar produce alegría?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Explica tu opinión..."
+          },
+          {
+            "q": "🤝 Ves que alguien se burla de los sentimientos de otro estudiante. ¿Cómo puedes actuar con empatía?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Escribe una acción respetuosa..."
+          },
+          {
+            "q": "🧠 ¿Cuál de los cuatro pasos para gestionar las emociones te parece más útil y por qué?",
+            "minLength": 16,
+            "rows": 2,
+            "placeholder": "Elige un paso y explica por qué..."
+          }
+        ]
+      }
+    ]
+  }
+};</script>
+  <script src="game-center.js"></script>
+</body>
+</html>
