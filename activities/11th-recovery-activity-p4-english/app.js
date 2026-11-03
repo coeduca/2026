@@ -121,9 +121,9 @@
     });
     document.getElementById('check-final').addEventListener('click', () => {
       const feedback = document.getElementById('final-feedback');
-      if (done.size !== 20 || storage.get(`mystery-p4:first:${nie}`) !== '1') {
+      if (done.size !== 20) {
         feedback.className = 'feedback try';
-        feedback.textContent = 'Encuentra primero la palabra del QR interior y resuelve los veinte desafíos.';
+        feedback.textContent = 'Resuelve primero los veinte desafíos y completa la palabra 01 con el QR interior.';
         return;
       }
       const typed = words(document.getElementById('final-input').value).map(normalize);
