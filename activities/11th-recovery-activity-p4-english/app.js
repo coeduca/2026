@@ -110,7 +110,7 @@
       else if (challenge.type === 'choice') renderChoice(body, challenge, index);
       else renderInput(body, challenge, index);
       const hint = document.createElement('button');
-      hint.type = 'button'; hint.className = 'hint-btn'; hint.textContent = 'Necesito una pista';
+      hint.type = 'button'; hint.className = 'hint-btn'; hint.textContent = '💡 Necesito una pista';
       hint.addEventListener('click', () => { feedback(challenge.hint); window.rigo?.say?.(challenge.hint, 4500); });
       stage.querySelector('.exercise-slide').appendChild(hint);
     }

@@ -951,12 +951,14 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host {
-            position: relative;
+            position: fixed;
             display: block;
-            width: 140px;
-            height: 140px;
-            margin: 75px 28px 20px auto;
-            z-index: 1;
+            top: 10px;
+            right: 12px;
+            width: 96px;
+            height: 96px;
+            margin: 0;
+            z-index: 9999;
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
@@ -965,8 +967,8 @@
           }
           #rigo-wrapper {
             position: relative;
-            width: 140px;
-            height: 140px;
+            width: 96px;
+            height: 96px;
             cursor: grab;
             filter: drop-shadow(3px 4px 0 rgba(0,0,0,0.25));
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -1139,7 +1141,8 @@
 
           #speech-bubble {
             position: absolute;
-            bottom: 110%;
+            top: 105%;
+            bottom: auto;
             right: 10%;
             background: #fff;
             border: 3px solid #1a1a1a;
@@ -1162,24 +1165,24 @@
           #speech-bubble::after {
             content: '';
             position: absolute;
-            bottom: -10px;
+            top: -10px;
             right: 25px;
             width: 0;
             height: 0;
             border: 10px solid transparent;
-            border-top-color: #fff;
-            border-bottom: 0;
+            border-bottom-color: #fff;
+            border-top: 0;
           }
           #speech-bubble::before {
             content: '';
             position: absolute;
-            bottom: -14px;
+            top: -14px;
             right: 22px;
             width: 0;
             height: 0;
             border: 13px solid transparent;
-            border-top-color: #1a1a1a;
-            border-bottom: 0;
+            border-bottom-color: #1a1a1a;
+            border-top: 0;
           }
           #speech-bubble.show {
             opacity: 1;
@@ -1187,8 +1190,8 @@
           }
 
           @media (max-width: 480px) {
-            :host { width: 84px; height: 84px; margin: 80px 18px 18px auto; }
-            #rigo-wrapper { width: 84px; height: 84px; }
+            :host { top: 8px; right: 8px; width: 72px; height: 72px; }
+            #rigo-wrapper { width: 72px; height: 72px; }
             #speech-bubble { font-size: 12px; max-width: 160px; }
           }
         </style>
