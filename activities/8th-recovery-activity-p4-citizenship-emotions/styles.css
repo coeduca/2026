@@ -4,3 +4,14 @@
 @media(max-width:850px){.hero{grid-template-columns:1fr;padding:35px 0}.hero-art{display:none}.code-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.section-heading{display:block}.final-reveal{grid-template-columns:auto 1fr}.final-reveal .primary-button{grid-column:1/-1}.options,.traffic{grid-template-columns:1fr}.collectible{grid-template-columns:1fr}.revealed-card{max-width:270px}}
 @media(max-width:540px){.site-shell{padding:0 16px}.topbar>span{display:none}.hero h1{font-size:49px}.hero-copy>p{font-size:16px}.section-heading h2{font-size:38px}.code-grid,.student-list{grid-template-columns:1fr}.code-card{min-height:185px}.progress-wrap{display:block}.progress-track{margin-top:10px}.challenge-content{padding:19px}.challenge-content h2{font-size:40px}.memory{grid-template-columns:repeat(2,1fr)}footer{display:block}}
 .challenge-mode .hero{min-height:0;grid-template-columns:1fr;padding:25px 0 20px}.challenge-mode .hero-art,.challenge-mode .hero-copy>p{display:none}.challenge-mode .hero h1{font-size:38px;margin:5px 0}.challenge-mode .identity{margin-top:12px;padding:8px 13px}.challenge-mode .identity small,.challenge-mode .identity span{font-size:9px}.challenge-mode .identity strong{font-size:14px}
+.hero{display:block;min-height:0;margin:22px 0 20px;padding:27px 26px 25px;border:1px solid #ffffff37;border-radius:25px;background:radial-gradient(circle at 8% 10%,#d6bcff22,transparent 28%),radial-gradient(circle at 95% 90%,#7be8d622,transparent 26%),#2b2347;text-align:center}
+.hero-copy{max-width:900px;margin:auto}
+.hero h1{font-size:clamp(40px,5vw,62px);margin:7px 0 10px}
+.hero-copy>p{max-width:760px;margin:0 auto;color:#e4dff0;font-size:16px}
+.identity{display:flex;flex-direction:row;align-items:center;gap:12px;min-width:0;margin:18px auto 0;padding:8px 15px 8px 8px;text-align:left}
+.student-icon{width:56px;height:56px;flex:none;padding:5px;border-radius:10px;background:#fff8ed;object-fit:contain}
+.identity-copy{display:flex;flex-direction:column;gap:1px;min-width:0}
+.identity-copy strong{line-height:1.2}
+.progress-wrap{margin-top:0}
+.challenge-mode .hero{margin:16px 0;padding:15px 20px}.challenge-mode .hero h1{font-size:32px;margin:3px 0}.challenge-mode .identity{margin-top:9px;padding:5px 11px 5px 5px}.challenge-mode .student-icon{width:43px;height:43px}
+@media(max-width:540px){.hero{margin:15px 0;padding:22px 16px}.hero h1{font-size:39px}.hero-copy>p{font-size:15px}.identity{max-width:100%}.student-icon{width:48px;height:48px}.identity-copy strong{font-size:15px}.challenge-mode .hero{padding:13px}.challenge-mode .hero h1{font-size:27px}}

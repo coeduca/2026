@@ -11,15 +11,21 @@
 </head>
 <body>
   <div class="site-shell">
-    <header class="topbar"><a class="wordmark" href="index.html">✦ ARCHIVO DE EMOCIONES</a><span>CIUDADANÍA Y VALORES · 8.º GRADO · P4</span></header>
+    <header class="topbar"><a class="wordmark" href="index.html">✦ ARCHIVO DE EMOCIONES</a><span>CIUDADANÍA Y VALORES · 8.º GRADO · TRIMESTRE 3</span></header>
     <main>
-      <section class="hero">
-        <div class="hero-copy"><span class="eyebrow">RECUPERACIÓN ORDINARIA / PERIODO 4</span><h1>Lo que sientes<br><em>también cuenta.</em></h1><p>Resuelve ocho retos. Cada uno revelará una carta coleccionable y un código. Guarda los ocho códigos y vuelve aquí para abrir tu álbum final de reflexión.</p><div class="identity"><small>EXPEDIENTE PERSONAL</small><strong id="student-name">Cargando colección…</strong><span id="student-id"></span></div></div>
-        <div class="hero-art" aria-hidden="true"><div class="hero-card hero-card-back"><span>08</span><b>EMOCIONES</b></div><div class="hero-card hero-card-front"><span>✦</span><b>DESCUBRE<br>TU COLECCIÓN</b><small>8 cartas · 8 códigos</small></div></div>
+      <section class="hero" aria-labelledby="album-title">
+        <div class="hero-copy">
+          <span class="eyebrow">RECUPERACIÓN ORDINARIA · TRIMESTRE 3</span>
+          <h1 id="album-title">Tu colección <em>de cartas</em></h1>
+          <p>Escanea los ocho QR de tu álbum. Cada reto revela una emoción y un código. Escríbelo en su casilla para desbloquear tu álbum final.</p>
+          <div class="identity">
+            <img class="student-icon" src="student-graduation-dance-svgrepo-com.svg" alt="" width="64" height="64">
+            <div class="identity-copy"><small>EXPEDIENTE PERSONAL</small><strong id="student-name">Cargando colección…</strong><span id="student-id"></span></div>
+          </div>
+        </div>
       </section>
       <section id="picker" class="panel" hidden><h2>Elige tu expediente</h2><p>Usa el QR de tu álbum impreso para entrar directamente a tu colección.</p><div id="student-list" class="student-list"></div></section>
       <section id="main-board" hidden>
-        <div class="section-heading"><div><span class="eyebrow">TABLERO PRINCIPAL</span><h2>Tu colección de cartas</h2></div><p>Escanea los ocho QR interiores de tu álbum. Cuando termines un reto, anota el código de la carta y escríbelo aquí.</p></div>
         <div class="progress-wrap"><div class="progress-copy"><strong id="progress-count">0 / 8</strong><span>códigos correctos</span></div><div class="progress-track"><div id="progress-fill"></div></div></div>
         <div id="code-grid" class="code-grid"></div>
         <div class="submit-row"><button id="check-codes" class="primary-button" type="button">REVISAR MIS 8 CÓDIGOS →</button><p id="code-message" role="status" aria-live="polite">Puedes resolver los retos en cualquier orden. Escribe cada código en su casilla numerada.</p></div>
