@@ -41,3 +41,22 @@
 @media(max-width:850px){.code-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.code-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.code-card,.code-card.valid,.code-card.invalid{height:265px}.card-face{padding:10px}.card-front h3{font-size:20px}.card-mystery{font-size:63px;min-height:47px}.card-entry{margin:6px 0}.card-entry label{font-size:9px}.card-entry input{font-size:15px;padding:7px}.card-front .route-link{font-size:10px}.card-back-label{font-size:9px}.emotion-icon{font-size:64px}.card-back h3{font-size:23px}.card-code{font-size:18px;margin-top:4px}.flip-back{font-size:9px;margin-top:8px}}
 @media(prefers-reduced-motion:reduce){.card-inner{transition:none}}
+.submit-row{flex-direction:column;justify-content:center;align-items:center;gap:8px;margin:31px auto 35px;text-align:center}
+.submit-row p{max-width:550px;margin:0}
+.emotion-icon{width:96px;min-height:96px;max-height:112px;margin:auto;flex:1;display:grid;place-items:center;border-radius:50%;background:#ffffffb8;box-shadow:0 5px 0 #33214b29;text-decoration:none;cursor:pointer;transition:transform .18s,box-shadow .18s}
+.emotion-icon:hover,.emotion-icon:focus-visible{transform:translateY(-4px) scale(1.07);box-shadow:0 9px 0 #33214b29;outline:2px solid #624891;outline-offset:3px}
+.emoji-hint{font-size:9px;font-weight:900;letter-spacing:.04em;color:#5d4b78;line-height:1.15}
+.final-reveal{position:relative;isolation:isolate;display:block;max-width:850px;margin:38px auto 65px;padding:37px 28px 42px;border:3px solid #ffda78;border-radius:28px;background:radial-gradient(circle at 50% 12%,#ffe17c45,transparent 42%),linear-gradient(145deg,#50402c,#30264b 58%,#245c57);box-shadow:0 0 0 7px #ffffff12,0 24px 45px #05030b8c;text-align:center;overflow:hidden}
+.final-reveal[hidden]{display:none}
+.final-reveal:before,.final-reveal:after{content:'✦  ✧  ✦  ✧  ✦';position:absolute;left:0;right:0;color:#ffe7a444;font-size:28px;letter-spacing:1.25em;pointer-events:none;z-index:-1}
+.final-reveal:before{top:22px;transform:rotate(-12deg)}.final-reveal:after{bottom:22px;transform:rotate(10deg)}
+.achievement-kicker{display:inline-block;padding:7px 15px;border:1px solid #ffe3989e;border-radius:99px;background:#ffe3981f;color:#ffe7a4;font-size:11px;font-weight:900;letter-spacing:.16em}
+.achievement-medal{display:grid;place-items:center;width:130px;height:130px;margin:21px auto 14px;border:3px solid #ffe398;border-radius:50%;background:radial-gradient(circle,#ffefb5,#d69437);box-shadow:0 0 0 9px #ffe39823,0 0 35px #ffcf5680;font-size:71px;animation:achievement-pop .65s both}
+.final-reveal h3{margin:4px 0 10px;color:#fff0b3;font-size:clamp(39px,5vw,58px)}
+.final-reveal p{max-width:590px;margin:0 auto;color:#f2edf6;font-size:16px}
+.achievement-stats{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin:22px 0 24px}
+.achievement-stats span{padding:7px 12px;border:1px solid #ffe3988c;border-radius:8px;background:#0d14214d;color:#fff2ca;font-size:11px;font-weight:900;letter-spacing:.06em}
+.final-reveal .primary-button{background:#ffe398;color:#352511;box-shadow:5px 5px 0 #171020}
+@keyframes achievement-pop{from{transform:scale(.65) rotate(-18deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+@media(max-width:540px){.emotion-icon{width:65px;min-height:65px;max-height:75px;font-size:55px}.emoji-hint{font-size:7px}.final-reveal{padding:28px 15px 33px}.achievement-medal{width:106px;height:106px;font-size:61px}.achievement-kicker{font-size:9px}.final-reveal p{font-size:14px}.final-reveal .primary-button{width:100%}}
+@media(prefers-reduced-motion:reduce){.achievement-medal,.emotion-icon{animation:none;transition:none}}

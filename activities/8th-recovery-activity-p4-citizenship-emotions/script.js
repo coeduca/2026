@@ -57,7 +57,8 @@ function renderMain() {
         </div>
         <div class="card-face card-back" aria-hidden="true" inert>
           <span class="card-back-label">CARTA ${String(index + 1).padStart(2, '0')} · ${data.emotions[emotionId].kind.toUpperCase()}</span>
-          <span class="emotion-icon" role="img" aria-label="${data.emotions[emotionId].name}">${data.emotions[emotionId].icon}</span>
+          <a class="emotion-icon" href="${route(nie, index + 1)}" aria-label="Abrir actividad de ${data.emotions[emotionId].name}" title="Abrir actividad de esta carta">${data.emotions[emotionId].icon}</a>
+          <span class="emoji-hint">TOCA EL EMOJI PARA VER EL RETO</span>
           <h3>${data.emotions[emotionId].name}</h3>
           <span class="card-code">${student.codes[index]}</span>
           <button class="flip-back" type="button" aria-label="Editar código de la carta ${index + 1}">EDITAR CÓDIGO ↶</button>
