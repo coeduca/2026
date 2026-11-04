@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html translate="no" lang="es">
+<head>
+<script>window.COEDUCA_CLASSROOM_CONFIG={"publicationId":"5004dccd-4e18-4ce1-955f-b49105ca9abd","token":"e8e9c721-87b4-498a-85ad-f7a7f879c807"};</script>
+<script src="coeduca-classroom.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="es">
+  <title>Prueba - 2do Año de Bach.</title>
+  <link rel="stylesheet" href="coeduca-core.css">
+  <link rel="icon" href="favicon.webp" type="image/webp">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="students.js"></script>
+  <script src="coeduca-fixed-auth.js"></script>
+  <script src="rigo.js"></script>
+  <script src="coeduca-core.js"></script>
+  <script src="coeduca-leaderboard.js"></script>
+  <script src="coeduca-ocean.js"></script>
+  <script src="coeduca-game-viewport.js"></script>
+  <script src="coeduca-hangman-bank.js"></script>
+  <script src="coeduca-select.js"></script>
+  <script src="coeduca-exercises.js"></script>
+  <script src="coeduca-tables.js"></script>
+  <script src="matter.min.js"></script>
+  <script src="coeduca-games.js"></script>
+  <script src="coeduca-flappy.js"></script>
+  <script src="coeduca-doodle.js"></script>
+  <rigo-mascot></rigo-mascot>
+  <script>
+    COEDUCA.init({
+  "id": "97ca4d62-f83b-4474-be1e-210a91bdf837",
+  "container": "#app",
+  "topic": "Prueba",
+  "level": "2do Año de Bach.",
+  "pdfDesign": "PopArt",
+  "uiTheme": "PopArt",
+  "colors": {
+    "primary": "#81BBF7",
+    "accent": "#43B069",
+    "bg": "#FFF1F8",
+    "cardBg": "#FFFFFF",
+    "itemBg": "#C9DBE9",
+    "text": "#1A1A1A"
+  },
+  "exercises": [
+    {
+      "type": "note",
+      "title": "Nota",
+      "html": ""
+    },
+    {
+      "type": "wordsearch",
+      "title": "Sopa de letras",
+      "instruction": "Instrucción: ",
+      "dataA": {
+        "words": [
+          "Hola"
+        ],
+        "gridSize": 12
+      }
+    }
+  ],
+  "game": {
+    "type": "tictactoe"
+  }
+});
+  </script>
+</body>
+</html>
