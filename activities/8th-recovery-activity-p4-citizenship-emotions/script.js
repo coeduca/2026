@@ -44,24 +44,58 @@ function renderMain() {
   $('#main-board').hidden = false;
   const codes = saved('entered', Array(8).fill(''));
   const completed = saved('completed', []);
-  $('#code-grid').innerHTML = student.emotions.map((_, index) => `
+  $('#code-grid').innerHTML = student.emotions.map((emotionId, index) => `
     <article class="code-card" data-slot="${index + 1}">
-      <div class="slot-num">${String(index + 1).padStart(2, '0')}</div>
-      <h3>Carta por descubrir</h3>
-      <label for="code-${index}">CÓDIGO DE LA CARTA ${index + 1}</label>
-      <input id="code-${index}" inputmode="text" maxlength="3" autocomplete="off" spellcheck="false" aria-label="Código de la carta ${index + 1}" value="${codes[index] || ''}" placeholder="A00">
-      <a class="route-link" href="${route(nie, index + 1)}">${completed.includes(index + 1) ? '↗ VER CARTA OTRA VEZ' : '↗ ABRIR RETO'} </a>
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-top"><span class="slot-num">${String(index + 1).padStart(2, '0')}</span><span aria-hidden="true">✦</span></div>
+          <span class="card-mystery" aria-hidden="true">?</span>
+          <h3>Carta por descubrir</h3>
+          <div class="card-entry"><label for="code-${index}">CÓDIGO ${index + 1}</label>
+          <input id="code-${index}" inputmode="text" maxlength="3" autocomplete="off" spellcheck="false" aria-label="Código de la carta ${index + 1}" value="${codes[index] || ''}" placeholder="A00"></div>
+          <a class="route-link" href="${route(nie, index + 1)}">${completed.includes(index + 1) ? '↗ VER RETO' : '↗ ABRIR RETO'}</a>
+        </div>
+        <div class="card-face card-back" aria-hidden="true" inert>
+          <span class="card-back-label">CARTA ${String(index + 1).padStart(2, '0')} · ${data.emotions[emotionId].kind.toUpperCase()}</span>
+          <span class="emotion-icon" role="img" aria-label="${data.emotions[emotionId].name}">${data.emotions[emotionId].icon}</span>
+          <h3>${data.emotions[emotionId].name}</h3>
+          <span class="card-code">${student.codes[index]}</span>
+          <button class="flip-back" type="button" aria-label="Editar código de la carta ${index + 1}">EDITAR CÓDIGO ↶</button>
+        </div>
+      </div>
     </article>`).join('');
   $('#code-grid').addEventListener('input', (event) => {
     if (!event.target.matches('input')) return;
     event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 3);
     const values = [...document.querySelectorAll('.code-card input')].map(input => input.value);
     save('entered', values);
-    event.target.closest('.code-card').classList.remove('invalid', 'valid');
-    $('#code-message').textContent = 'Pulsa «Revisar» cuando tengas tus ocho códigos.';
+    const card = event.target.closest('.code-card');
+    const index = Number(card.dataset.slot) - 1;
+    checkCodes(true);
+    if (values[index] === student.codes[index]) {
+      event.target.blur();
+      $('#code-message').textContent = values.every((value, i) => value === student.codes[i])
+        ? '¡Revelaste las ocho cartas! Tu álbum final está disponible abajo.'
+        : `¡Carta ${index + 1} revelada! Ya puedes ver su emoción.`;
+    } else if (values[index].length === 3) {
+      card.classList.add('invalid');
+      $('#code-message').textContent = `El código de la carta ${index + 1} no coincide. Revísalo en tu álbum.`;
+    } else {
+      $('#code-message').textContent = 'Escribe el código de tres caracteres que obtuviste en el reto.';
+    }
+  });
+  $('#code-grid').addEventListener('click', (event) => {
+    const button = event.target.closest('.flip-back');
+    if (!button) return;
+    const input = button.closest('.code-card').querySelector('input');
+    input.value = '';
+    save('entered', [...document.querySelectorAll('.code-card input')].map(field => field.value));
+    checkCodes(true);
+    input.focus();
+    $('#code-message').textContent = 'Escribe de nuevo el código de esta carta.';
   });
   $('#check-codes').addEventListener('click', () => checkCodes(false));
-  if (codes.every(Boolean)) checkCodes(true);
+  checkCodes(true);
 }
 
 function checkCodes(quiet) {
@@ -69,7 +103,12 @@ function checkCodes(quiet) {
   const correct = values.map((value, i) => value === student.codes[i]);
   document.querySelectorAll('.code-card').forEach((card, i) => {
     card.classList.toggle('valid', correct[i]);
-    card.classList.toggle('invalid', !correct[i] && Boolean(values[i]) && !quiet);
+    card.classList.toggle('flipped', correct[i]);
+    card.classList.toggle('invalid', !correct[i] && values[i].length === 3 && !quiet);
+    card.querySelector('.card-front').inert = correct[i];
+    card.querySelector('.card-front').setAttribute('aria-hidden', String(correct[i]));
+    card.querySelector('.card-back').inert = !correct[i];
+    card.querySelector('.card-back').setAttribute('aria-hidden', String(!correct[i]));
   });
   const count = correct.filter(Boolean).length;
   $('#progress-count').textContent = `${count} / 8`;
@@ -78,7 +117,7 @@ function checkCodes(quiet) {
     $('#code-message').textContent = '¡Encontraste los ocho códigos!';
     $('#pdf-link').href = `revelacion/album-${nie}.pdf`;
     $('#final-reveal').hidden = false;
-    $('#final-reveal').scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    if (!quiet) $('#final-reveal').scrollIntoView({behavior: 'smooth', block: 'nearest'});
   } else {
     $('#final-reveal').hidden = true;
     if (!quiet) $('#code-message').textContent = `Tienes ${count} de 8 códigos correctos. Revisa las casillas marcadas y termina los retos que faltan.`;

@@ -15,3 +15,29 @@
 .progress-wrap{margin-top:0}
 .challenge-mode .hero{margin:16px 0;padding:15px 20px}.challenge-mode .hero h1{font-size:32px;margin:3px 0}.challenge-mode .identity{margin-top:9px;padding:5px 11px 5px 5px}.challenge-mode .student-icon{width:43px;height:43px}
 @media(max-width:540px){.hero{margin:15px 0;padding:22px 16px}.hero h1{font-size:39px}.hero-copy>p{font-size:15px}.identity{max-width:100%}.student-icon{width:48px;height:48px}.identity-copy strong{font-size:15px}.challenge-mode .hero{padding:13px}.challenge-mode .hero h1{font-size:27px}}
+.code-grid{align-items:stretch;grid-auto-rows:1fr}
+.code-card,.code-card.valid,.code-card.invalid{width:100%;height:345px;min-height:0;padding:0;border:0;border-radius:19px;background:none;box-shadow:none;perspective:1200px}
+.card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .68s cubic-bezier(.2,.75,.2,1)}
+.code-card.flipped .card-inner{transform:rotateY(180deg)}
+.card-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:16px;border:2px solid #8b79ad;border-radius:18px;box-shadow:7px 8px 0 #0a0818;backface-visibility:hidden;-webkit-backface-visibility:hidden;text-align:center;overflow:hidden}
+.card-front{background:linear-gradient(155deg,#3c315f,#201a38 75%)}
+.card-back{transform:rotateY(180deg);justify-content:space-between;background:linear-gradient(155deg,#fff,var(--pale));border-color:#fff;color:#261d3d}
+.card-top{align-self:stretch;display:flex;justify-content:space-between;align-items:start;color:var(--accent);font-size:27px;line-height:1}
+.card-top .slot-num{line-height:1}
+.card-mystery{display:grid;place-items:center;flex:1;min-height:65px;font:83px Ticket;color:#ffffff25;line-height:1}
+.card-front h3{min-height:2.1em;margin:0;font-size:24px;display:grid;place-items:center}
+.card-entry{width:100%;margin:9px 0 7px}
+.card-entry label{display:block;font-size:10px;font-weight:900;letter-spacing:.08em;color:#d4cde4}
+.card-entry input{width:100%;margin-top:5px;text-align:center;font-size:18px}
+.card-front .route-link{margin-top:auto;color:#b3f3df;font-size:11px;line-height:1.2}
+.card-back-label{font-size:10px;font-weight:900;letter-spacing:.06em;line-height:1.25}
+.emotion-icon{display:grid;place-items:center;flex:1;font-size:83px;line-height:1}
+.card-back h3{margin:0;font-size:clamp(23px,2.4vw,32px);line-height:1.05;overflow-wrap:anywhere}
+.card-code{margin-top:9px;padding:4px 12px;border:1px dashed #8274a2;border-radius:8px;background:#ffffffa8;font:21px Ticket;letter-spacing:.1em}
+.flip-back{margin-top:13px;padding:0;border:0;background:none;color:#51427a;font-size:10px;font-weight:900;letter-spacing:.05em}
+.flip-back:hover,.flip-back:focus-visible{text-decoration:underline}
+.code-card.invalid .card-front{border-color:var(--bad)}
+.code-card.valid .card-back{border-color:var(--good)}
+@media(max-width:850px){.code-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.code-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.code-card,.code-card.valid,.code-card.invalid{height:265px}.card-face{padding:10px}.card-front h3{font-size:20px}.card-mystery{font-size:63px;min-height:47px}.card-entry{margin:6px 0}.card-entry label{font-size:9px}.card-entry input{font-size:15px;padding:7px}.card-front .route-link{font-size:10px}.card-back-label{font-size:9px}.emotion-icon{font-size:64px}.card-back h3{font-size:23px}.card-code{font-size:18px;margin-top:4px}.flip-back{font-size:9px;margin-top:8px}}
+@media(prefers-reduced-motion:reduce){.card-inner{transition:none}}
