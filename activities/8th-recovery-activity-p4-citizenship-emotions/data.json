@@ -1,0 +1,276 @@
+{
+  "emotions": {
+    "alegria": {
+      "name": "Alegría",
+      "kind": "primaria",
+      "icon": "☀️",
+      "definition": "Aparece cuando vivimos algo agradable o valioso.",
+      "scenario": "Logras terminar un proyecto que te costó mucho.",
+      "signal": "Sientes energía y ganas de sonreír.",
+      "helpful": "Celebrar sin burlarte de quienes aún están aprendiendo.",
+      "prompt": "¿Cómo compartirías tu alegría sin excluir a nadie?"
+    },
+    "tristeza": {
+      "name": "Tristeza",
+      "kind": "primaria",
+      "icon": "🌧️",
+      "definition": "Puede aparecer ante una pérdida, una decepción o un cambio importante.",
+      "scenario": "Un amigo se cambia de escuela y lo vas a extrañar.",
+      "signal": "Tienes menos energía y ganas de estar tranquilo.",
+      "helpful": "Hablar con alguien de confianza y darte tiempo.",
+      "prompt": "¿A quién podrías acudir si te sientes triste en la escuela?"
+    },
+    "miedo": {
+      "name": "Miedo",
+      "kind": "primaria",
+      "icon": "🛡️",
+      "definition": "Nos alerta ante algo que percibimos como peligroso o incierto.",
+      "scenario": "Debes presentar un trabajo frente a todo el grupo.",
+      "signal": "El corazón late rápido y prestas mucha atención.",
+      "helpful": "Respirar, prepararte y pedir apoyo si lo necesitas.",
+      "prompt": "¿Qué harías para afrontar un miedo sin lastimarte ni lastimar a otros?"
+    },
+    "enojo": {
+      "name": "Enojo",
+      "kind": "primaria",
+      "icon": "🔥",
+      "definition": "Señala que sentimos una injusticia, un límite cruzado o frustración.",
+      "scenario": "Alguien toma tus materiales sin pedir permiso.",
+      "signal": "Notas tensión en el cuerpo y ganas de responder de inmediato.",
+      "helpful": "Hacer una pausa y expresar el límite con respeto.",
+      "prompt": "¿Cómo expresarías tu enojo sin agredir a nadie?"
+    },
+    "sorpresa": {
+      "name": "Sorpresa",
+      "kind": "primaria",
+      "icon": "✨",
+      "definition": "Es la reacción inicial ante algo inesperado; después pueden aparecer otras emociones.",
+      "scenario": "Tu grupo organiza una bienvenida que no esperabas.",
+      "signal": "Abres los ojos y prestas atención a lo nuevo.",
+      "helpful": "Tomarte un momento para entender lo que sucede.",
+      "prompt": "¿Cómo actuarías si una sorpresa te incomoda en público?"
+    },
+    "asco": {
+      "name": "Asco",
+      "kind": "primaria",
+      "icon": "🍋",
+      "definition": "Puede advertirnos que algo resulta desagradable o que conviene evitarlo.",
+      "scenario": "Encuentras comida en mal estado en tu lonchera.",
+      "signal": "Arrugas la nariz y quieres alejarte.",
+      "helpful": "Apartarte con cuidado y avisar sin avergonzar a nadie.",
+      "prompt": "¿Cómo expresarías el asco con respeto hacia otras personas?"
+    },
+    "verguenza": {
+      "name": "Vergüenza",
+      "kind": "secundaria",
+      "icon": "🫣",
+      "definition": "Aparece cuando nos preocupa cómo nos ven los demás.",
+      "scenario": "Te equivocas al leer en voz alta frente a la clase.",
+      "signal": "Te sonrojas y quieres esconderte.",
+      "helpful": "Recordar que equivocarse es parte de aprender.",
+      "prompt": "¿Qué te dirías después de equivocarte frente al grupo?"
+    },
+    "orgullo": {
+      "name": "Orgullo",
+      "kind": "secundaria",
+      "icon": "🏅",
+      "definition": "Surge al reconocer un esfuerzo o un logro propio.",
+      "scenario": "Aprendiste a resolver un problema tras practicar varias veces.",
+      "signal": "Sientes satisfacción por tu esfuerzo.",
+      "helpful": "Reconocer tu logro y agradecer la ayuda recibida.",
+      "prompt": "¿Cómo compartirías un logro sin menospreciar a otros?"
+    },
+    "frustracion": {
+      "name": "Frustración",
+      "kind": "secundaria",
+      "icon": "🧩",
+      "definition": "Aparece cuando algo importante no sale como esperábamos.",
+      "scenario": "Intentas un ejercicio varias veces y aún no te sale.",
+      "signal": "Aprietas las manos y te cuesta concentrarte.",
+      "helpful": "Pausar, cambiar de estrategia y pedir una explicación.",
+      "prompt": "¿Qué otra estrategia probarías cuando una tarea te frustra?"
+    },
+    "gratitud": {
+      "name": "Gratitud",
+      "kind": "secundaria",
+      "icon": "💛",
+      "definition": "Es reconocer y apreciar una ayuda o algo valioso que recibimos.",
+      "scenario": "Una compañera te ayuda a entender un tema difícil.",
+      "signal": "Sientes aprecio por la ayuda recibida.",
+      "helpful": "Agradecer de manera sincera y ofrecer apoyo cuando puedas.",
+      "prompt": "¿Cómo mostrarías gratitud a alguien en tu escuela?"
+    },
+    "esperanza": {
+      "name": "Esperanza",
+      "kind": "secundaria",
+      "icon": "🌱",
+      "definition": "Nos ayuda a imaginar que algo bueno puede construirse con acciones.",
+      "scenario": "Después de una mala nota, haces un plan para mejorar.",
+      "signal": "Sientes ganas de volver a intentarlo.",
+      "helpful": "Plantear un paso pequeño y realista para avanzar.",
+      "prompt": "¿Qué primer paso darías para mejorar una situación difícil?"
+    },
+    "calma": {
+      "name": "Calma",
+      "kind": "secundaria",
+      "icon": "🫧",
+      "definition": "Es un estado de tranquilidad que facilita pensar antes de actuar.",
+      "scenario": "Terminas un trabajo y tienes unos minutos para respirar.",
+      "signal": "La respiración se vuelve más lenta y el cuerpo se relaja.",
+      "helpful": "Aprovechar la tranquilidad para escuchar y decidir bien.",
+      "prompt": "¿Qué te ayuda a recuperar la calma en la escuela?"
+    },
+    "ansiedad": {
+      "name": "Ansiedad",
+      "kind": "secundaria",
+      "icon": "🌪️",
+      "definition": "Puede aparecer al anticipar muchas posibilidades o preocupaciones.",
+      "scenario": "Piensas en varias pruebas de la próxima semana.",
+      "signal": "Sientes inquietud y pensamientos que van muy rápido.",
+      "helpful": "Ordenar tareas, respirar y hablar con alguien de confianza.",
+      "prompt": "¿Qué harías si tus preocupaciones te impiden concentrarte?"
+    },
+    "empatia": {
+      "name": "Empatía",
+      "kind": "secundaria",
+      "icon": "🤝",
+      "definition": "Es la capacidad de comprender cómo podría sentirse otra persona.",
+      "scenario": "Ves a un compañero solo después de una discusión.",
+      "signal": "Notas la situación y te preguntas cómo se siente.",
+      "helpful": "Escuchar sin juzgar y preguntar si necesita compañía.",
+      "prompt": "¿Cómo acompañarías a alguien sin decidir por esa persona?"
+    },
+    "celos": {
+      "name": "Celos",
+      "kind": "secundaria",
+      "icon": "💚",
+      "definition": "Pueden aparecer cuando tememos perder atención o un vínculo importante.",
+      "scenario": "Tu mejor amigo pasa más tiempo con otro compañero.",
+      "signal": "Sientes inseguridad y ganas de reclamar atención.",
+      "helpful": "Hablar de lo que sientes sin controlar a la otra persona.",
+      "prompt": "¿Cómo hablarías de tus celos respetando la libertad de otros?"
+    },
+    "culpa": {
+      "name": "Culpa",
+      "kind": "secundaria",
+      "icon": "🔎",
+      "definition": "Puede avisarnos que queremos reparar una acción que causó daño.",
+      "scenario": "Sin querer, rompes un material prestado.",
+      "signal": "Recuerdas lo ocurrido y sientes peso en el pecho.",
+      "helpful": "Reconocer lo sucedido, disculparte y buscar cómo repararlo.",
+      "prompt": "¿Cómo repararías un error sin esconderlo?"
+    },
+    "entusiasmo": {
+      "name": "Entusiasmo",
+      "kind": "secundaria",
+      "icon": "🚀",
+      "definition": "Es una energía positiva que nos impulsa hacia algo que nos interesa.",
+      "scenario": "Te invitan a participar en un proyecto que te gusta.",
+      "signal": "Sientes energía y muchas ideas nuevas.",
+      "helpful": "Participar con energía y escuchar las ideas del equipo.",
+      "prompt": "¿Cómo usarías tu entusiasmo para animar al grupo?"
+    }
+  },
+  "students": {
+    "20176661": {
+      "name": "Gustavo Ezequiel Corvera Alfaro",
+      "color": "#6939C8",
+      "pale": "#E9DFFF",
+      "emotions": [
+        "alegria",
+        "miedo",
+        "frustracion",
+        "gratitud",
+        "enojo",
+        "esperanza",
+        "verguenza",
+        "calma"
+      ],
+      "codes": [
+        "K31",
+        "O31",
+        "P87",
+        "G61",
+        "P83",
+        "O43",
+        "U88",
+        "L22"
+      ]
+    },
+    "20176662": {
+      "name": "Pedro Ernesto Corvera Flores",
+      "color": "#D0541F",
+      "pale": "#FFE2D3",
+      "emotions": [
+        "sorpresa",
+        "tristeza",
+        "orgullo",
+        "ansiedad",
+        "asco",
+        "empatia",
+        "celos",
+        "alegria"
+      ],
+      "codes": [
+        "W91",
+        "O51",
+        "B92",
+        "R68",
+        "N26",
+        "X48",
+        "Q99",
+        "T51"
+      ]
+    },
+    "20176663": {
+      "name": "Luis Rafael Corvera Fuentes",
+      "color": "#007F80",
+      "pale": "#D7F4F0",
+      "emotions": [
+        "miedo",
+        "orgullo",
+        "tristeza",
+        "calma",
+        "culpa",
+        "entusiasmo",
+        "gratitud",
+        "frustracion"
+      ],
+      "codes": [
+        "M18",
+        "J97",
+        "Q87",
+        "U53",
+        "I70",
+        "N34",
+        "B72",
+        "H24"
+      ]
+    },
+    "20179891": {
+      "name": "Raul Ernesto Melendez Corvera",
+      "color": "#B12778",
+      "pale": "#FFE0F0",
+      "emotions": [
+        "enojo",
+        "alegria",
+        "verguenza",
+        "esperanza",
+        "ansiedad",
+        "empatia",
+        "sorpresa",
+        "culpa"
+      ],
+      "codes": [
+        "N73",
+        "S27",
+        "W93",
+        "Y92",
+        "G12",
+        "J26",
+        "E78",
+        "K13"
+      ]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#17142b">
+  <meta name="description" content="Colecciona ocho cartas de emociones, guarda sus códigos y revela tu álbum de reflexión.">
+  <title>Archivo de emociones · 8.º grado</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar"><a class="wordmark" href="index.html">✦ ARCHIVO DE EMOCIONES</a><span>CIUDADANÍA Y VALORES · 8.º GRADO · P4</span></header>
+    <main>
+      <section class="hero">
+        <div class="hero-copy"><span class="eyebrow">RECUPERACIÓN ORDINARIA / PERIODO 4</span><h1>Lo que sientes<br><em>también cuenta.</em></h1><p>Resuelve ocho retos. Cada uno revelará una carta coleccionable y un código. Guarda los ocho códigos y vuelve aquí para abrir tu álbum final de reflexión.</p><div class="identity"><small>EXPEDIENTE PERSONAL</small><strong id="student-name">Cargando colección…</strong><span id="student-id"></span></div></div>
+        <div class="hero-art" aria-hidden="true"><div class="hero-card hero-card-back"><span>08</span><b>EMOCIONES</b></div><div class="hero-card hero-card-front"><span>✦</span><b>DESCUBRE<br>TU COLECCIÓN</b><small>8 cartas · 8 códigos</small></div></div>
+      </section>
+      <section id="picker" class="panel" hidden><h2>Elige tu expediente</h2><p>Usa el QR de tu álbum impreso para entrar directamente a tu colección.</p><div id="student-list" class="student-list"></div></section>
+      <section id="main-board" hidden>
+        <div class="section-heading"><div><span class="eyebrow">TABLERO PRINCIPAL</span><h2>Tu colección de cartas</h2></div><p>Escanea los ocho QR interiores de tu álbum. Cuando termines un reto, anota el código de la carta y escríbelo aquí.</p></div>
+        <div class="progress-wrap"><div class="progress-copy"><strong id="progress-count">0 / 8</strong><span>códigos correctos</span></div><div class="progress-track"><div id="progress-fill"></div></div></div>
+        <div id="code-grid" class="code-grid"></div>
+        <div class="submit-row"><button id="check-codes" class="primary-button" type="button">REVISAR MIS 8 CÓDIGOS →</button><p id="code-message" role="status" aria-live="polite">Puedes resolver los retos en cualquier orden. Escribe cada código en su casilla numerada.</p></div>
+        <div id="final-reveal" class="final-reveal" hidden><span class="final-star" aria-hidden="true">✦</span><div><small>REVELACIÓN FINAL DESBLOQUEADA</small><h3>Tu álbum de emociones está listo.</h3><p>Descarga tu versión personal. Lee cada emoción y escribe cómo la manejarías en la escuela, en público o con otras personas.</p></div><a id="pdf-link" class="primary-button" href="#" download>DESCARGAR MI ÁLBUM PDF ↓</a></div>
+      </section>
+      <section id="challenge" hidden><div class="challenge-head"><a id="back-link" class="back-link" href="index.html">← VOLVER AL TABLERO</a><span id="challenge-count" class="eyebrow">RETO 01 / 08</span></div><div id="challenge-content" class="challenge-content"></div></section>
+    </main>
+    <footer>Sentir es humano. Elegir cómo actuar también se aprende. <span>✦</span> Archivo de emociones</footer>
+  </div>
+</body>
+</html>
