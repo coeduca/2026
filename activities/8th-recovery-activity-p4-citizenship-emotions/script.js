@@ -278,7 +278,23 @@ function revealCard() {
   const completed = saved('completed', []);
   if (!completed.includes(slot)) { completed.push(slot); save('completed', completed); }
   const code = student.codes[slot - 1];
-  $('#challenge-content').innerHTML = `<div class="collectible"><div class="revealed-card"><small>CARTA ${String(slot).padStart(2, '0')} · ${emotion.kind}</small><span class="icon" aria-hidden="true">${emotion.icon}</span><strong>${emotion.name}</strong><small>ARCHIVO DE EMOCIONES</small></div><div class="reveal-copy"><span class="challenge-kicker">¡CARTA DESBLOQUEADA!</span><h2>${emotion.name}</h2><p>${emotion.definition}</p><p>Guarda este código en la casilla ${slot} de tu álbum de papel. Después, escríbelo en el tablero principal.</p><span class="reveal-code" aria-label="Código ${code}">${code}</span><br><a class="primary-button" href="${route(nie)}">ABRIR WEB PRINCIPAL →</a></div></div>`;
+  $('#challenge-content').classList.add('reward-mode');
+  $('#challenge-content').innerHTML = `<div class="collectible">
+    <div class="revealed-card">
+      <small class="card-rarity">✦ CARTA ${String(slot).padStart(2, '0')} · ${emotion.kind.toUpperCase()} ✦</small>
+      <div class="card-emblem"><span class="icon" aria-hidden="true">${emotion.icon}</span></div>
+      <strong>${emotion.name}</strong>
+      <small class="card-signature">ARCHIVO DE EMOCIONES · TRIMESTRE 3</small>
+    </div>
+    <div class="reveal-copy">
+      <span class="challenge-kicker">¡CARTA DESBLOQUEADA!</span>
+      <h2>${emotion.name}</h2>
+      <p>${emotion.definition}</p>
+      <p>Guarda esta emoción y su código en la casilla ${slot} de tu álbum. Después, escribe el código en el tablero principal.</p>
+      <div class="reveal-code" aria-label="Código ${code}"><small>CÓDIGO DE LA CARTA ${slot}</small><strong>${code}</strong><span>✦ TICKET DORADO ✦</span></div>
+      <a class="primary-button" href="${route(nie)}">ABRIR WEB PRINCIPAL →</a>
+    </div>
+  </div>`;
 }
 
 start();
